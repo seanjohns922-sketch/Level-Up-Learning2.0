@@ -49,14 +49,14 @@ assert.match(programPage, /getStarpathBackground/);
 assert.match(programPage, /buildStarpathWeeklyQuizHref/);
 assert.doesNotMatch(programPage, /fetch\("\/api\/demo-access"/, "The live Starpath week route must not depend on demo access");
 assert.match(programPage, /restoreStudentStateFromServer\(studentId, canonicalRealmId\)/, "The shared Starpath week route must restore canonical progress");
-assert.match(programPage, /isStarpathRealm \? item\.type === "quiz" \? "START QUIZ" : "START MISSION"/);
-assert.match(programPage, /isStarpathRealm \? "Missions" : "Lessons"/);
-assert.match(programPage, /borderRadius: isStarpathRealm \? 6/);
+assert.match(programPage, /isStarpathRealm && !isPostTest \? isQuiz \? "Start quiz" : "Start mission"/, "Starpath week cards keep their mission wording");
+assert.match(programPage, /isStarpathRealm \? "missions" : "lessons"/, "Starpath progress counts missions");
 assert.match(programPage, /readProgress\(canonicalRealmId\)/, "Starpath must read canonical space placement state");
 assert.match(lessonPage, /buildStarpathProgramHref/);
 assert.match(quizPage, /buildStarpathProgramHref/);
 assert.match(lessonPlaceholder, /StarpathMissionHome/);
-assert.match(read("components/starpath/StarpathMissionHome.tsx"), /Back to Week/);
+assert.match(read("components/starpath/StarpathMissionHome.tsx"), /<RealmLessonHome/, "The Starpath mission page uses the shared lesson start page");
+assert.match(read("components/lesson/RealmLessonHome.tsx"), /Back to Week/);
 assert.match(quizPlaceholder, /onBack=\{\(\) => router\.push\(quiz\.weekHref\)\}/);
 assert.match(quizPage, /realmId !== STARPATH_REALM_ID/);
 

@@ -4,8 +4,8 @@ import { getLegendForYear } from "@/data/legends";
 import { LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
 import ReliqRealmLogo from "@/components/brand/ReliqRealmLogo";
 import Level7JourneyLinks from "@/components/lesson/Level7JourneyLinks";
-import { Suspense, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { Check, Lock, LockOpen, RotateCcw } from "lucide-react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, ChevronRight, Lock, LockOpen } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { getCurriculumPlan, genreIdForRealm } from "@/data/programs/genres";
 import { getStarpathProgram } from "@/data/starpath/program-registry";
@@ -60,6 +60,10 @@ import { level8DemoHref } from "@/lib/level8-routes";
 import { LEVEL7_LIVE, level7LiveHref, level7LessonId } from "@/lib/level7-release";
 import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import { WeekCard, type WeekCardState } from "@/components/program/WeekCard";
+import { WeekPageNav } from "@/components/program/WeekPageNav";
+import { weekPageTheme, WEEK_FILL, WEEK_GLASS, WEEK_PILL } from "@/lib/week-page-theme";
+import { getRealmDefinition } from "@/lib/realms/realm-registry";
 import { weeklyQuizMinimumCorrect, weeklyQuizPassed } from "@/lib/assessment-rules";
 import {
   getWorld3DReturnPathForWeek,
@@ -143,327 +147,6 @@ function ProgramPage() {
   const isPrep = curriculumYear === "Prep";
   const lastWeek = Math.max(program.length, 1);
   const isMeasurementRealm = realmId === "measurement";
-
-  // ── Realm theme ── add a new entry here to support any future realm
-  const rt = isStarpathRealm ? {
-    rounded: true,
-    scanline: false,
-    cardClip: undefined as string | undefined,
-    bezelClip: undefined as string | undefined,
-    badgeClip: undefined as string | undefined,
-    statusClip: undefined as string | undefined,
-    actionClip: undefined as string | undefined,
-    connClip: undefined as string | undefined,
-    cardActiveBg: "linear-gradient(145deg, rgba(30,27,75,0.97), rgba(12,20,55,0.97) 58%, rgba(8,47,73,0.95))",
-    cardCompletedBg: "linear-gradient(145deg, rgba(49,46,129,0.98), rgba(21,94,117,0.96))",
-    cardLockedBg: "linear-gradient(145deg, rgba(15,23,42,0.88), rgba(30,27,75,0.82))",
-    bezelActiveBg: "linear-gradient(145deg, rgba(103,232,249,0.58), rgba(139,92,246,0.26) 48%, rgba(34,211,238,0.52))",
-    bezelCompletedBg: "linear-gradient(145deg, rgba(196,181,253,0.6), rgba(34,211,238,0.52))",
-    bezelLockedBg: "linear-gradient(145deg, rgba(148,163,184,0.24), rgba(76,29,149,0.18))",
-    bezelPosttestBg: "linear-gradient(145deg, rgba(253,224,71,0.72), rgba(124,58,237,0.48))",
-    cardActiveShadow: "0 12px 30px rgba(3,7,30,0.55), 0 0 16px rgba(34,211,238,0.14), inset 0 1px 0 rgba(207,250,254,0.18)",
-    cardCompletedShadow: "0 12px 30px rgba(3,7,30,0.52), 0 0 18px rgba(139,92,246,0.18), inset 0 1px 0 rgba(207,250,254,0.24)",
-    cardLockedShadow: "0 8px 20px rgba(3,7,30,0.46)",
-    badgeActiveBg: "linear-gradient(135deg, #4c1d95, #0891b2)",
-    badgeCompletedBg: "linear-gradient(135deg, #6d28d9, #0e7490)",
-    badgeLockedBg: "linear-gradient(135deg, #1e293b, #312e81)",
-    badgePosttestBg: "linear-gradient(135deg, #a16207, #6d28d9)",
-    badgeShadow: "inset 0 1px 0 rgba(207,250,254,0.28), 0 0 12px rgba(34,211,238,0.25)",
-    statusActiveBg: "linear-gradient(135deg, #312e81, #0e7490)",
-    statusCompletedBg: "linear-gradient(135deg, #6d28d9, #0891b2)",
-    statusLockedBg: "linear-gradient(135deg, #1e293b, #312e81)",
-    statusPosttestBg: "linear-gradient(135deg, #a16207, #6d28d9)",
-    statusShadow: "0 0 12px rgba(34,211,238,0.3)",
-    dotClass: "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]",
-    actionActiveBg: "linear-gradient(135deg, #6d28d9, #0891b2 58%, #22d3ee)",
-    actionCompletedBg: "linear-gradient(135deg, #7c3aed, #0e7490)",
-    actionPosttestBg: "linear-gradient(135deg, #a16207, #7c3aed)",
-    actionShadow: "0 0 18px rgba(34,211,238,0.35), 0 6px 16px rgba(3,7,30,0.5), inset 0 1px 0 rgba(207,250,254,0.3)",
-    connActiveBg: "radial-gradient(circle, #67e8f9, #6d28d9 72%)",
-    connCompletedBg: "radial-gradient(circle, #c4b5fd, #0e7490 72%)",
-    connShadow: "0 0 14px rgba(103,232,249,0.55)",
-    xpBg: "linear-gradient(90deg, #7c3aed, #22d3ee 58%, #a5f3fc)",
-    xpGlow: "0 0 14px rgba(34,211,238,0.62)",
-    pillBg: "linear-gradient(135deg, rgba(30,27,75,0.96), rgba(76,29,149,0.92), rgba(8,47,73,0.94))",
-    pillShadow: "inset 0 1px 0 rgba(207,250,254,0.25), 0 0 22px rgba(124,58,237,0.28)",
-    pillDot: "bg-cyan-200 shadow-[0_0_9px_rgba(103,232,249,0.95)]",
-    headingGlow: "drop-shadow-[0_2px_16px_rgba(34,211,238,0.35)]",
-    focusColor: "text-cyan-200",
-    dividerColor: "border-cyan-300/20",
-    xpLabelColor: "text-cyan-100/90",
-  } : isPatternRealm ? {
-    // Pattern Peaks — charcoal panels, emerald primary, controlled violet
-    // secondary, restrained ancient gold highlight. Rounded like the other
-    // non-Number realms; never the Number cyber-clip.
-    rounded: true,
-    scanline: false,
-    cardClip: undefined as string | undefined,
-    bezelClip: undefined as string | undefined,
-    badgeClip: undefined as string | undefined,
-    statusClip: undefined as string | undefined,
-    actionClip: undefined as string | undefined,
-    connClip: undefined as string | undefined,
-    cardActiveBg: "linear-gradient(145deg, rgba(10,17,14,0.97), rgba(13,28,24,0.97) 58%, rgba(24,20,48,0.94))",
-    cardCompletedBg: "linear-gradient(145deg, rgba(6,63,52,0.98), rgba(37,44,110,0.95))",
-    cardLockedBg: "linear-gradient(145deg, rgba(10,17,14,0.9), rgba(20,28,36,0.84))",
-    bezelActiveBg: "linear-gradient(145deg, rgba(16,185,129,0.62), rgba(139,92,246,0.28) 48%, rgba(52,211,153,0.5))",
-    bezelCompletedBg: "linear-gradient(145deg, rgba(52,211,153,0.6), rgba(200,160,48,0.4))",
-    bezelLockedBg: "linear-gradient(145deg, rgba(16,185,129,0.18), rgba(139,92,246,0.14))",
-    bezelPosttestBg: "linear-gradient(145deg, rgba(212,175,55,0.7), rgba(139,92,246,0.48))",
-    cardActiveShadow: "0 12px 30px rgba(3,14,10,0.56), 0 0 18px rgba(16,185,129,0.16), inset 0 1px 0 rgba(209,250,229,0.16)",
-    cardCompletedShadow: "0 12px 30px rgba(3,14,10,0.52), 0 0 18px rgba(139,92,246,0.2), inset 0 1px 0 rgba(209,250,229,0.22)",
-    cardLockedShadow: "0 8px 20px rgba(3,14,10,0.46)",
-    badgeActiveBg: "linear-gradient(135deg, #065f46, #7c3aed)",
-    badgeCompletedBg: "linear-gradient(135deg, #047857, #10b981)",
-    badgeLockedBg: "linear-gradient(135deg, #1e293b, #312e59)",
-    badgePosttestBg: "linear-gradient(135deg, #a1791f, #7c3aed)",
-    badgeShadow: "inset 0 1px 0 rgba(209,250,229,0.28), 0 0 12px rgba(16,185,129,0.22)",
-    statusActiveBg: "linear-gradient(135deg, #065f46, #0d9488)",
-    statusCompletedBg: "linear-gradient(135deg, #047857, #10b981)",
-    statusLockedBg: "linear-gradient(135deg, #1e293b, #312e59)",
-    statusPosttestBg: "linear-gradient(135deg, #a1791f, #7c3aed)",
-    statusShadow: "0 0 12px rgba(16,185,129,0.3)",
-    dotClass: "bg-emerald-200 shadow-[0_0_8px_rgba(52,211,153,0.9)]",
-    actionActiveBg: "linear-gradient(135deg, #7c3aed, #059669 55%, #34d399)",
-    actionCompletedBg: "linear-gradient(135deg, #7c3aed, #047857)",
-    actionPosttestBg: "linear-gradient(135deg, #a1791f, #7c3aed)",
-    actionShadow: "0 0 18px rgba(16,185,129,0.34), 0 6px 16px rgba(3,14,10,0.5), inset 0 1px 0 rgba(209,250,229,0.28)",
-    connActiveBg: "radial-gradient(circle, #34d399, #7c3aed 72%)",
-    connCompletedBg: "radial-gradient(circle, #a7f3d0, #047857 72%)",
-    connShadow: "0 0 14px rgba(52,211,153,0.5)",
-    xpBg: "linear-gradient(90deg, #7c3aed, #10b981 55%, #d4af37)",
-    xpGlow: "0 0 14px rgba(16,185,129,0.58)",
-    pillBg: "linear-gradient(135deg, rgba(10,17,14,0.96), rgba(46,29,99,0.9), rgba(6,49,40,0.94))",
-    pillShadow: "inset 0 1px 0 rgba(209,250,229,0.22), 0 0 22px rgba(124,58,237,0.24)",
-    pillDot: "bg-emerald-200 shadow-[0_0_9px_rgba(52,211,153,0.95)]",
-    headingGlow: "drop-shadow-[0_2px_16px_rgba(16,185,129,0.32)]",
-    focusColor: "text-emerald-200",
-    dividerColor: "border-emerald-300/20",
-    xpLabelColor: "text-emerald-100/90",
-  } : isChanceRealm ? {
-    rounded: true,
-    scanline: false,
-    cardClip: undefined as string | undefined,
-    bezelClip: undefined as string | undefined,
-    badgeClip: undefined as string | undefined,
-    statusClip: undefined as string | undefined,
-    actionClip: undefined as string | undefined,
-    connClip: undefined as string | undefined,
-    cardActiveBg: "linear-gradient(145deg, rgba(31,18,32,0.97), rgba(62,34,46,0.97) 58%, rgba(75,42,20,0.94))",
-    cardCompletedBg: "linear-gradient(145deg, rgba(118,38,58,0.98), rgba(101,67,20,0.95))",
-    cardLockedBg: "linear-gradient(145deg, rgba(31,18,32,0.9), rgba(45,33,43,0.84))",
-    bezelActiveBg: "linear-gradient(145deg, rgba(251,113,133,0.62), rgba(251,191,36,0.28) 48%, rgba(34,211,238,0.5))",
-    bezelCompletedBg: "linear-gradient(145deg, rgba(251,113,133,0.6), rgba(251,191,36,0.45))",
-    bezelLockedBg: "linear-gradient(145deg, rgba(251,113,133,0.18), rgba(251,191,36,0.14))",
-    bezelPosttestBg: "linear-gradient(145deg, rgba(251,191,36,0.7), rgba(251,113,133,0.48))",
-    cardActiveShadow: "0 12px 30px rgba(18,10,24,0.56), 0 0 18px rgba(251,113,133,0.16), inset 0 1px 0 rgba(255,241,242,0.16)",
-    cardCompletedShadow: "0 12px 30px rgba(18,10,24,0.52), 0 0 18px rgba(251,191,36,0.2), inset 0 1px 0 rgba(255,241,242,0.22)",
-    cardLockedShadow: "0 8px 20px rgba(18,10,24,0.46)",
-    badgeActiveBg: "linear-gradient(135deg, #be3455, #b45309)",
-    badgeCompletedBg: "linear-gradient(135deg, #be3455, #fb7185)",
-    badgeLockedBg: "linear-gradient(135deg, #1f2937, #4a2632)",
-    badgePosttestBg: "linear-gradient(135deg, #a16207, #be3455)",
-    badgeShadow: "inset 0 1px 0 rgba(255,241,242,0.28), 0 0 12px rgba(251,113,133,0.22)",
-    statusActiveBg: "linear-gradient(135deg, #be3455, #d97706)",
-    statusCompletedBg: "linear-gradient(135deg, #be3455, #fb7185)",
-    statusLockedBg: "linear-gradient(135deg, #1f2937, #4a2632)",
-    statusPosttestBg: "linear-gradient(135deg, #a16207, #be3455)",
-    statusShadow: "0 0 12px rgba(251,113,133,0.3)",
-    dotClass: "bg-rose-200 shadow-[0_0_8px_rgba(251,113,133,0.9)]",
-    actionActiveBg: "linear-gradient(135deg, #be3455, #fb7185 55%, #fbbf24)",
-    actionCompletedBg: "linear-gradient(135deg, #be3455, #b45309)",
-    actionPosttestBg: "linear-gradient(135deg, #a16207, #be3455)",
-    actionShadow: "0 0 18px rgba(251,113,133,0.34), 0 6px 16px rgba(18,10,24,0.5), inset 0 1px 0 rgba(255,241,242,0.28)",
-    connActiveBg: "radial-gradient(circle, #fbbf24, #fb7185 72%)",
-    connCompletedBg: "radial-gradient(circle, #ffe4e6, #be3455 72%)",
-    connShadow: "0 0 14px rgba(251,113,133,0.5)",
-    xpBg: "linear-gradient(90deg, #fb7185, #fbbf24 55%, #22d3ee)",
-    xpGlow: "0 0 14px rgba(251,113,133,0.58)",
-    pillBg: "linear-gradient(135deg, rgba(31,18,32,0.96), rgba(88,35,54,0.9), rgba(75,42,20,0.94))",
-    pillShadow: "inset 0 1px 0 rgba(255,241,242,0.22), 0 0 22px rgba(251,113,133,0.24)",
-    pillDot: "bg-rose-200 shadow-[0_0_9px_rgba(251,113,133,0.95)]",
-    headingGlow: "drop-shadow-[0_2px_16px_rgba(251,113,133,0.32)]",
-    focusColor: "text-rose-200",
-    dividerColor: "border-rose-300/20",
-    xpLabelColor: "text-rose-100/90",
-  } : isStatisticsRealm ? {
-    rounded: true,
-    scanline: false,
-    cardClip: undefined as string | undefined,
-    bezelClip: undefined as string | undefined,
-    badgeClip: undefined as string | undefined,
-    statusClip: undefined as string | undefined,
-    actionClip: undefined as string | undefined,
-    connClip: undefined as string | undefined,
-    cardActiveBg: "linear-gradient(145deg, rgba(18,49,42,0.97), rgba(36,70,57,0.96) 58%, rgba(72,61,40,0.94))",
-    cardCompletedBg: "linear-gradient(145deg, rgba(43,92,65,0.98), rgba(91,107,54,0.96))",
-    cardLockedBg: "linear-gradient(145deg, rgba(20,35,29,0.9), rgba(38,53,43,0.84))",
-    bezelActiveBg: "linear-gradient(145deg, rgba(240,107,100,0.66), rgba(242,188,69,0.24) 48%, rgba(121,184,90,0.52))",
-    bezelCompletedBg: "linear-gradient(145deg, rgba(121,184,90,0.62), rgba(242,188,69,0.46))",
-    bezelLockedBg: "linear-gradient(145deg, rgba(121,184,90,0.2), rgba(89,173,209,0.14))",
-    bezelPosttestBg: "linear-gradient(145deg, rgba(242,188,69,0.72), rgba(240,107,100,0.48))",
-    cardActiveShadow: "0 12px 30px rgba(8,27,22,0.56), 0 0 18px rgba(240,107,100,0.16), inset 0 1px 0 rgba(255,244,223,0.16)",
-    cardCompletedShadow: "0 12px 30px rgba(8,27,22,0.52), 0 0 18px rgba(121,184,90,0.2), inset 0 1px 0 rgba(255,244,223,0.2)",
-    cardLockedShadow: "0 8px 20px rgba(8,27,22,0.46)",
-    badgeActiveBg: "linear-gradient(135deg, #a83e4b, #e85d63 58%, #f2bc45)",
-    badgeCompletedBg: "linear-gradient(135deg, #477d42, #79b85a)",
-    badgeLockedBg: "linear-gradient(135deg, #253c32, #344f43)",
-    badgePosttestBg: "linear-gradient(135deg, #9a6818, #e85d63)",
-    badgeShadow: "inset 0 1px 0 rgba(255,244,223,0.28), 0 0 12px rgba(240,107,100,0.22)",
-    statusActiveBg: "linear-gradient(135deg, #7b3c43, #d8535b)",
-    statusCompletedBg: "linear-gradient(135deg, #477d42, #79b85a)",
-    statusLockedBg: "linear-gradient(135deg, #253c32, #344f43)",
-    statusPosttestBg: "linear-gradient(135deg, #9a6818, #e85d63)",
-    statusShadow: "0 0 12px rgba(240,107,100,0.28)",
-    dotClass: "bg-[#fff4df] shadow-[0_0_8px_rgba(242,188,69,0.9)]",
-    actionActiveBg: "linear-gradient(135deg, #a83e4b, #e85d63 58%, #f2bc45)",
-    actionCompletedBg: "linear-gradient(135deg, #477d42, #79b85a)",
-    actionPosttestBg: "linear-gradient(135deg, #9a6818, #e85d63)",
-    actionShadow: "0 0 18px rgba(240,107,100,0.3), 0 6px 16px rgba(8,27,22,0.5), inset 0 1px 0 rgba(255,244,223,0.28)",
-    connActiveBg: "radial-gradient(circle, #f2bc45, #e85d63 72%)",
-    connCompletedBg: "radial-gradient(circle, #fff4df, #79b85a 72%)",
-    connShadow: "0 0 14px rgba(242,188,69,0.5)",
-    xpBg: "linear-gradient(90deg, #f06b64, #f2bc45 58%, #fff4df)",
-    xpGlow: "0 0 14px rgba(242,188,69,0.58)",
-    pillBg: "linear-gradient(135deg, rgba(18,49,42,0.96), rgba(56,71,47,0.94), rgba(123,60,67,0.9))",
-    pillShadow: "inset 0 1px 0 rgba(255,244,223,0.22), 0 0 22px rgba(240,107,100,0.22)",
-    pillDot: "bg-[#f2bc45] shadow-[0_0_9px_rgba(242,188,69,0.9)]",
-    headingGlow: "drop-shadow-[0_2px_16px_rgba(240,107,100,0.3)]",
-    focusColor: "text-[#fff4df]",
-    dividerColor: "border-[#f2bc45]/20",
-    xpLabelColor: "text-[#fff4df]/90",
-  } : isMeasurementRealm ? {
-    rounded: true,
-    scanline: false,
-    // shapes
-    cardClip:   undefined as string | undefined,
-    bezelClip:  undefined as string | undefined,
-    badgeClip:  undefined as string | undefined,
-    statusClip: undefined as string | undefined,
-    actionClip: undefined as string | undefined,
-    connClip:   undefined as string | undefined,
-    // colours — card body (aged parchment / dark leather)
-    cardActiveBg:     "linear-gradient(135deg, rgba(16,11,6,0.985) 0%, rgba(28,18,11,0.97) 52%, rgba(42,27,16,0.95) 100%)",
-    cardCompletedBg:  "linear-gradient(135deg, #160d06 0%, #3a2413 50%, #7a5518 100%)",
-    cardLockedBg:     "linear-gradient(135deg, rgba(16,11,6,0.9) 0%, rgba(30,20,12,0.8) 100%)",
-    // colours — bezel / border (aged brass — less saturated, more antique)
-    bezelActiveBg:    "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(120,90,15,0.16) 40%, rgba(200,160,48,0.42))",
-    bezelCompletedBg: "linear-gradient(135deg, rgba(200,160,48,0.48), rgba(109,40,217,0.18) 45%, rgba(200,160,48,0.44))",
-    bezelLockedBg:    "linear-gradient(135deg, rgba(109,40,217,0.22), rgba(76,29,149,0.10))",
-    bezelPosttestBg:  "linear-gradient(135deg, rgba(139,92,246,0.52), rgba(109,40,217,0.22) 40%, rgba(139,92,246,0.46))",
-    // box shadows (warm depth + subtle purple magical glow)
-    cardActiveShadow:    "0 8px 28px rgba(22,14,4,0.55), 0 0 22px rgba(109,40,217,0.12), inset 0 1px 0 rgba(200,160,48,0.12)",
-    cardCompletedShadow: "0 8px 28px rgba(109,40,217,0.22), 0 0 22px rgba(200,160,48,0.18), inset 0 1px 0 rgba(200,160,48,0.22)",
-    cardLockedShadow:    "0 4px 16px rgba(0,0,0,0.4)",
-    // badge (lesson label pill — bronze gradient)
-    badgeActiveBg:    "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 50%, #8b6520 100%)",
-    badgeCompletedBg: "linear-gradient(135deg, #5b21b6 0%, #7c3aed 60%, #c8a030 100%)",
-    badgeLockedBg:    "linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%)",
-    badgePosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
-    badgeShadow:      "inset 0 1px 0 rgba(200,160,48,0.28), 0 0 8px rgba(120,90,15,0.3)",
-    // status pill (ACTIVE — muted brass, not bright gold)
-    statusActiveBg:    "linear-gradient(135deg, #3d2808 0%, #5c3d0e 50%, #7a5418 100%)",
-    statusCompletedBg: "linear-gradient(135deg, #5b21b6 0%, #7c3aed 55%, #c8a030 100%)",
-    statusLockedBg:    "linear-gradient(135deg, #2d1b69 0%, #4c1d95 100%)",
-    statusPosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
-    statusShadow:      "0 0 8px rgba(120,90,15,0.35)",
-    dotClass:          "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.55)]",
-    // action button (START — soft brass, warm bronze glow on hover)
-    actionActiveBg:    "linear-gradient(135deg, #2a1a04 0%, #5c3d0e 40%, #8b6520 75%, #c8a030 100%)",
-    actionCompletedBg: "linear-gradient(135deg, #5b21b6 0%, #7c3aed 55%, #c8a030 100%)",
-    actionPosttestBg:  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)",
-    actionShadow:      "0 0 16px rgba(120,90,15,0.5), 0 4px 12px rgba(0,0,0,0.45), inset 0 1px 0 rgba(200,160,48,0.3)",
-    // connector between cards
-    connActiveBg:    "radial-gradient(circle, #c8a030, #3d2808 70%)",
-    connCompletedBg: "radial-gradient(circle, #c8a030, #6d28d9 72%)",
-    connShadow:      "0 0 10px rgba(200,160,48,0.35), 0 0 14px rgba(109,40,217,0.18)",
-    // XP bar — brass shimmer (light catches at 60%)
-    xpBg:   "linear-gradient(90deg, #3d2808 0%, #7a5418 25%, #c8a030 55%, #e8d5a8 65%, #c8a030 75%, #7a5418 90%, #3d2808 100%)",
-    xpGlow: "0 0 10px rgba(200,160,48,0.5)",
-    // header / nav (antiqued dark + purple magical glow)
-    pillBg:     "linear-gradient(135deg, #120b06 0%, #221609 50%, #33210f 100%)",
-    pillShadow: "inset 0 1px 0 rgba(200,160,48,0.25), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 16px rgba(109,40,217,0.18)",
-    pillDot:    "bg-yellow-200/80 shadow-[0_0_8px_rgba(200,160,48,0.5)]",
-    headingGlow:  "drop-shadow-[0_2px_14px_rgba(109,40,217,0.3)]",
-    focusColor:   "text-amber-200/90 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]",
-    dividerColor: "border-yellow-900/25",
-    xpLabelColor: "text-yellow-100/65",
-  } : {
-    rounded: false,
-    scanline: true,
-    cardClip:   "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-    bezelClip:  "polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)",
-    badgeClip:  "polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)",
-    statusClip: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
-    actionClip: "polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px)",
-    connClip:   "polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%)",
-    cardActiveBg:     "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
-    cardCompletedBg:  "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%)",
-    cardLockedBg:     "linear-gradient(135deg, #021a18 0%, #052e2b 100%)",
-    bezelActiveBg:    "linear-gradient(135deg, rgba(94,234,212,0.6), rgba(13,148,136,0.2) 40%, rgba(20,184,166,0.55))",
-    bezelCompletedBg: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(13,148,136,0.2) 40%, rgba(16,185,129,0.45))",
-    bezelLockedBg:    "linear-gradient(135deg, rgba(94,234,212,0.12), rgba(13,148,136,0.08))",
-    bezelPosttestBg:  "linear-gradient(135deg, rgba(251,191,36,0.6), rgba(245,158,11,0.25) 40%, rgba(251,191,36,0.55))",
-    cardActiveShadow:    "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -10px 24px rgba(0,0,0,0.45), 0 0 22px rgba(20,184,166,0.3)",
-    cardCompletedShadow: "inset 0 1px 0 rgba(110,231,183,0.4), inset 0 -10px 24px rgba(0,0,0,0.4), 0 0 26px rgba(16,185,129,0.45)",
-    cardLockedShadow:    "inset 0 1px 0 rgba(94,234,212,0.18), inset 0 -10px 20px rgba(0,0,0,0.4), 0 0 14px rgba(20,184,166,0.15)",
-    badgeActiveBg:    "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
-    badgeCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-    badgeLockedBg:    "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
-    badgePosttestBg:  "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
-    badgeShadow:      "inset 0 1px 0 rgba(94,234,212,0.35)",
-    statusActiveBg:    "linear-gradient(135deg, #064e47 0%, #14b8a6 100%)",
-    statusCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-    statusLockedBg:    "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
-    statusPosttestBg:  "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
-    statusShadow:      "inset 0 1px 0 rgba(94,234,212,0.4)",
-    dotClass:          "bg-teal-200 shadow-[0_0_6px_rgba(94,234,212,0.9)]",
-    actionActiveBg:    "linear-gradient(135deg, #064e47 0%, #0d9488 50%, #14b8a6 100%)",
-    actionCompletedBg: "linear-gradient(135deg, #064e3b 0%, #10b981 100%)",
-    actionPosttestBg:  "linear-gradient(135deg, #78350f 0%, #f59e0b 100%)",
-    actionShadow:      "inset 0 1px 0 rgba(94,234,212,0.4), 0 0 8px rgba(20,184,166,0.35)",
-    connActiveBg:    "radial-gradient(circle, #14b8a6, #064e47 70%)",
-    connCompletedBg: "radial-gradient(circle, #10b981, #064e3b 70%)",
-    connShadow:      "0 0 10px rgba(94,234,212,0.5)",
-    xpBg:   "linear-gradient(90deg, #5eead4 0%, #14b8a6 50%, #10b981 100%)",
-    xpGlow: "0 0 10px rgba(94,234,212,0.7)",
-    pillBg:     "linear-gradient(135deg, #021a18 0%, #064e47 50%, #0a5048 100%)",
-    pillShadow: "inset 0 1px 0 rgba(94,234,212,0.35), inset 0 -1px 0 rgba(0,0,0,0.5), 0 0 18px rgba(20,184,166,0.25)",
-    pillDot:    "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]",
-    headingGlow:  "drop-shadow-[0_2px_12px_rgba(20,184,166,0.35)]",
-    focusColor:   "text-teal-300/80",
-    dividerColor: "border-teal-400/15",
-    xpLabelColor: "text-teal-100/90",
-  };
-
-  // Starpath uses compact rectangular controls throughout the week page.
-  const starpathNavWidgetStyle = {
-    borderRadius: 8,
-    border: "1px solid rgba(103,232,249,0.32)",
-    background: "linear-gradient(135deg, rgba(30,27,75,0.88), rgba(76,29,149,0.55) 55%, rgba(8,47,73,0.85))",
-    boxShadow: "inset 0 1px 0 rgba(207,250,254,0.18), 0 8px 20px rgba(7,10,27,0.28)",
-  } as const;
-
-  const statisticaNavWidgetStyle = {
-    borderRadius: 8,
-    border: "1px solid rgba(242,188,69,0.34)",
-    background: "linear-gradient(135deg, rgba(18,49,42,0.9), rgba(55,72,48,0.82), rgba(123,60,67,0.76))",
-    boxShadow: "inset 0 1px 0 rgba(255,244,223,0.16), 0 8px 20px rgba(8,27,22,0.3)",
-  } as const;
-
-  const patternNavWidgetStyle = {
-    borderRadius: 8,
-    border: "1px solid rgba(52,211,153,0.34)",
-    background: "linear-gradient(135deg, rgba(10,17,14,0.9), rgba(46,29,99,0.72) 55%, rgba(6,49,40,0.85))",
-    boxShadow: "inset 0 1px 0 rgba(167,243,208,0.16), 0 8px 20px rgba(6,14,10,0.32)",
-  } as const;
-
-  const chanceNavWidgetStyle = {
-    borderRadius: 8,
-    border: "1px solid rgba(251,113,133,0.34)",
-    background: "linear-gradient(135deg, rgba(31,18,32,0.92), rgba(88,35,54,0.78) 55%, rgba(75,42,20,0.84))",
-    boxShadow: "inset 0 1px 0 rgba(255,241,242,0.16), 0 8px 20px rgba(18,10,24,0.34)",
-  } as const;
 
   const legacyProgramMode = sp.get("legacy") === "1";
   const demoPreviewMode = useDemoPreviewMode();
@@ -946,32 +629,47 @@ function ProgramPage() {
     );
   }
 
-  // Back, week and journey links share one realm-styled widget look.
-  const navWidgetClass = `px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
-                  isStarpathRealm
-                    ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
-                    : isStatisticsRealm
-                    ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
-                    : isMeasurementRealm
-                    ? "text-yellow-100/85 hover:bg-yellow-950/30"
-                    : isPatternRealm
-                    ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
-                    : isChanceRealm
-                    ? "text-rose-50 hover:brightness-110 focus:ring-2 focus:ring-rose-300/30"
-                    : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
-                }`;
-  const navWidgetStyle: CSSProperties = isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isChanceRealm ? chanceNavWidgetStyle : isMeasurementRealm ? {
-                  borderRadius: 999,
-                  border: "1px solid rgba(200,160,48,0.32)",
-                  background: "rgba(22,14,4,0.65)",
-                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 0 12px rgba(109,40,217,0.08)",
-                } : {
-                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
-                };
+  const weekIsOpen = (targetWeek: number) =>
+    unrestrictedMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
+
+  // Where each lesson and quiz is up to; the first one ready to do is "Up next".
+  const quizBestPercent = progress.quizBestScore ?? progress.quizScore ?? 0;
+  const quizTotal = progress.quizTotal ?? 15;
+  const quizBestCorrect = progress.quizBestCorrect ?? Math.round((quizBestPercent / 100) * quizTotal);
+  const weekCards = items.map((item) => {
+    const isLesson = item.type === "lesson";
+    const isPostTest = item.type === "posttest";
+    const comingSoon = item.comingSoon === true;
+    const quizPassed = item.type === "quiz" && weeklyQuizPassed(quizBestPercent);
+    const needsRetry = item.type === "quiz" && progress.quizCompleted && !quizPassed;
+    const completed = isLesson ? progress.lessonsCompleted[item.n - 1] : !isPostTest && quizPassed;
+    let locked = comingSoon;
+    if (!unrestrictedMode) {
+      if (!weekUnlocked) locked = true;
+      if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
+      if (item.type === "quiz" && lessonsDoneCount < 3) locked = true;
+      if (isPostTest) locked = hasPersonalizedPlan ? !requiredWeeksComplete : locked || lessonsDoneCount < 3;
+    }
+    return { item, isLesson, isPostTest, comingSoon, needsRetry, completed, locked };
+  });
+  const upNextIndex = weekCards.findIndex((card) => !card.locked && !card.completed && !card.needsRetry);
+
+  const activityNoun = isStarpathRealm ? "missions" : "lessons";
+  const quizName = isStarpathRealm ? "voyage quiz" : "quiz";
+  const weekStatusLine = isExpeditionWeek && !isNumber7
+    ? "Lessons coming soon"
+    : !weekUnlocked
+    ? "Week locked"
+    : weekComplete
+    ? "Week complete"
+    : isNumber7 && weekNum === lastWeek
+    ? `${lessonsDoneCount} of 3 lessons · post-test to go`
+    : isChanceRealm && !hasWeeklyQuizThisWeek
+    ? `${lessonsDoneCount} of 3 lessons`
+    : `${lessonsDoneCount} of 3 ${activityNoun} · ${progress.quizCompleted ? `${quizName} to try again` : `${quizName} to go`}`;
 
   return (
-    <main className="min-h-screen relative">
+    <main className="min-h-screen relative" style={weekPageTheme(realmId)}>
       {isExpeditionWeek && (
         <div className={`relative z-20 flex flex-wrap items-center justify-center gap-3 bg-slate-950 px-3 pb-3 text-center text-sm text-white ${previewMode ? "pt-16" : "pt-3"}`}>
           {previewMode && <>
@@ -1153,328 +851,110 @@ function ProgramPage() {
 
       {/* ── Hero header ── */}
       <div className="relative z-10">
-        <div className="relative max-w-6xl mx-auto px-6 pt-5 pb-10">
-          <div className="flex items-start justify-between gap-3 mb-6">
-            <div className="flex min-w-0 flex-wrap items-center gap-2 sm:gap-3">
-              <button
-                onClick={goBackToMap}
-                className={navWidgetClass}
-                style={navWidgetStyle}
-              >
-                ← {isLevel8 ? "Back to stronghold" : isExpeditionWeek ? "Back to the cavern" : isStarpathRealm ? "Back to Starpath" : "Back to Map"}
-              </button>
+        {/* Demo Review shows its badge across the top centre, so the bar sits below it. */}
+        <div className={`relative max-w-6xl mx-auto px-6 pb-10 ${previewMode ? "pt-20" : "pt-5"}`}>
+          <WeekPageNav
+            realmLabel={isLevel8 ? "Stronghold" : isExpeditionWeek ? "Cavern" : getRealmDefinition(realmId).name}
+            onHub={() => router.push("/world")}
+            onRealm={goBackToMap}
+            onProfile={() => router.push("/profile")}
+            logo={<ReliqRealmLogo realmId={realmId} levelLabel={levelLabel} className="shrink-0" />}
+            extraLinks={isExpeditionWeek ? <Level7JourneyLinks level={isLevel8?8:7} realm={realmId} week={weekNum} demo={previewMode} showCave={false} showHub={false} linkClassName={WEEK_PILL} /> : null}
+            weekMenu={
               <div ref={weekMenuRef} className="relative">
                 <button
                   type="button"
                   onClick={() => setWeekMenuOpen((v) => !v)}
                   aria-haspopup="listbox"
                   aria-expanded={weekMenuOpen}
-                  className={`relative flex min-w-[170px] items-center justify-between gap-3 px-4 py-2 text-xs font-mono font-black uppercase tracking-[0.14em] backdrop-blur-md transition focus:outline-none ${
-                    isStarpathRealm
-                      ? "text-cyan-50 hover:brightness-110 focus:ring-2 focus:ring-cyan-300/25"
-                      : isStatisticsRealm
-                      ? "text-[#fff4df] hover:brightness-110 focus:ring-2 focus:ring-[#f2bc45]/30"
-                    : isMeasurementRealm
-                    ? "text-yellow-100/85 hover:bg-yellow-950/30"
-                    : isPatternRealm
-                    ? "text-emerald-50 hover:brightness-110 focus:ring-2 focus:ring-emerald-300/30"
-                    : isChanceRealm
-                    ? "text-rose-50 hover:brightness-110 focus:ring-2 focus:ring-rose-300/30"
-                    : "border border-teal-300/25 bg-black/25 text-teal-50 hover:border-teal-200/45 hover:bg-teal-950/45 focus:ring-2 focus:ring-teal-300/25"
-                  }`}
-                  style={isStarpathRealm ? starpathNavWidgetStyle : isStatisticsRealm ? statisticaNavWidgetStyle : isPatternRealm ? patternNavWidgetStyle : isChanceRealm ? chanceNavWidgetStyle : isMeasurementRealm ? {
-                    borderRadius: 999,
-                    border: "1px solid rgba(200,160,48,0.32)",
-                    background: "rgba(22,14,4,0.65)",
-                    boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 0 12px rgba(109,40,217,0.08)",
-                  } : {
-                    clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                    boxShadow: "inset 0 1px 0 rgba(94,234,212,0.2), 0 0 18px rgba(20,184,166,0.12)",
-                  }}
+                  className={`${WEEK_PILL} min-w-[150px] justify-between`}
                 >
-                  <span className="flex items-center gap-2">
-                    <span className={`h-1.5 w-1.5 rounded-full ${isStarpathRealm ? "bg-cyan-200 shadow-[0_0_8px_rgba(103,232,249,0.9)]" : isStatisticsRealm ? "bg-[#f2bc45] shadow-[0_0_8px_rgba(242,188,69,0.9)]" : isPatternRealm ? "bg-emerald-300 shadow-[0_0_8px_rgba(52,211,153,0.9)]" : isChanceRealm ? "bg-rose-200 shadow-[0_0_8px_rgba(251,113,133,0.9)]" : isMeasurementRealm ? "bg-yellow-200/80 shadow-[0_0_6px_rgba(200,160,48,0.6)]" : "bg-teal-300 shadow-[0_0_8px_rgba(94,234,212,0.9)]"}`} />
-                    Week {weekNum}
-                  </span>
-                  <svg viewBox="0 0 24 24" className={`h-3.5 w-3.5 transition-transform ${isStarpathRealm ? "text-cyan-100/80" : isPatternRealm ? "text-emerald-100/80" : isChanceRealm ? "text-rose-100/80" : isMeasurementRealm ? "text-yellow-200/60" : "text-teal-100/80"} ${weekMenuOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
+                  Week {weekNum}
+                  <ChevronDown aria-hidden className={`h-[18px] w-[18px] transition-transform ${weekMenuOpen ? "rotate-180" : ""}`} />
                 </button>
                 {weekMenuOpen && (
                   <div
                     role="listbox"
-                    className={`absolute left-0 top-[calc(100%+6px)] z-50 max-h-[260px] w-[170px] overflow-y-auto backdrop-blur-xl ${
-                      isStarpathRealm
-                        ? "border border-cyan-300/30"
-                        : isStatisticsRealm
-                        ? "border border-[#f2bc45]/35"
-                        : isPatternRealm
-                        ? "border border-emerald-300/30"
-                        : isChanceRealm
-                        ? "border border-rose-300/30"
-                        : isMeasurementRealm
-                        ? "border border-yellow-900/40"
-                        : "border border-teal-300/30"
-                    }`}
-                    style={isStarpathRealm ? {
-                      borderRadius: 8,
-                      background: "rgba(15,17,45,0.95)",
-                      boxShadow: "inset 0 1px 0 rgba(207,250,254,0.2), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(124,58,237,0.18)",
-                    } : isStatisticsRealm ? {
-                      borderRadius: 8,
-                      background: "rgba(18,49,42,0.96)",
-                      boxShadow: "inset 0 1px 0 rgba(255,244,223,0.18), 0 14px 40px rgba(8,27,22,0.62), 0 0 24px rgba(240,107,100,0.18)",
-                    } : isPatternRealm ? {
-                      borderRadius: 8,
-                      background: "rgba(10,17,14,0.96)",
-                      boxShadow: "inset 0 1px 0 rgba(167,243,208,0.18), 0 14px 40px rgba(6,14,10,0.62), 0 0 24px rgba(124,58,237,0.18)",
-                    } : isChanceRealm ? {
-                      borderRadius: 8,
-                      background: "rgba(31,18,32,0.96)",
-                      boxShadow: "inset 0 1px 0 rgba(255,241,242,0.18), 0 14px 40px rgba(18,10,24,0.62), 0 0 24px rgba(251,113,133,0.18)",
-                    } : isMeasurementRealm ? {
-                      borderRadius: 14,
-                      background: "rgba(22,14,4,0.94)",
-                      boxShadow: "inset 0 1px 0 rgba(200,160,48,0.18), 0 14px 40px rgba(0,0,0,0.6), 0 0 24px rgba(109,40,217,0.12)",
-                    } : {
-                      clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                      background: "rgba(2,18,18,0.92)",
-                      boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), 0 14px 40px rgba(0,0,0,0.55), 0 0 28px rgba(20,184,166,0.18)",
-                    }}
+                    aria-label="Choose a week"
+                    className="absolute left-0 top-[calc(100%+8px)] z-50 max-h-[320px] w-[250px] overflow-y-auto rounded-2xl border-[1.5px] border-white/15 bg-[rgba(6,10,14,0.92)] p-1.5 shadow-[0_14px_40px_rgba(0,0,0,0.55)] backdrop-blur-xl"
                   >
-                    <div className={`px-3 py-1.5 border-b text-[9px] font-mono font-bold uppercase tracking-[0.2em] ${
-                      isStarpathRealm ? "border-cyan-300/15 text-cyan-300/80" : isStatisticsRealm ? "border-[#f2bc45]/20 text-[#f2bc45]/80" : isPatternRealm ? "border-emerald-300/20 text-emerald-300/80" : isChanceRealm ? "border-rose-300/20 text-rose-200/80" : isMeasurementRealm ? "border-yellow-900/30 text-yellow-200/50" : "border-teal-300/15 text-teal-300/80"
-                    }`}>
-                      Select Week
-                    </div>
-                    <ul className="py-0.5">
-                      {Array.from({ length: lastWeek }).map((_, index) => {
-                        const targetWeek = index + 1;
-                        const isUnlocked = unrestrictedMode || (hasAssignedWeekAccess ? playableWeeks.includes(targetWeek) : targetWeek <= lastAllowedWeek);
-                        const isCurrent = targetWeek === weekNum;
-                        const isRequiredWeek = requiredWeeks.includes(targetWeek);
-                        const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId, targetWeek, year);
-                        const status = hasPersonalizedPlan
-                          ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
-                          : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
-                        return (
-                          <li key={targetWeek}>
-                            <button
-                              type="button"
-                              role="option"
-                              aria-selected={isCurrent}
-                              onClick={() => { setWeekMenuOpen(false); goToWeek(targetWeek); }}
-                              className={`group flex w-full items-center justify-between gap-2 px-3 py-1 text-left text-[10px] font-mono font-bold uppercase tracking-[0.12em] transition ${
-                                isStarpathRealm
-                                  ? isCurrent
-                                    ? "bg-cyan-400/15 text-cyan-100"
-                                    : isUnlocked
-                                    ? "text-cyan-50/85 hover:bg-cyan-400/10 hover:text-cyan-50"
-                                    : "text-cyan-50/30 hover:bg-white/5"
-                                  : isStatisticsRealm
-                                  ? isCurrent
-                                    ? "bg-[#f06b64]/20 text-[#fff4df]"
-                                    : isUnlocked
-                                    ? "text-[#fff4df]/85 hover:bg-[#f06b64]/12 hover:text-[#fff4df]"
-                                    : "text-[#fff4df]/30 hover:bg-white/5"
-                                  : isPatternRealm
-                                  ? isCurrent
-                                    ? "bg-emerald-400/15 text-emerald-100"
-                                    : isUnlocked
-                                    ? "text-emerald-50/85 hover:bg-emerald-400/10 hover:text-emerald-50"
-                                    : "text-emerald-50/30 hover:bg-white/5"
-                                  : isChanceRealm
-                                  ? isCurrent
-                                    ? "bg-rose-400/15 text-rose-100"
-                                    : isUnlocked
-                                    ? "text-rose-50/85 hover:bg-rose-400/10 hover:text-rose-50"
-                                    : "text-rose-50/30 hover:bg-white/5"
-                                  : isMeasurementRealm
-                                  ? isCurrent
-                                    ? "bg-yellow-900/20 text-yellow-100"
-                                    : isUnlocked
-                                    ? "text-yellow-100/70 hover:bg-yellow-900/15 hover:text-yellow-100"
-                                    : "text-yellow-100/25 hover:bg-white/5"
-                                  : isCurrent
-                                    ? "bg-teal-400/15 text-teal-100"
-                                    : isUnlocked
-                                    ? "text-teal-50/85 hover:bg-teal-400/10 hover:text-teal-50"
-                                    : "text-teal-50/30 hover:bg-white/5"
-                              }`}
-                            >
-                              <span className="flex items-center gap-1.5">
-                                {isCurrent ? (
-                                  <svg viewBox="0 0 24 24" className={`h-2.5 w-2.5 ${isStarpathRealm ? "text-cyan-300" : isPatternRealm ? "text-emerald-300" : isChanceRealm ? "text-rose-300" : isMeasurementRealm ? "text-yellow-300" : "text-teal-300"}`} fill="none" stroke="currentColor" strokeWidth="3">
-                                    <path d="M5 12l5 5L20 7" />
-                                  </svg>
-                                ) : (
-                                  <span className={`h-1 w-1 rounded-full ${
-                                    isStarpathRealm
-                                      ? isUnlocked ? "bg-cyan-400/70" : "bg-white/20"
-                                      : isPatternRealm
-                                      ? isUnlocked ? "bg-emerald-400/70" : "bg-white/20"
-                                      : isChanceRealm
-                                      ? isUnlocked ? "bg-rose-400/70" : "bg-white/20"
-                                      : isMeasurementRealm
-                                      ? isUnlocked ? "bg-yellow-600/60" : "bg-white/15"
-                                      : isUnlocked ? "bg-teal-400/70" : "bg-white/20"
-                                  }`} />
-                                )}
-                                Week {targetWeek}
-                              </span>
-                              <span className={`text-[8px] tracking-[0.16em] ${
-                                isStarpathRealm
-                                  ? isCurrent ? "text-cyan-300" : isUnlocked ? "text-cyan-200/60" : "text-white/30"
-                                  : isPatternRealm
-                                  ? isCurrent ? "text-emerald-300" : isUnlocked ? "text-emerald-200/60" : "text-white/30"
-                                  : isChanceRealm
-                                  ? isCurrent ? "text-rose-300" : isUnlocked ? "text-rose-200/60" : "text-white/30"
-                                  : isMeasurementRealm
-                                  ? isCurrent ? "text-yellow-300/80" : isUnlocked ? "text-yellow-200/45" : "text-white/25"
-                                  : isCurrent ? "text-teal-300" : isUnlocked ? "text-teal-200/60" : "text-white/30"
-                              }`}>
-                                {status}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                    {Array.from({ length: lastWeek }).map((_, index) => {
+                      const targetWeek = index + 1;
+                      const isUnlocked = weekIsOpen(targetWeek);
+                      const isCurrent = targetWeek === weekNum;
+                      const isRequiredWeek = requiredWeeks.includes(targetWeek);
+                      const isDoneWeek = isWeekCompleteForRealm(getWeekProgress(store, year, targetWeek, realmId), realmId, targetWeek, year);
+                      const status = hasPersonalizedPlan
+                        ? isCurrent ? "Current" : isRequiredWeek ? isDoneWeek ? "Required Done" : "Required" : isDoneWeek ? "Optional Done" : requiredWeeksComplete ? "Optional" : "Locked"
+                        : isCurrent ? "Current" : isUnlocked ? "Open" : "Locked";
+                      return (
+                        <button
+                          key={targetWeek}
+                          type="button"
+                          role="option"
+                          aria-selected={isCurrent}
+                          onClick={() => { setWeekMenuOpen(false); goToWeek(targetWeek); }}
+                          className={`flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-left text-[15px] font-extrabold transition ${
+                            isCurrent ? "bg-[color-mix(in_srgb,var(--wk-accent)_22%,transparent)] text-white" : isUnlocked ? "text-white/90 hover:bg-white/10" : "text-white/45 hover:bg-white/5"
+                          }`}
+                        >
+                          <span className="flex items-center gap-2">
+                            {isCurrent ? <Check aria-hidden className="h-4 w-4 text-[var(--wk-accent)]" strokeWidth={3} /> : isUnlocked ? <span aria-hidden className="mx-1 h-2 w-2 rounded-full bg-[var(--wk-accent)]" /> : <Lock aria-hidden className="h-4 w-4" />}
+                            Week {targetWeek}
+                          </span>
+                          <span className={`text-[13px] font-bold ${isCurrent || isUnlocked ? "text-[var(--wk-accent)]" : "text-white/40"}`}>{status}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
               </div>
-              {isExpeditionWeek && <Level7JourneyLinks level={isLevel8?8:7} realm={realmId} week={weekNum} demo={previewMode} showCave={false} linkClassName={navWidgetClass} linkStyle={navWidgetStyle} />}
-            </div>
-            <ReliqRealmLogo realmId={realmId} levelLabel={levelLabel} className="ml-1 shrink-0" />
-          </div>
+            }
+          />
 
           <div className="text-center">
-            {/* Nexus level pill */}
-            <div
-              className={`inline-flex items-center gap-2 px-4 py-1.5 text-[11px] font-mono font-bold uppercase tracking-[0.18em] ${isStatisticsRealm ? "text-[#fff4df]" : isPatternRealm ? "text-emerald-50" : isChanceRealm ? "text-rose-50" : isMeasurementRealm ? "text-yellow-50/95" : "text-teal-50"}`}
-              style={{
-                background: rt.pillBg,
-                clipPath: rt.rounded ? undefined : "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                borderRadius: isStarpathRealm ? 8 : rt.rounded ? 999 : undefined,
-                boxShadow: rt.pillShadow,
-              }}
-            >
-              <span className={`h-1.5 w-1.5 rounded-full ${rt.pillDot}`} />
+            <div className={`${WEEK_GLASS} inline-flex h-8 items-center gap-2 rounded-full px-3.5 text-sm font-extrabold text-white`}>
+              <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--wk-accent)] shadow-[0_0_8px_var(--wk-accent)]" />
               {levelLabel} · {isStarpathRealm ? "Starpath Voyage" : isStatisticsRealm ? "Data Program" : isPatternRealm ? "Algebra Program" : isChanceRealm ? "Probability Program" : "Program"}
             </div>
-            <h1 className={`text-4xl md:text-5xl font-black text-white mt-3 tracking-tight ${rt.headingGlow}`}>Week {weekNum}</h1>
-            <p className={`text-base md:text-lg mt-2 font-semibold ${isStatisticsRealm ? "text-[#fff4df]" : isChanceRealm ? "text-rose-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : isMeasurementRealm ? "text-amber-50/95 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]" : "text-teal-50/95"}`}>
-              <span className={`${rt.focusColor} font-mono text-xs uppercase tracking-[0.18em] mr-2`}>Focus</span>
+            <h1 className="mt-2 text-5xl font-black leading-none tracking-tight text-white [text-shadow:0_4px_22px_rgba(0,0,0,0.6)] md:text-[64px]">Week {weekNum}</h1>
+            <p className="mt-2 text-lg font-bold text-white [text-shadow:0_2px_12px_rgba(0,0,0,0.75)] md:text-xl">
+              <span className="mr-2 font-extrabold text-[var(--wk-accent)]">Focus</span>
               {currentWeekPlan?.topic ?? "Your current focus"}
             </p>
             {hasPersonalizedPlan ? (
-              <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isChanceRealm ? "text-rose-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
-                {currentWeekIsRequired ? "◆ Required Week" : canTakePostTestEarly ? "◆ Optional Practice Week" : "◆ Locked Bonus Week"}
+              <p className="mt-1 text-[15px] font-bold text-white/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.7)]">
+                {currentWeekIsRequired ? "Required week" : canTakePostTestEarly ? "Optional practice week" : "Locked bonus week"}
               </p>
             ) : null}
-            <p className={`mt-2 text-xs font-mono uppercase tracking-[0.16em] ${isChanceRealm ? "text-rose-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : isMeasurementRealm ? "text-amber-100/85 [text-shadow:0_1px_6px_rgba(0,0,0,0.65)]" : "text-teal-200/80"}`}>
-              {isExpeditionWeek && !isNumber7 ? "Lessons coming soon" : weekUnlocked
-                ? weekComplete
-                  ? "◆ Completed"
-                  : isNumber7 && weekNum === lastWeek
-                  ? `${lessonsDoneCount}/3 Lessons · Post-Test`
-                  : isChanceRealm
-                  ? hasWeeklyQuizThisWeek
-                    ? `${lessonsDoneCount}/3 Lessons · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : "Quiz Pending"}`
-                    : `${lessonsDoneCount}/3 Lessons`
-                  : `${lessonsDoneCount}/3 ${isStarpathRealm ? "Missions" : "Lessons"} · ${progress.quizCompleted ? (weekComplete ? "Quiz Passed" : "Quiz Attempted") : isStarpathRealm ? "Voyage Quiz Pending" : "Quiz Pending"}`
-                : "◆ Preview Locked"}
-            </p>
 
-            {/* XP plate */}
-            <div className={`mt-5 mx-auto relative ${isStarpathRealm ? "max-w-xs" : "max-w-sm"}`}>
-              <div
-                className="absolute -inset-[2px] pointer-events-none"
-                style={isStarpathRealm ? {
-                  borderRadius: 8,
-                  background: "linear-gradient(135deg, rgba(103,232,249,0.55), rgba(124,58,237,0.22) 45%, rgba(34,211,238,0.5))",
-                } : isMeasurementRealm ? {
-                  borderRadius: 14,
-                  background: "linear-gradient(135deg, rgba(200,160,48,0.42), rgba(120,90,15,0.14) 40%, rgba(200,160,48,0.36))",
-                } : isStatisticsRealm ? {
-                  borderRadius: 14,
-                  background: "linear-gradient(135deg, rgba(240,107,100,0.5), rgba(242,188,69,0.18) 42%, rgba(121,184,90,0.5))",
-                } : isPatternRealm ? {
-                  borderRadius: 14,
-                  background: "linear-gradient(135deg, rgba(16,185,129,0.5), rgba(139,92,246,0.2) 42%, rgba(52,211,153,0.5))",
-                } : isChanceRealm ? {
-                  borderRadius: 14,
-                  background: "linear-gradient(135deg, rgba(251,113,133,0.5), rgba(251,191,36,0.18) 42%, rgba(34,211,238,0.42))",
-                } : {
-                  clipPath: "polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)",
-                  background: "linear-gradient(135deg, rgba(94,234,212,0.55), rgba(20,184,166,0.15) 40%, rgba(13,148,136,0.5))",
-                }}
-              />
-              <div
-                className={`relative px-5 ${isStarpathRealm ? "py-2.5" : "py-3"}`}
-                style={isStarpathRealm ? {
-                  borderRadius: 6,
-                  background: "linear-gradient(135deg, rgba(30,27,75,0.96) 0%, rgba(15,23,42,0.9) 50%, rgba(8,47,73,0.92) 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(207,250,254,0.18), inset 0 -6px 14px rgba(0,0,0,0.42), 0 8px 20px rgba(7,10,27,0.24)",
-                } : isMeasurementRealm ? {
-                  borderRadius: 12,
-                  background: "linear-gradient(135deg, #140e04 0%, #1e1506 50%, #2a1e08 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(200,160,48,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(109,40,217,0.08)",
-                } : isStatisticsRealm ? {
-                  borderRadius: 12,
-                  background: "linear-gradient(135deg, #0d221d 0%, #12312a 50%, #1c3f37 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(242,188,69,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(240,107,100,0.1)",
-                } : isPatternRealm ? {
-                  borderRadius: 12,
-                  background: "linear-gradient(135deg, #0a110e 0%, #0d1c18 50%, #181430 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(16,185,129,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(124,58,237,0.1)",
-                } : isChanceRealm ? {
-                  borderRadius: 12,
-                  background: "linear-gradient(135deg, #1f1220 0%, #351d2b 50%, #4b2a14 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(255,241,242,0.2), inset 0 -8px 18px rgba(0,0,0,0.5), 0 0 18px rgba(251,113,133,0.12)",
-                } : {
-                  clipPath: "polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)",
-                  background: "linear-gradient(135deg, #021a18 0%, #052e2b 50%, #064e47 100%)",
-                  boxShadow: "inset 0 1px 0 rgba(94,234,212,0.25), inset 0 -8px 18px rgba(0,0,0,0.45)",
-                }}
-              >
-                {!isMeasurementRealm && !isStarpathRealm && !isStatisticsRealm && !isPatternRealm && !isChanceRealm && (
-                  <div
-                    className="absolute inset-0 opacity-15 pointer-events-none"
-                    style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.4) 0 1px, transparent 1px 3px)" }}
-                  />
-                )}
-                <div className={`relative h-2 rounded-full bg-black/50 overflow-hidden ${isStarpathRealm ? "ring-1 ring-cyan-400/20" : isMeasurementRealm ? "ring-1 ring-yellow-900/40" : isStatisticsRealm ? "ring-1 ring-[#f2bc45]/25" : isPatternRealm ? "ring-1 ring-emerald-400/20" : isChanceRealm ? "ring-1 ring-rose-400/20" : "ring-1 ring-teal-400/20"}`}>
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{ width: `${percent}%`, background: rt.xpBg, boxShadow: rt.xpGlow }}
-                  />
+            {/* Week progress */}
+            <div className={`${WEEK_GLASS} mx-auto mt-3 flex max-w-[480px] items-center gap-4 rounded-[18px] px-[18px] py-3 text-left`}>
+              <div className="min-w-0 flex-1">
+                <div className="flex justify-between gap-3 text-[15px] font-extrabold text-white">
+                  <span>{weekStatusLine}</span>
+                  <span className="shrink-0 tabular-nums text-white/80">{xp} / {totalXp} XP</span>
                 </div>
-                <p className={`relative text-[10px] mt-2 text-center font-mono font-bold tracking-[0.2em] ${rt.xpLabelColor ?? "text-teal-100/90"}`}>
-                  {xp} / {totalXp} XP
-                </p>
+                <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/15">
+                  <div className="h-full rounded-full bg-[linear-gradient(90deg,var(--wk-from),var(--wk-accent))] transition-all duration-500" style={{ width: `${percent}%` }} />
+                </div>
               </div>
+              {weekComplete && weekNum < lastWeek && weekIsOpen(weekNum + 1) ? (
+                <button
+                  type="button"
+                  onClick={() => goToWeek(weekNum + 1)}
+                  className={`${WEEK_FILL} inline-flex h-[46px] shrink-0 items-center gap-1.5 rounded-[14px] px-4 text-base font-black text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)] transition hover:brightness-110`}
+                >
+                  Week {weekNum + 1}
+                  <ChevronRight aria-hidden className="h-4 w-4" />
+                </button>
+              ) : null}
             </div>
+
 
             {hasPersonalizedPlan ? (
               <div className="mt-4 mx-auto max-w-3xl">
-                <div
-                  className={`overflow-hidden backdrop-blur-md ${isMeasurementRealm || isChanceRealm ? "rounded-[22px]" : ""}`}
-                  style={isMeasurementRealm ? {
-                    background: "rgba(20,14,6,0.66)",
-                    border: "1px solid rgba(200,160,48,0.24)",
-                    boxShadow: "0 14px 34px rgba(0,0,0,0.24), inset 0 1px 0 rgba(200,160,48,0.12)",
-                  } : isChanceRealm ? {
-                    background: "rgba(31,18,32,0.68)",
-                    border: "1px solid rgba(251,113,133,0.24)",
-                    boxShadow: "0 14px 34px rgba(18,10,24,0.28), inset 0 1px 0 rgba(255,241,242,0.12)",
-                  } : {
-                    clipPath: "polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px)",
-                    background: "rgba(2,18,18,0.72)",
-                    border: "1px solid rgba(94,234,212,0.18)",
-                    boxShadow: "0 14px 34px rgba(0,0,0,0.22), inset 0 1px 0 rgba(94,234,212,0.08)",
-                  }}
-                >
+                <div className={`${WEEK_GLASS} overflow-hidden rounded-[22px] text-left shadow-[0_14px_34px_rgba(0,0,0,0.24)]`}>
                   <button
                     type="button"
                     onClick={() => setPathwayJournalOpen((open) => !open)}
@@ -1638,354 +1118,73 @@ function ProgramPage() {
         </div>
       </div>
 
-      {/* ── Horizontal lesson dashboard ── */}
-      <div
-        className={`relative z-10 px-4 pb-16 md:px-6 ${
-          isMeasurementRealm || isStatisticsRealm || isPatternRealm || isChanceRealm ? "pt-16 md:pt-24" : "pt-10 md:pt-16"
-        }`}
-      >
+      {/* ── The week's lessons and quiz ── */}
+      <div className="relative z-10 px-4 pb-16 pt-10 md:px-6 md:pt-14">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 items-stretch relative">
-            {items.map((item, idx) => {
-              const isLesson = item.type === "lesson";
-              const isPostTest = item.type === "posttest";
-              const comingSoon = item.comingSoon === true;
-              const quizBestPercent = progress.quizBestScore ?? progress.quizScore ?? 0;
-              const quizTotal = progress.quizTotal ?? 15;
-              const quizBestCorrect = progress.quizBestCorrect
-                ?? Math.round((quizBestPercent / 100) * quizTotal);
-              const quizPassed = item.type === "quiz" && weeklyQuizPassed(quizBestPercent);
-              const needsRetry = item.type === "quiz" && progress.quizCompleted && !quizPassed;
-              const completed = isLesson
-                ? progress.lessonsCompleted[item.n - 1]
-                : isPostTest
-                  ? false
-                  : quizPassed;
-
-              let locked = false;
-              if (comingSoon) locked = true;
-              if (!unrestrictedMode) {
-                if (!weekUnlocked) {
-                  locked = true;
-                }
-                if (isLesson && item.n > 1 && !progress.lessonsCompleted[item.n - 2]) locked = true;
-                if (item.type === "quiz" && lessonsDoneCount < 3) locked = true;
-                if (isPostTest) {
-                  if (hasPersonalizedPlan) locked = !requiredWeeksComplete;
-                  else if (lessonsDoneCount < 3) locked = true;
-                }
-              }
-
-              const isActive = !locked && !completed;
-              const postTestReady = isPostTest && !locked;
-              const isLast = idx === items.length - 1;
+          <div className="relative grid grid-cols-2 items-stretch gap-4 lg:grid-cols-4 lg:gap-[22px]">
+            {weekCards.map((card, idx) => {
+              const { item, isLesson, isPostTest, comingSoon, needsRetry, completed, locked } = card;
+              const isQuiz = item.type === "quiz";
+              const state: WeekCardState = comingSoon ? "soon" : locked ? "locked" : needsRetry ? "retry" : completed ? "done" : idx === upNextIndex ? "next" : "open";
+              const itemXp = isLesson ? LESSON_XP : QUIZ_PASS_XP;
+              const startLabel = isStarpathRealm && !isPostTest ? isQuiz ? "Start quiz" : "Start mission" : "Start";
               return (
-                <div
+                <WeekCard
                   key={`${item.type}-${item.n}`}
-                  className={isStarpathRealm ? "relative flex min-w-0" : "relative flex"}
-                >
-                  {/* Bezel / border frame */}
-                  <div
-                    className="absolute -inset-[2px] pointer-events-none"
-                    style={{
-                      clipPath: rt.bezelClip,
-                      borderRadius: isStarpathRealm ? 12 : rt.rounded ? 28 : undefined,
-                      background: locked
-                        ? rt.bezelLockedBg
-                        : needsRetry
-                          ? "linear-gradient(145deg, rgba(251,191,36,0.82), rgba(180,83,9,0.72))"
-                        : postTestReady
-                          ? rt.bezelPosttestBg
-                          : isActive
-                            ? rt.bezelActiveBg
-                            : rt.bezelCompletedBg,
-                    }}
-                  />
-                  <div
-                    role={comingSoon ? "group" : "button"}
-                    tabIndex={locked ? -1 : 0}
-                    aria-disabled={comingSoon ? undefined : locked}
-                    onClick={() => !locked && openItem(item)}
-                    onKeyDown={(e) => {
-                      if (!locked && (e.key === "Enter" || e.key === " ")) {
-                        e.preventDefault();
-                        openItem(item);
-                      }
-                    }}
-                    className={[
-                      isStarpathRealm
-                        ? "relative min-h-[190px] w-full rounded-[8px] p-4 text-left transition-all flex flex-col gap-2.5 group overflow-hidden"
-                        : `relative w-full text-left p-5 transition-all flex flex-col gap-3 group overflow-hidden ${rt.rounded ? "rounded-3xl" : ""}`,
-                      comingSoon ? "cursor-default" : locked ? "opacity-60 cursor-not-allowed" : "hover:-translate-y-1 cursor-pointer",
-                    ].join(" ")}
-                    style={{
-                      clipPath: rt.cardClip,
-                      background: comingSoon ? rt.cardActiveBg : locked
-                        ? rt.cardLockedBg
-                        : needsRetry
-                          ? "linear-gradient(145deg, rgba(69,36,5,0.98), rgba(120,53,15,0.96) 58%, rgba(92,45,8,0.98))"
-                        : completed
-                          ? rt.cardCompletedBg
-                          : rt.cardActiveBg,
-                      boxShadow: completed
-                        ? rt.cardCompletedShadow
-                        : needsRetry
-                          ? "0 12px 30px rgba(38,18,2,0.58), 0 0 20px rgba(245,158,11,0.3), inset 0 1px 0 rgba(254,243,199,0.2)"
-                        : isActive
-                          ? rt.cardActiveShadow
-                          : rt.cardLockedShadow,
-                    }}
-                  >
-                    {/* Scanline texture — Nexus only */}
-                    {rt.scanline && (
-                      <div
-                        className="absolute inset-0 pointer-events-none opacity-[0.06]"
-                        style={{ backgroundImage: "repeating-linear-gradient(0deg, rgba(94,234,212,0.6) 0 1px, transparent 1px 3px)" }}
-                      />
-                    )}
-                    {/* Completed checkmark watermark */}
-                    {completed && (
-                      <svg
-                        className={`absolute -right-4 -bottom-4 h-32 w-32 pointer-events-none ${isChanceRealm ? "text-rose-300/10" : isMeasurementRealm ? "text-yellow-200/10" : "text-emerald-400/10"}`}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                      >
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                    )}
-                    {/* Completed top stripe */}
-                    {completed && (
-                      <div
-                        className="absolute top-0 left-0 h-1 w-full pointer-events-none"
-                        style={
-                          isChanceRealm
-                            ? {
-                                background:
-                                  "linear-gradient(90deg, #fb7185, #fbbf24 55%, transparent 100%)",
-                                boxShadow:
-                                  "0 0 12px rgba(251,113,133,0.58), 0 0 16px rgba(251,191,36,0.2)",
-                              }
-                            : isMeasurementRealm
-                            ? {
-                                background:
-                                  "linear-gradient(90deg, #fcd34d, #c8a030 45%, #7c3aed 80%, transparent 100%)",
-                                boxShadow:
-                                  "0 0 12px rgba(200,160,48,0.55), 0 0 16px rgba(109,40,217,0.22)",
-                              }
-                            : {
-                                background:
-                                  "linear-gradient(90deg, #6ee7b7, #10b981 50%, transparent 100%)",
-                                boxShadow: "0 0 12px rgba(110,231,183,0.7)",
-                              }
-                        }
-                      />
-                    )}
-
-                    {/* Row 1: lesson label + status badge */}
-                    <div className="relative flex items-center justify-between">
-                      <span
-                        className="inline-flex items-center px-3 py-1 text-[11px] font-mono font-extrabold uppercase tracking-[0.18em]"
-                        style={{
-                          clipPath: rt.badgeClip,
-                          borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                          background: locked
-                            ? rt.badgeLockedBg
-                            : needsRetry
-                              ? "linear-gradient(135deg, #92400e, #d97706)"
-                            : postTestReady
-                              ? rt.badgePosttestBg
-                              : completed
-                                ? rt.badgeCompletedBg
-                                : rt.badgeActiveBg,
-                          color: locked ? "#94a3b8" : "#ecfeff",
-                          boxShadow: locked ? undefined : rt.badgeShadow,
-                        }}
-                      >
-                        {isPostTest ? "Post Test" : item.type === "quiz" ? isStarpathRealm ? "Voyage Quiz" : "Weekly Quiz" : `${isStarpathRealm ? "Mission" : "Lesson"} ${item.n}`}
-                      </span>
-
-                      {completed ? (
-                        <span
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] ${isChanceRealm ? "text-rose-50" : isMeasurementRealm ? "text-yellow-50" : "text-emerald-100"}`}
-                          style={{
-                            clipPath: rt.statusClip,
-                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                            background: rt.statusCompletedBg,
-                            boxShadow: isChanceRealm
-                              ? "inset 0 1px 0 rgba(255,241,242,0.32), 0 0 10px rgba(251,113,133,0.18)"
-                              : isMeasurementRealm
-                              ? "inset 0 1px 0 rgba(252,211,77,0.32), 0 0 10px rgba(109,40,217,0.18)"
-                              : "inset 0 1px 0 rgba(110,231,183,0.4)",
-                          }}
-                        >
-                          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3"><path d="M20 6L9 17l-5-5" /></svg>
-                          DONE
-                        </span>
-                      ) : needsRetry ? (
-                        <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-amber-50"
-                          style={{
-                            clipPath: rt.statusClip,
-                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                            background: "linear-gradient(135deg, #b45309, #f59e0b)",
-                            boxShadow: "0 0 12px rgba(245,158,11,0.4)",
-                          }}
-                        >
-                          <RotateCcw className="h-3.5 w-3.5" /> TRY AGAIN
-                        </span>
-                      ) : comingSoon ? (
-                        <span
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-rose-50"
-                          style={{
-                            clipPath: rt.statusClip,
-                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                            background: rt.statusLockedBg,
-                          }}
-                        >
-                          COMING SOON
-                        </span>
-                      ) : locked ? (
-                        <span
-                          className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-slate-400"
-                          style={{
-                            clipPath: rt.statusClip,
-                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                            background: rt.statusLockedBg,
-                          }}
-                        >
-                          <span className="inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" /> LOCKED</span>
-                        </span>
-                      ) : (
-                        <span
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono font-extrabold tracking-[0.14em] text-white"
-                          style={{
-                            clipPath: rt.statusClip,
-                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                            background: postTestReady ? rt.statusPosttestBg : rt.statusActiveBg,
-                            boxShadow: rt.statusShadow,
-                          }}
-                        >
-                          <span className={`h-1.5 w-1.5 rounded-full ${rt.dotClass} animate-pulse`} />
-                          ACTIVE
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Row 2: title + focus */}
-                    <div className="relative flex-1 min-w-0">
-                      <div className="flex items-start gap-2">
-                        <div className="font-extrabold text-white leading-tight line-clamp-2 drop-shadow-[0_1px_4px_rgba(0,0,0,0.5)]">
-                          {item.title}
-                        </div>
-                        <ReadAloudBtn
-                          text={comingSoon ? `${item.title}. Coming soon. ${item.focus}` : item.title}
-                          className="shrink-0 mt-0.5 !bg-white/10 !border-white/25 !text-white hover:!text-white hover:!border-white/40"
-                        />
-                      </div>
-                      <div className="mt-1.5 text-xs text-white/60 leading-snug line-clamp-2">
-                        {needsRetry
-                          ? `Best score: ${quizBestCorrect}/${quizTotal}. You need ${weeklyQuizMinimumCorrect(quizTotal)}/${quizTotal} to unlock Week ${Math.min(lastWeek, weekNum + 1)}.`
-                          : comingSoon
-                          ? item.focus
-                          : !weekUnlocked
-                          ? hasPersonalizedPlan
-                            ? "Complete your current lesson to unlock this"
-                            : "Complete previous weeks to unlock"
-                          : locked && isPostTest
-                            ? hasPersonalizedPlan
-                              ? "Complete your required pathway to unlock"
-                              : "Complete all lessons to unlock"
-                            : item.focus}
-                      </div>
-                    </div>
-
-                    {/* Row 3: XP + action button */}
-                    <div className={`relative flex items-center justify-between pt-2 border-t ${rt.dividerColor ?? "border-teal-400/15"}`}>
-                      <span className={`text-[10px] font-mono font-bold tracking-[0.14em] ${rt.xpLabelColor ?? "text-teal-200/70"}`}>
-                        {isPostTest ? "MASTERY" : isLesson ? `${LESSON_XP} XP` : comingSoon ? "QUIZ" : `${QUIZ_PASS_XP} XP`}
-                      </span>
-                      {locked ? (
-                        <span className="text-[10px] font-mono font-extrabold text-slate-400">
-                          {comingSoon ? "SOON" : weekUnlocked ? "—" : "LOCKED"}
-                        </span>
-                      ) : (
-                        <span
-                          className="text-[10px] font-mono font-extrabold tracking-[0.18em] px-4 py-1.5 text-white"
-                          style={{
-                            clipPath: rt.actionClip,
-                            borderRadius: isStarpathRealm ? 6 : rt.rounded ? 999 : undefined,
-                            background: postTestReady
-                              ? rt.actionPosttestBg
-                              : needsRetry
-                                ? "linear-gradient(135deg, #b45309, #f59e0b 58%, #fbbf24)"
-                              : completed
-                                ? rt.actionCompletedBg
-                                : rt.actionActiveBg,
-                            boxShadow: locked ? undefined : rt.actionShadow,
-                          }}
-                        >
-                          {needsRetry ? "TRY AGAIN" : completed ? "REPLAY" : isStarpathRealm ? item.type === "quiz" ? "START QUIZ" : "START MISSION" : "START"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Connector between cards */}
-                  {!isLast && (
-                    <div className="hidden lg:flex absolute top-1/2 -right-3 -translate-y-1/2 z-20 pointer-events-none">
-                      <div
-                        className="h-7 w-7 flex items-center justify-center"
-                        style={{
-                          clipPath: rt.connClip,
-                          borderRadius: isStarpathRealm ? 7 : rt.rounded ? "50%" : undefined,
-                          background: completed ? rt.connCompletedBg : rt.connActiveBg,
-                          boxShadow: rt.connShadow,
-                        }}
-                      >
-                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" strokeWidth="3"><path d="M9 6l6 6-6 6" /></svg>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  kicker={isPostTest ? "Post test" : isQuiz ? isStarpathRealm ? "Voyage quiz" : "Weekly quiz" : `${isStarpathRealm ? "Mission" : "Lesson"} ${item.n}`}
+                  title={item.title}
+                  readAloudText={comingSoon ? `${item.title}. Coming soon. ${item.focus}` : item.title}
+                  description={
+                    needsRetry
+                      ? `Best score: ${quizBestCorrect}/${quizTotal}. You need ${weeklyQuizMinimumCorrect(quizTotal)}/${quizTotal} to unlock Week ${Math.min(lastWeek, weekNum + 1)}.`
+                      : comingSoon
+                      ? item.focus
+                      : !weekUnlocked
+                      ? hasPersonalizedPlan
+                        ? "Complete your current lesson to unlock this"
+                        : "Complete previous weeks to unlock"
+                      : locked && isPostTest
+                        ? hasPersonalizedPlan
+                          ? "Complete your required pathway to unlock"
+                          : "Complete all lessons to unlock"
+                        : item.focus
+                  }
+                  state={state}
+                  badgeLabel={{ soon: "Coming soon", locked: "Locked", retry: "Try again", done: isLesson ? "Done" : "Passed", next: "Up next", open: undefined }[state]}
+                  xpLabel={isPostTest ? "Mastery" : completed ? `+${itemXp} XP earned` : needsRetry ? `${itemXp} XP waiting` : `${itemXp} XP`}
+                  actionLabel={{ soon: "Coming soon", locked: "Locked", retry: "Try again", done: "Replay", next: startLabel, open: startLabel }[state]}
+                  onOpen={() => openItem(item)}
+                  connector={idx < weekCards.length - 1 ? completed ? "lit" : "dim" : undefined}
+                />
               );
             })}
           </div>
 
           {!weekUnlocked ? (
-            <div className="mt-6 rounded-[28px] border border-white/10 bg-black/25 p-6 text-center backdrop-blur-md shadow-[0_16px_48px_rgba(0,0,0,0.24)]">
-              <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-2xl shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] ${isChanceRealm ? "bg-[#301b27]/85 text-rose-100" : isMeasurementRealm ? "bg-[#2a1a06]/85 text-yellow-100" : "bg-white/8 text-teal-100"}`}>
-                <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="4" y="11" width="16" height="9" rx="2" />
-                  <path d="M8 11V8a4 4 0 018 0v3" />
-                </svg>
+            <div className={`${WEEK_GLASS} mt-6 rounded-[28px] p-6 text-center shadow-[0_16px_48px_rgba(0,0,0,0.24)]`}>
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/10 text-[var(--wk-accent)]">
+                <Lock aria-hidden className="h-8 w-8" />
               </div>
               <h2 className="mt-4 text-2xl font-black text-white">Week {weekNum} is locked</h2>
-              <p className={`mt-2 text-sm font-semibold ${isChanceRealm ? "text-rose-50/80" : isMeasurementRealm ? "text-amber-50/80" : "text-teal-100/75"}`}>
+              <p className="mt-2 text-[15px] font-semibold text-white/85">
                 {previousQuizNeedsRetry
                   ? `Pass the Week ${weekNum - 1} quiz with ${weeklyQuizMinimumCorrect(previousQuizTotal)}/${previousQuizTotal}. Your best is ${previousQuizBestCorrect}/${previousQuizTotal}.`
                   : "Complete previous weeks to unlock"}
               </p>
               <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                 <button
+                  type="button"
                   onClick={() => goToWeek(previousQuizNeedsRetry ? weekNum - 1 : lastAllowedWeek)}
-                  className={`rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 ${isMeasurementRealm || isChanceRealm ? "" : "bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-emerald-950/30"}`}
-                  style={isChanceRealm ? {
-                    background: "linear-gradient(135deg, #be3455, #fb7185 55%, #fbbf24)",
-                    boxShadow: "0 10px 24px rgba(49,18,34,0.32)",
-                  } : isMeasurementRealm ? {
-                    background: "linear-gradient(135deg, #7c5a20 0%, #b8893a 55%, #d6b86c 100%)",
-                    boxShadow: "0 10px 24px rgba(80,45,8,0.32)",
-                  } : undefined}
+                  className={`${WEEK_FILL} rounded-2xl px-5 py-3 text-base font-black text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)] shadow-lg transition hover:-translate-y-0.5`}
                 >
                   {previousQuizNeedsRetry ? `Return to Week ${weekNum - 1}` : `Go to Week ${lastAllowedWeek}`}
                 </button>
                 <button
+                  type="button"
                   onClick={goBackToMap}
-                  className="rounded-2xl bg-white/10 px-5 py-3 text-sm font-black text-white transition hover:bg-white/15"
+                  className="rounded-2xl bg-white/10 px-5 py-3 text-base font-black text-white transition hover:bg-white/15"
                 >
-                  Back to Map
+                  Back to {isLevel8 ? "the stronghold" : isExpeditionWeek ? "the cavern" : getRealmDefinition(realmId).name}
                 </button>
               </div>
             </div>

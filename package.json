@@ -316,7 +316,8 @@
     "qa:school-year-db": "node scripts/manual-school-year-db-test.mjs",
     "qa:school-current-year": "node scripts/school-current-year-db-test.mjs",
     "qa:realm-locks": "node scripts/student-realm-locks-db-test.mjs",
-    "qa:remove-empty-class": "node scripts/remove-empty-class-db-test.mjs"
+    "qa:remove-empty-class": "node scripts/remove-empty-class-db-test.mjs",
+    "qa:week-page-look": "node scripts/week-page-look-audit.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

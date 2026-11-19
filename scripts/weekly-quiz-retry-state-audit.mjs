@@ -23,7 +23,8 @@ requireText(progress, "quizBestScore", "Program progress does not preserve a stu
 requireText(progress, "Math.max(previousBest, score)", "A later retry can overwrite a better quiz result.");
 requireText(hydration, "const best = candidates.reduce", "Canonical quiz attempts are not hydrated using the best attempt.");
 requireText(weekPage, "const needsRetry", "The shared week card has no persistent retry state.");
-requireText(weekPage, "TRY AGAIN", "The shared week card does not label an unsuccessful quiz clearly.");
+requireText(weekPage, 'retry: "Try again"', "The shared week card does not label an unsuccessful quiz clearly.");
+requireText(read("components/program/WeekCard.tsx"), "border-amber-400", "An unsuccessful quiz card is not amber.");
 requireText(weekPage, "previousQuizNeedsRetry", "A locked next week does not explain the previous quiz requirement.");
 requireText(sharedQuiz, "is not unlocked yet", "Number Nexus and Measurelands results do not explain the progression block.");
 requireText(sharedQuiz, "Try Quiz Again", "The shared quiz result does not provide a direct retry action.");
