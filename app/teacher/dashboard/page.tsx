@@ -1242,14 +1242,16 @@ export default function TeacherDashboardPage() {
             </div>
 
             {/* eslint-disable @typescript-eslint/no-explicit-any */}
-            {activeTab === "live" ? (
+            <div hidden={activeTab !== "live"}>
               <LiveClassPanel
                 key={selectedClass?.id ?? "none"}
                 selectedClass={selectedClass ?? null}
                 students={classStudents as any}
                 progressRows={progress}
+                active={activeTab === "live"}
               />
-            ) : activeTab === "curriculum" ? (
+            </div>
+            {activeTab === "live" ? null : activeTab === "curriculum" ? (
               <CurriculumExplorer
                 yearLabel={activeYear}
                 studentCount={classStudents.length}

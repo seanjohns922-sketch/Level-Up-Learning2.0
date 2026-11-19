@@ -3,6 +3,31 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Live Class tab reuse — 19 November
+
+The teacher dashboard keeps its single selected-class Live Class panel mounted
+while other top-level tabs are shown. Its retained event reader avoids a fresh
+history bootstrap on every return. Inactive-panel guards pause polling, focus-
+triggered reads and drawer timeline reads. The existing private subscription stays
+connected to record insert/invalidation hints without triggering hidden reads.
+Returning requests an immediate reconciliation while existing rows remain visible;
+in-flight reads can finish, and failures retain the prior data as before.
+
+Class changes remount by class ID, disposing the old reader, timers and subscription.
+Leaving the dashboard also disposes them. No browser storage or shared/global cache
+is introduced. This retains Live Class filters and drawer selection when changing
+tabs; diagnostic, curriculum and Students panels retain their existing lifecycle.
+No scoring, data persistence, access policy or display calculation changes apply.
+
+`qa:teacher-live-tab` mounts the actual panel in React/JSDOM and checks reader
+retention, no hidden focus/realtime reloads, immediate return refresh, disposal,
+no hidden new-class preload, and no old student displayed after a class change.
+It runs in the 20-check critical suite. The existing scheduler/reconnect regression
+also exercises the updated active-tab guard. Browser layout, realtime network
+behaviour and measured end-to-end tab-switch latency remain unverified; this is
+not a claim that all dashboard lag is resolved. Keeping one hidden panel costs
+memory and one live subscription while the dashboard remains open.
+
 ## Teacher Students interaction work — 19 November
 
 `StrandStudentsPanel` now memoizes per-student canonical snapshots and derived

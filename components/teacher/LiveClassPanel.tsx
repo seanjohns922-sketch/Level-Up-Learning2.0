@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowUp, ChevronsUpDown, Eye, Sparkles } from "lucide-react";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { fetchLiveClassAttempts } from "@/lib/live-class-attempts";
@@ -965,7 +965,9 @@ export default function LiveClassPanel({
   selectedClass,
   students,
   progressRows,
+  active = true,
 }: {
+  active?: boolean;
   selectedClass: ClassRow | null;
   students: StudentRow[];
   progressRows: CanonicalProgressRow[];
@@ -982,6 +984,14 @@ export default function LiveClassPanel({
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
   const studentIdsKey = students.map((student) => student.id).sort().join(",");
+
+  // Scoped to this mounted class; never persisted or shared between dashboards.
+  const activeRef = useRef(active);
+  const resumeRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    activeRef.current = active;
+    if (active) resumeRef.current?.();
+  }, [active]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1021,14 +1031,14 @@ export default function LiveClassPanel({
     let reconcileOnVisible = false;
 
     async function loadEvents() {
-      if (cancelled || document.visibilityState !== "visible" || !selectedClass?.id || !studentIds.length) return;
+      if (cancelled || !activeRef.current || document.visibilityState !== "visible" || !selectedClass?.id || !studentIds.length) return;
       const result = await eventReader.read();
       if (result.error) console.warn("[LiveClassPanel] Failed to load live activity events", result.error);
       else if (!cancelled) setEvents((result.data ?? []) as LiveActivityEventRow[]);
     }
 
     async function loadRows() {
-      if (cancelled || document.visibilityState !== "visible") return;
+      if (cancelled || !activeRef.current || document.visibilityState !== "visible") return;
       if (!selectedClass?.id) {
         if (!cancelled) {
           setRows([]);
@@ -1123,15 +1133,20 @@ export default function LiveClassPanel({
     const eventRefresh = createCoalescedRefresh(loadEvents, (error) => {
       console.warn("[LiveClassPanel] Event refresh failed", error);
     }, 30_000);
+    let sessionChecked = false;
     const refreshWhenVisible = () => {
-      if (document.visibilityState === "visible") {
+      if (activeRef.current && document.visibilityState === "visible") {
+        if (!sessionChecked) { sessionChecked = true; void ensureLiveSession(); }
         const immediate = reconcileOnVisible;
         reconcileOnVisible = false;
         refresh.request({ immediate });
         eventRefresh.request({ immediate });
       }
     };
-    void ensureLiveSession();
+    resumeRef.current = () => {
+      reconcileOnVisible = true;
+      refreshWhenVisible();
+    };
     refreshWhenVisible();
     intervalId = setInterval(refreshWhenVisible, 30000);
     window.addEventListener("focus", refreshWhenVisible);
@@ -1183,6 +1198,7 @@ export default function LiveClassPanel({
       });
     return () => {
       cancelled = true;
+      resumeRef.current = null;
       refresh.dispose();
       eventRefresh.dispose();
       eventReader.dispose();
@@ -1196,7 +1212,7 @@ export default function LiveClassPanel({
   useEffect(() => {
     let cancelled = false;
     const selectedClassId = selectedClass?.id ?? null;
-    if (!selectedClassId || !selectedStudentId) {
+    if (!active || !selectedClassId || !selectedStudentId) {
       return;
     }
 
@@ -1221,7 +1237,7 @@ export default function LiveClassPanel({
       cancelled = true;
       clearInterval(intervalId);
     };
-  }, [selectedClass?.id, selectedStudentId]);
+  }, [active, selectedClass?.id, selectedStudentId]);
 
   const cards = useMemo(() => {
     const rowMap = new Map(rows.map((row) => [row.student_id, row]));

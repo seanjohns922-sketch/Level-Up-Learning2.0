@@ -56,7 +56,7 @@ try {
   assert.equal(recoveredCalls, 2, 'cleanup cancels the waiting timer');
 
   const source = fs.readFileSync('components/teacher/LiveClassPanel.tsx', 'utf8');
-  assert.ok(source.includes('if (cancelled || document.visibilityState !== "visible") return;'));
+  assert.ok(source.includes('if (cancelled || !activeRef.current || document.visibilityState !== "visible") return;'));
   assert.equal((source.match(/refreshWhenVisible,\n      \)/g) ?? []).length, 3, 'presence and attempt subscriptions share the scheduler');
   assert.ok(source.includes('setInterval(refreshWhenVisible, 30000)'));
   assert.ok(source.includes('window.addEventListener("focus", refreshWhenVisible)'));
@@ -81,6 +81,7 @@ try {
   };
   const env = {
     createCoalescedRefresh,
+    activeRef: { current: true }, resumeRef: { current: null },
     loadRows: async () => {},
     loadEvents: async () => { reads++; await new Promise(resolve => { finishRead = resolve; }); },
     document: { get visibilityState() { return visible; }, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener() {} },
