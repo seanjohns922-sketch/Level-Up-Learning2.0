@@ -45,7 +45,8 @@ const items=new Map(catalogue.map(item=>[item.item_key,item]));
 const storage=new Map();globalThis.window={localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)}};
 for(const spec of village.VILLAGE_BUILDINGS){
  const item=catalogue.find(item=>item.metadata.worldAssetKey===spec.key);
- assert(item?.purchasable && item.price>0,'XP reward registered');
+ assert(item && item.price>0,'XP reward registered');
+ assert.equal(item.purchasable,!village.RETIRED_VILLAGE_HOME_KEYS.has(spec.key),'Retired homes stop selling; the rest stay for sale: '+spec.key);
  const styles=spec.kind==='apartments'?['castle']:Object.keys(village.VILLAGE_STYLES);
  for(const style of styles){
   const root=new THREE.Group();attach(VillageBuilding({assetKey:spec.key,style,tint:'#a855f7'}),root);root.updateMatrixWorld(true);

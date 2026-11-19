@@ -2,7 +2,7 @@ import { REALM_BUILDING_SHOP_ITEMS } from "./realm-building-collections";
 import { PREMIUM_HOME_ITEM_KEYS, PREMIUM_HOME_SHOP_ITEMS, PREMIUM_HOME_UPGRADE_ITEMS } from "./premium-homes";
 import { TRAIN_CATALOGUE } from "./train-catalogue";
 import { WORLD_SHOP_ART } from "./world-shop-art";
-import { isVillageBuilding } from "./village-buildings";
+import { isVillageBuilding, RETIRED_VILLAGE_HOME_KEYS } from "./village-buildings";
 import { WORLD_REWARD_ADDITIONS, worldCollectionFor } from "./world-expansion";
 import type { EconomyItem, EconomyState } from "@/lib/economy";
 
@@ -77,7 +77,7 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
   icon: entry.icon,
   accent: entry.accent,
   active: true,
-  purchasable: true,
+  purchasable: !RETIRED_VILLAGE_HOME_KEYS.has(entry.assetKey),
   discoverable: true,
   sort_order: entry.plot * 10 + entry.tier,
   metadata: {

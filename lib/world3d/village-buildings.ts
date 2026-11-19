@@ -16,4 +16,6 @@ export const VILLAGE_BUILDINGS = [
   { key: "village_apartments", name: "City Apartment Tower", price: 2800, tier: 3, grid: "7x7", height: 35, width: 9, floors: 10, depth: 8, kind: "apartments", icon: "building-2" },
 ] as const;
 export const VILLAGE_BUILDING_KEYS = new Set<string>(VILLAGE_BUILDINGS.map(item => item.key));
+/** Homes replaced by the premium homes: no longer sold, but anyone who owns one keeps and places it. */
+export const RETIRED_VILLAGE_HOME_KEYS = new Set<string>(["village_cottage", "village_family_house", "village_townhouse", "village_manor", "village_apartments"]);
 export function isVillageBuilding(assetKey: unknown) { return typeof assetKey === "string" && VILLAGE_BUILDING_KEYS.has(assetKey); }
