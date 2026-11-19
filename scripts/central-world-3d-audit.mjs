@@ -62,7 +62,7 @@ check(config.includes('myHomeEntrance: "my-home-entry"'), "Semantic My Home entr
 check(config.includes('myHomeExitSpawn: "my-home-exit-spawn"'), "Semantic My Home return anchor is missing");
 check(config.includes('futureLeaderboardMonument: "future-leaderboard-monument"'), "Future leaderboard reservation is missing");
 check(config.includes('futureCollectionArea: "future-collection-area"'), "Future collection reservation is missing");
-check(config.includes("maxZ: 54"), "Central world rear meadow must provide substantial playable depth");
+check(Number(config.match(/playableBounds: \{[^}]*maxZ: (\d+)/)?.[1]) >= 54, "Central world rear meadow must provide substantial playable depth");
 check(environment.includes("PlaceholderKnowledgeTower"), "Placeholder Tower is missing");
 check(environment.includes("PlaceholderMyHome"), "Physical My Home placeholder is missing");
 check(!environment.includes("CustomisationPaths") && !environment.includes("LockedCustomisationPlot") && !environment.includes("EquippedCustomisationPlot"), "Legacy fixed-slot pads or branch paths must not render in the free-placement hub");
@@ -91,18 +91,15 @@ check(world.includes('"path"') && world.includes('"road"') && world.includes('"s
 check(layout.includes("CentralWorldGroundTile") && layout.includes("writeCentralWorldGroundTiles"), "Ground customisation persistence is missing");
 check(environment.includes("GroundTile") && environment.includes("StarterScenery"), "Ground tiles or starter scenery do not render in the 3D hub");
 for (const item of ["tree", "pine_tree", "flower_bed", "lamp_post"]) check(editorCatalogue.includes(`"${item}"`), `Starter scenery missing: ${item}`);
+// The marketplace groups every world reward under one World department.
 check(
-  marketplace.includes("Buildings")
-    && marketplace.includes("Animals")
-    && marketplace.includes("Pools & Play")
-    && marketplace.includes("Special")
-    && marketplace.includes("mergeCentralWorldCatalogue"),
-  "Marketplace is not wired to the V1 central-world reward categories",
+  marketplace.includes("mergeCentralWorldCatalogue") && marketplace.includes("Buildings, trains & wildlife"),
+  "Marketplace is not wired to the central-world rewards",
 );
 check(catalogue.includes("slot: `world_plot_${entry.plot}`"), "Central-world catalogue item slots are missing");
 check((catalogue.match(/assetKey: "/g) ?? []).length === 21, "Central-world catalogue must define the 21 launch reward items");
 for (const category of ["buildings", "animals", "pools_play", "special"]) {
-  check(catalogue.includes(`area: "${category}"`) && marketplace.includes(category), `Launch category missing: ${category}`);
+  check(catalogue.includes(`area: "${category}"`), `Launch category missing: ${category}`);
 }
 check(catalogue.includes("gridSize") && launchMigration.includes('"gridSize"'), "Launch rewards must carry future grid placement size metadata");
 check(migration.includes("world_plot_1") && migration.includes("world_plot_8"), "Central-world catalogue migration does not allow world plot equip slots");

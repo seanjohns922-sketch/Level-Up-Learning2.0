@@ -34,7 +34,7 @@ const route=fs.readFileSync('app/demo-review/shattered-realms/[realm]/page.tsx',
 assert.match(route,/if\(!access.allowed\)redirect\('\/login'\)/);
 const program=fs.readFileSync('app/program/page.tsx','utf8');
 assert.match(program,/if\(\(isExpeditionWeek && !isNumber7\) \|\| item.comingSoon\) return/);
-assert.match(program,/isStarpathRealm && !isExpeditionWeek \? getStarpathWeekProgram/);
+assert.match(program,/isStarpathRealm && !isExpeditionWeek \? year : null/);assert.match(program,/getStarpathWeekProgram\(starpathProgramYear\)/);
 assert.match(program,/if \(isExpeditionWeek \|\| isStarpathRealm \|\| !previewMode\) return/);
 console.log('PASS all 64 realm-length week destinations, return links, continuous cavern floor, darkness, input validation, preview guards and unavailable lesson isolation');
 
