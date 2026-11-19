@@ -54,6 +54,7 @@ export function PostTestNotYet({
   onReview,
   onRetry,
   onBack,
+  backLabel = "Back to realm",
 }: {
   realmId: RealmLessonThemeId;
   realmName: string;
@@ -73,6 +74,8 @@ export function PostTestNotYet({
   onReview?: () => void;
   onRetry: () => void;
   onBack: () => void;
+  /** Where the quiet back link goes, e.g. "Back to my world" for Levels 7 and 8. */
+  backLabel?: string;
 }) {
   const message = postTestNotYetMessage(score, total, percent);
   const firstWeek = planWeeks[0]?.week;
@@ -206,7 +209,7 @@ export function PostTestNotYet({
                 onClick={() => (firstWeek ? onStartWeek(firstWeek) : onBack())}
                 className={`${WEEK_FILL} inline-flex h-[62px] items-center justify-center gap-2.5 rounded-[18px] text-lg font-black text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.35)] shadow-[inset_0_2px_0_rgba(255,255,255,0.3),inset_0_-4px_0_rgba(0,0,0,0.25)] transition hover:brightness-110`}
               >
-                {firstWeek ? <><Play aria-hidden className="h-5 w-5 fill-current" /> Start Week {firstWeek}</> : "Back to realm"}
+                {firstWeek ? <><Play aria-hidden className="h-5 w-5 fill-current" /> Start Week {firstWeek}</> : backLabel}
               </button>
               <button type="button" onClick={onPractise} className="h-[62px] rounded-[18px] border-2 border-amber-400/55 bg-amber-400/[0.14] text-lg font-black text-amber-200 transition hover:bg-amber-400/20">
                 Practise weak areas
@@ -222,7 +225,7 @@ export function PostTestNotYet({
             </div>
             {firstWeek ? (
               <button type="button" onClick={onBack} className="self-center text-[15px] font-bold text-white/70 underline-offset-4 hover:text-white hover:underline">
-                Back to realm
+                {backLabel}
               </button>
             ) : null}
           </div>

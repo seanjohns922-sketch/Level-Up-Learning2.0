@@ -1,0 +1,127 @@
+"use client";
+
+import { useRouter } from "next/navigation";
+import type { AssessmentQuestion } from "@/data/assessments/api";
+import { analyzeAssessmentResult, isAssessmentAnswerCorrect, type AssessmentResultProfile } from "@/data/assessments/analysis";
+import { NEW_CAVE7_PROGRAMS } from "@/data/activities/cave7/curriculum";
+import { LEVEL8_PROGRAMS } from "@/data/activities/level8/program";
+import { MEASUREMENT7_PROGRAM } from "@/data/activities/year7Measurement/curriculum";
+import { NUMBER7_PROGRAM } from "@/data/activities/year7Number/curriculum";
+import { SPACE7_PROGRAM } from "@/data/activities/year7Space/curriculum";
+import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
+import type { Cave7Realm } from "@/lib/cave7-config";
+import { level7LiveHref } from "@/lib/level7-release";
+import { getRealmDefinition } from "@/lib/realms/realm-registry";
+import type { RealmLessonThemeId } from "@/components/lesson/RealmLessonHome";
+import { PostTestNotYet, postTestNotYetMessage } from "@/components/assessment/PostTestNotYet";
+
+/**
+ * The result of a Level 7 or 8 post-test, worked out exactly as it is saved
+ * (score, strengths, weak areas and suggested weeks), so the screen can show it
+ * straight after the learner finishes.
+ */
+export function extensionPostTestResult(questions: readonly AssessmentQuestion[], answers: Record<string, string>, level: 7 | 8) {
+  return analyzeAssessmentResult({
+    questions: questions.map((question) => ({ ...question, correctAnswer: String(question.correctAnswer) })),
+    answers,
+    yearLevel: level,
+    testType: "post",
+    passThreshold: ASSESSMENT_THRESHOLDS.posttestPassPercent,
+  });
+}
+
+type ProgramWeek = { week: number; topic: string; curriculum?: readonly string[]; lessons: ReadonlyArray<{ lesson: number; curriculum?: readonly string[] }> };
+
+function levelProgram(realm: RealmLessonThemeId, level: 7 | 8): readonly ProgramWeek[] {
+  if (level === 8) return LEVEL8_PROGRAMS[realm];
+  if (realm === "number") return NUMBER7_PROGRAM;
+  if (realm === "measurement") return MEASUREMENT7_PROGRAM;
+  if (realm === "space") return SPACE7_PROGRAM;
+  return NEW_CAVE7_PROGRAMS[realm];
+}
+
+export type ExtensionPlanWeek = { week: number; topic: string; lesson: number };
+/** Level 7 and 8 questions name the curriculum descriptor they assess. */
+type CodedQuestion = AssessmentQuestion & { primaryDescriptorCode?: string; curriculumCodes?: readonly string[] };
+
+/**
+ * Levels 7 and 8 questions carry curriculum codes rather than week links, so the
+ * plan matches each wrong answer to the weeks that teach its code and suggests
+ * up to three weeks covering the most missed questions, in week order.
+ */
+export function extensionPlanWeeks(realm: RealmLessonThemeId, level: 7 | 8, questions: readonly CodedQuestion[], answers: Record<string, string>): ExtensionPlanWeek[] {
+  const weeks = levelProgram(realm, level);
+  const missed = new Map<number, { count: number; lesson: number }>();
+  for (const question of questions) {
+    const answer = answers[question.id];
+    if (answer !== undefined && answer !== "idk" && isAssessmentAnswerCorrect({ ...question, correctAnswer: String(question.correctAnswer) }, String(answer))) continue;
+    const codes = new Set([question.primaryDescriptorCode, ...(question.curriculumCodes ?? [])].filter(Boolean));
+    for (const week of weeks) {
+      const lesson = week.lessons.find((item) => item.curriculum?.some((code) => codes.has(code)));
+      if (!lesson && !week.curriculum?.some((code) => codes.has(code))) continue;
+      const entry = missed.get(week.week) ?? { count: 0, lesson: lesson?.lesson ?? 1 };
+      missed.set(week.week, { ...entry, count: entry.count + 1 });
+    }
+  }
+  return [...missed.entries()]
+    .sort(([weekA, a], [weekB, b]) => b.count - a.count || weekA - weekB)
+    .slice(0, 3)
+    .sort(([weekA], [weekB]) => weekA - weekB)
+    .map(([week, entry]) => ({ week, lesson: entry.lesson, topic: weeks.find((item) => item.week === week)?.topic ?? "" }));
+}
+
+/** Levels 7 and 8 share the "not yet" post-test screen every other level uses. */
+export function ExtensionPostTestNotYet({
+  realm,
+  level,
+  result,
+  plan,
+  onRetry,
+}: {
+  realm: RealmLessonThemeId;
+  level: 7 | 8;
+  result: AssessmentResultProfile;
+  plan: readonly ExtensionPlanWeek[];
+  onRetry: () => void;
+}) {
+  const router = useRouter();
+  const year = `Year ${level}`;
+  const realmName = getRealmDefinition(realm).name;
+  const planWeeks = plan.map((item) => ({ week: item.week, skill: item.topic || undefined }));
+  const weekHref = (week: number) =>
+    level === 7 ? level7LiveHref(realm as Cave7Realm, week, "week") : `/program?year=${encodeURIComponent(year)}&realm_id=${realm}&week=${week}&legacy=1`;
+  const message = postTestNotYetMessage(result.score, result.total, result.percentage);
+  const speech = [
+    `${message.title}. ${message.sub}`,
+    `${realmName}, Level ${level}, post-test results. You scored ${result.score} out of ${result.total}, which is ${result.percentage} percent.`,
+    planWeeks.length ? `Your plan: start with Week ${planWeeks.map((item) => item.week).join(", then Week ")}, then retry the post-test.` : "Retry the post-test when you're ready.",
+    `Score ${ASSESSMENT_THRESHOLDS.posttestPassPercent} percent or more to unlock your RELIQ card.`,
+    "Once you've finished your plan, you can replay any week and retry the post-test whenever you're ready.",
+  ].join(" ");
+
+  return (
+    <PostTestNotYet
+      realmId={realm}
+      realmName={realmName}
+      levelLabel={`Level ${level}`}
+      levelNumber={level}
+      year={year}
+      score={result.score}
+      total={result.total}
+      percent={result.percentage}
+      planWeeks={planWeeks}
+      strengths={result.strengths.slice(0, 2).map((item) => item.skillLabel)}
+      speech={speech}
+      speechKey={`assessment-results-${realm}-${year}-posttest`}
+      onStartWeek={(week) => router.push(weekHref(week))}
+      onPractise={() => {
+        const first = plan[0];
+        if (!first) return router.push(weekHref(1));
+        router.push(level === 7 ? level7LiveHref(realm as Cave7Realm, first.week, first.lesson) : weekHref(first.week));
+      }}
+      onRetry={onRetry}
+      onBack={() => router.push("/world")}
+      backLabel="Back to my world"
+    />
+  );
+}

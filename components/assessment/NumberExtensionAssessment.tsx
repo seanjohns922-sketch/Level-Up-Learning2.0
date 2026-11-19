@@ -1,5 +1,7 @@
 "use client";
 import {useEffect,useState} from 'react';
+import {ExtensionPostTestNotYet,extensionPlanWeeks,extensionPostTestResult} from './ExtensionPostTestNotYet';
+import {ASSESSMENT_THRESHOLDS} from '@/lib/assessment-rules';
 import {useRouter} from 'next/navigation';
 import AssessmentShell from './AssessmentShell';
 import AssessmentQuestionCard from './AssessmentQuestionCard';
@@ -53,6 +55,9 @@ export default function NumberExtensionAssessment({form,level=7}:{form:'pretest'
    if(key)localStorage.removeItem(key);setDone(true);
   }catch(e){setError(e instanceof Error?e.message:'Your answers could not be saved. Please retry.');}finally{setSaving(false);}
  }
+ // A post-test under the pass mark shows the shared "not yet" screen with a plan to pass.
+ const notYet=done&&form==='posttest'&&draft?extensionPostTestResult(questions,draft.answers,level):null;
+ if(notYet&&notYet.percentage<ASSESSMENT_THRESHOLDS.posttestPassPercent)return <ExtensionPostTestNotYet realm="number" level={level} result={notYet} plan={extensionPlanWeeks("number",level,questions,draft!.answers)} onRetry={()=>{setDone(false);setDraft({answers:{},index:0,completionId:crypto.randomUUID(),startedAt:new Date().toISOString()});}}/>;
  if(done)return <main className="grid min-h-screen place-items-center bg-[#001b18] p-6 text-white"><div className="max-w-lg text-center"><h1 className="text-3xl font-black">Level {level} {form==='pretest'?'pre-test':'post-test'} saved</h1><p className="my-5">Your teacher can review your answers and progress.</p><button className="rounded-xl bg-teal-400 px-5 py-3 font-bold text-teal-950" onClick={()=>router.push('/world')}>Back to my world</button></div></main>;
  if(!draft)return <main className="grid min-h-screen place-items-center bg-[#001b18] p-6 text-white"><div>{error||'Loading your assessment…'}{error?<button className="ml-4 underline" onClick={()=>router.push('/world')}>Back</button>:null}</div></main>;
  const q=questions[draft.index],answered=questions.map(q=>Boolean(draft.answers[q.id]));
