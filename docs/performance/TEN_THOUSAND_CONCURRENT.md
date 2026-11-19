@@ -3,6 +3,48 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Concurrent compact dashboard reads — 19 November
+
+Added `scripts/staging/compact-dashboard-load-local.mjs`. It compares six dashboard
+read sources at 1, 4 and 20 concurrent teachers (25 students per class), with three
+alternating full/compact rounds. The isolated local API contains 500 synthetic
+students; these students are **not concurrently writing** during this test.
+55,000 temporary events model ten attempts per student, each with a start and ten
+answers. The runner checks that the compact path exists, preserves the latest
+eleven events per student, keeps all canonical evidence and class boundaries, and
+produces identical activity/performance with the actual UI reducers. It does not
+render the browser or reproduce every panel query.
+
+Final measured snapshot p95 (milliseconds):
+
+| Concurrent teachers | Full history | Compact | Under 1 second |
+| --- | ---: | ---: | --- |
+| 1 | 203 | 142 | Yes |
+| 4 | 541 | 430 | Yes |
+| 20 | 3,394 | 2,048 | **No** |
+
+Across the 60 snapshots in each 20-teacher mode, event payloads fell from
+169,693,608 to 7,228,560 serialized UTF-8 bytes (95.7%); HTTP requests fell from
+1,440 to 420. All 150 snapshots passed equivalence and data-scope assertions.
+The runner deliberately exits non-zero because the 20-teacher latency gate fails.
+An earlier realistic-event run also missed the gate (compact p95 2,197 ms).
+
+Per-source HTTP timings in the final compact run were presence 1,492 ms, events
+1,936 ms, lessons 1,948 ms, quizzes 1,960 ms, assessments 1,881 ms and daily activity
+1,746 ms. This suggests shared concurrency pressure rather than an event-only
+bottleneck; these timings include queueing/transport and do not identify its cause.
+Next: profile query plans and API/connection wait under this exact workload before
+changing pooling or consolidating requests. Larger classes, concurrent student
+writes, hosted hardware and 10,000-user capacity remain unverified.
+
+Results: `docs/performance/compact-dashboard-load-2026-11-19.json`. Reproduce with
+Node 24 by running the absolute path to the new script from the checkout containing
+the isolated `.local-archive/scale-local` fixtures. It rejects hosted URLs and
+pre-existing compact functions, removes only randomly marked test events, drops
+temporary functions, and verifies restoration in `finally`. Cleanup passed.
+Targeted ESLint (`--no-ignore`) and Node syntax checks passed. This change contains
+only test tooling and evidence: no application change, new migration or deployment.
+
 ## Compact Live Class read implemented — 18 November
 
 The panel now opts into `get_live_class_compact_event_page_secure`. Migration

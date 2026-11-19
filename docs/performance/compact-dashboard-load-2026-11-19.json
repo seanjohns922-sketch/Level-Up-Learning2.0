@@ -1,0 +1,122 @@
+{
+  "at": "2026-11-19T00:46:11.615Z",
+  "environment": "isolated local synthetic data",
+  "students": 500,
+  "cases": [
+    {
+      "concurrency": 1,
+      "rounds": 3,
+      "full": {
+        "snapshots": 3,
+        "p95Ms": 203,
+        "maximumMs": 203,
+        "requests": 72,
+        "eventRows": 26622,
+        "eventBytes": 8712618,
+        "sourceP95Ms": {
+          "presence": 17,
+          "events": 203,
+          "lessons": 142,
+          "quizzes": 137,
+          "assessments": 146,
+          "dailyActivity": 20
+        }
+      },
+      "compact": {
+        "snapshots": 3,
+        "p95Ms": 142,
+        "maximumMs": 142,
+        "requests": 21,
+        "eventRows": 825,
+        "eventBytes": 361428,
+        "sourceP95Ms": {
+          "presence": 25,
+          "events": 82,
+          "lessons": 132,
+          "quizzes": 140,
+          "assessments": 142,
+          "dailyActivity": 22
+        }
+      },
+      "passedLatencyGate": true
+    },
+    {
+      "concurrency": 4,
+      "rounds": 3,
+      "full": {
+        "snapshots": 12,
+        "p95Ms": 541,
+        "maximumMs": 541,
+        "requests": 288,
+        "eventRows": 106614,
+        "eventBytes": 34890585,
+        "sourceP95Ms": {
+          "presence": 245,
+          "events": 541,
+          "lessons": 356,
+          "quizzes": 428,
+          "assessments": 396,
+          "dailyActivity": 247
+        }
+      },
+      "compact": {
+        "snapshots": 12,
+        "p95Ms": 430,
+        "maximumMs": 430,
+        "requests": 84,
+        "eventRows": 3300,
+        "eventBytes": 1445712,
+        "sourceP95Ms": {
+          "presence": 108,
+          "events": 340,
+          "lessons": 386,
+          "quizzes": 430,
+          "assessments": 397,
+          "dailyActivity": 233
+        }
+      },
+      "passedLatencyGate": true
+    },
+    {
+      "concurrency": 20,
+      "rounds": 3,
+      "full": {
+        "snapshots": 60,
+        "p95Ms": 3394,
+        "maximumMs": 3430,
+        "requests": 1440,
+        "eventRows": 517011,
+        "eventBytes": 169693608,
+        "sourceP95Ms": {
+          "presence": 1889,
+          "events": 3394,
+          "lessons": 2393,
+          "quizzes": 2140,
+          "assessments": 2654,
+          "dailyActivity": 2389
+        }
+      },
+      "compact": {
+        "snapshots": 60,
+        "p95Ms": 2048,
+        "maximumMs": 2125,
+        "requests": 420,
+        "eventRows": 16500,
+        "eventBytes": 7228560,
+        "sourceP95Ms": {
+          "presence": 1492,
+          "events": 1936,
+          "lessons": 1948,
+          "quizzes": 1960,
+          "assessments": 1881,
+          "dailyActivity": 1746
+        }
+      },
+      "passedLatencyGate": false
+    }
+  ],
+  "restored": true,
+  "syntheticEventsAdded": 55000,
+  "equivalencePassed": true,
+  "passed": false
+}
