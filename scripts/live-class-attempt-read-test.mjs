@@ -42,6 +42,16 @@ for (const table of ['student_lesson_attempts','student_weekly_quiz_attempts','s
   assert(test.calls.every(c => c.filters.completed === (table === 'student_lesson_attempts' ? true : undefined)));
 }
 const empty = fixture();
+// Report details must survive pagination without increasing routine class payloads.
+const reportRows = rows.map(row => ({ ...row, question_results: [{ correct: true, curriculum_codes: ['AC9M3N01'] }] }));
+const report = fixture({ data: reportRows });
+assert.deepEqual((await fetchLiveClassAttempts(report.client,'student_realm_assessments',['ours'],()=>true,{includeQuestionResults:true})).data,reportRows);
+assert(report.calls.slice(1).every(call => call.projection.includes('question_results')));
+const summary = fixture();
+await fetchLiveClassAttempts(summary.client,'student_realm_assessments',['ours']);
+assert(summary.calls.every(call => !call.projection.includes('question_results')));
+const failedReport = fixture({data:reportRows,failAt:3});
+assert.equal((await fetchLiveClassAttempts(failedReport.client,'student_realm_assessments',['ours'],()=>true,{includeQuestionResults:true})).data,null);
 assert.deepEqual(await fetchLiveClassAttempts(empty.client,'student_lesson_attempts',[]),{data:[],error:null});
 assert.equal(empty.calls.length,0,'Empty scope must not read all students');
 for (const failAt of [1,3]) {

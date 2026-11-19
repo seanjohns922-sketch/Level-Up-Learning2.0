@@ -20,7 +20,7 @@ type AttemptRows = {
     week: number; quiz_id: string; attempt_no: number; accuracy_percent: number;
   };
   student_realm_assessments: AttemptRow & {
-    assessment_type: "pretest" | "posttest"; score_percent: number;
+    assessment_type: "pretest" | "posttest"; score_percent: number; question_results?: unknown;
   };
 };
 
@@ -34,6 +34,7 @@ export async function fetchLiveClassAttempts<T extends AttemptTable>(
   table: T,
   studentIds: string[],
   isActive = () => true,
+  options: { includeQuestionResults?: boolean } = {},
 ) {
   const failure = (message: string) => ({ data: null, error: new Error(message) });
   if (!isActive()) return failure("Attempt read cancelled");
@@ -55,7 +56,10 @@ export async function fetchLiveClassAttempts<T extends AttemptTable>(
     let after: string | null = null;
     for (;;) {
       if (!isActive()) return failure("Attempt read cancelled");
-      let pageQuery: ReturnType<typeof query> = query(`id,${columns[table]}`).order("id", { ascending: true }).lte("id", through).limit(500);
+      // Detailed answers are only needed for an on-demand assessment report,
+      // never for the regularly refreshed class summaries.
+      const detail = table === "student_realm_assessments" && options.includeQuestionResults ? ",question_results" : "";
+      let pageQuery: ReturnType<typeof query> = query(`id,${columns[table]}${detail}`).order("id", { ascending: true }).lte("id", through).limit(500);
       if (after) pageQuery = pageQuery.gt("id", after);
       const page: Awaited<ReturnType<typeof query>> = await pageQuery;
       if (!isActive()) return failure("Attempt read cancelled");

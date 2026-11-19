@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
+import { assetUrl, documentHtml, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { diagnosticReportHtml, realmTestCheckpoints, type RealmTestRow } from "@/lib/documents/diagnostic-report";
 import { supabase } from "@/lib/supabase";
 import { fetchLiveClassAttempts } from "@/lib/live-class-attempts";
@@ -277,11 +277,22 @@ export default function WholeMathsDiagnosticPanel({
     if (!win) return;
     // Pre-tests count as Start and June / December post-tests as Mid / End
     // where no whole-maths diagnostic was sat.
-    const { data: realmTests, error } = await supabase
-      .from("student_realm_assessments")
-      .select("realm_id,assessment_type,working_level,score_percent,completed_at,question_results")
-      .eq("student_id", studentId);
-    if (error) console.warn("[WholeMathsDiagnosticPanel] realm tests unavailable for the report", error);
+    const { data: realmTests, error } = await fetchLiveClassAttempts(
+      supabase, "student_realm_assessments", [studentId], () => !win.closed,
+      { includeQuestionResults: true },
+    );
+    if (win.closed) return;
+    if (error) {
+      console.warn("[WholeMathsDiagnosticPanel] realm tests unavailable for the report", error);
+      // Static application-owned HTML only; no database or user text is interpolated.
+      writeDocument(win, documentHtml({
+        title: "Report unavailable",
+        css: ".toolbar { display: none; }",
+        pages: ["<h1>Report could not be loaded</h1><p>Close this window and try opening the report again. No report was generated because the complete test history could not be loaded.</p>"],
+        autoPrint: false,
+      }));
+      return;
+    }
     writeDocument(win, diagnosticReportHtml({
       brand: {
         schoolName,
