@@ -3,6 +3,26 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Teacher Students interaction work — 19 November
+
+`StrandStudentsPanel` now memoizes per-student canonical snapshots and derived
+row values separately from sorting. Opening details, sorting or changing only the
+loading flag reuses those values. Changes to progress, roster, live activity,
+realm, year or source availability invalidate the calculations. The dashboard
+also retains the filtered roster array while its inputs are unchanged. No saved
+values, snapshot rules, layout, sort comparators or access permissions changed.
+
+`qa:teacher-student-render` mounts the actual component in React/JSDOM, instruments
+the real snapshot builder and verifies sorting and expansion add no snapshot
+calculations. It checks new saved weeks appear immediately, unavailable sources
+are displayed as unavailable and Number progress does not leak into Measurement
+when switching realms. The new check belongs to `qa:critical` (19 checks).
+
+This removes confirmed redundant calculation; it is not a measured browser frame-
+time improvement. Top-level tab switches still unmount/remount panels and can reload
+history. That remains a separate investigation; do not claim all dashboard lag is
+fixed. No database migration is required.
+
 ## Production-reader load baseline — 19 November
 
 The local `dashboard-mixed` capacity scenario now uses the application's shared

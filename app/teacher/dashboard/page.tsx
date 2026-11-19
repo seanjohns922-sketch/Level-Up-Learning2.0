@@ -1,7 +1,7 @@
 "use client";
 
 import { getProgramWeekCount } from "@/lib/program-weeks";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -518,9 +518,9 @@ export default function TeacherDashboardPage() {
   const schoolHomeId =
     schoolPreviewSchoolId ?? selectedClass?.school_id ?? null;
   const schoolLogo = getSchoolLogo({ name: schoolName });
-  const classStudents = students.filter(
+  const classStudents = useMemo(() => students.filter(
     (student) => student.class_id === selectedClassId && !student.archived_at,
-  );
+  ), [students, selectedClassId]);
 
   useEffect(() => {
     let cancelled = false;

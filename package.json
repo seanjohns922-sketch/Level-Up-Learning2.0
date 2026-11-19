@@ -298,6 +298,7 @@
     "qa:g6-question-integrity": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/g6-question-integrity-test.mjs",
     "qa:g6-reliability": "node scripts/g6-reliability-audit.mjs",
     "typecheck": "next typegen && tsc --noEmit",
+    "qa:teacher-student-render": "node scripts/teacher-student-render-test.mjs",
     "qa:teacher-dashboard-loading": "node scripts/teacher-dashboard-loading-test.mjs",
     "qa:critical": "node scripts/qa-runner.mjs critical",
     "qa:assessment-question-results": "node scripts/assessment-question-results-audit.mjs",
