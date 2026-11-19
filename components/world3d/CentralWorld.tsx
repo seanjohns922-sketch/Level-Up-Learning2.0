@@ -5,6 +5,9 @@ import "./world-editor-mobile.css";
 import { isRealmBuilding } from "@/lib/world3d/realm-building-collections";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
+import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeLevels, PREMIUM_HOME_SPECS, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { PremiumHomeWorldContext } from "@/components/world3d/premium-homes/PremiumHomeContext";
+import { PremiumHomeUpgradeRows } from "@/components/world3d/premium-homes/PremiumHomeUpgradeRows";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
@@ -33,7 +36,7 @@ import {
   type WorldMoveInput,
 } from "@/components/world3d/SharedWorldPlayer";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
-import { economyErrorMessage, fetchDemoEconomy, fetchStudentEconomy, type EconomyItem } from "@/lib/economy";
+import { economyErrorMessage, fetchDemoEconomy, fetchStudentEconomy, purchaseEconomyItem, type EconomyItem } from "@/lib/economy";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import {
   CENTRAL_WORLD_ANCHORS,
@@ -42,6 +45,7 @@ import {
 } from "@/lib/world3d/central-world-config";
 import {
   CENTRAL_WORLD_CUSTOMISATION_CATALOG,
+  CENTRAL_WORLD_SHOP_ROWS,
   mergeCentralWorldCatalogue,
 } from "@/lib/world3d/central-world-customisation-catalog";
 import { rememberCentralWorldHomeEntry } from "@/lib/world3d/world-navigation-context";
@@ -586,6 +590,24 @@ export default function CentralWorld() {
   const strokeState = useRef({active:false,recorded:false});
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
+  const [upgradingHome, setUpgradingHome] = useState(false);
+  const homeWorld = useMemo(() => ({ levels: premiumHomeLevels(ownedItemKeys), night }), [ownedItemKeys, night]);
+  // Upgrades are XP purchases checked by the server; every copy of the style shows the new level.
+  async function upgradeHome(style: PremiumHomeStyle) {
+    const next = nextPremiumHomeUpgrade(style, ownedItemKeys);
+    if (!next || upgradingHome) return;
+    if (!preview && !student?.studentId) return;
+    setUpgradingHome(true);
+    try {
+      const state = await purchaseEconomyItem(student?.studentId ?? "demo-preview", next.itemKey, CENTRAL_WORLD_SHOP_ROWS, preview);
+      setOwnedItemKeys(new Set(state.inventory.map((entry) => entry.item_key)));
+      setEconomyMessage(`${PREMIUM_HOME_SPECS[style].name} upgraded to Level ${next.level}: ${next.name}!`);
+    } catch (error) {
+      setEconomyMessage(economyErrorMessage(error));
+    } finally {
+      setUpgradingHome(false);
+    }
+  }
   const historyRef = useRef(editHistory);
   useEffect(() => { historyRef.current = editHistory; }, [editHistory]);
   const hasAvailableAction = activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
@@ -625,7 +647,7 @@ export default function CentralWorld() {
   useEffect(() => {
     let cancelled = false;
     const request = preview
-      ? fetchDemoEconomy(CENTRAL_WORLD_CUSTOMISATION_CATALOG)
+      ? fetchDemoEconomy(CENTRAL_WORLD_SHOP_ROWS)
       : student?.studentId
         ? fetchStudentEconomy(student.studentId)
         : null;
@@ -643,7 +665,7 @@ export default function CentralWorld() {
         if (requestedBuildItemKey && nextItemsById.has(requestedBuildItemKey) && ownedKeys.has(requestedBuildItemKey)) {
           const requestedItem = nextItemsById.get(requestedBuildItemKey)!;
           const nextBuildPlacement = selectCentralWorldInventoryPlacement(requestedItem, nextPlacements, { gridX: -5, gridZ: 5 });
-          if (isVillageBuilding(requestedItem.metadata.worldAssetKey) || isRealmBuilding(requestedItem.metadata.worldAssetKey) || isTrainAsset(requestedItem.metadata.worldAssetKey)) {
+          if (isVillageBuilding(requestedItem.metadata.worldAssetKey) || isRealmBuilding(requestedItem.metadata.worldAssetKey) || isPremiumHome(requestedItem.metadata.worldAssetKey) || isTrainAsset(requestedItem.metadata.worldAssetKey)) {
             setEditorOpen(true);
             setLibrarySection("owned");
             setSelectedInventoryItemKey(requestedBuildItemKey);
@@ -1189,9 +1211,11 @@ export default function CentralWorld() {
     <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
+        <PremiumHomeWorldContext.Provider value={homeWorld}>
         <CentralWorldScene night={night} selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
           <div className="worldEditPicked" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
             <b>{selectedItem.name}</b>
+            <PremiumHomeUpgradeRows assetKey={selectedItem.metadata.worldAssetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={(style) => void upgradeHome(style)} />
             <button type="button" className="worldEditPickedMove" onClick={() => pickUpPlacement(selectedPlacement)}><Move size={20} aria-hidden="true" />Move</button>
             {selectedPlacement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
               <button type="button" onClick={() => turnPlaced(selectedPlacement, selectedItem)}><RotateCw size={20} aria-hidden="true" />Turn</button>
@@ -1199,6 +1223,7 @@ export default function CentralWorld() {
             </> : null}
           </div>
         ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} />
+        </PremiumHomeWorldContext.Provider>
       </Canvas>
       </div>
 

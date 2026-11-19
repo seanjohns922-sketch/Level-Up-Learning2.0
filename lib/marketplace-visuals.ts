@@ -87,5 +87,7 @@ export function isMarketplaceItemAvailable(item: EconomyItem) {
 }
 
 export function isMarketplaceItemListed(item: EconomyItem) {
+  // Home upgrades are bought from the home itself in the world.
+  if (item.metadata?.marketplaceHidden === true) return false;
   return item.purchasable || item.metadata?.marketplace_status === "artwork_unavailable";
 }

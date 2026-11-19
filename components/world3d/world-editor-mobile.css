@@ -266,3 +266,8 @@
   .worldEditRound { width: 44px; height: 44px; }
   .worldEditDone { height: 44px; padding: 0 14px; font-size: 13px !important; gap: 6px; }
 }
+
+/* Premium homes: level and upgrade in the picked-item menu */
+.worldEditPicked .worldEditPickedLevel { font: 800 13px var(--font-sans); color: rgba(255, 255, 255, 0.72); padding: 0 2px; }
+.worldEditPicked .worldEditPickedUpgrade { background: linear-gradient(#ffd84d, #ffb81c); color: #4a2f00; box-shadow: 0 4px 0 #d18a00; }
+.worldEditPicked .worldEditPickedUpgrade:disabled { opacity: 0.7; cursor: progress; }

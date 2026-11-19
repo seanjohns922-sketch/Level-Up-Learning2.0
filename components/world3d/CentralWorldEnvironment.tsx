@@ -21,6 +21,8 @@ import { LandmarkDetails, Tree, DetailedScenery, DETAILED_SCENERY_KEYS, Detailed
 import { CollectionScenery, COLLECTION_SCENERY_KEYS } from "./CollectionScenery";
 import { VillageBuilding } from "./VillageBuildings";
 import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buildings";
+import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { PlacedPremiumHome } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { CollectionReward, COLLECTION_REWARD_KEYS } from "./CollectionRewards";
 import { FortressScenery, FORTRESS_SCENERY_KEYS } from "@/components/world3d/FortressScenery";
 import { WildlifeScenery, WILDLIFE_KEYS, AustralianHabitat } from "@/components/world3d/WildlifeScenery";
@@ -322,6 +324,8 @@ export function RewardPlotObject({ item, accent, tier, tint, buildingStyle }: { 
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const category = typeof item.metadata.marketplaceCategory === "string" ? item.metadata.marketplaceCategory : "";
   if (category === "world_basic") return <StarterScenery assetKey={assetKey} tint={tint} />;
+  const homeStyle = premiumHomeStyle(assetKey);
+  if (homeStyle) return <PlacedPremiumHome style={homeStyle} />;
   if (REALM_BUILDING_KEYS.has(assetKey)) return <RealmBuildingModel assetKey={assetKey} tint={tint} />;
   if (isVillageBuilding(assetKey)) return <VillageBuilding assetKey={assetKey} style={buildingStyle} tint={tint} />;
   if (isTrainAsset(assetKey) && assetKey !== "rail_train") return <TrainUnit asset={assetKey}/>;

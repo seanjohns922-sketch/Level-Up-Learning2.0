@@ -172,5 +172,9 @@
   {"key":"pattern_loom","name":"Pattern Peaks Crystal House","native":[4.41672945022583,4.05000000178814,5.099999904632568],"size":[7,6.4187766835180335,8.082903817122558],"footprint":[10,10]},
   {"key":"stats_station","name":"Statistica Glasshouse","native":[5,3.306000009775162,5],"size":[8,5.28960001564026,8],"footprint":[10,10]},
   {"key":"chance_games","name":"Chance Hollow Fortune House","native":[5,3.82000000089407,5],"size":[7,5.348000001251697,7],"footprint":[10,10]},
-  {"key":"star_habitat","name":"Starpath Orbital Home","native":[5.300000190734863,2.695999983549118,5.300000190734863],"size":[8,4.0694337909830285,8],"footprint":[10,10]}
+  {"key":"star_habitat","name":"Starpath Orbital Home","native":[5.300000190734863,2.695999983549118,5.300000190734863],"size":[8,4.0694337909830285,8],"footprint":[10,10]},
+  {"key":"home_cottage","name":"Cottage","native":[14.400024,12.336,9.48],"size":[14.400024,12.336,9.48],"footprint":[16,10]},
+  {"key":"home_modern","name":"Modern Home","native":[9.504012,9.492024,8.112],"size":[9.504012,9.492024,8.112],"footprint":[10,10]},
+  {"key":"home_treehouse","name":"Treehouse Home","native":[13.0098,17.872317,11.687193],"size":[13.0098,17.872317,11.687193],"footprint":[14,12]},
+  {"key":"home_apartment","name":"Apartment Block","native":[8.736,21.912012,7.008],"size":[8.736,21.912012,7.008],"footprint":[10,8]}
 ]

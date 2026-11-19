@@ -80,8 +80,10 @@ const freeRenderers=new Set([
  ...extractKeys('FortressScenery.tsx','FORTRESS_SCENERY_KEYS'),
  'drawbridge',
 ]);
+const { PREMIUM_HOME_STYLES, premiumHomeAssetKey } = await import('../lib/world3d/premium-homes.ts');
 const rewardRenderers=new Set([
  ...WORLD_REWARD_ADDITIONS.map(i=>i.key), ...VILLAGE_BUILDING_KEYS, ...REALM_BUILDING_KEYS, ...RAIL_KEYS,
+ ...PREMIUM_HOME_STYLES.map(premiumHomeAssetKey),
  ...extractKeys('DetailedScenery.tsx','DETAILED_REWARD_KEYS'),
  ...extractKeys('AustralianPlaces.tsx','AUSTRALIAN_PLACE_KEYS'),
  'wildlife_habitat','bunny_garden','puppy_yard','pet_sanctuary',

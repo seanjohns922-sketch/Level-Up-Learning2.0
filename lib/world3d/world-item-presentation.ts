@@ -2,6 +2,7 @@ import { REALM_DESIGN_PRESENTATIONS } from "./realm-building-collections";
 import { TRAIN_DESIGNS } from "./train-catalogue";
 import { VILLAGE_INFRASTRUCTURE } from "./village-infrastructure";
 import { VILLAGE_BUILDINGS } from "./village-buildings";
+import { PREMIUM_HOME_SPECS, PREMIUM_HOME_STYLES, premiumHomeAssetKey } from "./premium-homes";
 import { STATION_ROOF_HEIGHT } from "./world-scale";
 import type { EconomyItem } from "@/lib/economy";
 
@@ -31,6 +32,8 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   rail_train: {height:2.25, footprint:[2,2], sizing:"fixed", theme:"garden"},
   ...Object.fromEntries(TRAIN_DESIGNS.map(item=>[item.key,{height:2.7,footprint:[2,2] as [number,number],sizing:"fixed" as const,theme:"garden" as const}])),
   ...Object.fromEntries(VILLAGE_INFRASTRUCTURE.map(item=>[item.key,{height:item.height,width:"width" in item?item.width:undefined,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"garden" as const}])),
+  // Premium homes scale themselves (PremiumHome), so each upgrade grows in place.
+  ...Object.fromEntries(PREMIUM_HOME_STYLES.map(style=>[premiumHomeAssetKey(style),{height:8,sizing:"fixed" as const,footprint:PREMIUM_HOME_SPECS[style].gridSize.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
   ...Object.fromEntries(VILLAGE_BUILDINGS.map(item=>[item.key,{height:item.height,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
   // Small free props: target sizes relative to the reference avatar.
   fruit_tree: {height:5.5, footprint:[6,6], theme:"garden"},
