@@ -1,0 +1,767 @@
+{
+  "environment": "isolated local synthetic dashboard workload",
+  "settings": {
+    "pg_stat_statements.track_planning": "off",
+    "track_io_timing": "off",
+    "track_wal_io_timing": "off"
+  },
+  "caveats": [
+    "Shared database deltas include fixture preparation and background services",
+    "Consult captured settings before interpreting zero planning/I/O timings; WAL counters cover the entire database including fixture provisioning",
+    "Statement execution excludes network, pool waiting and some transaction overhead",
+    "One-second activity samples can miss short waits"
+  ],
+  "teacherStatements": [
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "assessment table",
+      "calls": 150,
+      "plans": 0,
+      "execution_ms": 32432.00021900001,
+      "planning_ms": 0,
+      "block_hits": 1656809,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 216.2133347933334
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "lesson attempts table",
+      "calls": 150,
+      "plans": 0,
+      "execution_ms": 31492.550934,
+      "planning_ms": 0,
+      "block_hits": 1671330,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 209.95033956
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "quiz attempts table",
+      "calls": 150,
+      "plans": 0,
+      "execution_ms": 31303.503479000006,
+      "planning_ms": 0,
+      "block_hits": 1650887,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 208.6900231933334
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "teacher event page RPC",
+      "calls": 1350,
+      "plans": 0,
+      "execution_ms": 4568.432887000001,
+      "planning_ms": 0,
+      "block_hits": 448647,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 3.3840243607407414
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "teacher compact event page RPC",
+      "calls": 75,
+      "plans": 0,
+      "execution_ms": 4556.712167,
+      "planning_ms": 0,
+      "block_hits": 355543,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 60.75616222666666
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "live activity RPC",
+      "calls": 150,
+      "plans": 0,
+      "execution_ms": 1424.6135460000096,
+      "planning_ms": 0,
+      "block_hits": 24921,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 9.497423640000063
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "event history table",
+      "calls": 150,
+      "plans": 0,
+      "execution_ms": 1399.2662869999995,
+      "planning_ms": 0,
+      "block_hits": 28999,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 9.32844191333333
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "teacher daily activity RPC",
+      "calls": 150,
+      "plans": 0,
+      "execution_ms": 173.27091300000006,
+      "planning_ms": 0,
+      "block_hits": 6073,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 1.1551394200000005
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "session configuration",
+      "calls": 2326,
+      "plans": 0,
+      "execution_ms": 72.68136299999998,
+      "planning_ms": 0,
+      "block_hits": 97,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.031247361564918304
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "teacher compact event page RPC",
+      "calls": 1,
+      "plans": 0,
+      "execution_ms": 35.347833,
+      "planning_ms": 0,
+      "block_hits": 7237,
+      "block_reads": 0,
+      "wal_bytes": 6330,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 35.347833
+    },
+    {
+      "workloadRole": "teacher authenticated",
+      "category": "commit",
+      "calls": 9,
+      "plans": 0,
+      "execution_ms": 0.002749999999999999,
+      "planning_ms": 0,
+      "block_hits": 0,
+      "block_reads": 0,
+      "wal_bytes": 0,
+      "averagePlanningMs": null,
+      "averageExecutionMs": 0.00030555555555555544
+    }
+  ],
+  "load": {
+    "at": "2026-11-19T00:50:50.655Z",
+    "environment": "isolated local synthetic data",
+    "students": 500,
+    "cases": [
+      {
+        "concurrency": 1,
+        "rounds": 3,
+        "full": {
+          "snapshots": 3,
+          "p95Ms": 158,
+          "maximumMs": 158,
+          "requests": 72,
+          "eventRows": 26622,
+          "eventBytes": 8712618,
+          "sourceP95Ms": {
+            "presence": 14,
+            "events": 158,
+            "lessons": 134,
+            "quizzes": 138,
+            "assessments": 136,
+            "dailyActivity": 29
+          }
+        },
+        "compact": {
+          "snapshots": 3,
+          "p95Ms": 133,
+          "maximumMs": 133,
+          "requests": 21,
+          "eventRows": 825,
+          "eventBytes": 361428,
+          "sourceP95Ms": {
+            "presence": 14,
+            "events": 54,
+            "lessons": 133,
+            "quizzes": 127,
+            "assessments": 121,
+            "dailyActivity": 11
+          }
+        },
+        "passedLatencyGate": true
+      },
+      {
+        "concurrency": 4,
+        "rounds": 3,
+        "full": {
+          "snapshots": 12,
+          "p95Ms": 466,
+          "maximumMs": 466,
+          "requests": 288,
+          "eventRows": 106614,
+          "eventBytes": 34890585,
+          "sourceP95Ms": {
+            "presence": 58,
+            "events": 466,
+            "lessons": 320,
+            "quizzes": 350,
+            "assessments": 350,
+            "dailyActivity": 229
+          }
+        },
+        "compact": {
+          "snapshots": 12,
+          "p95Ms": 390,
+          "maximumMs": 390,
+          "requests": 84,
+          "eventRows": 3300,
+          "eventBytes": 1445712,
+          "sourceP95Ms": {
+            "presence": 80,
+            "events": 301,
+            "lessons": 390,
+            "quizzes": 314,
+            "assessments": 374,
+            "dailyActivity": 240
+          }
+        },
+        "passedLatencyGate": true
+      },
+      {
+        "concurrency": 20,
+        "rounds": 3,
+        "full": {
+          "snapshots": 60,
+          "p95Ms": 2217,
+          "maximumMs": 2257,
+          "requests": 1440,
+          "eventRows": 517011,
+          "eventBytes": 169693608,
+          "sourceP95Ms": {
+            "presence": 1039,
+            "events": 2217,
+            "lessons": 1533,
+            "quizzes": 1628,
+            "assessments": 1574,
+            "dailyActivity": 1215
+          }
+        },
+        "compact": {
+          "snapshots": 60,
+          "p95Ms": 1687,
+          "maximumMs": 1710,
+          "requests": 420,
+          "eventRows": 16500,
+          "eventBytes": 7228560,
+          "sourceP95Ms": {
+            "presence": 1208,
+            "events": 1636,
+            "lessons": 1557,
+            "quizzes": 1549,
+            "assessments": 1666,
+            "dailyActivity": 1466
+          }
+        },
+        "passedLatencyGate": false
+      }
+    ],
+    "restored": true,
+    "syntheticEventsAdded": 55000,
+    "equivalencePassed": true,
+    "passed": false
+  },
+  "policyProbe": {
+    "environment": "isolated local rollback-only policy experiment",
+    "cases": [
+      {
+        "teacherOrdinal": 1,
+        "table": "student_lesson_attempts",
+        "rows": 1569,
+        "equivalent": true,
+        "baselineMs": 78.259,
+        "candidateMs": 78.235
+      },
+      {
+        "teacherOrdinal": 1,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 523,
+        "equivalent": true,
+        "baselineMs": 82.194,
+        "candidateMs": 76.983
+      },
+      {
+        "teacherOrdinal": 1,
+        "table": "student_realm_assessments",
+        "rows": 1046,
+        "equivalent": true,
+        "baselineMs": 79.714,
+        "candidateMs": 77.41
+      },
+      {
+        "teacherOrdinal": 2,
+        "table": "student_lesson_attempts",
+        "rows": 1560,
+        "equivalent": true,
+        "baselineMs": 79.302,
+        "candidateMs": 77.546
+      },
+      {
+        "teacherOrdinal": 2,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 520,
+        "equivalent": true,
+        "baselineMs": 80.869,
+        "candidateMs": 76.808
+      },
+      {
+        "teacherOrdinal": 2,
+        "table": "student_realm_assessments",
+        "rows": 1040,
+        "equivalent": true,
+        "baselineMs": 88.133,
+        "candidateMs": 78.545
+      },
+      {
+        "teacherOrdinal": 3,
+        "table": "student_lesson_attempts",
+        "rows": 1554,
+        "equivalent": true,
+        "baselineMs": 79.489,
+        "candidateMs": 94.048
+      },
+      {
+        "teacherOrdinal": 3,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 518,
+        "equivalent": true,
+        "baselineMs": 83.683,
+        "candidateMs": 80.104
+      },
+      {
+        "teacherOrdinal": 3,
+        "table": "student_realm_assessments",
+        "rows": 1036,
+        "equivalent": true,
+        "baselineMs": 79.727,
+        "candidateMs": 78.862
+      },
+      {
+        "teacherOrdinal": 4,
+        "table": "student_lesson_attempts",
+        "rows": 1548,
+        "equivalent": true,
+        "baselineMs": 87.418,
+        "candidateMs": 82.115
+      },
+      {
+        "teacherOrdinal": 4,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 516,
+        "equivalent": true,
+        "baselineMs": 78.792,
+        "candidateMs": 80.605
+      },
+      {
+        "teacherOrdinal": 4,
+        "table": "student_realm_assessments",
+        "rows": 1032,
+        "equivalent": true,
+        "baselineMs": 82.786,
+        "candidateMs": 78.165
+      },
+      {
+        "teacherOrdinal": 5,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 78.326,
+        "candidateMs": 83.131
+      },
+      {
+        "teacherOrdinal": 5,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 78.63,
+        "candidateMs": 82.888
+      },
+      {
+        "teacherOrdinal": 5,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 98.521,
+        "candidateMs": 80.094
+      },
+      {
+        "teacherOrdinal": 6,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 79.975,
+        "candidateMs": 78.013
+      },
+      {
+        "teacherOrdinal": 6,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 85.44,
+        "candidateMs": 77.271
+      },
+      {
+        "teacherOrdinal": 6,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 79.105,
+        "candidateMs": 77.478
+      },
+      {
+        "teacherOrdinal": 7,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 83.513,
+        "candidateMs": 78.623
+      },
+      {
+        "teacherOrdinal": 7,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 79.093,
+        "candidateMs": 77.523
+      },
+      {
+        "teacherOrdinal": 7,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 101.432,
+        "candidateMs": 79.097
+      },
+      {
+        "teacherOrdinal": 8,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.611,
+        "candidateMs": 77.747
+      },
+      {
+        "teacherOrdinal": 8,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 76.884,
+        "candidateMs": 77.084
+      },
+      {
+        "teacherOrdinal": 8,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 78.033,
+        "candidateMs": 77.898
+      },
+      {
+        "teacherOrdinal": 9,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 80.73,
+        "candidateMs": 77.324
+      },
+      {
+        "teacherOrdinal": 9,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 78.225,
+        "candidateMs": 77.43
+      },
+      {
+        "teacherOrdinal": 9,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 78.78,
+        "candidateMs": 82.808
+      },
+      {
+        "teacherOrdinal": 10,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 145.282,
+        "candidateMs": 77.875
+      },
+      {
+        "teacherOrdinal": 10,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 78.518,
+        "candidateMs": 77.847
+      },
+      {
+        "teacherOrdinal": 10,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 78.83,
+        "candidateMs": 83.004
+      },
+      {
+        "teacherOrdinal": 11,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.921,
+        "candidateMs": 78.215
+      },
+      {
+        "teacherOrdinal": 11,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 77.821,
+        "candidateMs": 77.333
+      },
+      {
+        "teacherOrdinal": 11,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 77.286,
+        "candidateMs": 77.948
+      },
+      {
+        "teacherOrdinal": 12,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 78.144,
+        "candidateMs": 86.066
+      },
+      {
+        "teacherOrdinal": 12,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 77.109,
+        "candidateMs": 84.233
+      },
+      {
+        "teacherOrdinal": 12,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 77.231,
+        "candidateMs": 78.199
+      },
+      {
+        "teacherOrdinal": 13,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.976,
+        "candidateMs": 78.009
+      },
+      {
+        "teacherOrdinal": 13,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 79.593,
+        "candidateMs": 77.95
+      },
+      {
+        "teacherOrdinal": 13,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 80.968,
+        "candidateMs": 79.165
+      },
+      {
+        "teacherOrdinal": 14,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 78.852,
+        "candidateMs": 88.713
+      },
+      {
+        "teacherOrdinal": 14,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 76.974,
+        "candidateMs": 78.859
+      },
+      {
+        "teacherOrdinal": 14,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 79.35,
+        "candidateMs": 79.055
+      },
+      {
+        "teacherOrdinal": 15,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 78.116,
+        "candidateMs": 77.608
+      },
+      {
+        "teacherOrdinal": 15,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 76.991,
+        "candidateMs": 83.371
+      },
+      {
+        "teacherOrdinal": 15,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 80.938,
+        "candidateMs": 76.863
+      },
+      {
+        "teacherOrdinal": 16,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.811,
+        "candidateMs": 77.581
+      },
+      {
+        "teacherOrdinal": 16,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 79.357,
+        "candidateMs": 77.705
+      },
+      {
+        "teacherOrdinal": 16,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 80.643,
+        "candidateMs": 77.664
+      },
+      {
+        "teacherOrdinal": 17,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 78.897,
+        "candidateMs": 78.105
+      },
+      {
+        "teacherOrdinal": 17,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 77.562,
+        "candidateMs": 79.405
+      },
+      {
+        "teacherOrdinal": 17,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 76.893,
+        "candidateMs": 77.316
+      },
+      {
+        "teacherOrdinal": 18,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.649,
+        "candidateMs": 78.182
+      },
+      {
+        "teacherOrdinal": 18,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 77.849,
+        "candidateMs": 77.23
+      },
+      {
+        "teacherOrdinal": 18,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 77.39,
+        "candidateMs": 79.818
+      },
+      {
+        "teacherOrdinal": 19,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.587,
+        "candidateMs": 85.402
+      },
+      {
+        "teacherOrdinal": 19,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 76.759,
+        "candidateMs": 79.714
+      },
+      {
+        "teacherOrdinal": 19,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 77.94,
+        "candidateMs": 86.184
+      },
+      {
+        "teacherOrdinal": 20,
+        "table": "student_lesson_attempts",
+        "rows": 750,
+        "equivalent": true,
+        "baselineMs": 77.967,
+        "candidateMs": 78.109
+      },
+      {
+        "teacherOrdinal": 20,
+        "table": "student_weekly_quiz_attempts",
+        "rows": 250,
+        "equivalent": true,
+        "baselineMs": 77.426,
+        "candidateMs": 77.764
+      },
+      {
+        "teacherOrdinal": 20,
+        "table": "student_realm_assessments",
+        "rows": 500,
+        "equivalent": true,
+        "baselineMs": 80.066,
+        "candidateMs": 79.777
+      }
+    ],
+    "policiesRestored": true
+  }
+}

@@ -3,6 +3,55 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Compact workload database profile — 19 November
+
+The existing local transaction profiler now labels compact-event RPC statements
+separately. A profiled repeat of the six-source benchmark preserved activity,
+scores and student scope, removed its 55,000 temporary events/functions, and again
+missed the latency gate: 20-teacher compact p95 1,687 ms versus full 2,217 ms.
+Timing varies between local runs; this is not a new production speed claim.
+
+Authenticated statement execution averages across the whole run:
+
+| Source | Calls | Mean SQL execution (ms) |
+| --- | ---: | ---: |
+| Lesson attempts | 150 | 209.950 |
+| Quiz attempts | 150 | 208.690 |
+| Assessments | 150 | 216.213 |
+| Compact event page | 75 | 60.756 |
+| Full event page | 1,350 | 3.384 |
+| Presence | 150 | 9.497 |
+| Event head | 150 | 9.328 |
+| Daily activity | 150 | 1.155 |
+
+These are aggregate SQL averages across both modes and all concurrency stages,
+not p95s or per-request traces. They must not be subtracted from HTTP p95 to infer
+pool wait. Planning and I/O timing collection were off. Attempt-query execution
+is substantial, while HTTP also includes waiting/transport; exact pool acquisition
+has not been isolated by this run. Prior larger-pool experiments were mixed, so
+there is still no evidence here to change production connection settings.
+
+A rollback-only experiment rewrote the three legacy teacher policies from a
+correlated `EXISTS` to an equivalent student-ID `IN` subquery, retaining the same
+teacher ownership predicate and leaving all school-staff policies intact. Across
+20 synthetic teachers and three tables, all 60 visible-row digests matched.
+Mean sequential query execution barely changed: lessons 82.54 to 80.53 ms,
+quizzes 78.99 to 78.91 ms, assessments 81.69 to 79.27 ms. **Candidate rejected**;
+all original policy definitions were verified restored. This was not a complete
+role/revocation matrix and is not approved for a migration.
+
+Next candidate: evaluate student authorisation once per requested student scope,
+then reuse that scope across the attempt reads. Before any release, prove parity
+for teacher, support, principal, admin, legacy and revoked access, including
+cross-school denials, and measure the whole concurrent HTTP workload. Avoid
+repeated policy rearrangements without a changed query plan or measured benefit.
+
+Sanitized evidence: `docs/performance/compact-dashboard-profile-2026-11-19.json`.
+Private reproducible probe and raw numeric evidence:
+`/Users/seanjohns/reliq-audits/2026-11-19/dashboard-profile/`.
+No application source, database migration, production policy or hosted setting
+changed. The only tooling change is the profiler's compact-RPC label.
+
 ## Concurrent compact dashboard reads — 19 November
 
 Added `scripts/staging/compact-dashboard-load-local.mjs`. It compares six dashboard
