@@ -1,6 +1,7 @@
 "use client";
 
 import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
+import { taskNeedsPagePrompt } from "@/lib/task-prompt";
 import LowerLessonGuide, { LessonHelpDialog } from "@/components/lesson/LowerLessonGuide";
 import { level1Answer, level1Speech } from "@/lib/level1-answer";
 import { Level1LookContext } from "@/lib/level1-look";
@@ -1191,7 +1192,7 @@ export function PracticeRunner({
     }
   }
 
-  const isBuiltinKind = ["mcq", "count", "order3", "audioPick", "numberHunt", "groupCountVisual"].includes(task.kind);
+  const isBuiltinKind = taskNeedsPagePrompt(task.kind);
 
   const hasGroundFeedback =
     task.kind === "measurementCompare" ||

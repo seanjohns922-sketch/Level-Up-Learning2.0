@@ -1,6 +1,7 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
+import { taskNeedsPagePrompt } from "@/lib/task-prompt";
 import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { measurement7Quiz } from "@/data/activities/year7Measurement/questions";
 import { number7Quiz } from "@/data/activities/year7Number/questions";
@@ -7963,11 +7964,17 @@ function makeSubtractionCountUpQuestion(): QuizQuestion {
   };
 }
 
+const SESSION_LOADING = <div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>;
+const subscribeNever = () => () => {};
+
 export default function SessionPageWrapper() {
-  return <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p className="text-gray-400">Loading…</p></div>}><SessionPageRouteInstance /></Suspense>;
+  return <Suspense fallback={SESSION_LOADING}><SessionPageRouteInstance /></Suspense>;
 }
 
 function SessionPageRouteInstance() {
+  // Quizzes pick their questions at random, so the page is drawn only in the browser:
+  // a server render would choose different questions and the browser would redraw it.
+  const inBrowser = useSyncExternalStore(subscribeNever, () => true, () => false);
   const sp = useSearchParams();
   const pathname=usePathname();
   const year = normalizeStudentYearLabel(sp.get("year") ?? "Year 3");
@@ -7976,6 +7983,7 @@ function SessionPageRouteInstance() {
   const n = Number(sp.get("n") ?? "1");
   const realmId = sp.get("realm_id") ?? "number";
   const routeKey = `${year}|${week}|${type}|${n}|${realmId}`;
+  if (!inBrowser) return SESSION_LOADING;
 
   if(year==='Year 7') {
     const liveQuiz=LEVEL7_LIVE&&pathname==='/level7/quiz';
@@ -9602,7 +9610,8 @@ function SessionPage({
 
               {quizQuestions.length ? (
                 <div data-level1-look={(newLookLevel === 1 || newLookLevel === 2) && quizRealmId === "number" ? "number" : undefined} data-number-nexus-level={newLookLevel >= 3 && quizRealmId === "number" ? String(newLookLevel) : undefined} data-premium-task className="rounded-[22px] border-2 border-[var(--quiz-border)] bg-white/80 p-3 shadow-[0_6px_0_rgba(15,23,42,0.05)] sm:p-6">
-                  {!isMoneyQuiz && currentQuiz?.kind !== "lessonActivity" ? (
+                  {/* Question cards that show their own prompt don't get it printed twice. */}
+                  {!isMoneyQuiz && currentQuiz?.kind !== "lessonActivity" && !(currentQuiz?.kind === "practiceTask" && currentQuiz.practiceTask && !taskNeedsPagePrompt(currentQuiz.practiceTask.kind)) ? (
                     <div
                       className={[
                         "mb-4 rounded-xl px-3 py-3 transition-all",

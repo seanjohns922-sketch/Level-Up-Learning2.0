@@ -22,6 +22,7 @@ import {
   Flame,
   Gem,
   ChartNoAxesColumnIncreasing,
+  Home,
   Dices,
   Medal,
   Play,
@@ -29,9 +30,11 @@ import {
   Sigma,
   Sparkles,
   Star,
+  UserRound,
   Video,
   Zap,
 } from "lucide-react";
+import Link from "next/link";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { FitToScreen } from "@/components/FitToScreen";
 import ChanceVisual from "@/components/chance-hollow/ChanceVisual";
@@ -398,6 +401,7 @@ export function LessonConceptIntro({
   );
 }
 
+const TOP_BAR_PILL = "inline-flex min-h-12 items-center gap-2 rounded-full border border-white/20 bg-black/40 px-5 text-base font-bold text-white backdrop-blur-md transition hover:bg-black/55";
 const HERO_FADE = "linear-gradient(180deg, #000 55%, transparent 100%)";
 
 export function RealmLessonHome({
@@ -475,20 +479,37 @@ export function RealmLessonHome({
       </div>
 
       <FitToScreen>
+      {/* Back to the week, home to the hub and the profile (where students log out) are always one tap away. */}
       <header className="flex flex-wrap items-center justify-between gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="inline-flex min-h-12 items-center gap-2 rounded-full border border-white/20 bg-black/40 px-5 text-base font-bold text-white backdrop-blur-md transition hover:bg-black/55"
-        >
-          <ArrowLeft className="h-5 w-5" /> Back to Week {week}
-        </button>
-        {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} />}
-        <div
-          className="flex items-center gap-2 rounded-full border bg-black/40 px-4 py-2.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.14em] backdrop-blur-md"
-          style={{ borderColor: theme.panelBorder, color: theme.accent }}
-        >
-          <theme.ThemeIcon className="h-5 w-5" /> {theme.realmName}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className={TOP_BAR_PILL}
+          >
+            <ArrowLeft className="h-5 w-5" /> Back to Week {week}
+          </button>
+          <Link href="/world" className={TOP_BAR_PILL} aria-label="Home to the central hub">
+            <Home className="h-5 w-5" /> Hub
+          </Link>
+          {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} showHub={false} />}
+        </div>
+        <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-2 rounded-full border bg-black/40 px-4 py-2.5 font-[family-name:var(--font-display)] text-xs font-black uppercase tracking-[0.14em] backdrop-blur-md"
+            style={{ borderColor: theme.panelBorder, color: theme.accent }}
+          >
+            <theme.ThemeIcon className="h-5 w-5" /> {theme.realmName}
+          </div>
+          <Link
+            href="/profile"
+            aria-label="My profile and log out"
+            title="Profile"
+            className="grid h-12 w-12 place-items-center rounded-full border-2 border-white/70 text-white shadow-[0_6px_18px_rgba(0,0,0,0.4)] transition hover:brightness-110"
+            style={{ background: theme.buttonBg }}
+          >
+            <UserRound className="h-6 w-6" />
+          </Link>
         </div>
       </header>
 
