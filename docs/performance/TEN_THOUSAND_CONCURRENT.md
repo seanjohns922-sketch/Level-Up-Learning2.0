@@ -3,6 +3,56 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Mixed dashboard and student completion rehearsal — 19 November
+
+`scripts/staging/scoped-dashboard-mixed-local.mjs` tests all six dashboard read
+sources alongside 100 synthetic students across 20 classes. Each student sends
+a lesson completion twice with the same completion key, followed by a live event.
+Missing-session and cross-student writes must fail explicitly with `42501`.
+Login happens before measured traffic. Twenty teachers each perform three fresh
+HTTP snapshots per mode, with two rounds alternating direct/scoped attempt reads.
+Both modes use compact events. This is an intentionally concentrated refresh
+workload, not a recreation of the panel's 30-second timer, incremental event cache
+or realtime rendering. The direct comparison retrieves all paginated attempts,
+whereas the current panel still uses unpaginated attempt queries.
+
+The first complete run verified 400 saved completions with correct scores, despite
+800 completion submissions, and 800 expected access denials. Each mode overlapped
+student traffic. After writes drained, all three complete attempt sets matched
+direct RLS on a fresh read. This confirms recovery after writes settle, not an
+atomic snapshot while writes are in flight.
+
+| Mode | Round 1 dashboard p95 | Round 2 dashboard p95 | Completion/retry pair p95 |
+| --- | ---: | ---: | ---: |
+| Direct attempts + compact events | 4,749 ms | 5,669 ms | 2,800 / 3,588 ms |
+| Scoped attempts + compact events | 1,569 ms | 2,069 ms | 880 / 1,274 ms |
+
+**The latency gate failed.** A subsequent instrumented run also failed in the
+first direct-read round with `PGRST003`, rather than the expected access-denial
+response. This is a connection-pool acquisition timeout, as documented by
+[PostgREST](https://docs.postgrest.org/en/stable/references/connection_pool.html).
+It must not be counted as a successful permission check or hidden by a retry.
+The completed run and failed repeat are both preserved in
+`docs/performance/scoped-dashboard-mixed-2026-11-19.json`.
+
+A further diagnostic repeat also timed out in the first direct round. Only 21
+dashboard snapshots completed: their source p95 times were 14,391 ms for attempts,
+13,072 ms for events, 8,085 ms for daily activity and 3,004 ms for presence. These
+are survivor-only samples, not successful workload percentiles. Seventy duplicate
+submission pairs completed before failure. These timings include API queueing;
+they do not identify a slow SQL statement or prove lock contention. Both failed
+repeats stopped before the scoped round, so neither measures scoped-mode failure.
+Next, collect SQL execution and wait-state evidence during this exact workload
+before choosing a query change or connection-pool setting. Do not increase
+timeouts to turn this failure into a pass.
+
+The runner shares the preceding probe's SQL and pagination code through an
+import-safe entry point. It drains requests before cleanup, removes the temporary
+read functions, and retains only local synthetic completions/events/sessions for
+later rehearsals. No production data, application behavior, grants or migration
+changed. Node syntax, targeted ESLint and diff checks pass. A production build was
+not rerun for these test-only changes. This does not prove 10,000-user capacity.
+
 ## Paginated attempt API experiment — 19 November
 
 `scripts/staging/scoped-attempts-http-local.mjs` extends the SQL experiment below

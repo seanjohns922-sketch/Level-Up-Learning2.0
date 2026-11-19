@@ -1,0 +1,135 @@
+{
+  "completedRun": {
+    "at": "2026-11-19T02:18:06.386Z",
+    "teachers": 20,
+    "studentsWriting": 100,
+    "rounds": [
+      {
+        "round": 1,
+        "mode": "direct",
+        "dashboard": {
+          "samples": 60,
+          "p95Ms": 4749,
+          "maximumMs": 6254
+        },
+        "completionPair": {
+          "samples": 100,
+          "p95Ms": 2800,
+          "maximumMs": 4756
+        },
+        "overlappingSnapshots": 58,
+        "verifiedCompletions": 100
+      },
+      {
+        "round": 1,
+        "mode": "scoped",
+        "dashboard": {
+          "samples": 60,
+          "p95Ms": 1569,
+          "maximumMs": 2098
+        },
+        "completionPair": {
+          "samples": 100,
+          "p95Ms": 880,
+          "maximumMs": 1257
+        },
+        "overlappingSnapshots": 52,
+        "verifiedCompletions": 100
+      },
+      {
+        "round": 2,
+        "mode": "scoped",
+        "dashboard": {
+          "samples": 60,
+          "p95Ms": 2069,
+          "maximumMs": 2127
+        },
+        "completionPair": {
+          "samples": 100,
+          "p95Ms": 1274,
+          "maximumMs": 1423
+        },
+        "overlappingSnapshots": 55,
+        "verifiedCompletions": 100
+      },
+      {
+        "round": 2,
+        "mode": "direct",
+        "dashboard": {
+          "samples": 60,
+          "p95Ms": 5669,
+          "maximumMs": 6358
+        },
+        "completionPair": {
+          "samples": 100,
+          "p95Ms": 3588,
+          "maximumMs": 4805
+        },
+        "overlappingSnapshots": 58,
+        "verifiedCompletions": 100
+      }
+    ],
+    "passedCorrectness": true,
+    "temporaryFunctionsRemoved": true,
+    "limitation": "Local synthetic six-source HTTP snapshots; no browser/realtime rendering or 10,000-user proof. Student completions and login sessions remain in the isolated fixture database. Both modes use compact events; only attempt reads differ.",
+    "expectedDenials": 800,
+    "verifiedCompletions": 400,
+    "passedLatencyGate": false
+  },
+  "repeatFailure": {
+    "at": "2026-11-19T02:19:11.667Z",
+    "teachers": 20,
+    "studentsWriting": 100,
+    "rounds": [],
+    "passedCorrectness": false,
+    "temporaryFunctionsRemoved": true,
+    "limitation": "Local synthetic six-source HTTP snapshots; no browser/realtime rendering or 10,000-user proof. Student completions and login sessions remain in the isolated fixture database. Both modes use compact events; only attempt reads differ.",
+    "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ 'PGRST003'\n- '42501'\n"
+  },
+  "diagnosticRepeat": {
+    "at": "2026-11-19T02:20:34.619Z",
+    "teachers": 20,
+    "studentsWriting": 100,
+    "rounds": [],
+    "passedCorrectness": false,
+    "temporaryFunctionsRemoved": true,
+    "limitation": "Local synthetic six-source HTTP snapshots; no browser/realtime rendering or 10,000-user proof. Student completions and login sessions remain in the isolated fixture database. Both modes use compact events; only attempt reads differ.",
+    "failedRound": {
+      "round": 1,
+      "mode": "direct",
+      "completedDashboardReads": {
+        "samples": 21,
+        "p95Ms": 15653,
+        "maximumMs": 16109
+      },
+      "sources": {
+        "attempts": {
+          "samples": 21,
+          "p95Ms": 14391,
+          "maximumMs": 15653
+        },
+        "presence": {
+          "samples": 21,
+          "p95Ms": 3004,
+          "maximumMs": 9238
+        },
+        "events": {
+          "samples": 21,
+          "p95Ms": 13072,
+          "maximumMs": 16109
+        },
+        "daily": {
+          "samples": 21,
+          "p95Ms": 8085,
+          "maximumMs": 8152
+        }
+      },
+      "completedSubmissionPairs": {
+        "samples": 70,
+        "p95Ms": 9502,
+        "maximumMs": 10039
+      }
+    },
+    "error": "complete_realm_lesson: HTTP 504, PGRST003"
+  }
+}

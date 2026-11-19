@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { localConfig, localDir } from './local-config.mjs';
 
@@ -102,59 +103,65 @@ async function snapshot(client, ids, candidate, limit = 500) {
   return { ms: performance.now() - start, requests, rows };
 }
 
-assert.equal(sql(`select to_regprocedure('${signature}') is null;`), 't', 'Never overwrite an existing function');
-try {
-  sql(setup);
-  const teachers = [];
-  for (const group of groups) {
-    const client = newClient();
-    const login = await client.auth.signInWithPassword({ email: group.email, password: group.password });
-    assert.equal(login.error, null);
-    teachers.push({ client, ids: idsFor(group) });
-  }
-  const first = teachers[0];
-  const anonymous = await newClient().rpc(name, args(first.ids));
-  assert.equal(anonymous.error?.code, '42501'); report.checks.push('anonymous execute denied');
-  for (const scope of [[...first.ids, teachers[1].ids[0]], [null], ['ffffffff-ffff-ffff-ffff-ffffffffffff']]) {
-    const response = await first.client.rpc(name, args(scope));
-    assert.equal(response.error, null); assert.deepEqual(response.data, { supported: false });
-  }
-  report.checks.push('mixed-school, null and unknown scopes return no data');
-  for (const invalid of [args(null), args(Array(501).fill(first.ids[0])), args(first.ids, 501), args(first.ids, 0), args(first.ids, 500, [])]) {
-    const response = await first.client.rpc(name, invalid);
-    assert.equal(response.error?.code, '22023');
-  }
-  report.checks.push('invalid scope, page size and cursor shape rejected');
-  const empty = await first.client.rpc(name, args([]));
-  assert.equal(empty.error, null); assert.deepEqual(empty.data, { supported: true, data: [[], [], []] });
-  const small = await snapshot(first.client, first.ids, true, 37);
-  const baseline = await snapshot(first.client, first.ids, false, 500);
-  assert.deepEqual(small.rows, baseline.rows);
-  assert(small.requests > 1);
-  assert.deepEqual((await snapshot(first.client, [...first.ids, ...first.ids], true)).rows, baseline.rows);
-  report.checks.push('empty and duplicate scopes; 37-row pages match full direct RLS results');
-  report.pagination = { rows: baseline.rows.map(rows => rows.length), smallPageRequests: small.requests };
-  for (const concurrency of [1, 4, 20]) {
-    const samples = { direct: [], scoped: [] };
-    for (let round = 0; round < 3; round++) {
-      const paired = {};
-      for (const mode of round % 2 ? ['scoped', 'direct'] : ['direct', 'scoped']) {
-        paired[mode] = await settled(teachers.slice(0, concurrency).map(t => snapshot(t.client, t.ids, mode === 'scoped')));
-        samples[mode].push(...paired[mode]);
+export { config, groups, name, signature, setup, sql, snapshot, settled, newClient, idsFor };
+
+async function main() {
+  assert.equal(sql(`select to_regprocedure('${signature}') is null;`), 't', 'Never overwrite an existing function');
+  try {
+    sql(setup);
+    const teachers = [];
+    for (const group of groups) {
+      const client = newClient();
+      const login = await client.auth.signInWithPassword({ email: group.email, password: group.password });
+      assert.equal(login.error, null);
+      teachers.push({ client, ids: idsFor(group) });
+    }
+    const first = teachers[0];
+    const anonymous = await newClient().rpc(name, args(first.ids));
+    assert.equal(anonymous.error?.code, '42501'); report.checks.push('anonymous execute denied');
+    for (const scope of [[...first.ids, teachers[1].ids[0]], [null], ['ffffffff-ffff-ffff-ffff-ffffffffffff']]) {
+      const response = await first.client.rpc(name, args(scope));
+      assert.equal(response.error, null); assert.deepEqual(response.data, { supported: false });
+    }
+    report.checks.push('mixed-school, null and unknown scopes return no data');
+    for (const invalid of [args(null), args(Array(501).fill(first.ids[0])), args(first.ids, 501), args(first.ids, 0), args(first.ids, 500, [])]) {
+      const response = await first.client.rpc(name, invalid);
+      assert.equal(response.error?.code, '22023');
+    }
+    report.checks.push('invalid scope, page size and cursor shape rejected');
+    const empty = await first.client.rpc(name, args([]));
+    assert.equal(empty.error, null); assert.deepEqual(empty.data, { supported: true, data: [[], [], []] });
+    const small = await snapshot(first.client, first.ids, true, 37);
+    const baseline = await snapshot(first.client, first.ids, false, 500);
+    assert.deepEqual(small.rows, baseline.rows);
+    assert(small.requests > 1);
+    assert.deepEqual((await snapshot(first.client, [...first.ids, ...first.ids], true)).rows, baseline.rows);
+    report.checks.push('empty and duplicate scopes; 37-row pages match full direct RLS results');
+    report.pagination = { rows: baseline.rows.map(rows => rows.length), smallPageRequests: small.requests };
+    for (const concurrency of [1, 4, 20]) {
+      const samples = { direct: [], scoped: [] };
+      for (let round = 0; round < 3; round++) {
+        const paired = {};
+        for (const mode of round % 2 ? ['scoped', 'direct'] : ['direct', 'scoped']) {
+          paired[mode] = await settled(teachers.slice(0, concurrency).map(t => snapshot(t.client, t.ids, mode === 'scoped')));
+          samples[mode].push(...paired[mode]);
+        }
+        paired.direct.forEach((value, i) => assert.deepEqual(paired.scoped[i].rows, value.rows, 'Complete result sets must match direct RLS'));
       }
-      paired.direct.forEach((value, i) => assert.deepEqual(paired.scoped[i].rows, value.rows, 'Complete result sets must match direct RLS'));
+      const summary = { concurrency };
+      for (const mode of ['direct', 'scoped']) {
+        const times = samples[mode].map(s => s.ms).sort((a,b) => a-b);
+        summary[mode] = { snapshots: times.length, p95Ms: Math.round(times[Math.ceil(times.length * .95)-1]), maximumMs: Math.round(times.at(-1)), requests: samples[mode].reduce((n,s) => n+s.requests, 0) };
+      }
+      report.cases.push(summary); console.log(JSON.stringify(summary));
     }
-    const summary = { concurrency };
-    for (const mode of ['direct', 'scoped']) {
-      const times = samples[mode].map(s => s.ms).sort((a,b) => a-b);
-      summary[mode] = { snapshots: times.length, p95Ms: Math.round(times[Math.ceil(times.length * .95)-1]), maximumMs: Math.round(times.at(-1)), requests: samples[mode].reduce((n,s) => n+s.requests, 0) };
-    }
-    report.cases.push(summary); console.log(JSON.stringify(summary));
+  } finally {
+    sql(`drop function if exists ${signature}; notify pgrst,'reload schema';`);
+    assert.equal(sql(`select to_regprocedure('${signature}') is null;`), 't');
+    report.restored = true;
+    fs.writeFileSync(`${localDir}/scoped-attempts-http-result.json`, JSON.stringify(report,null,2)+'\n');
   }
-} finally {
-  sql(`drop function if exists ${signature}; notify pgrst,'reload schema';`);
-  assert.equal(sql(`select to_regprocedure('${signature}') is null;`), 't');
-  report.restored = true;
-  fs.writeFileSync(`${localDir}/scoped-attempts-http-result.json`, JSON.stringify(report,null,2)+'\n');
+  console.log(JSON.stringify({ passed: true, checks: report.checks, restored: report.restored }));
+
 }
-console.log(JSON.stringify({ passed: true, checks: report.checks, restored: report.restored }));
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();
