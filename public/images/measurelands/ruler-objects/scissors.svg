@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 250">
+  <defs>
+    <linearGradient id="o" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffb26b"/>
+      <stop offset="0.35" stop-color="#f5761a"/>
+      <stop offset="0.75" stop-color="#c4520a"/>
+      <stop offset="1" stop-color="#8c3a06"/>
+    </linearGradient>
+    <linearGradient id="m" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.4" stop-color="#d9dde4"/>
+      <stop offset="0.75" stop-color="#9ea6b3"/>
+      <stop offset="1" stop-color="#6b7380"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#m)" stroke="#555c68" stroke-width="2" stroke-linejoin="round" d="M296 94L700 123L306 140Z"/>
+  <path fill="url(#m)" stroke="#555c68" stroke-width="2" stroke-linejoin="round" d="M306 116L700 129L296 166Z"/>
+  <path d="M320 112L680 125" stroke="#ffffff" stroke-width="3" opacity="0.8"/>
+  <path fill-rule="evenodd" fill="url(#o)" stroke="#7a3205" stroke-width="2.5" d="M120 10C190 10 250 44 290 100L320 116L300 130L266 112C230 136 180 150 120 150C55 150 0 118 0 80S55 10 120 10Z M120 46C80 46 44 62 44 80S80 114 120 114S196 98 196 80S160 46 120 46Z"/>
+  <path fill-rule="evenodd" fill="url(#o)" stroke="#7a3205" stroke-width="2.5" d="M140 108C200 108 250 120 292 136L320 132L304 150L270 156C238 196 196 240 140 240C75 240 24 212 24 174S75 108 140 108Z M140 142C102 142 68 156 68 174S102 206 140 206S212 192 212 174S178 142 140 142Z"/>
+  <path d="M40 66C70 34 120 24 170 30" stroke="#ffd7b0" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.7"/>
+  <circle cx="312" cy="128" r="11" fill="url(#m)" stroke="#555c68" stroke-width="2"/>
+  <circle cx="312" cy="128" r="4" fill="#555c68"/>
+</svg>

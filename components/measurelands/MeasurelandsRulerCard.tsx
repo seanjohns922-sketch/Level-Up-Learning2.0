@@ -50,6 +50,14 @@ const RULER_OBJECT_ART: Record<string, { src: string; aspect: number }> = {
   crayon: { src: "/images/measurelands/ruler-objects/crayon.webp", aspect: 8.377 },
   "toy car": { src: "/images/measurelands/ruler-objects/toy-car.webp", aspect: 1.429 },
   stick: { src: "/images/measurelands/ruler-objects/stick.webp", aspect: 13.617 },
+  // Hand-drawn to match until 3D versions are made; swap the file to upgrade.
+  key: { src: "/images/measurelands/ruler-objects/key.svg", aspect: 592 / 220 },
+  marker: { src: "/images/measurelands/ruler-objects/marker.svg", aspect: 794 / 100 },
+  ribbon: { src: "/images/measurelands/ruler-objects/ribbon.svg", aspect: 800 / 110 },
+  "glue stick": { src: "/images/measurelands/ruler-objects/glue-stick.svg", aspect: 600 / 140 },
+  paintbrush: { src: "/images/measurelands/ruler-objects/paintbrush.svg", aspect: 898 / 90 },
+  scissors: { src: "/images/measurelands/ruler-objects/scissors.svg", aspect: 700 / 250 },
+  toothbrush: { src: "/images/measurelands/ruler-objects/toothbrush.svg", aspect: 876 / 110 },
 };
 
 const TIMBER = { top: "#EBCFA2", mid: "#DCB77C", bot: "#C79A57", edge: "#A67B3C" };

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 794 100">
+  <defs>
+    <linearGradient id="w" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.3" stop-color="#f4f6f9"/>
+      <stop offset="0.75" stop-color="#cfd5de"/>
+      <stop offset="1" stop-color="#a9b1be"/>
+    </linearGradient>
+    <linearGradient id="n" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6d86d6"/>
+      <stop offset="0.3" stop-color="#2f4fb4"/>
+      <stop offset="0.75" stop-color="#1c337f"/>
+      <stop offset="1" stop-color="#11204f"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="22" width="34" height="56" rx="12" fill="url(#n)" stroke="#0d1840" stroke-width="2"/>
+  <rect x="26" y="14" width="540" height="72" rx="10" fill="url(#w)" stroke="#8a93a3" stroke-width="2"/>
+  <rect x="140" y="14" width="300" height="72" fill="url(#n)" opacity="0.92"/>
+  <rect x="170" y="38" width="240" height="24" rx="12" fill="#ffffff" opacity="0.9"/>
+  <rect x="190" y="45" width="120" height="10" rx="5" fill="#2f4fb4"/>
+  <path d="M556 10H760a34 40 0 0 1 0 80H556Z" fill="url(#n)" stroke="#0d1840" stroke-width="2"/>
+  <rect x="596" y="0" width="160" height="14" rx="7" fill="url(#n)" stroke="#0d1840" stroke-width="2"/>
+  <rect x="556" y="10" width="14" height="80" fill="#0d1840" opacity="0.35"/>
+  <path d="M34 24H760" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.55"/>
+</svg>

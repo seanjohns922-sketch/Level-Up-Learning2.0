@@ -7,11 +7,12 @@ const source = readFileSync(new URL("../components/measurelands/MeasurelandsRule
 const block = source.match(/const RULER_OBJECT_ART[\s\S]*?\n};/)?.[0];
 assert.ok(block, "the ruler must list its object pictures in RULER_OBJECT_ART");
 
-const entries = [...block.matchAll(/src: "([^"]+)", aspect: ([\d.]+)/g)];
-assert.ok(entries.length >= 7, "the ruler must have the seven existing object pictures");
+const entries = [...block.matchAll(/src: "([^"]+)", aspect: ([\d.]+(?: \/ [\d.]+)?)/g)];
+assert.ok(entries.length >= 14, "every ruler object in the lessons needs a picture");
 for (const [, src, aspect] of entries) {
   assert.ok(existsSync(new URL(`../public${src}`, import.meta.url)), `missing ruler picture ${src}`);
-  assert.ok(Number(aspect) > 0, `${src} needs its width / height aspect`);
+  const [w, h = "1"] = aspect.split(" / ");
+  assert.ok(Number(w) / Number(h) > 0, `${src} needs its width / height aspect`);
 }
 assert.ok(source.includes("art ? (") && source.includes('fill={`url(#obj-${uid})`}'), "objects without a picture must keep the coloured bar");
 
