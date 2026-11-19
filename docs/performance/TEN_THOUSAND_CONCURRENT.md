@@ -5,6 +5,14 @@ active students, plus teacher traffic. This is not a claim of supported capacity
 
 ## Live Class attempt-history pagination — 19 November
 
+Follow-up: `WholeMathsDiagnosticPanel` also uses this reader for its class-wide
+realm pre/post-test checkpoints, replacing its single capped request. It retains
+the existing checkpoint calculations and success-only state update; a failed page
+does not replace the previous history with a partial result. Class changes cancel
+further pages. The individual printable report still uses its separate query with
+question results and is not covered by this change. Complete history requires more
+requests than a capped response; this is a correctness fix, not a throughput claim.
+
 `LiveClassPanel` now uses `fetchLiveClassAttempts` for its lesson, weekly quiz and
 assessment history. Previously, each source used one unpaginated query and could
 silently stop at the API row limit. The shared reader retains the same projections,

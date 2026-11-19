@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { diagnosticReportHtml, realmTestCheckpoints, type RealmTestRow } from "@/lib/documents/diagnostic-report";
 import { supabase } from "@/lib/supabase";
+import { fetchLiveClassAttempts } from "@/lib/live-class-attempts";
 import { CalendarDays, Check, ChevronDown, Info, ListChecks, Lock, TrendingUp, Unlock, UserPlus, X } from "lucide-react";
 import { STANDING_META, STANDING_ORDER, expectedLevel, standingForGap } from "@/lib/proficiency";
 import { AC_STRANDS, type AcStrand } from "@/lib/curriculum/ac-standards";
@@ -373,12 +374,7 @@ export default function WholeMathsDiagnosticPanel({
       const [recordsResult, sessionResult, testsResult] = await Promise.allSettled([
         fetchTeacherDiagnostics(selectedClass.id),
         fetchDiagnosticSchoolSession(selectedClass.id),
-        studentIds.length
-          ? supabase
-            .from("student_realm_assessments")
-            .select("student_id,realm_id,assessment_type,working_level,score_percent,completed_at")
-            .in("student_id", studentIds)
-          : Promise.resolve({ data: [], error: null }),
+        fetchLiveClassAttempts(supabase, "student_realm_assessments", studentIds, () => !cancelled),
       ]);
       if (cancelled) return;
       // Pre- and post-tests fill checkpoints the diagnostic hasn't; without them the table still works.
