@@ -3,6 +3,53 @@
 Reviewed 16 November 2026 against `627cc7d4`. Target: 10,000 simultaneously
 active students, plus teacher traffic. This is not a claim of supported capacity.
 
+## Incremental refresh validation and existing-index status — 19 November
+
+**The class index is existing work, not a newly discovered production fix.**
+Migration `20261117090000_index_student_current_class.sql` was committed in
+`f49898ae`. The 17 November ramp report records the owner's statement that it had
+been applied; the hosted catalog has not been independently verified. Recent
+unindexed baselines intentionally used local fixtures with the index removed.
+Do not present the indexed/unindexed difference as a new deployed improvement,
+create a duplicate migration, or ask the owner to reapply it without checking.
+
+`scripts/staging/incremental-dashboard-local.mjs` now exercises the actual shared
+`createLiveClassEventReader` against local HTTP data for 20 synthetic teachers.
+It checks initial loading, unchanged history, 20 students' new completions and
+events at the next 30-second refresh, then explicit cache invalidation/recovery.
+The same phases run without and with a temporary equivalent of the existing
+class index. Each completion is submitted twice with one completion key.
+
+| Phase | Unindexed local baseline p95 | Existing-index equivalent p95 |
+| --- | ---: | ---: |
+| Initial read | 2,550 ms | 467 ms |
+| Unchanged history | 2,250 ms | 401 ms |
+| New results at next refresh | 2,471 ms | 589 ms |
+| Invalidated/recovery read | 2,498 ms | 559 ms |
+
+All 40 completions across the two modes were saved exactly once with correct
+scores. Every teacher saw the new canonical attempt and event, with no foreign
+student rows or duplicate cached events. Quiet refreshes issued exactly one event
+head request per teacher (20 total); other phases used 40 event requests each.
+The indexed phases passed the one-second p95 / three-second maximum gate for
+this workload. Temporary functions and index were verified removed.
+
+This is **not** a browser or WebSocket rehearsal. Read and invalidate triggers
+are controlled, the quiet-head check is immediate, and writes finish before the
+next 30-second refresh. It does not exercise the UI's full coalescing/timer wiring
+or writes during pagination. The existing event-read and refresh QA suites also
+passed, covering burst coalescing, late events, failed deltas and invalidation
+races. Node syntax, targeted ESLint and diff checks passed; production code was
+not changed and no production build was needed.
+
+The attempt reads here are fully paginated. The current `LiveClassPanel` still
+issues unpaginated attempt queries, so this rehearsal does not establish complete
+history in the shipped UI. That row-limit gap is the next implementation target:
+reuse ordinary RLS reads with pagination and preserve visible results on a failed
+page, rather than introducing the scoped authorisation prototype. Keep the
+earlier mixed-write stress failures open; 10,000-user capacity is not proven.
+Evidence: `docs/performance/incremental-dashboard-2026-11-19.json`.
+
 ## Mixed-load query profile and class index experiment — 19 November
 
 The review branch now includes redacted query categories and blocker counts in

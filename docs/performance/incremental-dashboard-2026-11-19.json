@@ -1,0 +1,79 @@
+{
+  "at": "2026-11-19T04:53:13.824Z",
+  "teachers": 20,
+  "studentsPerMode": 20,
+  "phases": [
+    {
+      "mode": "baseline",
+      "phase": "initial",
+      "count": 20,
+      "p95Ms": 2550,
+      "maxMs": 2602,
+      "eventRequests": 40
+    },
+    {
+      "mode": "baseline",
+      "phase": "quiet",
+      "count": 20,
+      "p95Ms": 2250,
+      "maxMs": 2255,
+      "eventRequests": 20
+    },
+    {
+      "mode": "baseline",
+      "phase": "changed",
+      "count": 20,
+      "p95Ms": 2471,
+      "maxMs": 2509,
+      "eventRequests": 40
+    },
+    {
+      "mode": "baseline",
+      "phase": "reconnected",
+      "count": 20,
+      "p95Ms": 2498,
+      "maxMs": 2575,
+      "eventRequests": 40
+    },
+    {
+      "mode": "indexed",
+      "phase": "initial",
+      "count": 20,
+      "p95Ms": 467,
+      "maxMs": 472,
+      "eventRequests": 40
+    },
+    {
+      "mode": "indexed",
+      "phase": "quiet",
+      "count": 20,
+      "p95Ms": 401,
+      "maxMs": 410,
+      "eventRequests": 20
+    },
+    {
+      "mode": "indexed",
+      "phase": "changed",
+      "count": 20,
+      "p95Ms": 589,
+      "maxMs": 592,
+      "eventRequests": 40
+    },
+    {
+      "mode": "indexed",
+      "phase": "reconnected",
+      "count": 20,
+      "p95Ms": 559,
+      "maxMs": 566,
+      "eventRequests": 40
+    }
+  ],
+  "correctnessPassed": true,
+  "temporaryObjectsRemoved": true,
+  "limitations": [
+    "Uses the actual event-reader cache, with controlled read/invalidate triggers, not browser timers, coalescing, WebSocket delivery or rendering.",
+    "Attempt queries are fully paginated; current UI queries are unpaginated. This is not a complete replica of the shipped panel.",
+    "Two sequential local modes, baseline then indexed; not a 10,000-user capacity test. Synthetic completions/events/sessions remain local."
+  ],
+  "latencyPassed": true
+}
