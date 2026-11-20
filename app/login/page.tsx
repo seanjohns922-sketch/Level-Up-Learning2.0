@@ -222,6 +222,22 @@ export default function LoginPage() {
       password: teacherPassword,
       options: { data: { display_name: teacherName || teacherEmail, role: "teacher" } },
     });
+    // An email that already has a RELIQ account (a parent login, or another
+    // school) can't be activated again: Supabase either rejects it or returns a
+    // user with no identities and sends nothing. Those staff join by logging in
+    // with their existing password and the School Code instead.
+    const existingAccount = signUpErr
+      ? /already (been )?registered|already exists/i.test(signUpErr.message)
+      : signUpData.user?.identities?.length === 0;
+    if (existingAccount) {
+      setTeacherMode("login");
+      setTeacherPassword("");
+      setTeacherResetNotice(
+        "This email already has a RELIQ account. Log in with your existing password and the same School Code to join the school. Use Forgot password if you need a new one.",
+      );
+      setTeacherLoading(false);
+      return;
+    }
     if (signUpErr) {
       setTeacherError(getAuthErrorMessage(signUpErr, "Account activation failed. Please try again."));
       setTeacherLoading(false);

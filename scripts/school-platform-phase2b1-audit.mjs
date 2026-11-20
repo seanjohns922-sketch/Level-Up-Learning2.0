@@ -127,8 +127,9 @@ const checks = [
       /\/class-access\?classId=/.test(teacherDashboard),
   ],
   [
+    // Since 3943e61c, "my classes" also includes every class at schools the user administers.
     "ordinary teacher dashboard keeps lead-teacher default",
-    /requestedClassId[\s\S]*?classQuery\.eq\("id", requestedClassId\)[\s\S]*?: classQuery\.eq\("teacher_id", teacherId\)/.test(
+    /requestedClassId[\s\S]*?classQuery\.eq\("id", requestedClassId\)[\s\S]*?: classQuery\.or\(classScopeFilter\(teacherId, /.test(
       teacherDashboard,
     ),
   ],

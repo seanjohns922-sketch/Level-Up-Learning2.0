@@ -34,9 +34,10 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type {
+  ArchivedSchoolClass,
   SchoolHomeSnapshot,
   SchoolLicenceSummary,
   SchoolSwitcherItem,
@@ -205,11 +206,20 @@ function formatSchoolDate(value: string) {
   return Number.isNaN(date.getTime()) ? "Date unavailable" : SCHOOL_DATE_FORMATTER.format(date);
 }
 
-function createCode(name: string) {
+function randomCodeSuffix() {
+  return Math.random().toString(36).slice(2, 5).toUpperCase().padEnd(3, "0");
+}
+
+function createCode(name: string, suffix = randomCodeSuffix()) {
   const letters = name.replace(/[^a-z0-9]/gi, "").toUpperCase().slice(0, 4);
-  const suffix = Math.random().toString(36).slice(2, 5).toUpperCase();
   return `${letters || "CLASS"}${suffix}`.slice(0, 10);
 }
+
+/**
+ * The page's latest error, repeated inside any open dialog so it isn't hidden
+ * behind the overlay. A dialog clears older errors when it opens.
+ */
+const ModalErrorContext = createContext<{ error: string; clear: () => void }>({ error: "", clear: () => {} });
 
 async function sendCommand(
   schoolId: string,
@@ -236,6 +246,8 @@ async function sendCommand(
     invitationId?: string;
     repeatedRequest?: boolean;
     emailDelivery?: "sent" | "unconfigured" | "failed";
+    staffingError?: string;
+    archivedClasses?: ArchivedSchoolClass[];
     created?: Array<Record<string, unknown>>;
     errors?: Array<{ row: number; name: string; message: string }>;
   };
@@ -270,6 +282,10 @@ function Modal({
   onClose: () => void;
   children: React.ReactNode;
 }) {
+  const { error, clear } = useContext(ModalErrorContext);
+  useEffect(() => {
+    clear();
+  }, [clear]);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 p-4">
       <div
@@ -289,6 +305,11 @@ function Modal({
             <X className="h-4 w-4" />
           </button>
         </div>
+        {error ? (
+          <p role="alert" className="mx-6 mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">
+            {error}
+          </p>
+        ) : null}
         {children}
       </div>
     </div>
@@ -299,10 +320,12 @@ function ClassTable({
   classes,
   schoolId,
   onAssign,
+  onClassAction,
 }: {
   classes: SchoolHomeSnapshot["classes"];
   schoolId: string;
   onAssign: (classRow: SchoolHomeSnapshot["classes"][number]) => void;
+  onClassAction: (kind: "archive" | "remove", classRow: SchoolHomeSnapshot["classes"][number]) => void;
 }) {
   if (classes.length === 0) {
     return (
@@ -376,6 +399,28 @@ function ClassTable({
                     >
                       Manage staff
                     </button>
+                  ) : null}
+                  {classRow.canManage && classRow.studentCount === 0 ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => onClassAction("archive", classRow)}
+                        aria-label={`Archive ${classRow.name}`}
+                        title="Archive class"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-300 text-amber-800 hover:border-amber-500"
+                      >
+                        <Archive className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onClassAction("remove", classRow)}
+                        aria-label={`Remove ${classRow.name}`}
+                        title="Remove class"
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-red-300 text-red-700 hover:border-red-500"
+                      >
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                    </>
                   ) : null}
                   {classRow.canOpen ? (
                     <a
@@ -2102,9 +2147,25 @@ export default function SchoolHomeClient({
   const [assignClass, setAssignClass] = useState<
     SchoolHomeSnapshot["classes"][number] | null
   >(null);
+  const [classAction, setClassAction] = useState<{
+    kind: "archive" | "remove";
+    classRow: SchoolHomeSnapshot["classes"][number];
+  } | null>(null);
+  const [archivedClasses, setArchivedClasses] = useState<ArchivedSchoolClass[] | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const clearError = useCallback(() => setError(""), []);
+  const modalError = useMemo(() => ({ error, clear: clearError }), [error, clearError]);
+
+  const loadArchivedClasses = useCallback(async () => {
+    try {
+      const result = await sendCommand(initialSnapshot.school.id, { action: "listArchivedClasses" });
+      setArchivedClasses(result.archivedClasses ?? []);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "Archived classes could not be loaded.");
+    }
+  }, [initialSnapshot.school.id]);
 
   const loadStudentDirectory = useCallback(async () => {
     setDirectoryState("loading");
@@ -2468,6 +2529,7 @@ export default function SchoolHomeClient({
     : (SCHOOL_ROLE_LABELS[snapshot.actor.role] ?? snapshot.actor.role);
 
   return (
+    <ModalErrorContext.Provider value={modalError}>
     <div className="reliq-adult min-h-screen text-slate-950 lg:flex">
       <aside className="flex flex-col gap-5 bg-[#121314] px-4 py-5 text-white lg:sticky lg:top-0 lg:h-screen lg:w-[264px] lg:shrink-0 lg:gap-7 lg:overflow-y-auto lg:py-7">
         <div className="flex items-center justify-between gap-3 px-2">
@@ -2672,6 +2734,7 @@ export default function SchoolHomeClient({
                     classes={filteredClasses}
                     schoolId={snapshot.school.id}
                     onAssign={setAssignClass}
+                    onClassAction={(kind, classRow) => setClassAction({ kind, classRow })}
                   />
                 </section>
 
@@ -2754,8 +2817,30 @@ export default function SchoolHomeClient({
                     classes={filteredClasses}
                     schoolId={snapshot.school.id}
                     onAssign={setAssignClass}
+                    onClassAction={(kind, classRow) => setClassAction({ kind, classRow })}
                   />
+                  {filteredClasses.some((classRow) => classRow.canManage && classRow.studentCount > 0) ? (
+                    <p className="mt-3 text-xs font-semibold text-slate-500">
+                      The archive and remove buttons appear once a class has no students. Move students to another class from the Students tab.
+                    </p>
+                  ) : null}
                 </section>
+                {snapshot.permissions.canManageSchool ? (
+                  <ArchivedClassesPanel
+                    classes={archivedClasses}
+                    academicYears={snapshot.academicYears}
+                    busy={busy}
+                    onShow={() => void loadArchivedClasses()}
+                    onHide={() => setArchivedClasses(null)}
+                    onRestore={async (classRow) => {
+                      const result = await command(
+                        { action: "restoreClass", classId: classRow.id },
+                        `${classRow.name} restored`,
+                      );
+                      if (result) await loadArchivedClasses();
+                    }}
+                  />
+                ) : null}
                 {academicYearId ? (
                   <ClassGroupsPanel
                     schoolId={snapshot.school.id}
@@ -3375,13 +3460,17 @@ export default function SchoolHomeClient({
           onSubmit={async (form) => {
             const result = await command(
               { action: "createClass", ...form },
-              "Class created",
+              (response) => response.staffingError
+                ? `Class created, but its teachers weren't fully set: ${response.staffingError}. Use Manage staff on the class to finish.`
+                : "Class created",
             );
             if (result?.classId) {
               setCreateOpen(false);
-              router.push(
-                `/school/${snapshot.school.id}/classes/${result.classId}`,
-              );
+              if (!result.staffingError) {
+                router.push(
+                  `/school/${snapshot.school.id}/classes/${result.classId}`,
+                );
+              }
             }
           }}
         />
@@ -3426,7 +3515,144 @@ export default function SchoolHomeClient({
           }}
         />
       ) : null}
+
+      {classAction ? (
+        <ClassLifecycleModal
+          action={classAction.kind}
+          classRow={classAction.classRow}
+          busy={busy}
+          onClose={() => setClassAction(null)}
+          onConfirm={async () => {
+            const { kind, classRow } = classAction;
+            const result = await command(
+              { action: kind === "remove" ? "removeClass" : "archiveClass", classId: classRow.id },
+              kind === "remove" ? `${classRow.name} removed` : `${classRow.name} archived`,
+            );
+            if (result) {
+              setClassAction(null);
+              if (archivedClasses) await loadArchivedClasses();
+            }
+          }}
+        />
+      ) : null}
     </div>
+    </ModalErrorContext.Provider>
+  );
+}
+
+function ClassLifecycleModal({
+  action,
+  classRow,
+  busy,
+  onClose,
+  onConfirm,
+}: {
+  action: "archive" | "remove";
+  classRow: SchoolHomeSnapshot["classes"][number];
+  busy: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+}) {
+  const remove = action === "remove";
+  return (
+    <Modal title={`${remove ? "Remove" : "Archive"} ${classRow.name}?`} onClose={onClose}>
+      <div className="space-y-4 p-6 text-sm text-slate-700">
+        {remove ? (
+          <>
+            <p>
+              Use this for a class made by mistake, such as a duplicate. RELIQ first checks the class has never had students
+              or saved work, then removes it and its staff assignments for good.
+            </p>
+            <p>If students have ever been in this class, RELIQ will ask you to archive it instead, so their history is kept.</p>
+          </>
+        ) : (
+          <p>
+            The class is hidden from your class lists. Nothing is deleted, and you can restore it at any time
+            from Archived classes.
+          </p>
+        )}
+        <div className="flex justify-end gap-2 border-t border-slate-200 pt-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-slate-300 px-4 py-2.5 text-sm font-bold"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void onConfirm()}
+            className={`rounded-md px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50 ${remove ? "bg-red-700" : "bg-amber-700"}`}
+          >
+            {busy ? (remove ? "Removing..." : "Archiving...") : remove ? "Remove class" : "Archive class"}
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function ArchivedClassesPanel({
+  classes,
+  academicYears,
+  busy,
+  onShow,
+  onHide,
+  onRestore,
+}: {
+  classes: ArchivedSchoolClass[] | null;
+  academicYears: SchoolHomeSnapshot["academicYears"];
+  busy: boolean;
+  onShow: () => void;
+  onHide: () => void;
+  onRestore: (classRow: ArchivedSchoolClass) => Promise<void>;
+}) {
+  const yearName = (id: string | null) => academicYears.find((year) => year.id === id)?.name ?? "No academic year";
+  return (
+    <section>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-bold">Archived classes</h2>
+          <p className="text-sm text-slate-500">Classes you have archived, from every academic year.</p>
+        </div>
+        <button
+          type="button"
+          onClick={classes ? onHide : onShow}
+          className="rounded-md border border-slate-300 px-3 py-2 text-xs font-bold text-slate-700 hover:border-slate-900"
+        >
+          {classes ? "Hide archived classes" : "Show archived classes"}
+        </button>
+      </div>
+      {classes ? (
+        classes.length ? (
+          <div className="mt-3 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-white">
+            {classes.map((classRow) => (
+              <div key={classRow.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+                <div className="min-w-0">
+                  <p className="font-bold text-slate-950">{classRow.name}</p>
+                  <p className="text-xs text-slate-500">
+                    <span className="font-mono">{classRow.code}</span> · {yearName(classRow.academicYearId)}
+                    {classRow.archivedAt ? ` · archived ${formatSchoolDate(classRow.archivedAt)}` : ""}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void onRestore(classRow)}
+                  className="inline-flex items-center gap-1 rounded-md border border-emerald-300 px-3 py-2 text-xs font-bold text-emerald-800 disabled:opacity-50"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+                  Restore
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-3 text-sm text-slate-500">No archived classes.</p>
+        )
+      ) : null}
+    </section>
   );
 }
 
@@ -3454,6 +3680,17 @@ function CreateClassModal({
   const [yearLevels, setYearLevels] = useState<string[]>([]);
   const [leadTeacherId, setLeadTeacherId] = useState(snapshot.actor.id);
   const [coTeacherIds, setCoTeacherIds] = useState<string[]>([]);
+  // One request key and code suffix per dialog, so pressing Create again after
+  // an error returns the same class instead of making a duplicate.
+  const [requestKey] = useState(() => crypto.randomUUID());
+  const [codeSuffix] = useState(randomCodeSuffix);
+  const [allowDuplicateName, setAllowDuplicateName] = useState(false);
+  const duplicateName = snapshot.classes.find(
+    (classRow) =>
+      classRow.academicYearId === academicYearId &&
+      name.trim() !== "" &&
+      classRow.name.trim().toLowerCase() === name.trim().toLowerCase(),
+  );
 
   return (
     <Modal title="Create class" onClose={onClose}>
@@ -3463,12 +3700,12 @@ function CreateClassModal({
           event.preventDefault();
           void onSubmit({
             name,
-            classCode: classCode || createCode(name),
+            classCode: classCode || createCode(name, codeSuffix),
             academicYearId,
             yearLevels,
             leadTeacherId,
             coTeacherIds,
-            idempotencyKey: crypto.randomUUID(),
+            idempotencyKey: requestKey,
           });
         }}
       >
@@ -3477,11 +3714,29 @@ function CreateClassModal({
           <input
             required
             value={name}
-            onChange={(event) => setName(event.target.value)}
+            onChange={(event) => {
+              setName(event.target.value);
+              setAllowDuplicateName(false);
+            }}
             className="mt-2 w-full rounded-md border border-slate-300 px-3 py-2.5 font-medium"
             placeholder="3/4J"
           />
         </label>
+        {duplicateName ? (
+          <div className="rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <p className="font-bold">
+              There&apos;s already a class called {duplicateName.name} in this academic year.
+            </p>
+            <label className="mt-2 flex items-center gap-2 font-semibold">
+              <input
+                type="checkbox"
+                checked={allowDuplicateName}
+                onChange={(event) => setAllowDuplicateName(event.target.checked)}
+              />
+              Create another class with this name anyway
+            </label>
+          </div>
+        ) : null}
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm font-bold">
             Academic year
@@ -3613,7 +3868,7 @@ function CreateClassModal({
             </button>
             <button
               type="submit"
-              disabled={busy || !name || !academicYearId || !leadTeacherId}
+              disabled={busy || !name || !academicYearId || !leadTeacherId || (Boolean(duplicateName) && !allowDuplicateName)}
               className="rounded-md bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50"
             >
               {busy ? "Creating..." : "Create class"}

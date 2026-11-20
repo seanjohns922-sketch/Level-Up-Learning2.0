@@ -311,7 +311,10 @@ async function supabaseRequest<T>(
     );
   }
 
-  return (await response.json()) as T;
+  // PostgREST answers void functions (and PATCH without a representation)
+  // with an empty body; treat that as null rather than a failed command.
+  const body = await response.text();
+  return (body ? JSON.parse(body) : null) as T;
 }
 
 async function getSchoolPreviewToken() {
@@ -705,6 +708,74 @@ export async function runSchoolCommand<T>(
     method: "POST",
     body: JSON.stringify(body),
   });
+}
+
+export type ArchivedSchoolClass = {
+  id: string;
+  name: string;
+  code: string;
+  academicYearId: string | null;
+  archivedAt: string | null;
+};
+
+/** Archived classes are left out of the School Home snapshot, so they are listed on request. */
+export async function listArchivedSchoolClasses(schoolId: string, accessToken: string) {
+  const rows = await supabaseRequest<Array<{
+    id: string;
+    name: string;
+    class_code: string;
+    academic_year_id: string | null;
+    archived_at: string | null;
+  }>>(
+    `/rest/v1/classes?school_id=eq.${encodeURIComponent(schoolId)}&status=eq.archived&select=id,name,class_code,academic_year_id,archived_at&order=name`,
+    accessToken,
+  );
+  return rows.map((row): ArchivedSchoolClass => ({
+    id: row.id,
+    name: row.name,
+    code: row.class_code,
+    academicYearId: row.academic_year_id,
+    archivedAt: row.archived_at,
+  }));
+}
+
+/**
+ * Archives or restores a class under the caller's own row-level security
+ * ("Class managers can update classes"). A class with current students can't
+ * be archived, so no student loses their class access by accident.
+ */
+export async function setSchoolClassArchived(
+  schoolId: string,
+  classId: string,
+  archived: boolean,
+  accessToken: string,
+) {
+  const classFilter = `class_id=eq.${encodeURIComponent(classId)}`;
+  if (archived) {
+    const [students, enrolments] = await Promise.all([
+      supabaseRequest<unknown[]>(`/rest/v1/students?${classFilter}&archived_at=is.null&select=id&limit=1`, accessToken),
+      supabaseRequest<unknown[]>(`/rest/v1/class_enrollments?${classFilter}&status=eq.active&select=id&limit=1`, accessToken),
+    ]);
+    if (students.length > 0 || enrolments.length > 0) {
+      throw new Error("This class still has students. Move them to another class before archiving it.");
+    }
+  }
+  const rows = await supabaseRequest<unknown[] | null>(
+    `/rest/v1/classes?id=eq.${encodeURIComponent(classId)}&school_id=eq.${encodeURIComponent(schoolId)}&status=eq.${archived ? "active" : "archived"}&select=id`,
+    accessToken,
+    {
+      method: "PATCH",
+      headers: { Prefer: "return=representation" },
+      body: JSON.stringify(
+        archived
+          ? { status: "archived", archived_at: new Date().toISOString() }
+          : { status: "active", archived_at: null },
+      ),
+    },
+  );
+  if (!rows?.length) {
+    throw new Error("This class has already changed. Refresh the page and try again.");
+  }
 }
 
 export async function runAuthenticatedCommand<T>(

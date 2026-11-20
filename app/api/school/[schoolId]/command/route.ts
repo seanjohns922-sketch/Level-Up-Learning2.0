@@ -2,8 +2,10 @@ import { schoolCalendarYear } from "@/lib/school-year-rollover";
 import { NextResponse } from "next/server";
 import {
   getSchoolInviteEmailContext,
+  listArchivedSchoolClasses,
   requireSchoolPreviewAccess,
   runSchoolCommand,
+  setSchoolClassArchived,
 } from "@/lib/school-platform-server";
 import { sendSchoolStaffInviteEmail } from "@/lib/school-admin-invite-email";
 
@@ -120,46 +122,86 @@ export async function POST(
         const idempotencyKey =
           stringValue(payload.idempotencyKey) || crypto.randomUUID();
 
-        const classId = await runSchoolCommand<string>(
-          schoolId,
-          "create_class",
-          {
-            p_school_id: schoolId,
-            p_academic_year_id: academicYearId,
-            p_name: name,
-            p_class_code: classCode,
-            p_year_levels: stringArray(payload.yearLevels),
-            p_idempotency_key: idempotencyKey,
-          },
-          accessToken,
-        );
+        let classId: string;
+        try {
+          classId = await runSchoolCommand<string>(
+            schoolId,
+            "create_class",
+            {
+              p_school_id: schoolId,
+              p_academic_year_id: academicYearId,
+              p_name: name,
+              p_class_code: classCode,
+              p_year_levels: stringArray(payload.yearLevels),
+              p_idempotency_key: idempotencyKey,
+            },
+            accessToken,
+          );
+        } catch (error) {
+          // The unique index covers archived classes too, which create_class does not pre-check.
+          if (error instanceof Error && /classes_class_code_unique/.test(error.message)) {
+            return errorResponse("That class code belongs to another class, possibly an archived one. Choose a different code.");
+          }
+          throw error;
+        }
 
-        if (leadTeacherId !== access.user.id) {
-          await runSchoolCommand<string>(schoolId, "assign_class_staff", {
-            p_class_id: classId,
-            p_user_id: leadTeacherId,
-            p_role: "lead_teacher",
-          }, accessToken);
-        }
-        for (const userId of coTeacherIds) {
-          await runSchoolCommand<string>(schoolId, "assign_class_staff", {
-            p_class_id: classId,
-            p_user_id: userId,
-            p_role: "teacher",
-          }, accessToken);
-        }
-        if (
-          leadTeacherId !== access.user.id &&
-          !coTeacherIds.includes(access.user.id)
-        ) {
-          await runSchoolCommand<void>(schoolId, "revoke_class_staff", {
-            p_class_id: classId,
-            p_user_id: access.user.id,
-          }, accessToken);
+        // The class now exists. A staffing failure must not read as a failed
+        // create, or a retry would make a duplicate class.
+        try {
+          if (leadTeacherId !== access.user.id) {
+            await runSchoolCommand<string>(schoolId, "assign_class_staff", {
+              p_class_id: classId,
+              p_user_id: leadTeacherId,
+              p_role: "lead_teacher",
+            }, accessToken);
+          }
+          for (const userId of coTeacherIds) {
+            await runSchoolCommand<string>(schoolId, "assign_class_staff", {
+              p_class_id: classId,
+              p_user_id: userId,
+              p_role: "teacher",
+            }, accessToken);
+          }
+          if (
+            leadTeacherId !== access.user.id &&
+            !coTeacherIds.includes(access.user.id)
+          ) {
+            await runSchoolCommand<void>(schoolId, "revoke_class_staff", {
+              p_class_id: classId,
+              p_user_id: access.user.id,
+            }, accessToken);
+          }
+        } catch (error) {
+          return NextResponse.json({
+            classId,
+            staffingError: error instanceof Error ? error.message : "Class staffing could not be finished",
+          });
         }
 
         return NextResponse.json({ classId });
       }
+
+      case "removeClass": {
+        const classId = stringValue(payload.classId);
+        if (!classId) return errorResponse("Choose a class");
+        return NextResponse.json(await runSchoolCommand<Record<string, unknown>>(
+          schoolId,
+          "remove_empty_class",
+          { p_class_id: classId },
+          accessToken,
+        ));
+      }
+
+      case "archiveClass":
+      case "restoreClass": {
+        const classId = stringValue(payload.classId);
+        if (!classId) return errorResponse("Choose a class");
+        await setSchoolClassArchived(schoolId, classId, payload.action === "archiveClass", accessToken);
+        return NextResponse.json({ success: true });
+      }
+
+      case "listArchivedClasses":
+        return NextResponse.json({ archivedClasses: await listArchivedSchoolClasses(schoolId, accessToken) });
 
       case "saveClassGroup": {
         const groupId = await runSchoolCommand<string>(schoolId, "save_class_group", {

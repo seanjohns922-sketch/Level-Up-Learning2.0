@@ -24,5 +24,12 @@ export async function resolve(specifier, context, nextResolve) {
       return nextResolve(pathToFileURL(withExtension(new URL(specifier, context.parentURL).pathname)).href, context);
     }
   }
-  return nextResolve(specifier, context);
+  try {
+    return await nextResolve(specifier, context);
+  } catch (error) {
+    // Next.js ships entry points such as "next/server" as CommonJS files
+    // without an exports map, so plain Node needs the ".js" extension.
+    if (/^next\/[\w/-]+$/.test(specifier)) return nextResolve(`${specifier}.js`, context);
+    throw error;
+  }
 }
