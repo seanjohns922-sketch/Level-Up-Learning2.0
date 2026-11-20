@@ -112,7 +112,7 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     description: "Shoot hoops! Walk on, tap Shoot and score. Grows from a driveway hoop to a neon arena with a scoreboard.",
     levels: ["Driveway Hoop", "Half Court", "Floodlit Full Court", "Neon Arena"],
     prices: [300, 300, 600, 1200],
-    gridSize: "6x8",
+    gridSize: "7x8",
     accent: "#ff7a1a",
     icon: "dribbble",
     assetKey: "play_basketball",

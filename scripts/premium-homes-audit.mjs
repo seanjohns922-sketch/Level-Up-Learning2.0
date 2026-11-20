@@ -75,6 +75,28 @@ assert.ok(ball.ballAt(make, 0.5)[1] > ball.RIM_HEIGHT + 1, "the ball arcs above 
 const turned = ball.courtInWorld({ gridX: 5, gridZ: 0, rotation: 90 }, 3, 2);
 assert.deepEqual(turned.hoops.map(([x, z]) => [Math.round(x * 100) / 100 + 0, Math.round(z * 100) / 100 + 0]), [[4.4, 0], [15.6, 0]], "hoops turn with the court");
 assert.deepEqual(ball.nearestHoop(14, 0, turned.hoops), turned.hoops[1]);
+// Court markings stay on the playing surface at every level (the three-point arc and key included).
+for (const level of [1, 2, 3, 4]) {
+  const area = ball.COURT_AREA[level];
+  for (const [, hz] of ball.HOOPS[level]) {
+    const inward = hz < area.z ? 1 : -1, arcEnd = hz + inward * ball.THREE_POINT_RADIUS;
+    assert.ok(ball.THREE_POINT_RADIUS <= area.w / 2 && Math.abs(arcEnd - area.z) <= area.d / 2 && Math.abs(hz - area.z) <= area.d / 2, `level ${level} markings fit the court`);
+  }
+  assert.ok(ball.courtReach(level) > Math.hypot(area.w, area.d) / 2, `level ${level}: Shoot works anywhere on the court`);
+}
+
+// Every placeable premium item, at every level, stays inside its plot. Measured from the real models
+// (solid parts only: glows, lasers and light cones are light, not land). Re-measure after changing a model.
+const levelSizes = JSON.parse(read("docs/world3d/premium-level-sizes.json"));
+for (const style of ALL_STYLES.filter((s) => !PREMIUM_HOME_SPECS[s].fixed)) {
+  const [w, d] = PREMIUM_HOME_SPECS[style].gridSize.split("x").map((n) => Number(n) * 2);
+  for (const level of [1, 2, 3, 4]) {
+    const row = levelSizes.find((r) => r.style === style && r.level === level);
+    assert.ok(row, `${style} level ${level} has been measured`);
+    const over = Math.max(-row.min[0] - w / 2, row.max[0] - w / 2, -row.min[2] - d / 2, row.max[2] - d / 2);
+    assert.ok(over <= 0.05, `${style} level ${level} spills ${over.toFixed(2)} m outside its ${w} x ${d} m plot`);
+  }
+}
 const hub = read("components/world3d/CentralWorld.tsx");
 assert.ok(hub.includes('nearCourt ? { label: "SHOOT", icon: "ball"') && hub.includes("<ShotBall key={shot.id}") && hub.includes("<BasketballScoreContext.Provider value={hoopScore}>"), "courts offer Shoot, fly the ball and score");
-console.log(`PASS premium items: ${PREMIUM_HOME_STYLES.length} styles x 4 levels (homes, Fair Ride, trampoline, basketball), ${rows.length} shop rows match the migrations, trampoline bounce, hoop shooting and world wiring in place`);
+console.log(`PASS premium items: ${PREMIUM_HOME_STYLES.length} styles x 4 levels (homes, Fair Ride, trampoline, basketball), ${rows.length} shop rows match the migrations, trampoline bounce, hoop shooting, every level inside its plot and world wiring in place`);

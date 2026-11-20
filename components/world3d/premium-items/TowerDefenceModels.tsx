@@ -332,7 +332,7 @@ export function DronePad({ level }: { level: TechLevel }) {
       {Array.from({ length: 6 }, (_, i) => { const a = (i / 6) * Math.PI * 2 + Math.PI / 6; return <Lamp key={i} pos={[Math.cos(a) * 1.05, 0.18, Math.sin(a) * 1.05]} color={color} r={0.04} />; })}
       {level >= 3 ? <group position={[1.0, 0, -0.9]}><Block size={[0.18, 1.6, 0.18]} pos={[0, 0.8, 0]} color={WHITE} r={0.05} /><Lamp pos={[0, 1.66, 0]} color={GREEN} r={0.08} /></group> : null}
       {level === 1 ? <Orbit radius={0.25} speed={1.2} phase={0} height={1.0} follow={state}><Drone color={color} /></Orbit> : null}
-      {level >= 2 ? Array.from({ length: level }, (_, i) => <Orbit key={i} radius={level === 4 ? 1.9 : 1.4} speed={0.7} phase={(i / level) * Math.PI * 2} height={1.2 + (i % 2) * 0.35} follow={state}><Drone color={color} spot={level === 4} /></Orbit>) : null}
+      {level >= 2 ? Array.from({ length: level }, (_, i) => <Orbit key={i} radius={level === 4 ? 1.22 : 1.15} speed={0.7} phase={(i / level) * Math.PI * 2} height={1.2 + (i % 2) * 0.35} follow={state}><Drone color={color} spot={level === 4} /></Orbit>) : null}
     </group>
   );
 }
@@ -585,8 +585,8 @@ export function PatrolDrone({ level }: { level: TechLevel }) {
       <Block size={[0.5, 0.12, 0.5]} pos={[0, 0.06, 0]} color={METAL} r={0.05} />
       <Lamp pos={[0, 0.16, 0]} color={ring} r={0.07} />
       <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.45, 0.52, 32]} /><meshBasicMaterial color={ring} toneMapped={false} /></mesh>
-      <FigureEight size={[1.6, 2.0, 2.3, 2.6][level - 1]} height={[1.8, 2.3, 2.7, 3.0][level - 1]} speed={0.8} follow={state}><group scale={1.7}>{drone}</group></FigureEight>
-      {level >= 3 ? <FigureEight size={[0, 0, 2.0, 2.3][level - 1]} height={[0, 0, 1.7, 2.1][level - 1]} speed={-0.65} follow={state}><group scale={1.7}>{drone}</group></FigureEight> : null}
+      <FigureEight size={[1.5, 1.7, 1.7, 1.45][level - 1]} height={[1.8, 2.3, 2.7, 3.0][level - 1]} speed={0.8} follow={state}><group scale={1.7}>{drone}</group></FigureEight>
+      {level >= 3 ? <FigureEight size={[0, 0, 1.5, 1.3][level - 1]} height={[0, 0, 1.7, 2.1][level - 1]} speed={-0.65} follow={state}><group scale={1.7}>{drone}</group></FigureEight> : null}
     </group>
   );
 }

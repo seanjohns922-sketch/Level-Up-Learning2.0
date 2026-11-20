@@ -98,11 +98,11 @@ function LampPost({ level, night }: Props) {
       <Block size={[0.9, 0.42, 0.9]} pos={[0, 0.21, 0]} color={M.concrete} r={0.1} />
       {[[-0.25, 0.2], [0.2, -0.22], [0.25, 0.25], [-0.2, -0.25]].map(([x, z], i) => <Ball key={i} pos={[x, 0.5, z]} r={0.13} color={C.leaf} />)}
       <mesh position={[0, 2.2, 0]}><cylinderGeometry args={[0.07, 0.1, 3.6, 18]} /><meshStandardMaterial color={M.white} metalness={0.3} roughness={0.3} /></mesh>
-      <Block size={[0.9, 0.08, 0.08]} pos={[0.35, 3.95, 0]} color={M.white} r={0.03} />
-      <group position={[0.75, 3.8, 0]}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.3, 0.05, 10, 32]} /><meshStandardMaterial color="#e8fbff" emissive="#bff4ff" emissiveIntensity={night ? 3 : 0.9} /></mesh><mesh rotation={[Math.PI / 2, 0, 0]}><circleGeometry args={[0.27, 28]} /><meshStandardMaterial color="#1d2b3a" side={DoubleSide} /></mesh></group>
+      <Block size={[0.7, 0.08, 0.08]} pos={[0.28, 3.95, 0]} color={M.white} r={0.03} />
+      <group position={[0.6, 3.8, 0]}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.3, 0.05, 10, 32]} /><meshStandardMaterial color="#e8fbff" emissive="#bff4ff" emissiveIntensity={night ? 3 : 0.9} /></mesh><mesh rotation={[Math.PI / 2, 0, 0]}><circleGeometry args={[0.27, 28]} /><meshStandardMaterial color="#1d2b3a" side={DoubleSide} /></mesh></group>
       <Block size={[0.04, 1.0, 0.5]} pos={[0.08, 2.9, 0.27]} color={C.blue} r={0.02} />
       <Block size={[0.045, 0.3, 0.5]} pos={[0.08, 3.1, 0.27]} color={C.yellow} r={0.02} />
-      <group position={[0.75, 0, 0]}><LightPool r={2.6} color="#bff4ff" night={night} /></group>
+      <group position={[0.6, 0, 0]}><LightPool r={2.6} color="#bff4ff" night={night} /></group>
     </group>
   );
   return (
@@ -248,7 +248,7 @@ function MailDrone({ night }: { night: boolean }) {
   useFrame(({ clock }) => {
     if (!ref.current) return;
     const t = clock.elapsedTime * 0.6;
-    ref.current.position.set(Math.sin(t) * 0.9, 2.1 + Math.sin(t * 2) * 0.25, Math.cos(t) * 0.5);
+    ref.current.position.set(Math.sin(t) * 0.7, 2.1 + Math.sin(t * 2) * 0.25, Math.cos(t) * 0.45);
     ref.current.rotation.y = t;
   });
   return (

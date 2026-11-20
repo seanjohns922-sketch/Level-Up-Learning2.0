@@ -12,8 +12,15 @@ export const HOOPS: Record<PremiumHomeLevel, readonly (readonly [number, number]
   3: [[0, -5.6], [0, 5.6]],
   4: [[0, -5.6], [0, 5.6]],
 };
-/** How near the court's centre the explorer must be for the Shoot button. */
-export const COURT_REACH: Record<PremiumHomeLevel, number> = { 1: 5, 2: 6.5, 3: 9, 4: 9 };
+/** The playing surface at each level, in the court's own space: centre (along z), width and depth. */
+export const COURT_AREA: Record<PremiumHomeLevel, { z: number; w: number; d: number }> = {
+  1: { z: -1, w: 8, d: 6.8 },
+  2: { z: -0.6, w: 8.6, d: 8.6 },
+  3: { z: 0, w: 8.6, d: 13.6 },
+  4: { z: 0, w: 8.6, d: 13.6 },
+};
+/** The Shoot button shows anywhere on the playing surface, plus a step off it. */
+export const courtReach = (level: PremiumHomeLevel) => Math.hypot(COURT_AREA[level].w, COURT_AREA[level].d) / 2 + 1;
 
 /** The chance a shot goes in: lay-ups always do, then it falls off with distance (never below 15%). */
 export function shotChance(distance: number) {
@@ -56,6 +63,7 @@ export function nearestHoop(x: number, z: number, hoops: readonly (readonly [num
 export function courtInWorld(placement: { gridX: number; gridZ: number; rotation: number }, level: PremiumHomeLevel, cellSize: number) {
   const x = placement.gridX * cellSize, z = placement.gridZ * cellSize, a = (placement.rotation * Math.PI) / 180;
   const cos = Math.cos(a), sin = Math.sin(a);
-  const hoops = HOOPS[level].map(([hx, hz]): [number, number] => [x + hx * cos + hz * sin, z - hx * sin + hz * cos]);
-  return { x, z, hoops, reach: COURT_REACH[level] };
+  const toWorld = (hx: number, hz: number): [number, number] => [x + hx * cos + hz * sin, z - hx * sin + hz * cos];
+  const [cx, cz] = toWorld(0, COURT_AREA[level].z);
+  return { x: cx, z: cz, hoops: HOOPS[level].map(([hx, hz]) => toWorld(hx, hz)), reach: courtReach(level) };
 }

@@ -5,7 +5,7 @@ import { Html, Sparkles } from "@react-three/drei";
 import { createContext, useContext } from "react";
 import { DoubleSide } from "three";
 import { Ball, Block } from "@/components/world3d/premium-homes/HomeKit";
-import { HOOPS, RIM_HEIGHT, THREE_POINT_RADIUS } from "@/lib/world3d/basketball";
+import { COURT_AREA, HOOPS, RIM_HEIGHT, THREE_POINT_RADIUS } from "@/lib/world3d/basketball";
 import type { PremiumHomeLevel } from "@/lib/world3d/premium-homes";
 
 const ORANGE = "#ff7a1a", NEON_BLUE = "#3fd0ff", NEON_PINK = "#ff4fd8", STEEL = "#3a3f4a", WHITE = "#f7f6f2";
@@ -85,10 +85,10 @@ function Stands({ x, rows, length, neon }: { x: number; rows: number; length: nu
     </group>
   );
 }
-function Scoreboard({ x, z, neon }: { x: number; z: number; neon: boolean }) {
+function Scoreboard({ x, z, neon, facing }: { x: number; z: number; neon: boolean; facing: number }) {
   const score = useContext(BasketballScoreContext);
   return (
-    <group position={[x, 0, z]} rotation={[0, x > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}>
+    <group position={[x, 0, z]} rotation={[0, facing, 0]}>
       {[-0.8, 0.8].map((sx) => <Block key={sx} size={[0.14, 3.2, 0.14]} pos={[sx, 1.6, 0]} color={STEEL} r={0.04} />)}
       <Block size={[2.4, 1.3, 0.25]} pos={[0, 3.6, 0]} color="#14161c" r={0.08} />
       <Block size={[2.5, 0.12, 0.3]} pos={[0, 4.28, 0]} color={neon ? NEON_PINK : ORANGE} r={0.03} glow={neon ? 2 : 0.4} />
@@ -103,7 +103,7 @@ function Level1() {
   // A driveway hoop on a concrete pad.
   return (
     <group>
-      <Block size={[6, 0.06, 6]} pos={[0, 0.03, -0.6]} color="#c9c6be" r={0.02} />
+      <Block size={[COURT_AREA[1].w, 0.06, COURT_AREA[1].d]} pos={[0, 0.03, COURT_AREA[1].z]} color="#c9c6be" r={0.02} />
       <EndMarkings z={HOOPS[1][0][1]} dir={1} color={WHITE} paint="#d86a3f" />
       <Hoop x={0} z={HOOPS[1][0][1]} facing={1} />
       <Basketball pos={[1.1, 0.2, 0.9]} />
@@ -132,7 +132,7 @@ function Level3({ night }: { night: boolean }) {
       {HOOPS[3].map(([x, z]) => <Hoop key={z} x={x} z={z} facing={z < 0 ? 1 : -1} />)}
       {[[-4.9, -6.6], [4.9, -6.6], [-4.9, 6.6], [4.9, 6.6]].map(([x, z]) => <Floodlight key={`${x}${z}`} x={x} z={z} h={6} night={night} neon={false} />)}
       <Stands x={-5.2} rows={3} length={9} neon={false} />
-      <Scoreboard x={5.4} z={0} neon={false} />
+      <Scoreboard x={5.4} z={0} neon={false} facing={-Math.PI / 2} />
       <Basketball pos={[0.6, 0.2, 0.8]} />
     </group>
   );
@@ -145,7 +145,7 @@ function Level4({ night }: { night: boolean }) {
       {HOOPS[4].map(([x, z]) => <Hoop key={z} x={x} z={z} facing={z < 0 ? 1 : -1} glow={NEON_PINK} />)}
       <Stands x={-5.2} rows={4} length={10} neon />
       <Stands x={5.2} rows={4} length={10} neon />
-      <Scoreboard x={0.01} z={-7.4} neon />
+      <Scoreboard x={0} z={-7.4} neon facing={0} />
       {[-6.6, 6.6].map((z) => [-4.4, 4.4].map((x) => <group key={`${x}${z}`}><Block size={[0.12, 7.2, 0.12]} pos={[x, 3.6, z]} color="#1d1f2b" r={0.04} /><Block size={[0.04, 6.8, 0.04]} pos={[x, 3.6, z + (z < 0 ? 0.08 : -0.08)]} color={NEON_BLUE} r={0.01} glow={2} /></group>))}
       {[-6.6, 6.6].map((z) => <group key={z}><Block size={[9, 0.14, 0.14]} pos={[0, 7.2, z]} color="#1d1f2b" r={0.04} /><Block size={[8.8, 0.04, 0.04]} pos={[0, 7.1, z]} color={NEON_PINK} r={0.01} glow={2} /></group>)}
       {[-4.4, 4.4].map((x) => <group key={x}><Block size={[0.14, 0.14, 13.5]} pos={[x, 7.2, 0]} color="#1d1f2b" r={0.04} /><Block size={[0.04, 0.04, 13.2]} pos={[x, 7.1, 0]} color={NEON_PINK} r={0.01} glow={2} /></group>)}
