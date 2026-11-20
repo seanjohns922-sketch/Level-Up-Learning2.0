@@ -1240,6 +1240,46 @@ for one desktop class, not physical iPad/Safari, latency targets or capacity.
 No shipped application code changed. Next: repeat the sustained 100-student
 capacity gate with schema parity, integrity checks and resource monitoring.
 
+### Compact dashboard load precheck — 20 November 2026
+
+Pushed the browser-freshness coverage as `b861af9c`. Before the sustained run,
+found the capacity runner still requested full event history. Added opt-in
+`SCALE_EVENT_MODE=compact` for `dashboard-mixed`; the existing default `full`
+mode remains the full-history stress scenario. Reports have distinct filenames
+and record the mode. Compact RPC failures fail the test instead of silently
+accepting a full-history fallback, and a run must actually exercise that RPC.
+New synthetic answer events include lesson context so compact reads should retain
+them. Both modes still verify every emitted event once, class/student isolation,
+exact persisted activity writes and complete canonical attempt counts.
+
+Ran two 60-second prechecks (about 63 seconds including reconciliation), each
+with 100 synthetic students, four ordinary teachers, 20,000 seeded history events,
+and existing history-heavy lesson/quiz/assessment attempts. Both had zero failed
+operations, all 100 presence checks and 200 exact activity writes verified, and
+all four teacher history/event checks passed. Neither passed the latency gate.
+
+- First run overlapped QA on the Mac: dashboard refresh p95 3,554 ms.
+- Repeat after QA finished, with HTTP profiling: dashboard refresh p95 2,348 ms;
+  lesson history 2,348 ms, assessment history 2,330 ms, quiz history 1,884 ms,
+  initial compact events 1,627 ms. Student endpoints were below 1,000 ms p95.
+  The generator event-loop p99 was 12 ms, maximum 47 ms, utilization about 3%.
+  These small dashboard sample counts are diagnostic, not stable capacity estimates.
+
+Aggregate resource monitoring began before both workloads. Private reports,
+HTTP timings and samples are preserved under
+`/Users/seanjohns/reliq-audits/2026-11-20/compact-precheck-*` and
+`compact-repeat-*`. This is a local protocol test with periodic dashboard reads;
+it excludes concurrent canonical completions, realtime delivery and browser
+rendering. Selected runtime/schema preflight passed, but full production schema
+and cloud-resource parity are not established. Synthetic writes/sessions remain
+in the isolated fixture database as with the existing capacity runner.
+
+All 20 critical checks, QA lint, typecheck and targeted runner lint passed.
+No shipped app code, migration or production data changed; no build was needed.
+The 30-minute test was deliberately not started after the latency precheck failed.
+Next: profile complete attempt-history reads and their pagination before changing
+the app, then repeat this gate without losing historical results or access checks.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate

@@ -18,6 +18,10 @@ const studentCount = groupCount * 25;
 const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
 assert.ok(['mixed', 'students-only', 'teachers-only', 'dashboard-mixed'].includes(scenario), 'Unknown local capacity scenario');
 const dashboard = scenario === 'dashboard-mixed';
+const eventMode = process.env.SCALE_EVENT_MODE ?? 'full';
+assert.ok(['full', 'compact'].includes(eventMode), 'Event mode must be full or compact');
+assert.ok(eventMode !== 'compact' || dashboard, 'Compact events require dashboard-mixed');
+let compactPageRequests = 0;
 const profileDashboard = process.env.SCALE_PROFILE_DASHBOARD === '1';
 assert.ok(!profileDashboard || dashboard, 'Dashboard profiling requires dashboard-mixed');
 const dashboardHttp = [];
@@ -34,7 +38,7 @@ const restUrl = restRoute === 'direct' ? 'http://127.0.0.1:56523' : `${config.AP
 const rampSeconds = Number(process.env.SCALE_LOGIN_RAMP_SECONDS ?? 0);
 assert.ok(Number.isInteger(rampSeconds) && rampSeconds >= 0 && rampSeconds <= 30, 'Login ramp must be 0–30 seconds');
 assert.ok(runStudents || rampSeconds === 0, 'Teacher-only scenario cannot ramp student logins');
-const outputSuffix = (scenario === 'mixed' ? '' : `-${scenario}`) + (rampSeconds ? `-ramp${rampSeconds}` : '') + (restRoute === 'direct' ? '-direct' : '');
+const outputSuffix = (scenario === 'mixed' ? '' : `-${scenario}`) + (eventMode === 'compact' ? '-compact' : '') + (rampSeconds ? `-ramp${rampSeconds}` : '') + (restRoute === 'direct' ? '-direct' : '');
 const groups = Array.from({ length: groupCount }, (_, i) => i === 0 ? '' : `-${i + 1}`).map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
 for (const group of groups) assert.equal(group.students.length, 25);
 for (const key of ['teacherId', 'classId', 'schoolId']) assert.equal(new Set(groups.map(g => g[key])).size, groupCount);
@@ -100,14 +104,24 @@ const teachers = await Promise.all(groups.map(async (group, teacherIndex) => {
   const auth = await request('/auth/v1/token?grant_type=password', { email: group.email, password: group.password }, config.ANON_KEY, null, runTeachers ? 'teacher_login' : undefined);
   return { group, profile, token: auth.access_token, client: createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession:false, autoRefreshToken:false }, global: { headers: { Authorization: `Bearer ${auth.access_token}` }, fetch: async (...args) => {
     snapshotHttpRequests++;
-    if (!profileDashboard) return fetch(...args);
+    const requestUrl = new URL(typeof args[0] === 'string' || args[0] instanceof URL ? args[0] : args[0].url);
+    const compactRequest = requestUrl.pathname.endsWith('/get_live_class_compact_event_page_secure');
+    async function checkedFetch() {
+      const response = await fetch(...args);
+      if (compactRequest) {
+        compactPageRequests++;
+        assert.ok(response.ok, `Compact RPC HTTP ${response.status}; fallback would invalidate this rehearsal`);
+      }
+      return response;
+    }
+    if (!profileDashboard) return checkedFetch();
     const start = performance.now();
     // Export fixed route labels only: never URLs, filters, headers or bodies.
-    const route = new URL(typeof args[0] === 'string' || args[0] instanceof URL ? args[0] : args[0].url).pathname.split('/').at(-1);
-    const labels = ['live_student_activity','live_activity_events','get_live_class_event_page_secure','student_lesson_attempts','student_weekly_quiz_attempts','student_realm_assessments','get_live_class_activity_today'];
+    const route = requestUrl.pathname.split('/').at(-1);
+    const labels = ['live_student_activity','live_activity_events','get_live_class_event_page_secure','get_live_class_compact_event_page_secure','student_lesson_attempts','student_weekly_quiz_attempts','student_realm_assessments','get_live_class_activity_today'];
     const row = { teacherIndex, phase: profile.phase, route: labels.includes(route) ? route : 'other', startedEpochMs: performance.timeOrigin + start, status: 0 };
     try {
-      const response = await fetch(...args);
+      const response = await checkedFetch();
       row.status = response.status;
       for (const [key, header] of [['upstreamMs','x-kong-upstream-latency'],['proxyMs','x-kong-proxy-latency']]) {
         const value = response.headers.get(header);
@@ -133,7 +147,7 @@ let completedStudentJourneys = 0;
 let initializedStudents = 0;
 function saveProgress(finished = false) {
   fs.writeFileSync(`${localDir}/capacity-progress.json`, JSON.stringify({
-    at: new Date().toISOString(), environment: 'isolated local test', scenario, finished,
+    at: new Date().toISOString(), environment: 'isolated local test', scenario, eventMode, finished,
     plannedSeconds: seconds, elapsedSeconds: Math.round((Date.now()-started)/1000),
     completedStudentJourneys, initializedStudents, verifiedWrites, recordedOperations: samples.length,
     snapshotHttpRequests, observedFailedOperations: samples.filter(s=>s.status<200||s.status>=300).length,
@@ -159,7 +173,8 @@ async function studentJourney({ group, student }, index) {
     writes++;
     if (dashboard) {
       await rpc('insert_live_activity_event_secure', { p_student_id: student.studentId, p_class_id: group.classId,
-        p_session_id: null, p_event_type: 'answer_correct', p_payload: { capacity_run: eventRun, sequence: writes } }, session);
+        p_session_id: null, p_event_type: 'answer_correct', p_payload: { capacity_run: eventRun, sequence: writes,
+          ...(eventMode === 'compact' ? { lessonId: `capacity-${eventRun}`, week: 1 } : {}) } }, session);
       expectedEvents.set(student.studentId, writes);
     }
     await sleep(Math.min(30000, Math.max(0, deadline - Date.now())));
@@ -175,7 +190,7 @@ async function studentJourney({ group, student }, index) {
 async function dashboardJourney({ group, client, profile }) {
   const ids = group.students.map(s => s.studentId);
   const allowed = new Set(ids);
-  const reader = createLiveClassEventReader(client, { classId: group.classId, studentIds: ids,
+  const reader = createLiveClassEventReader(client, { classId: group.classId, studentIds: ids, compact: eventMode === 'compact',
     eventTypes: ['activity_started','lesson_started','quiz_started','question_loaded','answer_correct','answer_incorrect','hint_used','lesson_completed','quiz_completed','idle_detected'] });
   let refreshes = 0;
   let latestRows = [];
@@ -205,7 +220,7 @@ async function dashboardJourney({ group, client, profile }) {
         measured('dashboard_assessments', fetchLiveClassAttempts(client, 'student_realm_assessments', ids)),
         measured('dashboard_daily_activity', client.rpc('get_live_class_activity_today',{p_class_id:group.classId})),
       ]);
-      assert.ok(latestRows[1].length >= 5000, 'Complete historical event snapshot');
+      if (eventMode === 'full') assert.ok(latestRows[1].length >= 5000, 'Complete historical event snapshot');
       assert.equal(new Set(latestRows[1].map(row => row.id)).size, latestRows[1].length, 'No duplicate events');
       refreshes++;
       status = 200;
@@ -281,13 +296,15 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
   return { name, timings, requests: rows.length, failedRequests: rows.filter(s => s.status < 200 || s.status >= 300).length, p95Ms: percentile(.95), p99Ms: percentile(.99), maximumMs: Math.round(times.at(-1)) };
 });
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
+if (eventMode === 'compact' && compactPageRequests === 0) failures.push('Compact event RPC was never exercised');
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
+  eventMode, compactPageRequests,
   workloadStartedAt: new Date(started).toISOString(),
   databaseTracing: traceDatabase, dashboardHttpProfiling: profileDashboard,
-  ...(dashboard ? { dashboardChecks, dashboardMode: 'six-source periodic refresh with production incremental event reader; no realtime subscription', expectedNewEvents: [...expectedEvents.values()].reduce((a,b)=>a+b,0) } : {}),
+  ...(dashboard ? { dashboardChecks, dashboardMode: `six-source periodic refresh with production ${eventMode} incremental event reader; no realtime subscription`, expectedNewEvents: [...expectedEvents.values()].reduce((a,b)=>a+b,0) } : {}),
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: dashboard ? 'student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total' : 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,
-  workloadVersion: 'production-attempt-pagination-v2',
+  workloadVersion: 'production-attempt-pagination-v3-event-modes',
   scheduling: 'Closed-loop journeys: each operation completes before its sleep; not a fixed arrival-rate or 10,000-user test',
   preliminaryGatePassed: failures.length === 0 && failedRequests / samples.length <= .001 && endpoints.every(e => e.p95Ms < 1000 && e.p99Ms < 3000),
   exclusions: ['canonical lesson/assessment completion and retry integrity',...(dashboard ? [] : ['full six-read teacher snapshots']),'realtime delivery','browser/iPad rendering','production-equivalent cloud resources','long soak'] };
