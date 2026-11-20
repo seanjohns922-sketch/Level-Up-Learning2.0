@@ -37,7 +37,7 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   // Kit pieces are authored in world units (PlacedSkatePiece, PlacedRacePiece), matching what the avatar rides.
   ...Object.fromEntries([...SKATE_PIECES, ...RACE_PIECES].map(piece=>[piece.assetKey,{height:2,sizing:"fixed" as const,footprint:piece.gridSize.split("x").map(n=>Number(n)*2) as [number,number],theme:"garden" as const}])),
   // Premium homes scale themselves (PremiumHome), so each upgrade grows in place.
-  ...Object.fromEntries(PREMIUM_HOME_STYLES.map(style=>[premiumHomeAssetKey(style),{height:8,sizing:"fixed" as const,footprint:PREMIUM_HOME_SPECS[style].gridSize.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
+  ...Object.fromEntries(PREMIUM_HOME_STYLES.map(style=>[premiumHomeAssetKey(style),{height:PREMIUM_HOME_SPECS[style].height??8,sizing:"fixed" as const,footprint:PREMIUM_HOME_SPECS[style].gridSize.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
   ...Object.fromEntries(VILLAGE_BUILDINGS.map(item=>[item.key,{height:item.height,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
   // Small free props: target sizes relative to the reference avatar.
   fruit_tree: {height:5.5, footprint:[6,6], theme:"garden"},

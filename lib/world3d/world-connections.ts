@@ -1,5 +1,5 @@
 import type { CentralWorldPlacement } from "./central-world-layout";
-export const CONNECTED_BOUNDARY_KEYS=new Set(["fence","picket_fence","rope_fence","stone_wall","castle_wall"]);
+export const CONNECTED_BOUNDARY_KEYS=new Set(["fence","picket_fence","rope_fence","stone_wall","castle_wall","defence_laser_fence"]);
 export type BoundaryDirection=[number,number];
 export function boundaryDirections(placement:CentralWorldPlacement, neighbours:CentralWorldPlacement[]):BoundaryDirection[]{
  const directions:BoundaryDirection[]=[[1,0],[-1,0],[0,1],[0,-1]];

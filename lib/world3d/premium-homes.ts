@@ -1,11 +1,12 @@
 import type { EconomyItem } from "@/lib/economy";
 
-/** Premium upgradeable items: the four home styles plus the Fair Ride and the trampoline,
- * each with four levels. ("Home" in the names is historical; the live shop rows use it.)
+/** Premium upgradeable items: the four home styles, the Fair Ride, the trampoline and the
+ * Protect the Tower set, each with four levels. ("Home" in the names is historical; the live shop rows use it.)
  * Unlocking a style and each upgrade are ordinary XP purchases, so the server
  * checks the balance and records ownership. A style's level is the highest
  * upgrade the learner owns; every copy they place shows that level. */
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline"] as const;
+export const DEFENCE_STYLES = ["laser_fence", "laser_gate", "scanner", "trip_wire", "drone_pad", "guard_dog", "patrol_drone", "sentry_bot", "tower_shield"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", ...DEFENCE_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -21,11 +22,18 @@ type StyleSpec = {
   icon: string;
   /** World model key; the shop row is central_world_plot_1_<assetKey>. */
   assetKey: string;
-  marketplaceCategory: "buildings" | "pools_play";
+  marketplaceCategory: "buildings" | "pools_play" | "defence";
   upgradePrefix: string;
+  /** Level 1 is free in the editor's Defence tab (it replaced a free castle piece); only upgrades cost XP. */
+  free?: boolean;
+  /** Not placed by the learner: it stands in a fixed spot (the Tower Shield goes round the Tower). */
+  fixed?: boolean;
+  /** World metres to the top of the model (name tags sit just above); homes use the default. */
+  height?: number;
 };
 const HOME = { marketplaceCategory: "buildings", upgradePrefix: "central_world_home_upgrade_" } as const;
 const SET_PIECE = { marketplaceCategory: "pools_play", upgradePrefix: "central_world_set_upgrade_" } as const;
+const DEFENCE = { marketplaceCategory: "defence", upgradePrefix: "central_world_defence_upgrade_" } as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -94,6 +102,118 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     assetKey: "play_trampoline",
     ...SET_PIECE,
   },
+  laser_fence: {
+    name: "Laser Fence",
+    description: "Lasers between posts that join up as you place them. Walk into it and you get zapped back!",
+    levels: ["Red Lasers", "Triple Lasers", "Energy Wall", "Neon Laser Wall"],
+    prices: [0, 300, 600, 1200],
+    gridSize: "1x1",
+    accent: "#ff3b4e",
+    icon: "zap",
+    assetKey: "defence_laser_fence",
+    height: 2.2,
+    ...DEFENCE,
+    free: true,
+  },
+  laser_gate: {
+    name: "Laser Gate",
+    description: "A gate of lasers that drops when you walk up and closes behind you.",
+    levels: ["Laser Bars", "Energy Curtain", "Pylon Gate", "Neon Arch"],
+    prices: [0, 400, 800, 1600],
+    gridSize: "3x1",
+    accent: "#3fe6ff",
+    icon: "door-open",
+    assetKey: "defence_laser_gate",
+    height: 4.5,
+    ...DEFENCE,
+    free: true,
+  },
+  scanner: {
+    name: "Scanner Tower",
+    description: "A tech tower that sweeps lasers round and locks on to anyone who comes close.",
+    levels: ["Holo Scanner", "Radar Halo", "Sensor Arms", "Sky Beacon"],
+    prices: [0, 400, 800, 1600],
+    gridSize: "2x2",
+    accent: "#3fe6ff",
+    icon: "radar",
+    assetKey: "defence_scanner",
+    height: 7.5,
+    ...DEFENCE,
+    free: true,
+  },
+  trip_wire: {
+    name: "Trip Wire Alarm",
+    description: "Ankle-height laser wires. Step over one and the alarm goes off!",
+    levels: ["One Wire", "Wires and Siren", "Laser Cross", "Laser Box"],
+    prices: [250, 250, 500, 1000],
+    gridSize: "2x2",
+    accent: "#ff3b4e",
+    icon: "siren",
+    assetKey: "defence_trip_wire",
+    height: 2.2,
+    ...DEFENCE,
+  },
+  drone_pad: {
+    name: "Security Drone Pad",
+    description: "A landing pad with security drones that fly over and escort you.",
+    levels: ["One Drone", "Drone Patrol", "Drone Squad", "Spotlight Squad"],
+    prices: [500, 450, 900, 1800],
+    gridSize: "2x2",
+    accent: "#3fe6ff",
+    icon: "plane",
+    assetKey: "defence_drone_pad",
+    height: 3.5,
+    ...DEFENCE,
+  },
+  guard_dog: {
+    name: "Robo Guard Dog",
+    description: "Robot guard dogs that patrol round their kennel. Walk up and they bark, then wag!",
+    levels: ["Robo Pup", "Guard Pair", "Scanner Dogs", "Hover Hounds"],
+    prices: [400, 400, 800, 1600],
+    gridSize: "3x3",
+    accent: "#3fe6ff",
+    icon: "dog",
+    assetKey: "defence_guard_dog",
+    height: 2.4,
+    ...DEFENCE,
+  },
+  patrol_drone: {
+    name: "Patrol Drone",
+    description: "A drone that flies a big figure-eight patrol and swings its searchlight onto you.",
+    levels: ["Patrol Drone", "Searchlight Drone", "Scanner Pair", "Jet Drones"],
+    prices: [450, 400, 800, 1600],
+    gridSize: "3x3",
+    accent: "#3fe6ff",
+    icon: "plane",
+    assetKey: "defence_patrol_drone",
+    height: 5,
+    ...DEFENCE,
+  },
+  sentry_bot: {
+    name: "Sentry Bot",
+    description: "A friendly security robot that rolls up and down its patch and waves hello.",
+    levels: ["Sentry Bot", "Siren Bot", "Hover Guard", "Shield Guard"],
+    prices: [350, 350, 700, 1400],
+    gridSize: "2x2",
+    accent: "#3fe6ff",
+    icon: "bot",
+    assetKey: "defence_sentry_bot",
+    height: 3.4,
+    ...DEFENCE,
+  },
+  tower_shield: {
+    name: "Tower Shield",
+    description: "A giant energy shield over the whole Tower. Every upgrade makes it more amazing.",
+    levels: ["Energy Shield", "Hex Shield", "Orbit Shield", "Legendary Shield"],
+    prices: [800, 600, 1200, 2400],
+    gridSize: "1x1",
+    accent: "#ff4fd8",
+    icon: "shield",
+    assetKey: "defence_tower_shield",
+    height: 62,
+    ...DEFENCE,
+    fixed: true,
+  },
 };
 
 export const premiumHomeAssetKey = (style: PremiumHomeStyle) => PREMIUM_HOME_SPECS[style].assetKey;
@@ -107,6 +227,7 @@ export function premiumHomeStyle(assetKey: unknown): PremiumHomeStyle | null {
 export function isPremiumHome(assetKey: unknown): boolean {
   return premiumHomeStyle(assetKey) !== null;
 }
+export const isDefenceStyle = (style: PremiumHomeStyle) => (DEFENCE_STYLES as readonly string[]).includes(style);
 
 /** The level a learner has reached for one style; 1 once unlocked. */
 export function premiumHomeLevel(style: PremiumHomeStyle, ownedItemKeys: ReadonlySet<string>): PremiumHomeLevel {
@@ -133,24 +254,27 @@ const baseItem = {
   discoverable: true,
 };
 
-/** Shop rows that unlock each style (placed from the Owned tray like other buildings). */
-export const PREMIUM_HOME_SHOP_ITEMS: EconomyItem[] = PREMIUM_HOME_STYLES.map((style, index) => {
+/** Shop rows that unlock each style (placed from the Owned tray like other buildings).
+ * Free styles have none: their Level 1 is in the Defence tab. */
+export const PREMIUM_HOME_SHOP_ITEMS: EconomyItem[] = PREMIUM_HOME_STYLES.filter((style) => !PREMIUM_HOME_SPECS[style].free).map((style, index) => {
   const spec = PREMIUM_HOME_SPECS[style];
   const assetKey = premiumHomeAssetKey(style);
   return {
     ...baseItem,
     item_key: premiumHomeItemKey(style),
     name: spec.name,
-    description: `${spec.description} Unlock once, place as many as you like, and upgrade it through four levels.`,
-    rarity: style === "fair" ? "legendary" : index < 2 || style === "trampoline" ? "rare" : "epic",
+    description: spec.fixed ? `${spec.description} Unlock it once and upgrade it through four levels.` : `${spec.description} Unlock once, place as many as you like, and upgrade it through four levels.`,
+    rarity: style === "fair" || style === "tower_shield" ? "legendary" : index < 2 || style === "trampoline" || spec.prices[0] < 500 ? "rare" : "epic",
     price: spec.prices[0],
     icon: spec.icon,
     accent: spec.accent,
     sort_order: 5 + index,
     metadata: {
-      slot: "world_plot_1", worldPlotId: "customisation-plot-1",
-      worldAssetKey: assetKey, worldArea: spec.marketplaceCategory, marketplaceCategory: spec.marketplaceCategory,
-      worldCollection: "country", gridSize: spec.gridSize, tier: 1, premiumHome: style,
+      // A fixed style (the Tower Shield) is never placed, so it carries no plot details.
+      ...(spec.fixed
+        ? { premiumFixed: true }
+        : { slot: "world_plot_1", worldPlotId: "customisation-plot-1", worldAssetKey: assetKey, worldArea: spec.marketplaceCategory, worldCollection: "country", gridSize: spec.gridSize, tier: 1 }),
+      marketplaceCategory: spec.marketplaceCategory, premiumHome: style,
       marketplace_visual: { type: "asset", src: `/marketplace/world-renders/${assetKey}.webp`, alt: `${spec.name}: the actual world model`, previewMode: "world" },
     },
   };

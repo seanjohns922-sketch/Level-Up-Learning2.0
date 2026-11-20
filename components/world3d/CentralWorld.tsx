@@ -5,7 +5,7 @@ import "./world-editor-mobile.css";
 import { isRealmBuilding } from "@/lib/world3d/realm-building-collections";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
-import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeLevels, premiumHomeStyle, PREMIUM_HOME_SPECS, trampolineBounceAt, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeItemKey, premiumHomeLevels, premiumHomeStyle, PREMIUM_HOME_SPECS, trampolineBounceAt, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PremiumHomeWorldContext } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PremiumHomeUpgradeRows } from "@/components/world3d/premium-homes/PremiumHomeUpgradeRows";
 import { SkateKitWorldContext } from "@/components/world3d/premium-items/SkatePieces";
@@ -15,6 +15,9 @@ import { RACE_KIT, RACE_PIECE_KEYS } from "@/lib/world3d/race-kit";
 import { buildRaceCourse, raceExitPosition, raceStartLine, type KartWorld, type PlacedRaceItem } from "@/lib/world3d/race-driving";
 import { newRaceHud, RaceKartDriver, type RaceHud as RaceHudState } from "@/components/world3d/premium-items/RaceKartDriver";
 import { RaceHud } from "@/components/world3d/premium-items/RaceHud";
+import { ExplorerPositionContext } from "@/components/world3d/premium-items/TowerDefenceModels";
+import { laserFenceBeams, laserFenceHit } from "@/lib/world3d/tower-defence";
+import { defenceSounds } from "@/lib/audio/defence-sfx";
 import { KartGarage, type KartGarageActions } from "@/components/world3d/premium-items/KartGarage";
 import { kartSetup, type KartParts, type KartStyle } from "@/lib/world3d/kart-garage";
 import { fetchFinishedRealms } from "@/lib/world3d/kart-garage-client";
@@ -129,7 +132,7 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
   { key: "rocks_water", label: "Rocks", Icon: Mountain },
   { key: "furniture_fun", label: "Décor", Icon: Lamp },
   { key: "animals", label: "Animals", Icon: PawPrint },
-  { key: "fortress", label: "Fortress", Icon: Castle },
+  { key: "fortress", label: "Defence", Icon: Shield },
   { key: "skate", label: "Skate", Icon: Bike },
   { key: "race", label: "Race", Icon: Flag },
 ];
@@ -168,8 +171,8 @@ const SCENERY_ICON: Record<string, LucideIcon> = {
   hopscotch: Grid2x2, sandpit: Shell, seesaw: Logs, small_slide: Route,
   shield_decoration: Shield, supply_wagon: PackageOpen, training_dummy: Hand, stone_steps: BrickWall,
   small_jetty: Anchor, rowboat: Waves, fishing_rod_stand: Anchor, lifebuoy: Waves,
-  castle_wall: BrickWall, castle_corner: Grid2x2, castle_gate: DoorOpen, castle_turret: Castle, castle_keep: Shield, castle_banner: Flag,
-  drawbridge: Anchor, torch: Flame, chest: Gem, well: Droplets,
+  defence_laser_fence: Fence, defence_laser_gate: DoorOpen, defence_scanner: ScanEye,
+  torch: Flame, chest: Gem, well: Droplets,
 };
 
 type CentralWorldMetrics = {
@@ -362,6 +365,21 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     if (!rideHeightAt) return terrain;
     return (x: number, z: number) => (terrain ? terrain(x, z) : 1) * (rideHeightAt(x, z) === null ? 1 : SKATE_SPEED_BOOST);
   }, [hubV2, rideHeightAt]);
+  // The laser fence stops the explorer (and karts) with a zap.
+  const fenceBeams = useMemo(() => laserFenceBeams(placedCustomisations.filter((placement) => itemsById.get(placement.itemId)?.metadata.worldAssetKey === "defence_laser_fence")), [placedCustomisations, itemsById]);
+  const zap = useRef<{ x: number; z: number; at: number } | null>(null);
+  const canStandAt = useMemo(() => {
+    const ground = hubV2 ? hubCanStand : undefined;
+    if (!fenceBeams.length) return ground;
+    return (x: number, z: number) => {
+      if (ground && !ground(x, z)) return false;
+      const beam = laserFenceHit(x, z, fenceBeams);
+      if (!beam) return true;
+      zap.current = { x, z, at: performance.now() };
+      defenceSounds.zap();
+      return false;
+    };
+  }, [hubV2, fenceBeams]);
   // Racing: the course is the painted tarmac plus the placed Race Kit pieces.
   const raceCourse = useMemo(() => race ? buildRaceCourse(raceItems, groundTiles) : null, [race, raceItems, groundTiles]);
   const raceStart = useMemo(() => race ? raceStartLine(race.start) : null, [race]);
@@ -371,13 +389,13 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
       groundHeightAt: hubV2 ? hubGroundHeight : undefined,
       canDriveAt: (x, z) => x >= bounds.minX && x <= bounds.maxX && z >= bounds.minZ && z <= bounds.maxZ
         && (x / roam.radiusX) ** 2 + ((z - roam.centerZ) / roam.radiusZ) ** 2 <= 1
-        && (!hubV2 || hubCanStand(x, z)),
+        && (canStandAt ? canStandAt(x, z) : true),
     };
-  }, [hubV2]);
+  }, [hubV2, canStandAt]);
   const racing = Boolean(raceCourse && raceStart);
   const roaming = !editing && !buildPreview && !racing;
   return (
-    <>
+    <ExplorerPositionContext.Provider value={avatarPosRef}>
       {hubV2 ? <>
         <HubSkyLights night={night} quality={quality} avatarPosRef={avatarPosRef} />
         <HubNightGlow night={night} animate={quality !== "low"} avatarPosRef={avatarPosRef} />
@@ -450,7 +468,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         bounds={hubV2 ? HUB_V2_BOUNDS : CENTRAL_WORLD_CONFIG.playableBounds}
         roamEllipse={hubV2 ? HUB_V2_ROAM : CENTRAL_WORLD_CONFIG.roamEllipse}
         groundHeightAt={hubV2 ? hubGroundHeight : undefined}
-        canStandAt={hubV2 ? hubCanStand : undefined}
+        canStandAt={canStandAt}
         speedFactorAt={speedAt}
         bounceAt={bounceAt}
         rideHeightAt={rideHeightAt}
@@ -478,7 +496,30 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
       {hubV2 && !editing && !buildPreview ? <HubWadingRipples positionRef={avatarPosRef} /> : null}
       {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
-    </>
+      {fenceBeams.length ? <ZapSpark zap={zap} /> : null}
+    </ExplorerPositionContext.Provider>
+  );
+}
+
+/** A quick crackle of light where the explorer bumped the laser fence. */
+function ZapSpark({ zap }: { zap: React.MutableRefObject<{ x: number; z: number; at: number } | null> }) {
+  const ref = useRef<THREE.Group>(null);
+  useFrame(() => {
+    const spark = ref.current, hit = zap.current;
+    if (!spark) return;
+    const age = hit ? (performance.now() - hit.at) / 1000 : Infinity;
+    spark.visible = age < 0.3;
+    if (!hit || !spark.visible) return;
+    spark.position.set(hit.x, 1, hit.z);
+    spark.scale.setScalar(0.6 + age * 3);
+    spark.rotation.y += 0.7;
+  });
+  return (
+    <group ref={ref} visible={false}>
+      <mesh><icosahedronGeometry args={[0.35, 0]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.85} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} /></mesh>
+      {[0, 1, 2].map((i) => <mesh key={i} rotation={[i, i * 1.3, i * 0.7]}><boxGeometry args={[1.4, 0.04, 0.04]} /><meshBasicMaterial color="#ff4fd8" transparent opacity={0.9} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} /></mesh>)}
+      <pointLight color="#ff4fd8" intensity={8} distance={5} />
+    </group>
   );
 }
 
@@ -660,7 +701,7 @@ export default function CentralWorld() {
   const [editHistory, setEditHistory] = useState<Array<{ placements: CentralWorldPlacement[]; tiles: CentralWorldGroundTile[] }>>([]);
   const [economyMessage, setEconomyMessage] = useState<string | null>(null);
   const [upgradingHome, setUpgradingHome] = useState(false);
-  const homeWorld = useMemo(() => ({ levels: premiumHomeLevels(ownedItemKeys), night }), [ownedItemKeys, night]);
+  const homeWorld = useMemo(() => ({ levels: premiumHomeLevels(ownedItemKeys), night, towerShield: ownedItemKeys.has(premiumHomeItemKey("tower_shield")) }), [ownedItemKeys, night]);
   // Upgrades are XP purchases checked by the server; every copy of the style shows the new level.
   // In-world upgrades are XP purchases checked by the server.
   async function buyWorldUpgrade(itemKey: string, success: string) {
@@ -793,7 +834,8 @@ export default function CentralWorld() {
   } : null;
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
-    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains"].includes(String(item.metadata.marketplaceCategory))))
+    // The Tower Shield is never placed; it stands round the Tower.
+    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
 
   useEffect(() => {
@@ -1598,6 +1640,15 @@ export default function CentralWorld() {
                 </button>
               )) : <>
                 {tabKit ? <KitTrayHeader kit={tabKit.kit} level={tabKit.level} next={nextBuildKitUpgrade(tabKit.kit, ownedItemKeys)} upgrading={upgradingHome} onUpgrade={() => upgradeKit(tabKit.kit)} /> : null}
+                {paletteTab === "fortress" ? (
+                  // The Tower Shield has no placement: it goes round the Tower once unlocked, and upgrades here.
+                  <div className="worldEditKit" role="status">
+                    <b>{PREMIUM_HOME_SPECS.tower_shield.name}</b>
+                    {homeWorld.towerShield
+                      ? <PremiumHomeUpgradeRows assetKey={PREMIUM_HOME_SPECS.tower_shield.assetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={upgradeHome} />
+                      : <span>Unlock it in the Marketplace (Protect the Tower) for a giant energy shield over the Tower. Trip wires, drones, guard dogs and sentry bots are there too.</span>}
+                  </div>
+                ) : null}
                 {paletteTab === "race" && raceLevel ? (
                   <button type="button" className="worldEditCard" onClick={() => chooseEditTool("track")} aria-pressed={!heldItemKey && editTool === "track"}>
                     <span className="worldEditArt"><GroundSwatch tool="track" /></span><b>Paint tarmac</b>

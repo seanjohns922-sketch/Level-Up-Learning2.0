@@ -2,9 +2,10 @@
 // The sixteen premium home models: four styles, four levels each.
 import { Sparkles } from "@react-three/drei";
 import type { ReactElement } from "react";
-import type { PremiumHomeLevel, PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { DEFENCE_STYLES, isDefenceStyle, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { FAIR_RIDE_MODELS } from "@/components/world3d/premium-items/FairRide";
 import { TRAMPOLINE_MODELS } from "@/components/world3d/premium-items/TrampolineModels";
+import { DEFENCE_MODELS, type TechLevel } from "@/components/world3d/premium-items/TowerDefenceModels";
 import { C, M, Apartment, Ball, BigTrunk, Block, Bush, Chimney, Deck, Door, FairyLights, FlatRoof, GableRoof, GlassRail, GlassWall, GoldSparkle, Lantern, LeafCloud, LedStrip, Mat, Picket, Planter, Pod, Pool, RopeLadder, Slats, Slide, Solar, Stones, Walls, Window , type V3 } from "./HomeKit";
 
 type Night = { night: boolean };
@@ -283,16 +284,28 @@ function AptL4({ night }: Night) {
 /** Model units to world metres: a 0.86 door becomes about 2 m, beside the 1.98 m avatar. */
 export const PREMIUM_HOME_SCALE = 2.4;
 
-const MODELS: Record<PremiumHomeStyle, readonly [(p: Night) => ReactElement, (p: Night) => ReactElement, (p: Night) => ReactElement, (p: Night) => ReactElement]> = {
+type LevelModels = readonly [(p: Night) => ReactElement, (p: Night) => ReactElement, (p: Night) => ReactElement, (p: Night) => ReactElement];
+/** The defence models take their level directly; give each level its own component like the homes. */
+function byLevel(Model: (p: { level: TechLevel }) => ReactElement): LevelModels {
+  return ([1, 2, 3, 4] as const).map((level) => {
+    const AtLevel = () => <Model level={level} />;
+    AtLevel.displayName = `${Model.name}Level${level}`;
+    return AtLevel;
+  }) as unknown as LevelModels;
+}
+const DEFENCE_LEVEL_MODELS = Object.fromEntries(DEFENCE_STYLES.map((style) => [style, byLevel(DEFENCE_MODELS[style])])) as Record<(typeof DEFENCE_STYLES)[number], LevelModels>;
+
+const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   cottage: [HomeL1, HomeL2, HomeL3, HomeL4],
   modern: [ModernL1, ModernL2, ModernL3, ModernL4],
   treehouse: [TreeL1, TreeL2, TreeL3, TreeL4],
   apartment: [AptL1, AptL2, AptL3, AptL4],
   fair: FAIR_RIDE_MODELS,
   trampoline: TRAMPOLINE_MODELS,
+  ...DEFENCE_LEVEL_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
-const STYLE_DEPTH_OFFSET: Record<PremiumHomeStyle, number> = { cottage: -1.3, modern: -0.75, treehouse: -1.15, apartment: -0.6, fair: 0, trampoline: 0 };
+const STYLE_DEPTH_OFFSET: Partial<Record<PremiumHomeStyle, number>> = { cottage: -1.3, modern: -0.75, treehouse: -1.15, apartment: -0.6 };
 /** Wider levels add a wing or a second tree to one side; this keeps each level centred on its plot. */
 const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, number>> = {
   "cottage-4": -0.6,
@@ -303,7 +316,8 @@ const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, n
 export function PremiumHome({ style, level, night }: { style: PremiumHomeStyle; level: PremiumHomeLevel; night: boolean }) {
   const Model = MODELS[style][level - 1];
   return (
-    <group position={[0, 0, STYLE_DEPTH_OFFSET[style]]} scale={PREMIUM_HOME_SCALE}>
+    // The defence set is modelled in world metres already.
+    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={isDefenceStyle(style) ? 1 : PREMIUM_HOME_SCALE}>
       <group position={[CENTRE_OFFSET[`${style}-${level}`] ?? 0, 0, 0]}>
         <Model night={night} />
       </group>

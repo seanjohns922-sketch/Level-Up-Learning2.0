@@ -7,6 +7,7 @@ import { isVillageBuilding, type VillageStyle } from "./village-buildings";
 import { getItemPresentation } from "./world-item-presentation";
 import type { EconomyItem } from "@/lib/economy";
 import { CENTRAL_WORLD_CONFIG } from "./central-world-config";
+import { DEFENCE_STARTER_KEYS } from "./central-world-editor-catalog";
 
 export type CentralWorldPlacement = {
   placementId?: string;
@@ -262,17 +263,37 @@ export function validateCentralWorldPlacement(placement: CentralWorldPlacement, 
   return centralWorldPlacementProblem(placement, item, placements, itemsById, groundTiles, rules) === null;
 }
 
+/** The castle pieces were retired for the Protect the Tower tech set; saved worlds swap each one
+ * for its nearest replacement (walls become laser fence, gates laser gates, towers scanner towers). */
+const RETIRED_CASTLE_PIECES: Record<string, string> = {
+  central_world_starter_wall: DEFENCE_STARTER_KEYS.laser_fence,
+  central_world_starter_corner: DEFENCE_STARTER_KEYS.laser_fence,
+  central_world_starter_banner: DEFENCE_STARTER_KEYS.laser_fence,
+  central_world_starter_gatehouse: DEFENCE_STARTER_KEYS.laser_gate,
+  central_world_starter_drawbridge: DEFENCE_STARTER_KEYS.laser_gate,
+  central_world_starter_turret: DEFENCE_STARTER_KEYS.scanner,
+  central_world_starter_keep: DEFENCE_STARTER_KEYS.scanner,
+};
+export function retireCastlePieces(placements: readonly CentralWorldPlacement[]): CentralWorldPlacement[] {
+  return placements.map((placement) => {
+    const replacement = RETIRED_CASTLE_PIECES[placement.itemId];
+    if (!replacement) return placement;
+    // Castle-only details (stone tint, raised drawbridge) don't carry over.
+    return { placementId: placement.placementId, itemId: replacement, gridX: placement.gridX, gridZ: placement.gridZ, rotation: placement.rotation };
+  });
+}
+
 export function readCentralWorldPlacements(scope: string) {
   if (typeof window === "undefined") return normaliseHomes([]);
   try {
     const parsed = JSON.parse(window.localStorage.getItem(`${STORAGE_PREFIX}:${scope}`) ?? "[]");
     if (!Array.isArray(parsed)) return normaliseHomes([]);
-    return normaliseHomes(parsed
+    return normaliseHomes(retireCastlePieces(parsed
       .filter((entry): entry is CentralWorldPlacement => typeof entry?.itemId === "string" && Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && [0, 90, 180, 270].includes(entry?.rotation))
       // Backfill a stable id for older placements saved before ids existed, so a
       // moved item can always be matched (and excluded) by placementId — vital
       // now that many identical scenery items can share an itemId.
-      .map((entry, index) => (entry.placementId ? entry : { ...entry, placementId: `${entry.itemId}-legacy-${index}` })));
+      .map((entry, index) => (entry.placementId ? entry : { ...entry, placementId: `${entry.itemId}-legacy-${index}` }))));
   } catch { return normaliseHomes([]); }
 }
 

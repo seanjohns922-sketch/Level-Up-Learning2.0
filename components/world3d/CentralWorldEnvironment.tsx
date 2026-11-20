@@ -22,7 +22,7 @@ import { CollectionScenery, COLLECTION_SCENERY_KEYS } from "./CollectionScenery"
 import { VillageBuilding } from "./VillageBuildings";
 import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buildings";
 import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
-import { PlacedPremiumHome } from "@/components/world3d/premium-homes/PremiumHomeContext";
+import { PlacedPremiumHome, TowerShieldAtTower } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
 import { PlacedRacePiece, RaceTrackTiles } from "@/components/world3d/premium-items/RacePieces";
 import { RACE_PIECE_KEYS } from "@/lib/world3d/race-kit";
@@ -353,6 +353,9 @@ function StarterGum({ canopyColor = "#8fae86" }: { canopyColor?: string }) {
 // foliage, canopy, cloth, cap, water, glow…). Structural parts — trunks, poles,
 // posts, stems, basins — keep their fixed colours so the recolour always reads.
 function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string }) {
+  // The free Defence pieces (laser gate, scanner tower) are upgradeable set pieces.
+  const defence = premiumHomeStyle(assetKey);
+  if (defence) return <PlacedPremiumHome style={defence} />;
   if (SKATE_PIECE_KEYS.has(assetKey)) return <PlacedSkatePiece assetKey={assetKey} />;
   if (RACE_PIECE_KEYS.has(assetKey)) return <PlacedRacePiece assetKey={assetKey} />;
   if (RAIL_KEYS.has(assetKey)) return <group><RailTrack asset={assetKey}/>{assetKey === "rail_train" && <StarterTrain/>}</group>;
@@ -1277,6 +1280,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       </>}
       <PaintedGround tiles={groundTiles} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
+      <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>

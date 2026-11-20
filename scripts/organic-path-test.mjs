@@ -72,6 +72,7 @@ const extractKeys=(file,name)=>{
  assert.ok(match,'Find renderer registry '+name);
  return [...match[1].matchAll(/"([^"]+)"/g)].map(m=>m[1]);
 };
+const { PREMIUM_HOME_STYLES, PREMIUM_HOME_SPECS, premiumHomeAssetKey } = await import('../lib/world3d/premium-homes.ts');
 const freeRenderers=new Set([
  ...FREE_WORLD_ADDITIONS.map(i=>i.key), ...RAIL_KEYS,
  ...extractKeys('DetailedScenery.tsx','DETAILED_SCENERY_KEYS'),
@@ -81,8 +82,9 @@ const freeRenderers=new Set([
  'drawbridge',
  ...(await import('../lib/world3d/skate-kit.ts')).SKATE_PIECES.map(piece=>piece.assetKey),
  ...(await import('../lib/world3d/race-kit.ts')).RACE_PIECES.map(piece=>piece.assetKey),
+ // Free Defence pieces render as upgradeable set pieces.
+ ...PREMIUM_HOME_STYLES.filter(style=>PREMIUM_HOME_SPECS[style].free).map(premiumHomeAssetKey),
 ]);
-const { PREMIUM_HOME_STYLES, premiumHomeAssetKey } = await import('../lib/world3d/premium-homes.ts');
 const rewardRenderers=new Set([
  ...WORLD_REWARD_ADDITIONS.map(i=>i.key), ...VILLAGE_BUILDING_KEYS, ...REALM_BUILDING_KEYS, ...RAIL_KEYS,
  ...PREMIUM_HOME_STYLES.map(premiumHomeAssetKey),
@@ -158,7 +160,9 @@ const treeFootprint=parseGridSize(birch).map(n=>n*2);
 const treeScale=fitWorldItemScale({x:4.8,y:5.4,z:4.8},treeFootprint,WORLD_ITEM_PRESENTATION.birch_tree);
 assert.ok(Math.abs(treeScale[1]*5.4-14)<1e-6,'Broad tree canopy no longer shrinks a mature birch below its 14 m target');
 assert.equal(treeScale[0],treeScale[1],'Tree trunk and canopy keep their proportions');
-for(const key of ['castle_wall','castle_corner','fence','picket_fence','rope_fence','stone_wall']){
+// The castle walls were retired for the laser fence, which joins on the same 2 m pitch.
+assert.deepEqual(parseGridSize(catalogue.find(i=>i.metadata.worldAssetKey==='defence_laser_fence')),[1,1],'Laser fence keeps the 2 m connector pitch');
+for(const key of ['fence','picket_fence','rope_fence','stone_wall']){
  const item=catalogue.find(i=>i.metadata.worldAssetKey===key);
  assert.deepEqual(parseGridSize(item),[1,1],'Connected walls keep the saved 2 m grid pitch');
  const size={x:2,y:3.4,z:1.4};
@@ -216,25 +220,15 @@ for(const item of [...catalogue,...rewards]){
    fits=validateCentralWorldPlacement({itemId:item.item_key,gridX:gx,gridZ:gz,rotation:0},item,[],new Map());
  assert.ok(fits,'Item can actually be placed with the default home and protected landmarks: '+key);
 }
-// Lowering fortress buildings must not pull them away from saved wall connections.
-for(const key of ['castle_gate','castle_turret','castle_keep']){
- const row=measuredItems.get(key),p=WORLD_ITEM_PRESENTATION[key];
- const [x,y,z]=row.native;
- const prior=fitWorldItemScale({x,y,z},row.footprint,{...p,height:p.horizontalHeight,horizontalHeight:undefined,resizeHeight:false});
- const current=fitWorldItemScale({x,y,z},row.footprint,p);
- assert.equal(current[0],prior[0],'Existing fortress width stays aligned: '+key);
- assert.equal(current[2],prior[2],'Existing fortress depth stays aligned: '+key);
- assert.ok(Math.abs(current[1]/prior[1]-.8)<1e-8,'Only fortress height drops by 20%: '+key);
-}
-const gate=measuredItems.get('castle_gate');
-assert.ok(1.4*gate.size[1]/gate.native[1]>2.2+.5,'Gate arch springline remains comfortably above the avatar');
+// The laser gate replaced the castle gatehouse: the explorer walks through it upright.
+assert.ok(measuredItems.get('defence_laser_gate').size[1]>2.2,'Laser gate is taller than the explorer');
 const sizeOf=key=>measuredItems.get(key).size;
 const areaOf=key=>sizeOf(key)[0]*sizeOf(key)[2];
 assert.ok(sizeOf('sports_stadium')[0]>=sizeOf('backyard_pool')[0]*8-1e-5,'Oval is at least eight backyard pools wide');
 assert.ok(areaOf('sports_stadium')>areaOf('backyard_pool')*40,'Oval occupies substantially more land than a home pool');
 assert.ok(areaOf('sports_stadium')>areaOf('water_park')*8,'Oval also dwarfs the resort lagoon');
 assert.ok(areaOf('pony_paddock')>areaOf('puppy_yard')*10,'Horse paddock is not a dog-sized yard');
-assert.ok(sizeOf('castle_gate')[1]>sizeOf('castle_wall')[1],'Measured gate, not just its target, rises above ramparts');
+assert.ok(sizeOf('defence_laser_gate')[1]>sizeOf('defence_laser_fence')[1],'The laser gate rises above the laser fence');
 assert.ok(sizeOf('cinema')[1]<10,'Widening the drive-in does not create a giant screen and cars');
 assert.ok(sizeOf('railway_station')[1]<6,'Extending the platform does not inflate the station building');
 console.log('All measured models reach their size anchor, fit their land, rotate correctly and are placeable; oval/pool, paddock/yard and building proportions passed.');

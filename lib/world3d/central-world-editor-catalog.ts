@@ -39,6 +39,13 @@ function kitPiece(item: EconomyItem, level: number): EconomyItem {
   return { ...item, metadata: { ...item.metadata, kitPieceLevel: level } };
 }
 
+/** The free Defence-tab pieces, and the retired castle pieces each one replaces in saved worlds. */
+export const DEFENCE_STARTER_KEYS = {
+  laser_fence: "central_world_starter_laser_fence",
+  laser_gate: "central_world_starter_laser_gate",
+  scanner: "central_world_starter_scanner_tower",
+} as const;
+
 // The free toolbox every kid has from the start — no gems, no Marketplace.
 // Each entry pairs a catalogue row with a procedural mesh in
 // CentralWorldEnvironment's StarterScenery(). Add an item by adding one row
@@ -81,17 +88,13 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_echidna", "Echidna", "echidna", "#5c4a35", "animals", "1x1", 1.0),
   starter("central_world_starter_cockatoo", "Cockatoo", "cockatoo", "#e6ebef", "animals", "1x1", 1.0),
 
-  // Fortress kit
-  starter("central_world_starter_wall", "Castle Wall", "castle_wall", "#9a8d7c", "fortress", "1x1", 1.0),
-  starter("central_world_starter_corner", "Wall Corner", "castle_corner", "#9a8d7c", "fortress", "1x1", 1.0),
-  starter("central_world_starter_gatehouse", "Gatehouse", "castle_gate", "#8f8271", "fortress", "3x1", 1.3),
-  starter("central_world_starter_turret", "Turret", "castle_turret", "#9a8d7c", "fortress", "2x2", 1.45),
-  starter("central_world_starter_keep", "Keep", "castle_keep", "#8f8271", "fortress", "3x3", 1.65),
-  starter("central_world_starter_banner", "Banner", "castle_banner", "#1f3352", "fortress", "1x1", 1.2),
-  starter("central_world_starter_drawbridge", "Drawbridge", "drawbridge", "#8a5a34", "fortress", "2x2", 1.15),
-  starter("central_world_starter_torch", "Torch", "torch", "#f59e0b", "fortress", "1x1", 1.15),
-  starter("central_world_starter_chest", "Treasure Chest", "chest", "#b8863f", "fortress", "1x1", 1.2),
-  starter("central_world_starter_well", "Well", "well", "#9a8d7c", "fortress", "2x2", 1.15),
+  // Protect the Tower: Level 1 of these three is free (they replaced the castle pieces); upgrades cost XP.
+  starter(DEFENCE_STARTER_KEYS.laser_fence, "Laser Fence", "defence_laser_fence", "#ff3b4e", "fortress", "1x1", 1.0),
+  starter(DEFENCE_STARTER_KEYS.laser_gate, "Laser Gate", "defence_laser_gate", "#3fe6ff", "fortress", "3x1", 1.0),
+  starter(DEFENCE_STARTER_KEYS.scanner, "Scanner Tower", "defence_scanner", "#3fe6ff", "fortress", "2x2", 1.0),
+  starter("central_world_starter_torch", "Torch", "torch", "#f59e0b", "furniture_fun", "1x1", 1.15),
+  starter("central_world_starter_chest", "Treasure Chest", "chest", "#b8863f", "furniture_fun", "1x1", 1.2),
+  starter("central_world_starter_well", "Well", "well", "#9a8d7c", "furniture_fun", "2x2", 1.15),
   // Garden, wildlife and outdoor living additions. Existing item keys stay stable.
   starter("central_world_starter_birch_tree", "Silver Birch", "birch_tree", "#bec6a8", "trees_plants", "2x2", 1.3),
   starter("central_world_starter_autumn_tree", "Autumn Tree", "autumn_tree", "#ba7839", "trees_plants", "2x2", 1.3),
@@ -115,8 +118,8 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_platypus", "Platypus", "platypus", "#826849", "animals", "1x1", 1.1),
   starter("central_world_starter_blue_heeler", "Blue Heeler", "blue_heeler", "#819195", "animals", "1x1", 1.15),
   starter("central_world_starter_bilby", "Bilby", "bilby", "#ac9c89", "animals", "1x1", 1),
-  starter("central_world_starter_stone_wall", "Garden Stone Wall", "stone_wall", "#929581", "fortress", "1x1", 1),
-  starter("central_world_starter_wood_gate", "Timber Gate", "wood_gate", "#94704b", "fortress", "1x1", 1),
+  starter("central_world_starter_stone_wall", "Garden Stone Wall", "stone_wall", "#929581", "furniture_fun", "1x1", 1),
+  starter("central_world_starter_wood_gate", "Timber Gate", "wood_gate", "#94704b", "furniture_fun", "1x1", 1),
   ...FREE_WORLD_ADDITIONS.map(item => starter("central_world_starter_"+item.key,item.name,item.key,"#899b72",item.group,item.grid)),
   // Build kit pieces: free to place once the learner's kit level reaches the piece's level.
   ...SKATE_PIECES.map(piece => kitPiece(starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#ff4fd8", "skate", piece.gridSize), piece.level)),

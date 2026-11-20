@@ -99,10 +99,11 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
       previewMode: "background",
     },
   },
-})), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS, ...PREMIUM_HOME_SHOP_ITEMS];
+})), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS, ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed !== true)];
 
 /** Everything the world can buy: placeable items plus upgrades and build kits (which are not placeable). */
-export const CENTRAL_WORLD_SHOP_ROWS: EconomyItem[] = [...CENTRAL_WORLD_CUSTOMISATION_CATALOG, ...PREMIUM_HOME_UPGRADE_ITEMS, ...SKATE_KIT_SHOP_ITEMS, ...RACE_KIT_SHOP_ITEMS, ...KART_GARAGE_SHOP_ITEMS];
+/** Everything the hub sells: placeable items, upgrades, kits, karts, and the Tower Shield (never placed). */
+export const CENTRAL_WORLD_SHOP_ROWS: EconomyItem[] = [...CENTRAL_WORLD_CUSTOMISATION_CATALOG, ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed === true), ...PREMIUM_HOME_UPGRADE_ITEMS, ...SKATE_KIT_SHOP_ITEMS, ...RACE_KIT_SHOP_ITEMS, ...KART_GARAGE_SHOP_ITEMS];
 
 export function mergeCentralWorldCatalogue(state: EconomyState): EconomyState {
   const existing = new Map(state.items.map((item) => [item.item_key, item]));
