@@ -1,7 +1,7 @@
 {
   "8/number/1/1": {
     "title": "Recognise rational and irrational numbers",
-    "signature": "4eaa5cb05223224925e9f7bb8145b0c5c1437f4c878dbf471bd142923e97e5b9"
+    "signature": "c34bacd2a9e78ce74ec374b463263efb846ef7f25bf58c5f591800d0584c51e9"
   },
   "8/number/1/2": {
     "title": "Locate square roots on a number line",
@@ -37,11 +37,11 @@
   },
   "8/number/4/1": {
     "title": "Recognise terminating decimals",
-    "signature": "750222178469bec5e44b376ab62d9577fbda1a6a5d05b93aa2e0febdb8813c41"
+    "signature": "b7a293d6a7537ff33f45a7524d8bcceba0b17551c7ab7dfb6365b0743f681d4b"
   },
   "8/number/4/2": {
     "title": "Read and write recurring decimals",
-    "signature": "d993a05511238a82722be71529ac921c891a90dd3827e0fd5824cf5371351a7e"
+    "signature": "d1949c5bad2d8ada1c29376ae5813d593540489333adc710d7e476ce24ac62e3"
   },
   "8/number/4/3": {
     "title": "Predict terminating decimals from fractions",
@@ -473,7 +473,7 @@
   },
   "8/pattern/6/2": {
     "title": "Solve one-variable inequalities with positive coefficients",
-    "signature": "cdd4cb798b46e8bf1c1796e017a2aca600cbd873352ddae122478ab56a0a084c"
+    "signature": "af027d4a2a30996c50d5643f5f93f70dc1e2bd89521845f8bb8c3d0efaeb1390"
   },
   "8/pattern/6/3": {
     "title": "Graph and check an inequality solution",
@@ -565,7 +565,7 @@
   },
   "8/statistics/2/1": {
     "title": "Select a random sample",
-    "signature": "211f0f0d560891ea12030efdeb5da2a491ad59ac4489cd890f1cfd7f372fa1f0"
+    "signature": "1367f76d53fc53706bcb0cd26e3adb73aca5a7e82dc9ecf9d51985307d7b91f1"
   },
   "8/statistics/2/2": {
     "title": "Spot selection and response bias",

@@ -9,10 +9,12 @@ import {
   level8Quiz,
 } from "../data/activities/level8/questions.ts";
 import { LEVEL8_WEEK_COUNTS } from "../lib/level8-config.ts";
+import { joinWorking } from "../data/activities/level8/shared.ts";
 import {
   markLevel7Answer,
   level7Answer,
   level7SimplificationTip,
+  scalarAnswer,
 } from "../lib/level7-answer.ts";
 import {
   isLessonQuestionSafe,
@@ -215,3 +217,38 @@ await import("./measurement8-visuals-test.mjs");
 
 // Review all other realms at form level, including random branches.
 await import("./level8-realm-visuals-test.mjs");
+
+// Worked steps never chain into a false equation, and a prompt's answer-form instruction is marked.
+assert.equal(joinWorking(["Area: 4.8 × 4.3 = 20.64 m².", "× $41 = $846.24."]), "Area: 4.8 × 4.3 = 20.64 m². 20.64 m² × $41 = $846.24.");
+assert.equal(joinWorking(["Brackets first: 6 × 12", "= 72 cubes."]), "Brackets first: 6 × 12 = 72 cubes.");
+assert.equal(joinWorking(["b ≠ 0.", "−5 = −5/1."]), "b ≠ 0. −5 = −5/1.");
+let formChecks = 0;
+for (const realm of Object.keys(LEVEL8_FACTORIES)) {
+  for (let week = 1; week <= LEVEL8_WEEK_COUNTS[realm]; week++) {
+    for (let lesson = 1; lesson <= 3; lesson++) {
+      for (let seed = 0; seed < 120; seed++) {
+        const q = level8Question(realm, week, lesson, seed * 104729 + 3);
+        const spec = q.answerSpec;
+        if (!spec || (spec.kind !== "fraction" && spec.kind !== "number")) continue;
+        const label = `${realm} w${week} l${lesson}: ${q.prompt}`;
+        const value = scalarAnswer(q.answer) ?? NaN;
+        if (spec.kind === "fraction" && /simplest form/i.test(q.prompt)) {
+          formChecks++;
+          assert.equal(spec.format, "simplest", label);
+          const [n, d] = q.answer.split("/").map(Number);
+          if (d) assert.equal(markLevel7Answer(spec, `${n * 2}/${d * 2}`), false, `${label} accepts an unsimplified fraction`);
+        }
+        if (/\b(?:give|write)\b[^.?]*\bas a fraction\b|\bgive a fraction\b|simplest form/i.test(q.prompt) && q.answer.includes("/") && Number.isFinite(value) && String(value).length < 9) {
+          formChecks++;
+          assert.equal(markLevel7Answer(spec, String(value)), false, `${label} accepts the decimal ${value}`);
+        }
+        if (/\bas a decimal\b|\bgive a decimal\b/i.test(q.prompt) && !Number.isInteger(value)) {
+          formChecks++;
+          assert.equal(markLevel7Answer(spec, `${Math.round(value * 1000)}/1000`), false, `${label} accepts a fraction`);
+        }
+      }
+    }
+  }
+}
+assert(formChecks > 400, `only ${formChecks} answer-form checks ran`);
+console.log(`PASS: ${formChecks} answer-form instructions enforced; worked steps join without false equations.`);

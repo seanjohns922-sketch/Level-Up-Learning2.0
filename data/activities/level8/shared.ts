@@ -72,6 +72,34 @@ const tidyNumbers = (text: string) =>
   text.replace(/\d+\.\d*?(?:0{7,}|9{7,})\d+/g, (m) => String(Number(Number(m).toPrecision(12))));
 /** Display text shows a true minus sign: "(-2, -5)" → "(−2, −5)". Answers keep "-" for marking. */
 const trueMinus = (text: string) => tidyNumbers(text).replace(/(^|[\s(,=])-(?=\d)/g, "$1−");
+/**
+ * The answer form a prompt tells the student to use, so marking matches the instruction:
+ * "simplest form" needs a simplified fraction, "as a fraction" rejects a decimal and
+ * "as a decimal" rejects a fraction. "As a fraction" counts only after give/write, because
+ * method wording ("by writing each decimal as a fraction") is not about the answer's form.
+ */
+function answerFormatAsked(kind: Level7Answer["kind"], prompt: string): Level7Answer["format"] {
+  if (kind !== "fraction" && kind !== "number") return undefined;
+  if (kind === "fraction" && /\bsimplest form\b/i.test(prompt)) return "simplest";
+  if (/\b(?:give|write)\b[^.?]*\bas a fraction\b|\bgive a fraction\b/i.test(prompt)) return "fraction";
+  if (/\bas a decimal\b|\bgive a decimal\b/i.test(prompt)) return "decimal";
+  return undefined;
+}
+/**
+ * Joins working steps into one explanation. "= 72 cubes" continues the last calculation. An operator
+ * step ("× $41 = $846.24") restarts from the previous result, so the text never claims a false chain
+ * such as "4.8 × 4.3 = 20.64 m² × $41 = $846.24". A step starting with a negative number is a new sentence.
+ */
+export function joinWorking(steps: string[]) {
+  return steps.reduce((text, step, i) => {
+    if (!i) return step;
+    const open = text.replace(/\.$/, "");
+    if (/^[=≈]/.test(step)) return `${open} ${step}`;
+    if (!/^(?:[×÷+]|−\s)/.test(step)) return `${text} ${step}`;
+    const result = /[=≈]/.test(open) ? open.split(/[=≈]/).at(-1)!.trim() : "";
+    return result ? `${open}. ${result} ${step}` : `${open} ${step}`;
+  }, "");
+}
 export function question(
   realm: Level8Realm,
   week: number,
@@ -132,6 +160,7 @@ export function question(
       : /^-?\d+(\.\d+)?$/.test(answer)
         ? "number"
         : "text");
+  const format = draft.format ?? answerFormatAsked(kind, draft.prompt);
   return {
     kind: "multiple_choice",
     lessonId: `y8-${realm}-w${week}-l${lesson}`,
@@ -140,8 +169,7 @@ export function question(
     prompt,
     answer,
     options,
-    // A step that continues the last calculation ("= 72 cubes") joins it without a full stop between.
-    explanation: draft.steps.reduce((text, step, i) => (i && /^[=×÷+−≈]/.test(step) ? `${text.replace(/\.$/, "")} ${step}` : i ? `${text} ${step}` : step), ""),
+    explanation: joinWorking(draft.steps),
     steps: draft.steps,
     cave7Visual: draft.visual,
     space8Visual: draft.spaceVisual,
@@ -157,7 +185,7 @@ export function question(
             expected: answer,
             prompt: draft.prompt,
             unit: draft.unit,
-            ...(draft.format ? { format: draft.format } : {}),
+            ...(format ? { format } : {}),
             ...(kind === "list"
               ? {
                   labels:
