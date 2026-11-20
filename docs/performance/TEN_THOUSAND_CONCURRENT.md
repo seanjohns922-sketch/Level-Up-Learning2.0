@@ -1352,6 +1352,69 @@ sandbox build failed DNS access to Google Fonts and was stopped; the complete
 network-enabled build passed. Logs are `history-page-size-build.log` and
 `history-page-size-build-network.log` in the same private audit directory.
 
+### Preview build-memory repair — 20 November 2026
+
+Vercel preview `aa8d0fcc` failed during webpack compilation with SIGKILL and an
+explicit out-of-memory report. Main already contained the narrowly scoped cache
+fix `8bf6e08e`; the review branch had not incorporated it. Cherry-picked that
+existing commit as `83af2b13`, preserving its author and leaving unrelated main
+changes untouched. Production webpack caching is disabled; development retains
+its cache. No application behaviour, schema, permissions or data changes apply.
+
+The actual Next config loader verified both cache branches and that TypeScript
+build errors are not ignored. ESLint and whitespace checks passed. Vercel ran
+the full `npm run build` including prebuild audits: compilation succeeded in
+70 seconds, TypeScript and all 177 static pages completed, and the preview was
+Ready after 6 minutes 17 seconds. Deployment:
+`https://vercel.com/level-up-learning/level-up-learning-app/DnR66bacXADpavfdne3Qk8rbphJM`.
+Chrome loaded the preview login screen. Authenticated school workflows were not
+retested in that preview. The nonfatal `/admin/home` cookie-based static-render
+message remains in the build log; it did not prevent deployment.
+
+The review branch remains separate from main. No paid build-machine upgrade or
+migration was needed. Build success is not a concurrency benchmark.
+
+### Thirty-minute compact dashboard checkpoint — 20 November 2026
+
+The 100-student/four-teacher run at `aa8d0fcc` finished after 1,801 seconds.
+It used 1,000-row summary pages, the actual compact event reader, six dashboard
+sources, existing local class index and 30-second closed-loop activity cycles.
+No request or integrity assertion failed: all 100 persisted presence records,
+6,000 exact activity increments and 6,000 new events were verified. Every teacher
+received its 1,500 events exactly once. All three attempt histories matched
+independent exact database counts, with no duplicates or foreign-class rows.
+
+**Overall latency gate failed; do not advance the capacity claim.** Initial event
+loading p95 was 1,022 ms against the unchanged strict sub-1,000 ms target. There
+were only four initial loads, so this percentile is their maximum. Across 243
+dashboard refreshes, p95 was 851 ms, p99 2,732 ms and maximum 4,394 ms. Login p95
+was 573 ms; heartbeat and activity-write p95 were both 43 ms. Zero failed requests
+does not erase the initial-load miss or the slower tail.
+
+The HTTP profile narrows the initial miss: the event head table request took up
+to 800 ms to headers; compact-page requests took at most 216 ms. Subsequent
+read-only EXPLAINs under each synthetic teacher's authenticated role used the
+existing class/created index and executed in 1.3–5.7 ms. These quiet database
+plans do not reproduce concurrent HTTP latency. Do not add an index or change
+pool settings on this evidence alone. Next: profile repeated synchronized
+100-student starts and distinguish queueing/API delay from query execution
+before advancing to 250. Keep the same thresholds and complete-history checks.
+
+Aggregate evidence is `sustained-100-summary-2026-11-20.json`; private full
+reports, HTTP profile, resource samples and logs are in
+`/Users/seanjohns/reliq-audits/2026-11-20/sustained-100/`. The generator's event-loop
+p99 delay was 12 ms and utilization about 1.6%. Resource sampling reported no
+errors. Browser activity/read-only investigation continued on this Mac; no local
+production build overlapped. This is not an isolated cloud capacity measurement.
+
+Canonical completion/retry traffic, realtime subscriptions, rendering/device
+performance and production-equivalent hosting remain excluded. This completes
+the 30-minute activity run, not a longer soak or 10,000-user certification. The
+raw runner's static `long soak` exclusion is retained in the private original;
+the aggregate report distinguishes the completed duration from longer tests.
+No application, schema, permissions, curriculum or student data changed in this
+checkpoint. Documentation/aggregate evidence only; JSON and diff checks passed.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate

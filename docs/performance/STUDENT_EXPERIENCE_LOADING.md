@@ -59,6 +59,17 @@ server persistence, world frame rates and 10,000-user load are not verified here
 
 ## Next work
 
+Read-only remeasurement on 20 November of the retained successful local build
+(`8_ugoHYXKy-5pcpbLKQbd`) found 4,065,947 bytes of initial lesson JavaScript
+(estimated gzip 1,134,402 bytes). Including the selected engine gives 5,825,133
+bytes for PracticeRunner or 5,303,186 bytes for Year2LessonEngine. This is a
+baseline, not a new improvement or a timing measurement. The shared lesson page
+still imports Prep/Year 1 generators, Measurement metadata/generators and upper-
+level question generators synchronously. Identify their actual chunk contribution
+and preserve generator reset/session behaviour before changing those boundaries.
+The private chunk inventory is
+`/Users/seanjohns/reliq-audits/2026-11-20/student-route-current.json`.
+
 1. Measure cold and warm lesson entry on constrained devices, including the new
    deferred request. Several realms' question generators and guides are still
    imported by the shared entry point; profile the remaining dependency graph
