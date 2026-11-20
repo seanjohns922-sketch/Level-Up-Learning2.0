@@ -189,5 +189,13 @@
   {"key":"skate_quarter_big","name":"Big Quarter Pipe","native":[7.248024,3.845977,4.825969],"size":[7.248024,3.845977,4.825969],"footprint":[8,6]},
   {"key":"skate_bowl","name":"Skate Bowl","native":[7.488,2.304,7.488],"size":[7.488,2.304,7.488],"footprint":[8,8]},
   {"key":"skate_spine","name":"Spine Ramp","native":[3.648024,1.801612,3.17232],"size":[3.648024,1.801612,3.17232],"footprint":[4,4]},
-  {"key":"skate_vert","name":"Vert Ramp","native":[7.248024,5.048544,6.025857],"size":[7.248024,5.048544,6.025857],"footprint":[8,8]}
+  {"key":"skate_vert","name":"Vert Ramp","native":[7.248024,5.048544,6.025857],"size":[7.248024,5.048544,6.025857],"footprint":[8,8]},
+  {"key":"race_start","name":"Start and Finish Line","native":[7.00002,2.44002,0.42],"size":[7.00002,2.44002,0.42],"footprint":[8,2]},
+  {"key":"race_tyres","name":"Tyre Wall","native":[3.6,0.36,0.506963],"size":[3.6,0.36,0.506963],"footprint":[4,2]},
+  {"key":"race_grandstand","name":"Grandstand","native":[7.60002,2.86002,2.8],"size":[7.60002,2.86002,2.8],"footprint":[8,4]},
+  {"key":"race_jump","name":"Jump Ramp","native":[1.82002,0.659374,1.521505],"size":[1.82002,0.659374,1.521505],"footprint":[2,2]},
+  {"key":"race_boost","name":"Boost Pad","native":[1.60002,0.07001,1.6],"size":[1.60002,0.07001,1.6],"footprint":[2,2]},
+  {"key":"race_bridge","name":"Track Bridge","native":[2.18002,2.43915,7.923761],"size":[2.18002,2.43915,7.923761],"footprint":[4,8]},
+  {"key":"race_floodlight","name":"Floodlight","native":[0.88002,5.38002,0.47],"size":[0.88002,5.38002,0.47],"footprint":[2,2]},
+  {"key":"race_podium","name":"Winners' Podium","native":[2.24002,1.24001,0.76],"size":[2.24002,1.24001,0.76],"footprint":[4,2]}
 ]

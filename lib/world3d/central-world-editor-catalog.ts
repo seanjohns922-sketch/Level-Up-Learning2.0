@@ -1,8 +1,9 @@
 import { FREE_WORLD_ADDITIONS, worldCollectionFor } from "./world-expansion";
 import { SKATE_PIECES } from "./skate-kit";
+import { RACE_PIECES } from "./race-kit";
 import type { EconomyItem } from "@/lib/economy";
 
-export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress" | "skate";
+export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress" | "skate" | "race";
 
 function starter(
   item_key: string,
@@ -31,6 +32,11 @@ function starter(
     sort_order: 0,
     metadata: { marketplaceCategory: "world_basic", worldAssetKey, worldSceneryGroup: group, worldCollection: worldCollectionFor(worldAssetKey), gridSize, worldScale, tier: 1 },
   };
+}
+
+/** Marks a kit piece with the kit level that unlocks it (its kit is its scenery group). */
+function kitPiece(item: EconomyItem, level: number): EconomyItem {
+  return { ...item, metadata: { ...item.metadata, kitPieceLevel: level } };
 }
 
 // The free toolbox every kid has from the start — no gems, no Marketplace.
@@ -112,6 +118,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_stone_wall", "Garden Stone Wall", "stone_wall", "#929581", "fortress", "1x1", 1),
   starter("central_world_starter_wood_gate", "Timber Gate", "wood_gate", "#94704b", "fortress", "1x1", 1),
   ...FREE_WORLD_ADDITIONS.map(item => starter("central_world_starter_"+item.key,item.name,item.key,"#899b72",item.group,item.grid)),
-  // Skate Kit pieces: free to place once the learner's Skate Kit level reaches the piece's level.
-  ...SKATE_PIECES.map(piece => { const item = starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#ff4fd8", "skate", piece.gridSize); return { ...item, metadata: { ...item.metadata, skateKitLevel: piece.level } }; }),
+  // Build kit pieces: free to place once the learner's kit level reaches the piece's level.
+  ...SKATE_PIECES.map(piece => kitPiece(starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#ff4fd8", "skate", piece.gridSize), piece.level)),
+  ...RACE_PIECES.map(piece => kitPiece(starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#3fd0ff", "race", piece.gridSize), piece.level)),
 ];

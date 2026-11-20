@@ -24,6 +24,8 @@ import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buil
 import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PlacedPremiumHome } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
+import { PlacedRacePiece, RaceTrackTiles } from "@/components/world3d/premium-items/RacePieces";
+import { RACE_PIECE_KEYS } from "@/lib/world3d/race-kit";
 import { SKATE_PIECE_KEYS } from "@/lib/world3d/skate-kit";
 import { CollectionReward, COLLECTION_REWARD_KEYS } from "./CollectionRewards";
 import { FortressScenery, FORTRESS_SCENERY_KEYS } from "@/components/world3d/FortressScenery";
@@ -352,6 +354,7 @@ function StarterGum({ canopyColor = "#8fae86" }: { canopyColor?: string }) {
 // posts, stems, basins — keep their fixed colours so the recolour always reads.
 function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string }) {
   if (SKATE_PIECE_KEYS.has(assetKey)) return <PlacedSkatePiece assetKey={assetKey} />;
+  if (RACE_PIECE_KEYS.has(assetKey)) return <PlacedRacePiece assetKey={assetKey} />;
   if (RAIL_KEYS.has(assetKey)) return <group><RailTrack asset={assetKey}/>{assetKey === "rail_train" && <StarterTrain/>}</group>;
   if (COLLECTION_SCENERY_KEYS.has(assetKey)) return <CollectionScenery assetKey={assetKey} tint={tint} />;
   if (FORTRESS_SCENERY_KEYS.has(assetKey)) return <FortressScenery assetKey={assetKey} tint={tint} />;
@@ -899,7 +902,7 @@ function BuildModeGrid({ cursor, reservedCell }: { cursor: { gridX: number; grid
   );
 }
 
-const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a38a69", road: "#4b5563", stone: "#a8a29e", water: "#2f7fa6" };
+const GROUND_TILE_COLORS: Record<CentralWorldGroundType, string> = { path: "#a38a69", road: "#4b5563", stone: "#a8a29e", water: "#2f7fa6", track: "#3a3f4a" };
 
 function GroundTile({ tile, preview = false, valid = true }: { tile: CentralWorldGroundTile; preview?: boolean; valid?: boolean }) {
   const isWater = tile.tileType === "water";
@@ -932,7 +935,7 @@ function GroundTileBatch({ tiles, tileType }: { tiles: CentralWorldGroundTile[];
 
 function PaintedGround({ tiles }: { tiles: CentralWorldGroundTile[] }) {
   const batches = useMemo(() => (["stone"] as const).map(tileType => ({ tileType, tiles: tiles.filter(tile => tile.tileType === tileType) })), [tiles]);
-  return <group><OrganicPaths tiles={tiles} /><OrganicPaths tiles={tiles} road /><WorldWater tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
+  return <group><OrganicPaths tiles={tiles} /><OrganicPaths tiles={tiles} road /><WorldWater tiles={tiles} /><RaceTrackTiles tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
 }
 
 function MeadowGround() {

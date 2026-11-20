@@ -29,7 +29,8 @@ export function selectCentralWorldInventoryPlacement(item: EconomyItem, placemen
   return existing ?? { placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...focus, rotation: 0 };
 }
 
-export type CentralWorldGroundType = "path" | "road" | "stone" | "water";
+/** "track" is Race Kit tarmac, painted like the others once the kit is unlocked. */
+export type CentralWorldGroundType = "path" | "road" | "stone" | "water" | "track";
 export type CentralWorldGroundTile = { gridX: number; gridZ: number; tileType: CentralWorldGroundType };
 
 // Expand around the existing landmarks without shifting any saved coordinates.
@@ -323,7 +324,7 @@ export function readCentralWorldGroundTiles(scope: string) {
   const clean = (raw: string): CentralWorldGroundTile[] => {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) throw new Error("Invalid ground layout");
-    return parsed.filter((entry): entry is CentralWorldGroundTile => Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && ["path", "road", "stone", "water"].includes(entry?.tileType));
+    return parsed.filter((entry): entry is CentralWorldGroundTile => Number.isInteger(entry?.gridX) && Number.isInteger(entry?.gridZ) && ["path", "road", "stone", "water", "track"].includes(entry?.tileType));
   };
   try {
     const current = window.localStorage.getItem(`${GROUND_STORAGE_PREFIX}:${scope}`);

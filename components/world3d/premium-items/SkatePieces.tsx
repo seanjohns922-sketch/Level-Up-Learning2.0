@@ -3,7 +3,8 @@
 // centred on its plot with the front at +z. At Skate Kit Level 4 every piece goes neon.
 import { createContext, useContext } from "react";
 import { Block, M } from "@/components/world3d/premium-homes/HomeKit";
-import { quarterDepth, SKATE_SCALE, skatePiece, type KitLevel, type SkatePiece } from "@/lib/world3d/skate-kit";
+import { quarterDepth, SKATE_SCALE, skatePiece, type SkatePiece } from "@/lib/world3d/skate-kit";
+import type { KitLevel } from "@/lib/world3d/build-kits";
 
 const NEON_PINK = "#ff4fd8";
 const NEON_BLUE = "#3fd0ff";

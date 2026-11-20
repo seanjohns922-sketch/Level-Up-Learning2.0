@@ -5,7 +5,10 @@ import { existsSync, readFileSync } from "node:fs";
 // the kit levels, the shop rows and the hub wiring must all agree.
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const kit = await import(new URL("../lib/world3d/skate-kit.ts", import.meta.url).href);
-const { SKATE_KIT, SKATE_PIECES, SKATE_SCALE, SKATE_KIT_SHOP_ITEMS, skateKitLevel, nextSkateKitUpgrade, skateShapeHeight, skateHeightAt, quarterDepth } = kit;
+const { SKATE_KIT, SKATE_PIECES, SKATE_SCALE, SKATE_KIT_SHOP_ITEMS, skateShapeHeight, skateHeightAt, quarterDepth } = kit;
+const { buildKitLevel, nextBuildKitUpgrade } = await import(new URL("../lib/world3d/build-kits.ts", import.meta.url).href);
+const skateKitLevel = (owned) => buildKitLevel(SKATE_KIT, owned);
+const nextSkateKitUpgrade = (owned) => nextBuildKitUpgrade(SKATE_KIT, owned);
 
 // Levels: locked until bought, then the highest upgrade; every level adds pieces.
 assert.equal(skateKitLevel(new Set()), 0);
@@ -47,9 +50,9 @@ assert.ok(existsSync(new URL("../public/marketplace/world-renders/kit_skate.webp
 const editor = await import(new URL("../lib/world3d/central-world-editor-catalog.ts", import.meta.url).href);
 const pieces = editor.CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldSceneryGroup === "skate");
 assert.equal(pieces.length, SKATE_PIECES.length);
-assert.ok(pieces.every((item) => item.price === 0 && !item.purchasable && Number(item.metadata.skateKitLevel) >= 1));
+assert.ok(pieces.every((item) => item.price === 0 && !item.purchasable && Number(item.metadata.kitPieceLevel) >= 1));
 const world = read("components/world3d/CentralWorld.tsx");
-assert.ok(world.includes('(paletteTab !== "skate" || Number(item.metadata.skateKitLevel) <= skateLevel)'), "the Skate tab shows only unlocked pieces");
+assert.ok(world.includes('(tabKit === null || Number(item.metadata.kitPieceLevel) <= tabKit.level)') && world.includes('paletteTab === "skate" ? { kit: SKATE_KIT, level: skateLevel }'), "the Skate tab shows only unlocked pieces");
 assert.ok(world.includes("<SkateKitWorldContext.Provider value={skateKitWorld}>") && world.includes("rideHeightAt={rideHeightAt}"), "the hub must pass kit level and ride heights");
 assert.ok(read("components/world3d/CentralWorldEnvironment.tsx").includes("if (SKATE_PIECE_KEYS.has(assetKey)) return <PlacedSkatePiece assetKey={assetKey} />;"));
 assert.ok(read("components/world3d/SharedWorldPlayer.tsx").includes("board.current.visible = ride !== null"), "the avatar rides on a board on skate pieces");

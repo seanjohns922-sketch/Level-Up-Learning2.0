@@ -80,6 +80,7 @@ const freeRenderers=new Set([
  ...extractKeys('FortressScenery.tsx','FORTRESS_SCENERY_KEYS'),
  'drawbridge',
  ...(await import('../lib/world3d/skate-kit.ts')).SKATE_PIECES.map(piece=>piece.assetKey),
+ ...(await import('../lib/world3d/race-kit.ts')).RACE_PIECES.map(piece=>piece.assetKey),
 ]);
 const { PREMIUM_HOME_STYLES, premiumHomeAssetKey } = await import('../lib/world3d/premium-homes.ts');
 const rewardRenderers=new Set([

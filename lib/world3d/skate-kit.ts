@@ -1,19 +1,22 @@
 import type { EconomyItem } from "@/lib/economy";
 import type { CentralWorldPlacement } from "./central-world-layout";
 
+import { buildKitShopItems, defineBuildKit } from "./build-kits";
+
 /** The Skate Kit: kids place skate pieces anywhere and the avatar rides them.
- * Unlocking the kit and each kit upgrade are XP purchases (server-checked); the kit
- * level decides which pieces are in the Skate tab, and at Level 4 every piece goes neon.
- * Pieces themselves are free to place once their level is unlocked. */
-export type KitLevel = 0 | 1 | 2 | 3 | 4;
-export const SKATE_KIT = {
+ * At kit Level 4 every piece goes neon. */
+export const SKATE_KIT = defineBuildKit({
+  id: "skate",
   name: "Skate Kit",
+  tab: "Skate",
   description: "Build your own skate park anywhere: ramps, rails, a bowl and more. Then ride it! Upgrades unlock bigger pieces and neon.",
-  levels: ["Street Starter", "Mini Ramp Pack", "Half-Pipe and Bowl Pack", "Neon Vert Pack"] as const,
-  prices: [400, 400, 800, 1600] as const,
-  unlockKey: "central_world_kit_skate",
-  upgradeKey: (level: 2 | 3 | 4) => `central_world_kit_upgrade_skate_${level}`,
-};
+  levels: ["Street Starter", "Mini Ramp Pack", "Half-Pipe and Bowl Pack", "Neon Vert Pack"],
+  prices: [400, 400, 800, 1600],
+  accent: "#ff4fd8",
+  icon: "skateboard",
+  sortOrder: 4,
+  artCaption: "a park built from its pieces",
+});
 
 /** Model units to world metres, the same as the premium homes. */
 export const SKATE_SCALE = 2.4;
@@ -47,19 +50,6 @@ const PIECE_BY_ASSET = new Map(SKATE_PIECES.map((piece) => [piece.assetKey, piec
 export const SKATE_PIECE_KEYS = new Set(PIECE_BY_ASSET.keys());
 export function skatePiece(assetKey: unknown): SkatePiece | null {
   return typeof assetKey === "string" ? PIECE_BY_ASSET.get(assetKey) ?? null : null;
-}
-
-/** Skate Kit level from what the learner owns: 0 until unlocked, then the highest upgrade. */
-export function skateKitLevel(ownedItemKeys: ReadonlySet<string>): KitLevel {
-  if (!ownedItemKeys.has(SKATE_KIT.unlockKey)) return 0;
-  for (const level of [4, 3, 2] as const) if (ownedItemKeys.has(SKATE_KIT.upgradeKey(level))) return level;
-  return 1;
-}
-export function nextSkateKitUpgrade(ownedItemKeys: ReadonlySet<string>) {
-  const level = skateKitLevel(ownedItemKeys);
-  if (level === 0 || level === 4) return null;
-  const next = (level + 1) as 2 | 3 | 4;
-  return { level: next, itemKey: SKATE_KIT.upgradeKey(next), name: SKATE_KIT.levels[next - 1], price: SKATE_KIT.prices[next - 1] };
 }
 
 /* ───────── Ride heights (model units in, model units out) ───────── */
@@ -122,21 +112,6 @@ export function skateHeightAt(x: number, z: number, pieces: readonly PlacedSkate
   return best;
 }
 
-/* ───────── Shop and editor rows ───────── */
-const KIT_VISUAL = { type: "asset", src: "/marketplace/world-renders/kit_skate.webp", alt: "Skate Kit: a park built from its pieces", previewMode: "world" };
-export const SKATE_KIT_SHOP_ITEMS: EconomyItem[] = [
-  {
-    item_key: SKATE_KIT.unlockKey, name: SKATE_KIT.name, description: SKATE_KIT.description,
-    category: "decoration", realm_id: null, rarity: "epic", price: SKATE_KIT.prices[0], icon: "skateboard", accent: "#ff4fd8",
-    active: true, purchasable: true, discoverable: true, sort_order: 4,
-    metadata: { marketplaceCategory: "kits", buildKit: "skate", marketplace_visual: KIT_VISUAL },
-  },
-  ...([2, 3, 4] as const).map((level): EconomyItem => ({
-    item_key: SKATE_KIT.upgradeKey(level), name: `${SKATE_KIT.name}: ${SKATE_KIT.levels[level - 1]}`,
-    description: `Skate Kit level ${level}: ${SKATE_KIT.levels[level - 1]}. New pieces appear in the Skate tab.`,
-    category: "decoration", realm_id: null, rarity: level === 4 ? "legendary" : level === 3 ? "epic" : "rare",
-    price: SKATE_KIT.prices[level - 1], icon: "skateboard", accent: "#ff4fd8", active: true, purchasable: true, discoverable: true, sort_order: 950 + level,
-    metadata: { marketplaceCategory: "kit_upgrades", marketplaceHidden: true, buildKit: "skate", buildKitLevel: level },
-  })),
-];
+/* ───────── Shop rows ───────── */
+export const SKATE_KIT_SHOP_ITEMS: EconomyItem[] = buildKitShopItems(SKATE_KIT);
 export const SKATE_KIT_ITEM_KEYS = new Set(SKATE_KIT_SHOP_ITEMS.map((item) => item.item_key));
