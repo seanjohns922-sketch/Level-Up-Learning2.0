@@ -7,8 +7,8 @@ const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf
 const homes = await import(new URL("../lib/world3d/premium-homes.ts", import.meta.url).href);
 const { PREMIUM_HOME_STYLES: ALL_STYLES, DEFENCE_STYLES, PREMIUM_HOME_SPECS, premiumHomeLevel, premiumHomeUpgradeKey, premiumHomeItemKey, nextPremiumHomeUpgrade, trampolineBounceAt, TRAMPOLINE_BOUNCE } = homes;
 
-// The Protect the Tower styles share this system and have their own audit (qa:tower-defence).
-const PREMIUM_HOME_STYLES = ALL_STYLES.filter((style) => !DEFENCE_STYLES.includes(style));
+// The Protect the Tower and everyday styles share this system and have their own audits (qa:tower-defence, qa:everyday-items).
+const PREMIUM_HOME_STYLES = ALL_STYLES.filter((style) => !DEFENCE_STYLES.includes(style) && !homes.EVERYDAY_STYLES.includes(style));
 const isHomeRow = (row) => PREMIUM_HOME_STYLES.includes(row.metadata.premiumHome);
 const PREMIUM_HOME_SHOP_ITEMS = homes.PREMIUM_HOME_SHOP_ITEMS.filter(isHomeRow), PREMIUM_HOME_UPGRADE_ITEMS = homes.PREMIUM_HOME_UPGRADE_ITEMS.filter(isHomeRow);
 assert.deepEqual([...PREMIUM_HOME_STYLES], ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball"]);

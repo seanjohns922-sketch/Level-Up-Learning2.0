@@ -19,6 +19,7 @@ const FREE_BUILD_RENDER_KEYS = new Set<string>([
   "bridge",
   "buoy",
   "camp_lantern",
+  "campfire",
   "campsite",
   "canal_corner",
   "canal_junction",

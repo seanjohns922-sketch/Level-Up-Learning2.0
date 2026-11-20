@@ -6,7 +6,9 @@ import type { EconomyItem } from "@/lib/economy";
  * checks the balance and records ownership. A style's level is the highest
  * upgrade the learner owns; every copy they place shows that level. */
 export const DEFENCE_STYLES = ["laser_fence", "laser_gate", "scanner", "trip_wire", "drone_pad", "guard_dog", "patrol_drone", "sentry_bot", "tower_shield"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES] as const;
+/** The everyday keepers: free at Level 1 (they are the editor's long-standing free items), upgraded with XP. */
+export const EVERYDAY_STYLES = ["lamp_post", "bench", "fence", "mailbox", "campfire"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -36,6 +38,7 @@ type StyleSpec = {
 const HOME = { marketplaceCategory: "buildings", upgradePrefix: "central_world_home_upgrade_" } as const;
 const SET_PIECE = { marketplaceCategory: "pools_play", upgradePrefix: "central_world_set_upgrade_" } as const;
 const DEFENCE = { marketplaceCategory: "defence", upgradePrefix: "central_world_defence_upgrade_", metres: true } as const;
+const EVERYDAY = { marketplaceCategory: "buildings", upgradePrefix: "central_world_everyday_upgrade_", metres: true, free: true } as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -228,6 +231,67 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     height: 62,
     ...DEFENCE,
     fixed: true,
+  },
+  // The everyday keepers keep their original world keys, so every one already placed upgrades in place.
+  lamp_post: {
+    name: "Lamp Post",
+    description: "A street lamp that glows after dark, from a park lamp to a floating crystal.",
+    levels: ["Park Lamp", "Double Lantern", "Smart Halo Lamp", "Crystal Lamp"],
+    prices: [0, 100, 200, 400],
+    gridSize: "1x1",
+    accent: "#f5c451",
+    icon: "lamp",
+    assetKey: "lamp_post",
+    height: 4.6,
+    ...EVERYDAY,
+  },
+  bench: {
+    name: "Bench",
+    description: "A seat for your world, from a park bench to a glowing swing seat.",
+    levels: ["Park Bench", "Garden Bench", "Pergola Bench", "Swing Seat"],
+    prices: [0, 100, 200, 400],
+    gridSize: "2x1",
+    accent: "#b6763f",
+    icon: "sofa",
+    assetKey: "bench",
+    height: 2.9,
+    ...EVERYDAY,
+  },
+  fence: {
+    name: "Fence",
+    description: "A fence that joins up as you place it, from timber rails to glass and gold.",
+    levels: ["Rail Fence", "Picket Fence", "Modern Slat Fence", "Crystal Fence"],
+    prices: [0, 80, 160, 320],
+    gridSize: "1x1",
+    accent: "#c69a63",
+    icon: "fence",
+    assetKey: "fence",
+    height: 1.8,
+    ...EVERYDAY,
+  },
+  mailbox: {
+    name: "Mailbox",
+    description: "Your own letterbox, all the way up to a drone that brings the mail.",
+    levels: ["Letterbox", "Mini House Mailbox", "Brick Pillar Mailbox", "Drone Mail Station"],
+    prices: [0, 100, 200, 400],
+    gridSize: "1x1",
+    accent: "#d0463f",
+    icon: "mailbox",
+    assetKey: "mailbox",
+    height: 2.6,
+    ...EVERYDAY,
+  },
+  campfire: {
+    name: "Campfire",
+    description: "A crackling campfire to sit round, up to magic flames that change colour.",
+    levels: ["Campfire", "Cosy Campfire", "Camp Circle", "Magic Campfire"],
+    prices: [0, 150, 300, 600],
+    gridSize: "2x2",
+    accent: "#ff7a1a",
+    icon: "flame",
+    assetKey: "campfire",
+    height: 2.6,
+    ...EVERYDAY,
   },
 };
 

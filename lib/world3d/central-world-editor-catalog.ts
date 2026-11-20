@@ -74,6 +74,7 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_bench", "Bench", "bench", "#b6763f", "furniture_fun", "2x1", 1.35),
   starter("central_world_starter_fence", "Fence", "fence", "#c69a63", "furniture_fun", "1x1", 1.0),
   starter("central_world_starter_mailbox", "Mailbox", "mailbox", "#d0463f", "furniture_fun", "1x1", 1.1),
+  starter("central_world_starter_campfire", "Campfire", "campfire", "#ff7a1a", "furniture_fun", "2x2", 1.0),
   starter("central_world_starter_flag", "Flag", "flag", "#2563eb", "furniture_fun", "1x1", 1.15),
   starter("central_world_starter_umbrella", "Umbrella", "umbrella", "#f2704a", "furniture_fun", "2x2", 1.4),
   starter("central_world_starter_sign", "Sign", "signpost", "#a16207", "furniture_fun", "1x1", 1.1),

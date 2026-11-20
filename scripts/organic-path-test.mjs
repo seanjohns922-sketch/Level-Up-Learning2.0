@@ -162,7 +162,9 @@ assert.ok(Math.abs(treeScale[1]*5.4-14)<1e-6,'Broad tree canopy no longer shrink
 assert.equal(treeScale[0],treeScale[1],'Tree trunk and canopy keep their proportions');
 // The castle walls were retired for the laser fence, which joins on the same 2 m pitch.
 assert.deepEqual(parseGridSize(catalogue.find(i=>i.metadata.worldAssetKey==='defence_laser_fence')),[1,1],'Laser fence keeps the 2 m connector pitch');
-for(const key of ['fence','picket_fence','rope_fence','stone_wall']){
+// The everyday fence is a premium item now (fixed size, joining on the same 2 m pitch).
+assert.deepEqual(parseGridSize(catalogue.find(i=>i.metadata.worldAssetKey==='fence')),[1,1],'Fence keeps the 2 m connector pitch');
+for(const key of ['picket_fence','rope_fence','stone_wall']){
  const item=catalogue.find(i=>i.metadata.worldAssetKey===key);
  assert.deepEqual(parseGridSize(item),[1,1],'Connected walls keep the saved 2 m grid pitch');
  const size={x:2,y:3.4,z:1.4};

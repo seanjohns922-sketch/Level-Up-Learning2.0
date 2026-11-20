@@ -167,7 +167,7 @@ const SCENERY_TINTS = ["#ef4444", "#f97316", "#f5c451", "#22c55e", "#16a34a", "#
 const SCENERY_ICON: Record<string, LucideIcon> = {
   tree: TreeDeciduous, pine_tree: TreePine, palm_tree: TreePalm, gum_tree: TreeDeciduous, shrub: Shrub, hedge: Leaf, toadstool: Cherry, log: Logs, flower_bed: Flower2,
   boulder: Mountain, rock_pile: Hexagon, pond: Waves, fountain: Droplets, bridge: Landmark,
-  lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
+  lamp_post: Lamp, bench: Sofa, fence: Fence, mailbox: Mailbox, campfire: Flame, flag: Flag, umbrella: Umbrella, signpost: Signpost, balloons: PartyPopper,
   kangaroo: Rabbit, koala: PawPrint, wombat: PawPrint, emu: Bird, kookaburra: Feather, echidna: Shell, cockatoo: Bird,
   fruit_tree: Cherry, flower_pots: Flower2, mushroom_cluster: Sprout, hedge_arch: Shrub,
   hopscotch: Grid2x2, sandpit: Shell, seesaw: Logs, small_slide: Route,

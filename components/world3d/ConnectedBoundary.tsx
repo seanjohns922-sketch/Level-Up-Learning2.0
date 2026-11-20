@@ -8,10 +8,12 @@ import type { CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
 import { useContext } from "react";
 import { PremiumHomeWorldContext } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { LaserFenceRun } from "@/components/world3d/premium-items/TowerDefenceModels";
+import { EverydayFenceRun } from "@/components/world3d/premium-items/EverydayItems";
 export function ConnectedBoundary({assetKey,placement,neighbours}:{assetKey:string;placement:CentralWorldPlacement;neighbours:CentralWorldPlacement[]}){
  const directions=boundaryDirections(placement,neighbours);
- const laserLevel=useContext(PremiumHomeWorldContext).levels.laser_fence;
- if(assetKey==="defence_laser_fence")return <group rotation={[0,-placement.rotation*Math.PI/180,0]}><LaserFenceRun level={laserLevel} directions={directions}/></group>;
+ const premium=useContext(PremiumHomeWorldContext);
+ if(assetKey==="defence_laser_fence")return <group rotation={[0,-placement.rotation*Math.PI/180,0]}><LaserFenceRun level={premium.levels.laser_fence} directions={directions}/></group>;
+ if(assetKey==="fence")return <group rotation={[0,-placement.rotation*Math.PI/180,0]}><EverydayFenceRun level={premium.levels.fence} night={premium.night} directions={directions}/></group>;
  const tint=placement.tint,stone=assetKey==="stone_wall",castle=assetKey==="castle_wall",rope=assetKey==="rope_fence",picket=assetKey==="picket_fence";
  const targetHeight=WORLD_ITEM_PRESENTATION[assetKey]?.height??1.6;
  const height=castle?targetHeight-.39:targetHeight;

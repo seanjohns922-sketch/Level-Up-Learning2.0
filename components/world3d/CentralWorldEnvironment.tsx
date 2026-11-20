@@ -365,7 +365,6 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   if (REFERENCE_PROP_KEYS.has(assetKey)) return <ReferenceProp assetKey={assetKey} tint={tint} />;
   if (DETAILED_SCENERY_KEYS.has(assetKey)) return <DetailedScenery assetKey={assetKey} tint={tint} />;
   const t = (fallback: string) => tint ?? fallback;
-  if (assetKey === "lamp_post") return <group><mesh position={[0, 1.25, 0]} castShadow><cylinderGeometry args={[0.09, 0.13, 2.5, 10]} /><meshStandardMaterial color="#344239" metalness={0.45} roughness={0.48} /></mesh><mesh position={[0, 2.55, 0]}><sphereGeometry args={[0.3, 16, 12]} /><meshStandardMaterial color={t("#fff1a8")} emissive={t("#facc15")} emissiveIntensity={0.85} /></mesh></group>;
   if (assetKey === "flower_bed") return <group><mesh position={[0, 0.15, 0]}><cylinderGeometry args={[0.72, 0.82, 0.24, 20]} /><meshStandardMaterial color="#5d3b24" roughness={1} /></mesh>{[[0.3, "#f472b6"], [-0.28, "#facc15"], [0, "#a78bfa"]].map(([x, color], index) => <mesh key={index} position={[Number(x), 0.48, index === 2 ? 0.25 : -0.08]}><sphereGeometry args={[0.2, 10, 8]} /><meshStandardMaterial color={t(String(color))} /></mesh>)}</group>;
 
   if (assetKey === "palm_tree") return <group>
@@ -427,25 +426,6 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
     {Array.from({ length: 9 }, (_, i) => { const p = i / 8 - 0.5; const x = p * 2.7; const y = 0.5 + 0.32 * (1 - (2 * p) * (2 * p)); return <mesh key={i} position={[x, y, 0]} castShadow><boxGeometry args={[0.34, 0.1, 1.3]} /><meshStandardMaterial color={t(i % 2 ? "#a4713f" : "#8f5f2c")} roughness={0.9} /></mesh>; })}
     {([-0.6, 0.6] as const).map((z) => Array.from({ length: 9 }, (_, i) => { const p = i / 8 - 0.5; const x = p * 2.7; const y = 0.5 + 0.32 * (1 - (2 * p) * (2 * p)); return <mesh key={`${z}-${i}`} position={[x, y + 0.3, z]}><boxGeometry args={[0.34, 0.06, 0.06]} /><meshStandardMaterial color="#6f4a24" roughness={0.9} /></mesh>; }))}
     {([[-1.28, -0.6], [1.28, -0.6], [-1.28, 0.6], [1.28, 0.6]] as const).map(([x, z], i) => <mesh key={i} position={[x, 0.5, z]} castShadow><boxGeometry args={[0.1, 0.5, 0.1]} /><meshStandardMaterial color="#6f4a24" roughness={0.9} /></mesh>)}
-  </group>;
-
-  if (assetKey === "bench") return <group>
-    <mesh position={[0, 0.46, 0]} castShadow><boxGeometry args={[1.5, 0.1, 0.5]} /><meshStandardMaterial color={t("#b6763f")} roughness={0.85} /></mesh>
-    <mesh position={[0, 0.76, -0.22]} rotation={[-0.25, 0, 0]} castShadow><boxGeometry args={[1.5, 0.4, 0.08]} /><meshStandardMaterial color={t("#a86a37")} roughness={0.85} /></mesh>
-    {([-0.65, 0.65] as const).map((x) => <mesh key={x} position={[x, 0.22, 0]} castShadow><boxGeometry args={[0.1, 0.44, 0.44]} /><meshStandardMaterial color="#8a5a34" roughness={0.9} /></mesh>)}
-  </group>;
-
-  if (assetKey === "fence") return <group>
-    {/* posts on the shared cell edges + full-width rails so fences join up */}
-    {([-1.0, 1.0] as const).map((x) => <mesh key={x} position={[x, 0.55, 0]} castShadow><boxGeometry args={[0.16, 1.1, 0.16]} /><meshStandardMaterial color={t("#c69a63")} roughness={0.9} /></mesh>)}
-    {([0.78, 0.4] as const).map((y) => <mesh key={y} position={[0, y, 0]} castShadow><boxGeometry args={[2.0, 0.13, 0.08]} /><meshStandardMaterial color={t("#d8b483")} roughness={0.9} /></mesh>)}
-  </group>;
-
-  if (assetKey === "mailbox") return <group>
-    <mesh position={[0, 0.6, 0]} castShadow><cylinderGeometry args={[0.06, 0.06, 1.2, 8]} /><meshStandardMaterial color="#7a5230" roughness={0.9} /></mesh>
-    <mesh position={[0, 1.22, 0]} castShadow><boxGeometry args={[0.36, 0.34, 0.58]} /><meshStandardMaterial color={t("#d0463f")} roughness={0.6} /></mesh>
-    <mesh position={[0, 1.39, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow><cylinderGeometry args={[0.18, 0.18, 0.58, 12, 1, false, 0, Math.PI]} /><meshStandardMaterial color={t("#d0463f")} roughness={0.6} /></mesh>
-    <mesh position={[0.21, 1.32, 0]}><boxGeometry args={[0.04, 0.2, 0.02]} /><meshStandardMaterial color="#eab308" /></mesh>
   </group>;
 
   if (assetKey === "flag") return <group>

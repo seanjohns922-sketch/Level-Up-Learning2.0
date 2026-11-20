@@ -321,6 +321,7 @@
     "qa:measurelands-ruler-objects": "node scripts/measurelands-ruler-objects-audit.mjs",
     "qa:kart-garage": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/kart-garage-audit.mjs",
     "qa:tower-defence": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/tower-defence-audit.mjs",
+    "qa:everyday-items": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/everyday-items-audit.mjs",
     "qa:race-driving": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/race-driving-test.mjs",
     "qa:race-kit": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/race-kit-audit.mjs",
     "qa:skate-kit": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/skate-kit-audit.mjs",

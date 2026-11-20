@@ -80,10 +80,7 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   birdbath: {height:1.5, footprint:[2,2], theme:"garden"},
   stepping_stones: {height:.16, footprint:[4,6], width:2.5, resizeHeight:true, theme:"garden"},
   mossy_boulder: {height:1.4, footprint:[4,4], theme:"garden"},
-  lamp_post: {height:5.5, footprint:[2,2], theme:"garden"},
-  bench: {height:1.15, footprint:[4,2], theme:"garden"},
-  fence: {height:1.6, footprint:[2,2], width:2, resizeHeight:true, theme:"garden"},
-  mailbox: {height:1.6, footprint:[2,2], theme:"garden"},
+  // Lamp post, bench, fence, mailbox and campfire are premium everyday items, sized above.
   flag: {height:6, footprint:[4,2], theme:"garden"},
   umbrella: {height:3.2, footprint:[6,6], theme:"garden"},
   signpost: {height:2.4, footprint:[4,2], theme:"garden"},
