@@ -28,12 +28,12 @@ export function laserFenceHit(x: number, z: number, beams: readonly FenceBeam[],
 
 /** How close the explorer must be for each defence to react, in metres. */
 export const DEFENCE_REACT_DISTANCE = {
-  laserGate: 3.5,
-  scanner: 9,
-  droneEscort: 9,
-  guardDog: 5,
-  patrolDrone: 10,
-  sentryBot: 6,
+  laserGate: 6,
+  scanner: 24,
+  droneEscort: 14,
+  guardDog: 8,
+  patrolDrone: 18,
+  sentryBot: 9,
 } as const;
 
 /** Trip wires catch the explorer anywhere inside their wire box (Levels 3 and 4 are square). */

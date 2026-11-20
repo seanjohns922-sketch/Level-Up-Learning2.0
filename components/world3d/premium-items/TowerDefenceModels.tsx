@@ -16,7 +16,7 @@ const UP = new Vector3(0, 1, 0), FORWARD = new Vector3(0, 0, 1);
 export const ExplorerPositionContext = createContext<MutableRefObject<{ x: number; z: number }> | null>(null);
 type Nearby = { x: number; z: number; dist: number; near: boolean; entered: boolean };
 const scratch = new Vector3();
-/** Where the explorer is in this group's own space, refreshed every frame, and whether they're within `radius`. */
+/** Where the explorer is in this group's own space, refreshed every frame, and whether they're within `radius` metres. */
 function useExplorer(radius: number) {
   const explorer = useContext(ExplorerPositionContext);
   const group = useRef<Group>(null);
@@ -25,9 +25,12 @@ function useExplorer(radius: number) {
     const s = state.current;
     s.entered = false;
     if (!explorer || !group.current) { s.near = false; return; }
-    group.current.worldToLocal(scratch.set(explorer.current.x, group.current.getWorldPosition(scratch).y, explorer.current.z));
+    const origin = group.current.getWorldPosition(scratch);
+    // Nearness is in world metres, however big the item is drawn; direction is in the item's own space.
+    const worldDistance = Math.hypot(explorer.current.x - origin.x, explorer.current.z - origin.z);
+    group.current.worldToLocal(scratch.set(explorer.current.x, origin.y, explorer.current.z));
     s.x = scratch.x; s.z = scratch.z; s.dist = Math.hypot(scratch.x, scratch.z);
-    const near = s.dist < radius;
+    const near = worldDistance < radius;
     s.entered = near && !s.near;
     s.near = near;
   });
@@ -84,11 +87,11 @@ function Pulse({ color, children, min = 0.25, max = 0.6, speed = 3 }: { color: s
 function FencePost({ h, level, color }: { h: number; level: TechLevel; color: string }) {
   return (
     <group>
-      <Block size={[0.5, 0.12, 0.5]} pos={[0, 0.06, 0]} color={METAL} r={0.04} />
-      <Block size={[0.22, h, 0.22]} pos={[0, h / 2, 0]} color={level >= 3 ? WHITE : METAL_LIGHT} r={0.05} metal={0.5} rough={0.35} />
-      <Block size={[0.3, 0.12, 0.3]} pos={[0, h + 0.06, 0]} color={METAL} r={0.04} />
-      {level >= 2 ? <Lamp pos={[0, h + 0.17, 0]} color={color} r={0.08} /> : null}
-      {level >= 4 ? <group position={[0, h * 0.55, 0]}><Spin speed={2}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.24, 0.025, 8, 32]} /><meshBasicMaterial color={color} toneMapped={false} /></mesh></Spin></group> : null}
+      <Block size={[0.8, 0.18, 0.8]} pos={[0, 0.09, 0]} color={METAL} r={0.05} />
+      <Block size={[0.34, h, 0.34]} pos={[0, h / 2, 0]} color={level >= 3 ? WHITE : METAL_LIGHT} r={0.07} metal={0.5} rough={0.35} />
+      <Block size={[0.46, 0.18, 0.46]} pos={[0, h + 0.09, 0]} color={METAL} r={0.05} />
+      {level >= 2 ? <Lamp pos={[0, h + 0.26, 0]} color={color} r={0.13} /> : null}
+      {level >= 4 ? <group position={[0, h * 0.55, 0]}><Spin speed={2}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.36, 0.035, 8, 32]} /><meshBasicMaterial color={color} toneMapped={false} /></mesh></Spin></group> : null}
     </group>
   );
 }
@@ -97,7 +100,7 @@ function SweepBeam({ h, color, from, to }: { h: number; color: string; from: num
   useFrame(({ clock }) => { if (ref.current) ref.current.position.y = 0.25 + (Math.sin(clock.elapsedTime * 1.6) * 0.5 + 0.5) * (h - 0.4); });
   return <group ref={ref}><Laser from={[from, 0, 0]} to={[to, 0, 0]} color={color} width={0.04} /></group>;
 }
-const FENCE_HEIGHT: Record<TechLevel, number> = { 1: 1.1, 2: 1.4, 3: 1.7, 4: 2.0 };
+const FENCE_HEIGHT: Record<TechLevel, number> = { 1: 2.2, 2: 2.8, 3: 3.4, 4: 4.0 };
 /** One cell of laser fence: a post, with beams running half a cell towards each joined neighbour
  * (the neighbour's beams meet them), like the old castle wall. */
 export function LaserFenceRun({ level, directions }: { level: TechLevel; directions: readonly (readonly [number, number])[] }) {
@@ -110,7 +113,7 @@ export function LaserFenceRun({ level, directions }: { level: TechLevel; directi
         <group key={`${x}:${z}`} rotation={[0, Math.atan2(-z, x), 0]}>
           {Array.from({ length: beams }, (_, i) => {
             const y = 0.3 + (i * (h - 0.45)) / Math.max(1, beams - 1);
-            return <Laser key={i} from={[0.11, y, 0]} to={[half, y, 0]} color={colors[i % colors.length]} pulse={level >= 3 ? 4 + i : 0} />;
+            return <Laser key={i} from={[0.17, y, 0]} to={[half, y, 0]} color={colors[i % colors.length]} width={0.045} pulse={level >= 3 ? 4 + i : 0} />;
           })}
           {level >= 3 ? <Pulse color={level === 4 ? PINK : CYAN} min={0.04} max={0.12}>{(m) => <mesh position={[half / 2 + 0.05, h / 2 + 0.1, 0]} rotation={[0, 0, 0]}><planeGeometry args={[half - 0.1, h - 0.2]} />{m}</mesh>}</Pulse> : null}
           {level === 4 ? <SweepBeam h={h} color={WHITE} from={0.11} to={half} /> : null}
@@ -245,7 +248,8 @@ function Satellites({ radius, color, count }: { radius: number; color: string; c
 }
 /** The Scanner Tower starts as a sleek tech tower and gets more spectacular with every level. */
 export function ScannerTower({ level }: { level: TechLevel }) {
-  const h = [3.2, 4.0, 5.0, 6.0][level - 1];
+  // About half the Tower of Knowledge at every level (the item is scaled up in the hub); upgrades add detail.
+  const h = [5.4, 5.2, 5.0, 4.8][level - 1];
   const color = level === 4 ? PINK : CYAN, accent = level === 4 ? AMBER : WHITE;
   const globe = [0.38, 0.46, 0.56, 0.66][level - 1];
   const rings = level + 1;
@@ -285,7 +289,7 @@ export function ScannerTower({ level }: { level: TechLevel }) {
 /* ───────── 5 · Drone pad ───────── */
 function Drone({ spot, color }: { spot?: boolean; color: string }) {
   return (
-    <group scale={1.7}>
+    <group scale={2.6}>
       <Block size={[0.42, 0.14, 0.42]} pos={[0, 0, 0]} color={WHITE} r={0.06} />
       <Lamp pos={[0, -0.02, 0.22]} color={color} r={0.05} />
       {[[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, z], i) => (
@@ -319,7 +323,7 @@ function Orbit({ radius, speed, phase, height, follow, children }: { radius: num
     ref.current.position.set(centre.current.x + Math.cos(a) * radius, height + lift + Math.sin(a * 2) * 0.15, centre.current.z + Math.sin(a) * radius);
     ref.current.rotation.y = -a;
   });
-  return <group ref={ref}>{children}</group>;
+  return <group ref={ref} userData={{ flying: true }}>{children}</group>;
 }
 export function DronePad({ level }: { level: TechLevel }) {
   const color = level === 4 ? PINK : CYAN;
@@ -331,8 +335,8 @@ export function DronePad({ level }: { level: TechLevel }) {
       <mesh position={[0, 0.165, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.6, 0.68, 6]} /><meshBasicMaterial color={color} toneMapped={false} /></mesh>
       {Array.from({ length: 6 }, (_, i) => { const a = (i / 6) * Math.PI * 2 + Math.PI / 6; return <Lamp key={i} pos={[Math.cos(a) * 1.05, 0.18, Math.sin(a) * 1.05]} color={color} r={0.04} />; })}
       {level >= 3 ? <group position={[1.0, 0, -0.9]}><Block size={[0.18, 1.6, 0.18]} pos={[0, 0.8, 0]} color={WHITE} r={0.05} /><Lamp pos={[0, 1.66, 0]} color={GREEN} r={0.08} /></group> : null}
-      {level === 1 ? <Orbit radius={0.25} speed={1.2} phase={0} height={1.0} follow={state}><Drone color={color} /></Orbit> : null}
-      {level >= 2 ? Array.from({ length: level }, (_, i) => <Orbit key={i} radius={level === 4 ? 1.22 : 1.15} speed={0.7} phase={(i / level) * Math.PI * 2} height={1.2 + (i % 2) * 0.35} follow={state}><Drone color={color} spot={level === 4} /></Orbit>) : null}
+      {/* Car-sized drones patrol wide, high loops round their pad (they fly over nearby builds). */}
+      {Array.from({ length: level }, (_, i) => <Orbit key={i} radius={[3.2, 3.6, 4.0, 4.4][level - 1] - (i % 2) * 0.8} speed={0.32} phase={(i / level) * Math.PI * 2} height={3.2 + (i % 2) * 0.9} follow={state}><Drone color={color} spot={level === 4} /></Orbit>)}
     </group>
   );
 }
@@ -523,7 +527,7 @@ function FigureEight({ size, height, speed, follow, children }: { size: number; 
     ref.current.rotation.y = Math.atan2(dx, dz);
     ref.current.rotation.z = -Math.cos(t) * 0.22;
   });
-  return <group ref={ref}>{children}</group>;
+  return <group ref={ref} userData={{ flying: true }}>{children}</group>;
 }
 /** A camera ball under the drone that keeps looking around. */
 function Gimbal({ color }: { color: string }) {
@@ -585,8 +589,8 @@ export function PatrolDrone({ level }: { level: TechLevel }) {
       <Block size={[0.5, 0.12, 0.5]} pos={[0, 0.06, 0]} color={METAL} r={0.05} />
       <Lamp pos={[0, 0.16, 0]} color={ring} r={0.07} />
       <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.45, 0.52, 32]} /><meshBasicMaterial color={ring} toneMapped={false} /></mesh>
-      <FigureEight size={[1.5, 1.7, 1.7, 1.45][level - 1]} height={[1.8, 2.3, 2.7, 3.0][level - 1]} speed={0.8} follow={state}><group scale={1.7}>{drone}</group></FigureEight>
-      {level >= 3 ? <FigureEight size={[0, 0, 1.5, 1.3][level - 1]} height={[0, 0, 1.7, 2.1][level - 1]} speed={-0.65} follow={state}><group scale={1.7}>{drone}</group></FigureEight> : null}
+      <FigureEight size={[5, 5.2, 5.4, 5.6][level - 1]} height={[4.2, 4.6, 5.0, 5.4][level - 1]} speed={0.35} follow={state}><group scale={level === 4 ? 1.25 : 1.45}>{drone}</group></FigureEight>
+      {level >= 3 ? <FigureEight size={[0, 0, 4.4, 4.6][level - 1]} height={[0, 0, 3.6, 4.2][level - 1]} speed={-0.3} follow={state}><group scale={level === 4 ? 1.25 : 1.45}>{drone}</group></FigureEight> : null}
     </group>
   );
 }

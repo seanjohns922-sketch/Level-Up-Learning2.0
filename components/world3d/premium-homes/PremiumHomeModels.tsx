@@ -333,7 +333,7 @@ const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, n
 export function PremiumHome({ style, level, night }: { style: PremiumHomeStyle; level: PremiumHomeLevel; night: boolean }) {
   const Model = MODELS[style][level - 1];
   return (
-    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={PREMIUM_HOME_SPECS[style].metres ? 1 : PREMIUM_HOME_SCALE}>
+    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={PREMIUM_HOME_SPECS[style].metres ? PREMIUM_HOME_SPECS[style].scale ?? 1 : PREMIUM_HOME_SCALE}>
       <group position={[CENTRE_OFFSET[`${style}-${level}`] ?? 0, 0, 0]}>
         <Model night={night} />
       </group>

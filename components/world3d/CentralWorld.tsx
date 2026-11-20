@@ -33,7 +33,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -1711,6 +1711,12 @@ export default function CentralWorld() {
                 {paletteTab === "race" && raceLevel ? (
                   <button type="button" className="worldEditCard" onClick={() => chooseEditTool("track")} aria-pressed={!heldItemKey && editTool === "track"}>
                     <span className="worldEditArt"><GroundSwatch tool="track" /></span><b>Paint tarmac</b>
+                  </button>
+                ) : null}
+                {paletteTab === "race" && raceLevel ? (
+                  // The kart garage also opens from the race screen; this makes it easy to find.
+                  <button type="button" className="worldEditCard" onClick={() => { closeWorldEditor(); openGarage(); }}>
+                    <span className="worldEditArt"><Wrench size={36} color="#3fd0ff" aria-hidden="true" /></span><b>Kart garage</b>
                   </button>
                 ) : null}
                 {sceneryInTab.map((item) => {

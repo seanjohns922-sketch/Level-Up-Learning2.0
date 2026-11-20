@@ -69,6 +69,9 @@ const ENTRIES: CatalogueEntry[] = [
   ...WORLD_REWARD_ADDITIONS.map(item => ({plot:item.plot, area:item.area, name:item.name, description:item.description, assetKey:item.key, rarity:(item.tier===3?"legendary":item.tier===2?"rare":"common") as EconomyItem["rarity"],tier:item.tier,price:item.price,accent:"#8b9972",icon:item.icon,gridSize:item.grid})),
 ];
 
+/** No longer sold (owners keep theirs): the old village homes, and the Trampoline Park the premium Trampoline replaced. */
+const RETIRED_FROM_SALE = new Set<string>([...RETIRED_VILLAGE_HOME_KEYS, "trampoline_park"]);
+
 export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.map<EconomyItem>((entry) => ({
   item_key: `central_world_plot_${entry.plot}_${entry.assetKey}`,
   name: entry.name,
@@ -80,7 +83,7 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
   icon: entry.icon,
   accent: entry.accent,
   active: true,
-  purchasable: !RETIRED_VILLAGE_HOME_KEYS.has(entry.assetKey),
+  purchasable: !RETIRED_FROM_SALE.has(entry.assetKey),
   discoverable: true,
   sort_order: entry.plot * 10 + entry.tier,
   metadata: {
@@ -101,7 +104,6 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
   },
 })), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS, ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed !== true)];
 
-/** Everything the world can buy: placeable items plus upgrades and build kits (which are not placeable). */
 /** Everything the hub sells: placeable items, upgrades, kits, karts, and the Tower Shield (never placed). */
 export const CENTRAL_WORLD_SHOP_ROWS: EconomyItem[] = [...CENTRAL_WORLD_CUSTOMISATION_CATALOG, ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed === true), ...PREMIUM_HOME_UPGRADE_ITEMS, ...SKATE_KIT_SHOP_ITEMS, ...RACE_KIT_SHOP_ITEMS, ...KART_GARAGE_SHOP_ITEMS];
 

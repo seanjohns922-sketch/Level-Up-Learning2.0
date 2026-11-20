@@ -82,10 +82,10 @@ function LampPost({ level, night }: Props) {
       <mesh position={[0, 1.85, 0]}><cylinderGeometry args={[0.07, 0.11, 3.4, 16]} /><Mat color={IRON} metal={0.4} rough={0.4} /></mesh>
       {/* Curled arms carry two lanterns; a basket of flowers hangs from the middle. */}
       {[-1, 1].map((s) => <group key={s}>
-        <Block size={[0.72, 0.05, 0.05]} pos={[s * 0.36, 3.48, 0]} color={IRON} r={0.02} />
-        <Block size={[0.05, 0.4, 0.05]} pos={[s * 0.28, 3.3, 0]} rot={[0, 0, s * 0.7]} color={IRON} r={0.02} />
-        <mesh position={[s * 0.62, 3.56, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.08, 0.02, 8, 16]} /><Mat color={IRON} /></mesh>
-        <group position={[s * 0.7, 2.92, 0]}><Block size={[0.03, 0.5, 0.03]} pos={[0, 0.3, 0]} color={IRON} r={0.01} /><Lantern night={night} s={0.9} /></group>
+        <Block size={[0.52, 0.05, 0.05]} pos={[s * 0.26, 3.48, 0]} color={IRON} r={0.02} />
+        <Block size={[0.05, 0.36, 0.05]} pos={[s * 0.2, 3.32, 0]} rot={[0, 0, s * 0.7]} color={IRON} r={0.02} />
+        <mesh position={[s * 0.44, 3.56, 0]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.07, 0.02, 8, 16]} /><Mat color={IRON} /></mesh>
+        <group position={[s * 0.52, 2.92, 0]}><Block size={[0.03, 0.5, 0.03]} pos={[0, 0.3, 0]} color={IRON} r={0.01} /><Lantern night={night} s={0.9} /></group>
       </group>)}
       <group position={[0, 2.55, 0.12]}><mesh><sphereGeometry args={[0.22, 16, 10, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2]} /><Mat color={TIMBER_DARK} /></mesh>{[C.pink, C.yellow, C.white, C.purple, C.red, C.pink].map((c, i) => <Ball key={i} pos={[Math.cos(i) * 0.15, 0.03, Math.sin(i) * 0.15]} r={0.07} color={c} />)}</group>
       <Ball pos={[0, 3.6, 0]} r={0.08} color={GOLD} />
@@ -98,11 +98,11 @@ function LampPost({ level, night }: Props) {
       <Block size={[0.9, 0.42, 0.9]} pos={[0, 0.21, 0]} color={M.concrete} r={0.1} />
       {[[-0.25, 0.2], [0.2, -0.22], [0.25, 0.25], [-0.2, -0.25]].map(([x, z], i) => <Ball key={i} pos={[x, 0.5, z]} r={0.13} color={C.leaf} />)}
       <mesh position={[0, 2.2, 0]}><cylinderGeometry args={[0.07, 0.1, 3.6, 18]} /><meshStandardMaterial color={M.white} metalness={0.3} roughness={0.3} /></mesh>
-      <Block size={[0.7, 0.08, 0.08]} pos={[0.28, 3.95, 0]} color={M.white} r={0.03} />
-      <group position={[0.6, 3.8, 0]}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.3, 0.05, 10, 32]} /><meshStandardMaterial color="#e8fbff" emissive="#bff4ff" emissiveIntensity={night ? 3 : 0.9} /></mesh><mesh rotation={[Math.PI / 2, 0, 0]}><circleGeometry args={[0.27, 28]} /><meshStandardMaterial color="#1d2b3a" side={DoubleSide} /></mesh></group>
+      <Block size={[0.5, 0.08, 0.08]} pos={[0.2, 3.95, 0]} color={M.white} r={0.03} />
+      <group position={[0.4, 3.8, 0]}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.26, 0.05, 10, 32]} /><meshStandardMaterial color="#e8fbff" emissive="#bff4ff" emissiveIntensity={night ? 3 : 0.9} /></mesh><mesh rotation={[Math.PI / 2, 0, 0]}><circleGeometry args={[0.23, 28]} /><meshStandardMaterial color="#1d2b3a" side={DoubleSide} /></mesh></group>
       <Block size={[0.04, 1.0, 0.5]} pos={[0.08, 2.9, 0.27]} color={C.blue} r={0.02} />
       <Block size={[0.045, 0.3, 0.5]} pos={[0.08, 3.1, 0.27]} color={C.yellow} r={0.02} />
-      <group position={[0.6, 0, 0]}><LightPool r={2.6} color="#bff4ff" night={night} /></group>
+      <group position={[0.4, 0, 0]}><LightPool r={2.6} color="#bff4ff" night={night} /></group>
     </group>
   );
   return (
@@ -194,18 +194,18 @@ function Bench({ level, night }: Props) {
 }
 
 /* ───────── Fence (one cell; joins to its neighbours) ───────── */
-const FENCE_HEIGHT: Record<Level, number> = { 1: 1.15, 2: 1.0, 3: 1.4, 4: 1.3 };
+const FENCE_HEIGHT: Record<Level, number> = { 1: 1.5, 2: 1.3, 3: 1.7, 4: 1.6 };
 function FenceSpan({ level, night }: { level: Level; night: boolean }) {
   // Runs along +x from the post to the cell edge (1 m); the neighbour's span meets it.
   const h = FENCE_HEIGHT[level];
-  if (level === 1) return <group>{[0.38, 0.85].map((y) => <Block key={y} size={[1.0, 0.1, 0.07]} pos={[0.5, y, 0]} color={TIMBER} r={0.03} />)}</group>;
+  if (level === 1) return <group>{[0.5, 1.1].map((y) => <Block key={y} size={[1.0, 0.12, 0.08]} pos={[0.5, y, 0]} color={TIMBER} r={0.03} />)}</group>;
   if (level === 2) return (
     <group>
-      {[0.3, 0.72].map((y) => <Block key={y} size={[1.0, 0.07, 0.05]} pos={[0.5, y, -0.04]} color={M.white} r={0.02} />)}
+      {[0.4, 0.95].map((y) => <Block key={y} size={[1.0, 0.07, 0.05]} pos={[0.5, y, -0.04]} color={M.white} r={0.02} />)}
       {[0.22, 0.5, 0.78].map((x) => <group key={x}><Block size={[0.11, h - 0.12, 0.04]} pos={[x, (h - 0.12) / 2, 0]} color={M.white} r={0.02} /><mesh position={[x, h - 0.06, 0]} rotation={[0, Math.PI / 4, 0]}><coneGeometry args={[0.08, 0.14, 4]} /><Mat color={M.white} /></mesh></group>)}
     </group>
   );
-  if (level === 3) return <group>{Array.from({ length: 6 }, (_, i) => <Block key={i} size={[1.0, 0.16, 0.06]} pos={[0.5, 0.18 + i * 0.21, 0]} color={i % 2 ? "#3b3f45" : "#2f3338"} r={0.02} />)}</group>;
+  if (level === 3) return <group>{Array.from({ length: 7 }, (_, i) => <Block key={i} size={[1.0, 0.17, 0.06]} pos={[0.5, 0.18 + i * 0.22, 0]} color={i % 2 ? "#3b3f45" : "#2f3338"} r={0.02} />)}</group>;
   return (
     <group>
       <Block size={[1.0, 0.1, 0.12]} pos={[0.5, 0.1, 0]} color={IRON} r={0.03} />
@@ -252,7 +252,7 @@ function MailDrone({ night }: { night: boolean }) {
     ref.current.rotation.y = t;
   });
   return (
-    <group ref={ref}>
+    <group ref={ref} userData={{ flying: true }}>
       <Block size={[0.26, 0.08, 0.26]} pos={[0, 0, 0]} color={M.white} r={0.04} />
       <Ball pos={[0, -0.01, 0.14]} r={0.03} color={CRYSTAL} glow={night ? 3 : 1} />
       {[[-1, -1], [1, -1], [1, 1], [-1, 1]].map(([x, z], i) => <group key={i} position={[x * 0.18, 0.05, z * 0.18]}><Spin speed={30}><Block size={[0.18, 0.008, 0.03]} pos={[0, 0, 0]} color={M.slate} r={0.003} /></Spin></group>)}

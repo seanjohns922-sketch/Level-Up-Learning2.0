@@ -51,7 +51,8 @@ export default function MarketplacePage() {
 
   const owned = useMemo(() => new Set(state?.inventory.map((entry) => entry.item_key) ?? []), [state?.inventory]);
   const equipped = useMemo(() => new Set(Object.values(state?.equipped ?? {})), [state?.equipped]);
-  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && matchesItemRealm(item, realmFilter) && marketplaceDepartment(item) === department && (category === "all" || marketplaceCategory(item) === category)), [category, department, realmFilter, state?.items]);
+  // In each shelf, items show in their sort order, so the newest premium pieces lead.
+  const items = useMemo(() => (state?.items ?? []).filter((item) => isMarketplaceItemListed(item) && matchesItemRealm(item, realmFilter) && marketplaceDepartment(item) === department && (category === "all" || marketplaceCategory(item) === category)).sort((a, b) => a.sort_order - b.sort_order), [category, department, realmFilter, state?.items]);
   useEffect(() => {
     if (!items.some((item) => item.item_key === selected?.item_key)) setSelected(items[0] ?? null);
   }, [items, selected?.item_key]);
