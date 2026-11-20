@@ -1415,6 +1415,41 @@ the aggregate report distinguishes the completed duration from longer tests.
 No application, schema, permissions, curriculum or student data changed in this
 checkpoint. Documentation/aggregate evidence only; JSON and diff checks passed.
 
+### Repeated startup-burst comparison — 20 November 2026
+
+Pushed the sustained findings as `50c61255`, then ran four 60-second local
+100-student/four-teacher workloads in order: simultaneous, 30-second login ramp,
+30-second ramp, simultaneous. Preflight passed. The reader, four fixture classes,
+1,000-row summary pages, permissions and integrity checks were unchanged.
+
+| Run | Login ramp | Login p95 | Initial events p95 | Dashboard p95 | Gate |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1 | None | 434 ms | 1,045 ms | 1,045 ms | Fail |
+| 2 | 30 seconds | 18 ms | 282 ms | 283 ms | Pass |
+| 3 | 30 seconds | 12 ms | 345 ms | 646 ms | Pass |
+| 4 | None | 628 ms | 1,088 ms | 1,160 ms | Fail |
+
+All four runs verified all 100 students, every expected new event, full attempt
+counts and exact activity totals, with zero failed requests/assertions. Verified
+activity increments were respectively 201, 199, 199 and 200. Closed-loop pacing
+and the fixed deadline mean ramped students have less active time; these are not
+identical total-traffic workloads. Initial percentiles still have only four
+samples each. Warm caches and evolving synthetic history remain limitations.
+
+The reverse-order repeat supports startup contention as the next investigation,
+not random loss of student data or evidence for an unindexed full-table scan.
+It does not isolate database execution from API/connection waiting. Do not add
+artificial student login delays, loosen the latency gate, tune production pools,
+or advance to 250 based on the ramped passes. Next: profile the simultaneous
+startup overlap across the API/connection boundary using the existing guarded
+local diagnostic tools. No application or database changes were made here.
+
+Aggregate: `startup-pair-summary-2026-11-20.json`. Complete private reports and
+HTTP profiles: `/Users/seanjohns/reliq-audits/2026-11-20/startup-pair/`.
+All child runs completed; exit code 1 on simultaneous runs records the expected
+latency-gate failures. The comparison stopped on any correctness/transport
+failure (none occurred). Aggregate JSON assertions and diff checks passed.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate
