@@ -6,7 +6,9 @@ type Visual={type:'number_y8_panel';kind:string;[key:string]:unknown};
 type Example={prompt:string;correctAnswer:string;type:'numeric'|'mcq';visual:Visual;options?:string[];readAloudText:string};
 const v=(kind:string,data:Record<string,unknown>):Visual=>({type:'number_y8_panel',kind,...data});
 const expression=(text:string)=>v('expression',{expression:text});
-const num=(prompt:string,answer:number,visual:Visual,spoken:string):Example=>({prompt,correctAnswer:String(Number(answer.toFixed(8))),type:'numeric',visual,readAloudText:`${prompt} ${spoken}`});
+/** The unit a typed answer is given in, from the question wording: dollars, litres or a percentage. */
+const unitAsked=(prompt:string)=>/\bdollars\b/.test(prompt)?'$':/\blitres\b/.test(prompt)?'L':/\bpercentage\b/.test(prompt)?'%':undefined;
+const num=(prompt:string,answer:number,visual:Visual,spoken:string):Example=>{const unit=unitAsked(prompt);return {prompt,correctAnswer:String(Number(answer.toFixed(8))),type:'numeric',visual,readAloudText:`${prompt} ${spoken}`,...(unit?{answerFormat:{kind:'number' as const,unit,ariaLabel:`Answer in ${unit==='$'?'dollars':unit==='L'?'litres':'percent'}`}}:{})};};
 const mc=(prompt:string,answer:string,options:string[],visual:Visual,spoken:string):Example=>({prompt,correctAnswer:answer,type:'mcq',options,visual,readAloudText:`${prompt} ${spoken}`});
 const context=(art:string,cards:Array<[string,string]>,note?:string)=>v('context',{art,cards,note});
 const gcd=(a:number,b:number):number=>b?gcd(b,a%b):Math.abs(a);

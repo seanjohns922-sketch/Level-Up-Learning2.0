@@ -373,6 +373,9 @@ export default function AssessmentQuestionCard({
         visual.type.startsWith("number_y5_") ||
         visual.type.startsWith("number_y6_") ||
         visual.type.startsWith("number_y7_") || visual.type.startsWith("number_y8_")));
+  // Unit and spoken label for a plain typed number, when the item states one.
+  const plainUnit = question.answerFormat?.kind === "number" ? question.answerFormat.unit : undefined;
+  const plainUnitLabel = question.answerFormat?.kind === "number" ? question.answerFormat.ariaLabel : undefined;
   const order = useMemo(
     () => (value ? value.split(type === "number_order" ? ORDER_SEPARATOR : ",").filter(Boolean) : []),
     [type, value]
@@ -932,16 +935,21 @@ export default function AssessmentQuestionCard({
       return (
         <div className="mt-3 space-y-4">
           {renderedVisual}
-          <div className="flex justify-center">
-            <input
-              type="text"
-              inputMode={question.inputMode ?? "decimal"}
-              value={value ?? ""}
-              onChange={(event) => onChange(event.target.value)}
-              aria-label="Answer"
-              className="h-20 w-36 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
-            />
-          </div>
+          <label className="flex flex-col items-center gap-2">
+            <span className="text-sm font-semibold text-slate-600">Your answer</span>
+            <span className="flex items-center gap-2 text-3xl font-black text-slate-700">
+              {plainUnit === "$" ? <span aria-hidden>$</span> : null}
+              <input
+                type="text"
+                inputMode={question.inputMode ?? "decimal"}
+                value={value ?? ""}
+                onChange={(event) => onChange(event.target.value)}
+                aria-label={plainUnitLabel ?? "Answer"}
+                className="h-20 w-36 rounded-lg border-2 border-cyan-700 bg-[#f8fbfc] px-3 text-center text-4xl font-black text-slate-950 shadow-sm outline-none transition focus:border-cyan-500 focus:ring-4 focus:ring-cyan-500/15"
+              />
+              {plainUnit && plainUnit !== "$" ? <span aria-hidden>{plainUnit}</span> : null}
+            </span>
+          </label>
         </div>
       );
     }

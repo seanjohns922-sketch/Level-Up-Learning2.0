@@ -106,7 +106,8 @@ function expressionInForm(spec:Level7Answer,answer:string){
  if(spec.format==='factorised'){const outside=(t:string)=>t.match(/^(-?\d*[a-zA-Z]*)\(([^()]+)\)$/)?.[1];const mine=outside(s);return mine!==undefined&&mine===outside(clean(spec.expected).replace(/\s+|\*/g,''));}
  return true;
 }
-export function stripAnswerUnit(spec:Level7Answer,value:string){const s=value.trim();return spec.unit==='$'?s.replace(/^\$\s*/,''):spec.unit&&s.endsWith(spec.unit)?s.slice(0,-spec.unit.length).trim():s;}
+/** Removes a typed unit: "$12", "12 cm", and for dollar rates "$17/kg" or "17/kg". */
+export function stripAnswerUnit(spec:Level7Answer,value:string){const s=value.trim();if(spec.unit==='$')return s.replace(/^\$\s*/,'');if(spec.unit?.startsWith('$/')){const per=spec.unit.slice(1);const t=s.replace(/^\$\s*/,'');return t.endsWith(spec.unit)?t.slice(0,-spec.unit.length).trim():t.endsWith(per)?t.slice(0,-per.length).trim():t;}return spec.unit&&s.endsWith(spec.unit)?s.slice(0,-spec.unit.length).trim():s;}
 export function markLevel7Answer(spec:Level7Answer,response:string):boolean{
  if(spec.kind==='build')return buildMeets(spec.build!,response.split(',').map(Number));
  if(spec.kind==='sorter')return sorterMeets(spec.sorter!,response.split('|'));

@@ -9,7 +9,8 @@ import {
   level8Quiz,
 } from "../data/activities/level8/questions.ts";
 import { LEVEL8_WEEK_COUNTS } from "../lib/level8-config.ts";
-import { joinWorking } from "../data/activities/level8/shared.ts";
+import { joinWorking, markRoundedResults } from "../data/activities/level8/shared.ts";
+import { stripAnswerUnit } from "../lib/level7-answer.ts";
 import {
   markLevel7Answer,
   level7Answer,
@@ -252,3 +253,23 @@ for (const realm of Object.keys(LEVEL8_FACTORIES)) {
 }
 assert(formChecks > 400, `only ${formChecks} answer-form checks ran`);
 console.log(`PASS: ${formChecks} answer-form instructions enforced; worked steps join without false equations.`);
+
+// Rounded results are written with ≈; exact results, fractions and non-arithmetic keep "=".
+assert.equal(markRoundedResults("Two semicircles make one circle: π × 50 = 157.08 m."), "Two semicircles make one circle: π × 50 ≈ 157.08 m.");
+assert.equal(markRoundedResults("Mean = 82 ÷ 9 = 9.11."), "Mean = 82 ÷ 9 ≈ 9.11.");
+assert.equal(markRoundedResults("Area: 4.8 × 4.3 = 20.64 m²."), "Area: 4.8 × 4.3 = 20.64 m².");
+assert.equal(markRoundedResults("3/2 × 1/3 = 1/2."), "3/2 × 1/3 = 1/2.");
+assert.equal(markRoundedResults("x² = 7² + 11² = 170."), "x² = 7² + 11² = 170.");
+assert.equal(markRoundedResults("π × 50 = 150 m."), "π × 50 = 150 m.", "a wrong value is not disguised as an approximation");
+// A weekly quiz never shows the same wording twice.
+for (const [quizRealm, weeks] of Object.entries(LEVEL8_WEEK_COUNTS)) {
+  for (let week = 1; week < weeks; week++) {
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const prompts = level8Quiz(quizRealm, week, attempt).map((q) => q.prompt);
+      assert.equal(new Set(prompts).size, prompts.length, `${quizRealm} week ${week} attempt ${attempt} repeats a prompt`);
+    }
+  }
+}
+// Dollar rates accept "$5/kg", "5/kg" and "5 $/kg".
+for (const typed of ["$5/kg", "5/kg", "5 $/kg", "5"]) assert.equal(stripAnswerUnit({ kind: "number", expected: "5", prompt: "", unit: "$/kg" }, typed), "5", typed);
+console.log("PASS: rounded results use ≈; quizzes never repeat a prompt; dollar-rate units are accepted.");

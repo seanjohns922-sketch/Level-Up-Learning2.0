@@ -87,14 +87,8 @@ const writeExpression: Form[] = [
     return expanded(`Towels cost $c each. Ana buys ${a} towels, Ben buys ${b} and Cai buys ${d}. Write a simplified expression for the total amount spent.`, `${a + b + d}c`, [`The costs are ${a}c, ${b}c and ${d}c.`, `They are like terms: ${a}c + ${b}c + ${d}c = ${a + b + d}c.`]);
   },
   (r) => {
-    const fee = 5 * r(4, 10), rate = 5 * r(12, 20);
-    const answer = poly([fee, ""], [rate, "x"]);
-    return {
-      prompt: `An electrician charges a $${fee} call-out fee and $${rate} per hour. Which expression gives the total cost, in dollars, for x hours?`,
-      answer,
-      choices: [answer, poly([fee, "x"], [rate, ""]), `${fee + rate}x`, poly([rate, "x"], [-fee, ""])],
-      steps: [`The hourly charge multiplies x: ${rate}x.`, `The call-out fee is paid once, so add ${fee}.`],
-    };
+    const fee = 5 * r(4, 10), rate = r(6, 15);
+    return expr(`A gym charges a $${fee} joining fee and $${rate} per visit. Write an expression for the total cost, in dollars, of v visits.`, poly([rate, "v"], [fee, ""]), [`Each visit costs $${rate}, so v visits cost ${rate}v.`, `The joining fee is paid once, so add ${fee}: ${poly([rate, "v"], [fee, ""])}.`]);
   },
   (r) => {
     const a = r(2, 5), b = r(2, 9), tripled = r(0, 1) === 1;

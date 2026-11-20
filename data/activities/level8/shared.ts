@@ -73,6 +73,50 @@ const tidyNumbers = (text: string) =>
 /** Display text shows a true minus sign: "(-2, -5)" → "(−2, −5)". Answers keep "-" for marking. */
 const trueMinus = (text: string) => tidyNumbers(text).replace(/(^|[\s(,=])-(?=\d)/g, "$1−");
 /**
+ * Value of a short display calculation such as "π × 6²", "√(5 ÷ π)" or "28,000 ÷ 15", using a small
+ * recursive parser (no eval). Returns null for anything that is not plain arithmetic.
+ */
+export function displayValue(expression: string): number | null {
+  const source = expression
+    .replace(/\$|\s/g, "")
+    .replace(/(\d),(?=\d{3}(?!\d))/g, "$1")
+    .replace(/½/g, "(1/2)").replace(/²/g, "^2").replace(/³/g, "^3")
+    .replace(/×/g, "*").replace(/÷/g, "/").replace(/−/g, "-")
+    .replace(/π/g, "p").replace(/√/g, "s")
+    .replace(/(\d|\))(?=[ps(])/g, "$1*");
+  if (!source || !/^[\d.+\-*/^()ps]+$/.test(source)) return null;
+  const tokens = source.match(/\d+(?:\.\d+)?|[+\-*/^()ps]/g) ?? [];
+  let i = 0;
+  const atom = (): number => {
+    const t = tokens[i++];
+    if (t === "(") { const v = sum(); if (tokens[i++] !== ")") throw new Error("bracket"); return v; }
+    if (t === "p") return Math.PI;
+    if (t === "s") return Math.sqrt(atom());
+    if (t === "-") return -atom();
+    if (!t || !/^\d/.test(t)) throw new Error("token");
+    return Number(t);
+  };
+  const power = (): number => { const base = atom(); if (tokens[i] !== "^") return base; i++; return base ** atom(); };
+  const product = (): number => { let v = power(); while (tokens[i] === "*" || tokens[i] === "/") v = tokens[i++] === "*" ? v * power() : v / power(); return v; };
+  const sum = (): number => { let v = product(); while (tokens[i] === "+" || tokens[i] === "-") v = tokens[i++] === "+" ? v + product() : v - product(); return v; };
+  try { const v = sum(); return i === tokens.length && Number.isFinite(v) ? v : null; } catch { return null; }
+}
+/**
+ * Writes "≈" where working states a rounded result: "π × 50 = 157.08" becomes "π × 50 ≈ 157.08".
+ * Only a calculation that evaluates to the stated number after rounding to its shown places is changed,
+ * so exact results, fractions and statements that are not plain arithmetic keep their "=".
+ */
+export function markRoundedResults(text: string) {
+  return text.replace(/([\d$.,()π√²³½+\−×÷ ]*[\d)²³π])\s=\s(\$?)(−?\d[\d,]*(?:\.(\d+))?)(?![\d/])/g, (whole, left: string, dollar: string, shown: string, places = "") => {
+    const calculation = left.trim();
+    if (!/[+\−×÷√π²³½]/.test(calculation.replace(/^−/, ""))) return whole;
+    const value = displayValue(calculation), stated = Number(shown.replace(/,/g, "").replace("−", "-"));
+    if (value === null) return whole;
+    const gap = Math.abs(value - stated), halfStep = 0.5 * 10 ** -places.length;
+    return gap > 1e-9 * Math.max(1, Math.abs(stated)) && gap <= halfStep + 1e-9 ? `${left} ≈ ${dollar}${shown}` : whole;
+  });
+}
+/**
  * The answer form a prompt tells the student to use, so marking matches the instruction:
  * "simplest form" needs a simplified fraction, "as a fraction" rejects a decimal and
  * "as a decimal" rejects a fraction. "As a fraction" counts only after give/write, because
@@ -111,7 +155,7 @@ export function question(
     ...raw,
     prompt: trueMinus(raw.prompt),
     answer: typeof raw.answer === "number" ? Number(raw.answer.toPrecision(12)) : tidyNumbers(raw.answer),
-    steps: raw.steps.map(trueMinus),
+    steps: raw.steps.map((step) => markRoundedResults(trueMinus(step))),
     choices: raw.choices?.map(tidyNumbers),
   };
   const answer = String(draft.answer);

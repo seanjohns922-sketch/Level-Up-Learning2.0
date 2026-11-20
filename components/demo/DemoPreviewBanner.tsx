@@ -18,6 +18,10 @@ export default function DemoPreviewBanner() {
     (route) => pathname.startsWith(route),
   );
 
+  // On lesson, quiz and assessment screens the badge sits bottom-left, clear of their centred header buttons;
+  // elsewhere (including 3D scenes with a bottom-left joystick) it stays top-centre.
+  const learningScreen = ["/lesson", "/session", "/pretest", "/posttest", "/demo-review/volcano/"].some((route) => pathname.startsWith(route)) || /^\/demo-review\/[a-z-]+-level-?\d/.test(pathname);
+
   if (!active || usesRealmNavigation) return null;
 
   const reviewingAssessment = pathname === "/pretest" || pathname === "/posttest" || pathname.startsWith("/demo-review/");
@@ -38,7 +42,7 @@ export default function DemoPreviewBanner() {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-3 z-[90] flex justify-center px-3 sm:top-4">
+    <div className={`pointer-events-none fixed z-[90] flex ${learningScreen ? "bottom-3 left-3 sm:bottom-4 sm:left-4" : "inset-x-0 top-3 justify-center px-3 sm:top-4"}`}>
       <div className={`pointer-events-auto inline-flex max-w-[calc(100vw-1.5rem)] items-center gap-2 border border-amber-300/55 bg-amber-50/95 px-3 py-2 text-[11px] font-bold uppercase tracking-[0.14em] text-amber-950 shadow-[0_10px_24px_rgba(0,0,0,0.16)] backdrop-blur-md sm:max-w-none sm:px-3.5 ${isStarpathProgram ? "rounded-lg" : "rounded-full"}`}>
         <div className="whitespace-nowrap">Demo Mode</div>
         <button

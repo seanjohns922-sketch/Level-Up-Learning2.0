@@ -58,16 +58,8 @@ export function level8Quiz(realm: Level8Realm, week: number, attempt = 0) {
     pickLevel7LessonQuiz(
       (_role, seed) => level8Question(realm, week, lesson, seed),
       810007 + week * 10007 + lesson * 101 + attempt * 1000003,
-      (q) =>
-        JSON.stringify([
-          q.prompt,
-          q.cave7Visual,
-          q.measurement8Visual,
-          q.number8Visual,
-          q.algebra8Visual,
-          q.chance8Visual,
-          q.space8Visual,
-        ]),
+      // Identical wording reads as the same question whatever the diagram, so a prompt appears once per quiz.
+      (q) => q.prompt,
       `Level 8 ${realm} ${week}/${lesson}`,
       taken,
     ).map((q, i) => ({

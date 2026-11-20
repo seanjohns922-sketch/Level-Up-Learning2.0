@@ -547,8 +547,9 @@ const compareVariation: Form[] = [
     return { ...{visual:{kind:"dotplot",title:"Repeated sample estimates",unit:"%",min:0,max:100,groups:[{label:"Sample size 10",values:s10},{label:"Sample size 100",values:s100}]}}, prompt: `Six samples of size 10 gave estimates ${s10.join(", ")}%. Six of size 100 gave ${s100.join(", ")}%. What is the difference between the two ranges?`, answer: range(s10) - range(s100), unit: "percentage points", steps: [`Size 10 range: ${range(s10)}. Size 100 range: ${range(s100)}.`, `Difference: ${range(s10) - range(s100)}.`] };
   },
   (r) => {
-    const n1 = pick(r, [10, 20, 25]), k = pick(r, [4, 5, 10]);
-    return { prompt: `Sample A has ${n1} people and sample B has ${n1 * k}. How many times larger is sample B?`, answer: k, steps: [`${n1 * k} ÷ ${n1} = ${k}.`, "Larger samples usually give more reliable estimates."] };
+    const small = pick(r, [10, 20, 25]), large = small * pick(r, [8, 10]), centre = r(35, 60), wide = r(10, 16), narrow = r(2, 5);
+    const visual = table("Repeated sample estimates", ["Sample size", "Lowest estimate", "Highest estimate"], [[small, `${centre - wide}%`, `${centre + wide}%`], [large, `${centre - narrow}%`, `${centre + narrow}%`]]);
+    return { prompt: `Repeated samples of size ${small} and size ${large} estimate the same percentage. How many percentage points wider is the range for size ${small}?`, answer: 2 * (wide - narrow), unit: "percentage points", steps: [`Size ${small} range: ${centre + wide} − ${centre - wide} = ${2 * wide}. Size ${large} range: ${centre + narrow} − ${centre - narrow} = ${2 * narrow}.`, `${2 * wide} − ${2 * narrow} = ${2 * (wide - narrow)}. The larger samples vary much less.`], visual };
   },
 ];
 const uncertainty: Form[] = [

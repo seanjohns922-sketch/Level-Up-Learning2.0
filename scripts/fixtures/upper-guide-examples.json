@@ -49,7 +49,7 @@
   },
   "8/number/5/1": {
     "title": "Add and subtract signed numbers",
-    "signature": "15b9b1557ee85f46862765ecea99b1fbae408fdc5566b9ca18f8d0a4d421a4c8"
+    "signature": "91608c2c78dacfec86d1dd6319dfe585adf83a59f4aa53e68b0e93d6118b063b"
   },
   "8/number/5/2": {
     "title": "Multiply and divide signed numbers",
@@ -617,7 +617,7 @@
   },
   "8/statistics/6/2": {
     "title": "Compare variation as sample size changes",
-    "signature": "c637019e9c1ee449111fd4eae21996e13fbf44298d0c43ee905693a07b3ba53e"
+    "signature": "6aec5c208f6023cfca7a917aa3dffcfe4cc75952e00f06421a1a1a7ba6b3f7ba"
   },
   "8/statistics/6/3": {
     "title": "Explain uncertainty in an estimate",

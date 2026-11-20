@@ -1249,6 +1249,11 @@
         "topic": "Model a percentage markup"
       },
       "readAloudText": "What is the selling price in dollars? The shop pays 160 dollars for one backpack and adds 25 percent of this cost.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-pretest-23-v1",
       "inputMode": "decimal",
       "answer": "200",
@@ -1322,6 +1327,11 @@
         "topic": "Include GST in a quoted price"
       },
       "readAloudText": "What is the price including GST, in dollars? Quoted price 160 dollars excluding GST. Add ten percent GST.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-pretest-24-v1",
       "inputMode": "decimal",
       "answer": "176",
@@ -1399,6 +1409,11 @@
         "topic": "Apply successive percentage changes"
       },
       "readAloudText": "What is the final price in dollars? Start at 160 dollars. Reduce by 20 percent, then increase the new price by 10 percent.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-pretest-25-v1",
       "inputMode": "decimal",
       "answer": "140.8",
@@ -1554,6 +1569,11 @@
         "topic": "Calculate a percentage increase"
       },
       "readAloudText": "What is the percentage increase? Recycling rose from 200 to 250 kilograms. Enter the percentage increase.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "%",
+        "ariaLabel": "Answer in percent"
+      },
       "id": "y8-number-review-pretest-27-v1",
       "inputMode": "decimal",
       "answer": "25",
@@ -1631,6 +1651,11 @@
         "topic": "Review equal percentage losses and gains"
       },
       "readAloudText": "After both changes, how many dollars less than the start remain? A 160 dollar balance falls by 20 percent, then the new balance rises by 20 percent. Find the loss compared with the start.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-pretest-28-v1",
       "inputMode": "decimal",
       "answer": "6.4",
@@ -1698,6 +1723,11 @@
         "topic": "Apply a supplied tiered tax model"
       },
       "readAloudText": "Using this example tax table, how much tax is paid in dollars? Example tax table only. First 20,000 dollars: no tax. Income above 20,000 dollars: 20 cents for each extra dollar. Income is 26000 dollars. No other charges.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-pretest-29-v1",
       "inputMode": "decimal",
       "answer": "1200",
@@ -1765,6 +1795,11 @@
         "topic": "Model water use and a percentage loss"
       },
       "readAloudText": "How many litres remain after both steps? Start with 800 litres. Use 120 litres, then lose ten percent of what remains.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in litres"
+      },
       "id": "y8-number-review-pretest-30-v1",
       "inputMode": "decimal",
       "answer": "612",
@@ -3072,6 +3107,11 @@
         "topic": "Model a percentage markup"
       },
       "readAloudText": "What is the selling price in dollars? The shop pays 200 dollars for one backpack and adds 25 percent of this cost.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-posttest-23-v1",
       "inputMode": "decimal",
       "answer": "250",
@@ -3145,6 +3185,11 @@
         "topic": "Include GST in a quoted price"
       },
       "readAloudText": "What is the price including GST, in dollars? Quoted price 200 dollars excluding GST. Add ten percent GST.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-posttest-24-v1",
       "inputMode": "decimal",
       "answer": "220",
@@ -3222,6 +3267,11 @@
         "topic": "Apply successive percentage changes"
       },
       "readAloudText": "What is the final price in dollars? Start at 200 dollars. Reduce by 20 percent, then increase the new price by 10 percent.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-posttest-25-v1",
       "inputMode": "decimal",
       "answer": "176",
@@ -3377,6 +3427,11 @@
         "topic": "Calculate a percentage increase"
       },
       "readAloudText": "What is the percentage increase? Recycling rose from 240 to 300 kilograms. Enter the percentage increase.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "%",
+        "ariaLabel": "Answer in percent"
+      },
       "id": "y8-number-review-posttest-27-v1",
       "inputMode": "decimal",
       "answer": "25",
@@ -3454,6 +3509,11 @@
         "topic": "Review equal percentage losses and gains"
       },
       "readAloudText": "After both changes, how many dollars less than the start remain? A 200 dollar balance falls by 20 percent, then the new balance rises by 20 percent. Find the loss compared with the start.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-posttest-28-v1",
       "inputMode": "decimal",
       "answer": "8",
@@ -3521,6 +3581,11 @@
         "topic": "Apply a supplied tiered tax model"
       },
       "readAloudText": "Using this example tax table, how much tax is paid in dollars? Example tax table only. First 20,000 dollars: no tax. Income above 20,000 dollars: 20 cents for each extra dollar. Income is 28000 dollars. No other charges.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-posttest-29-v1",
       "inputMode": "decimal",
       "answer": "1600",
@@ -3588,6 +3653,11 @@
         "topic": "Model water use and a percentage loss"
       },
       "readAloudText": "How many litres remain after both steps? Start with 900 litres. Use 120 litres, then lose ten percent of what remains.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in litres"
+      },
       "id": "y8-number-review-posttest-30-v1",
       "inputMode": "decimal",
       "answer": "702",
@@ -4895,6 +4965,11 @@
         "topic": "Model a percentage markup"
       },
       "readAloudText": "What is the selling price in dollars? The shop pays 240 dollars for one backpack and adds 25 percent of this cost.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-start-23-v1",
       "inputMode": "decimal",
       "answer": "300",
@@ -4968,6 +5043,11 @@
         "topic": "Include GST in a quoted price"
       },
       "readAloudText": "What is the price including GST, in dollars? Quoted price 240 dollars excluding GST. Add ten percent GST.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-start-24-v1",
       "inputMode": "decimal",
       "answer": "264",
@@ -5045,6 +5125,11 @@
         "topic": "Apply successive percentage changes"
       },
       "readAloudText": "What is the final price in dollars? Start at 240 dollars. Reduce by 20 percent, then increase the new price by 10 percent.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-start-25-v1",
       "inputMode": "decimal",
       "answer": "211.2",
@@ -5200,6 +5285,11 @@
         "topic": "Calculate a percentage increase"
       },
       "readAloudText": "What is the percentage increase? Recycling rose from 280 to 350 kilograms. Enter the percentage increase.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "%",
+        "ariaLabel": "Answer in percent"
+      },
       "id": "y8-number-review-start-27-v1",
       "inputMode": "decimal",
       "answer": "25",
@@ -5277,6 +5367,11 @@
         "topic": "Review equal percentage losses and gains"
       },
       "readAloudText": "After both changes, how many dollars less than the start remain? A 240 dollar balance falls by 20 percent, then the new balance rises by 20 percent. Find the loss compared with the start.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-start-28-v1",
       "inputMode": "decimal",
       "answer": "9.6",
@@ -5344,6 +5439,11 @@
         "topic": "Apply a supplied tiered tax model"
       },
       "readAloudText": "Using this example tax table, how much tax is paid in dollars? Example tax table only. First 20,000 dollars: no tax. Income above 20,000 dollars: 20 cents for each extra dollar. Income is 30000 dollars. No other charges.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-start-29-v1",
       "inputMode": "decimal",
       "answer": "2000",
@@ -5411,6 +5511,11 @@
         "topic": "Model water use and a percentage loss"
       },
       "readAloudText": "How many litres remain after both steps? Start with 1000 litres. Use 120 litres, then lose ten percent of what remains.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in litres"
+      },
       "id": "y8-number-review-start-30-v1",
       "inputMode": "decimal",
       "answer": "792",
@@ -6718,6 +6823,11 @@
         "topic": "Model a percentage markup"
       },
       "readAloudText": "What is the selling price in dollars? The shop pays 280 dollars for one backpack and adds 25 percent of this cost.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-mid-23-v1",
       "inputMode": "decimal",
       "answer": "350",
@@ -6791,6 +6901,11 @@
         "topic": "Include GST in a quoted price"
       },
       "readAloudText": "What is the price including GST, in dollars? Quoted price 280 dollars excluding GST. Add ten percent GST.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-mid-24-v1",
       "inputMode": "decimal",
       "answer": "308",
@@ -6868,6 +6983,11 @@
         "topic": "Apply successive percentage changes"
       },
       "readAloudText": "What is the final price in dollars? Start at 280 dollars. Reduce by 20 percent, then increase the new price by 10 percent.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-mid-25-v1",
       "inputMode": "decimal",
       "answer": "246.4",
@@ -7023,6 +7143,11 @@
         "topic": "Calculate a percentage increase"
       },
       "readAloudText": "What is the percentage increase? Recycling rose from 320 to 400 kilograms. Enter the percentage increase.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "%",
+        "ariaLabel": "Answer in percent"
+      },
       "id": "y8-number-review-mid-27-v1",
       "inputMode": "decimal",
       "answer": "25",
@@ -7100,6 +7225,11 @@
         "topic": "Review equal percentage losses and gains"
       },
       "readAloudText": "After both changes, how many dollars less than the start remain? A 280 dollar balance falls by 20 percent, then the new balance rises by 20 percent. Find the loss compared with the start.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-mid-28-v1",
       "inputMode": "decimal",
       "answer": "11.2",
@@ -7167,6 +7297,11 @@
         "topic": "Apply a supplied tiered tax model"
       },
       "readAloudText": "Using this example tax table, how much tax is paid in dollars? Example tax table only. First 20,000 dollars: no tax. Income above 20,000 dollars: 20 cents for each extra dollar. Income is 32000 dollars. No other charges.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-mid-29-v1",
       "inputMode": "decimal",
       "answer": "2400",
@@ -7234,6 +7369,11 @@
         "topic": "Model water use and a percentage loss"
       },
       "readAloudText": "How many litres remain after both steps? Start with 1100 litres. Use 120 litres, then lose ten percent of what remains.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in litres"
+      },
       "id": "y8-number-review-mid-30-v1",
       "inputMode": "decimal",
       "answer": "882",
@@ -8541,6 +8681,11 @@
         "topic": "Model a percentage markup"
       },
       "readAloudText": "What is the selling price in dollars? The shop pays 320 dollars for one backpack and adds 25 percent of this cost.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-end-23-v1",
       "inputMode": "decimal",
       "answer": "400",
@@ -8614,6 +8759,11 @@
         "topic": "Include GST in a quoted price"
       },
       "readAloudText": "What is the price including GST, in dollars? Quoted price 320 dollars excluding GST. Add ten percent GST.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-end-24-v1",
       "inputMode": "decimal",
       "answer": "352",
@@ -8691,6 +8841,11 @@
         "topic": "Apply successive percentage changes"
       },
       "readAloudText": "What is the final price in dollars? Start at 320 dollars. Reduce by 20 percent, then increase the new price by 10 percent.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-end-25-v1",
       "inputMode": "decimal",
       "answer": "281.6",
@@ -8846,6 +9001,11 @@
         "topic": "Calculate a percentage increase"
       },
       "readAloudText": "What is the percentage increase? Recycling rose from 360 to 450 kilograms. Enter the percentage increase.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "%",
+        "ariaLabel": "Answer in percent"
+      },
       "id": "y8-number-review-end-27-v1",
       "inputMode": "decimal",
       "answer": "25",
@@ -8923,6 +9083,11 @@
         "topic": "Review equal percentage losses and gains"
       },
       "readAloudText": "After both changes, how many dollars less than the start remain? A 320 dollar balance falls by 20 percent, then the new balance rises by 20 percent. Find the loss compared with the start.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-end-28-v1",
       "inputMode": "decimal",
       "answer": "12.8",
@@ -8990,6 +9155,11 @@
         "topic": "Apply a supplied tiered tax model"
       },
       "readAloudText": "Using this example tax table, how much tax is paid in dollars? Example tax table only. First 20,000 dollars: no tax. Income above 20,000 dollars: 20 cents for each extra dollar. Income is 34000 dollars. No other charges.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "$",
+        "ariaLabel": "Answer in dollars"
+      },
       "id": "y8-number-review-end-29-v1",
       "inputMode": "decimal",
       "answer": "2800",
@@ -9057,6 +9227,11 @@
         "topic": "Model water use and a percentage loss"
       },
       "readAloudText": "How many litres remain after both steps? Start with 1200 litres. Use 120 litres, then lose ten percent of what remains.",
+      "answerFormat": {
+        "kind": "number",
+        "unit": "L",
+        "ariaLabel": "Answer in litres"
+      },
       "id": "y8-number-review-end-30-v1",
       "inputMode": "decimal",
       "answer": "972",
