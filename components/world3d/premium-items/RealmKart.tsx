@@ -3,23 +3,18 @@
 // unit long with the front at +z; the race scales it up.
 import { Sparkles } from "@react-three/drei";
 import { Ball, Block, Mat, type V3 } from "@/components/world3d/premium-homes/HomeKit";
+import { KART_COLOURS, type KartParts, type KartStyle } from "@/lib/world3d/kart-garage";
 
 function Glowing({ color, night, day = 0.6 }: { color: string; night: boolean; day?: number }) {
   return <meshStandardMaterial color={color} emissive={color} emissiveIntensity={night ? 2.6 : day} roughness={0.4} />;
 }
 
-export const REALM_KARTS = {
-  number: { name: "Number Nexus", body: "#14b8a6", trim: "#10b981", accent: "#5eead4" },
-  measurement: { name: "Measurelands", body: "#b8893a", trim: "#d6b86c", accent: "#fff1c4" },
-  space: { name: "Starpath", body: "#7c3aed", trim: "#06b6d4", accent: "#a5f3fc" },
-  statistics: { name: "Statistica", body: "#a83e4b", trim: "#f2bc45", accent: "#f2bc45" },
-  pattern: { name: "Pattern Peaks", body: "#059669", trim: "#7c3aed", accent: "#6ee7b7" },
-  chance: { name: "Chance Hollow", body: "#be3455", trim: "#fbbf24", accent: "#fb7185" },
-} as const;
-export type RealmKey = keyof typeof REALM_KARTS;
-export type KartParts = { spoiler?: "none" | "wing" | "fin" | "jet"; wheels?: "classic" | "chunky" | "neon"; trail?: boolean };
+/** Wheels default to classic when no wheel part is fitted. */
+type WheelKind = NonNullable<KartParts["wheels"]> | "classic";
 
-function Emblem({ realm, color }: { realm: RealmKey; color: string }) {
+function Emblem({ realm, color }: { realm: KartStyle; color: string }) {
+  // The Starter Kart wears a plain round badge.
+  if (realm === "starter") return <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.09, 0.09, 0.02, 24]} /><Mat color={color} /></mesh>;
   if (realm === "number") return <group>{[[-0.07, 0], [0.07, 0]].map(([x], i) => <Block key={i} size={[0.05, 0.16, 0.02]} pos={[x, 0, 0]} color={color} r={0.01} />)}<Block size={[0.18, 0.04, 0.02]} pos={[0, 0.03, 0]} color={color} r={0.01} /></group>;
   if (realm === "measurement") return <group>{[0, 1, 2, 3].map((i) => <Block key={i} size={[0.025, i % 2 ? 0.08 : 0.14, 0.02]} pos={[-0.09 + i * 0.06, 0.02, 0]} color={color} r={0.005} />)}</group>;
   if (realm === "space") return <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.1, 0.1, 0.02, 5]} /><Mat color={color} /></mesh>;
@@ -27,7 +22,7 @@ function Emblem({ realm, color }: { realm: RealmKey; color: string }) {
   if (realm === "pattern") return <mesh rotation={[Math.PI / 2, 0, 0]}><cylinderGeometry args={[0.1, 0.1, 0.02, 3]} /><Mat color={color} /></mesh>;
   return <group><Block size={[0.15, 0.15, 0.02]} pos={[0, 0, 0]} color={color} r={0.03} />{[[-0.04, 0.04], [0.04, -0.04], [0, 0]].map(([x, y], i) => <Ball key={i} pos={[x, y, 0.012]} r={0.015} color="#222" />)}</group>;
 }
-function Wheel({ pos, kind, night, color }: { pos: V3; kind: KartParts["wheels"]; night: boolean; color: string }) {
+function Wheel({ pos, kind, night, color }: { pos: V3; kind: WheelKind; night: boolean; color: string }) {
   const r = kind === "chunky" ? 0.15 : 0.12, w = kind === "chunky" ? 0.16 : 0.11;
   return (
     <group position={pos}>
@@ -36,9 +31,9 @@ function Wheel({ pos, kind, night, color }: { pos: V3; kind: KartParts["wheels"]
     </group>
   );
 }
-export function RealmKart({ realm, parts = {}, night = false, driver = true }: { realm: RealmKey; parts?: KartParts; night?: boolean; driver?: boolean }) {
-  const k = REALM_KARTS[realm];
-  const wheels = parts.wheels ?? "classic";
+export function RealmKart({ realm, parts = {}, night = false, driver = true }: { realm: KartStyle; parts?: KartParts; night?: boolean; driver?: boolean }) {
+  const k = KART_COLOURS[realm];
+  const wheels: WheelKind = parts.wheels ?? "classic";
   const lift = wheels === "chunky" ? 0.03 : 0;
   return (
     <group position={[0, lift, 0]}>

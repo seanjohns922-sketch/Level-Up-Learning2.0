@@ -10,7 +10,8 @@ import {
   newKart, newLaps, raceGridPosition, stepKart, updateLaps,
   type KartWorld, type LapState, type RaceCourse, type RaceStart,
 } from "@/lib/world3d/race-driving";
-import { RealmKart, type RealmKey } from "./RealmKart";
+import type { KartParts, KartStyle } from "@/lib/world3d/kart-garage";
+import { RealmKart } from "./RealmKart";
 
 /** Kart model units to world metres: about three metres long. */
 const KART_SCALE = 3.2;
@@ -25,13 +26,15 @@ export const newRaceHud = (bestLap: number | null): RaceHud => ({ countdown: RAC
 
 const DRIVE_KEYS = { up: ["w", "arrowup"], down: ["s", "arrowdown"], left: ["a", "arrowleft"], right: ["d", "arrowright"] } as const;
 
-export function RaceKartDriver({ course, start, world, moveInput, hud, realm = "number", night = false, onBestLap }: {
+export function RaceKartDriver({ course, start, world, moveInput, hud, kart: { style, parts }, paused = false, night = false, onBestLap }: {
   course: RaceCourse;
   start: RaceStart;
   world: KartWorld;
   moveInput: WorldMoveInput;
   hud: React.MutableRefObject<RaceHud>;
-  realm?: RealmKey;
+  kart: { style: KartStyle; parts: KartParts };
+  /** While the garage is open the kart and clock stand still. */
+  paused?: boolean;
   night?: boolean;
   onBestLap: (seconds: number) => void;
 }) {
@@ -60,6 +63,7 @@ export function RaceKartDriver({ course, start, world, moveInput, hud, realm = "
   }, [camera]);
 
   useFrame(({ camera: view }, rawDelta) => {
+    if (paused) return;
     const delta = Math.min(rawDelta, 1 / 20);
     const held = (names: readonly string[]) => names.some((name) => keys.current.has(name));
     const throttle = THREE.MathUtils.clamp((held(DRIVE_KEYS.up) || moveInput.up ? 1 : 0) - (held(DRIVE_KEYS.down) || moveInput.down ? 1 : 0) + (moveInput.analogY ?? 0), -1, 1);
@@ -114,7 +118,7 @@ export function RaceKartDriver({ course, start, world, moveInput, hud, realm = "
   return (
     <group ref={kartRef} position={[grid.x, 0, grid.z]} rotation={[0, grid.heading, 0]}>
       <group ref={bodyRef}>
-        <group scale={KART_SCALE}><RealmKart realm={realm} night={night} driver={false} /></group>
+        <group scale={KART_SCALE}><RealmKart realm={style} parts={parts} night={night} driver={false} /></group>
         <group position={[0, SEAT_HEIGHT, -0.15]} scale={WORLD_AVATAR_SCALE * 0.92}><TrialStudentAvatar movingRef={seated} /></group>
       </group>
     </group>

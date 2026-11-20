@@ -358,6 +358,7 @@ export function economyErrorMessage(error: unknown) {
   const message = error instanceof Error ? error.message : String(error ?? "");
   if (/not enough xp/i.test(message)) return "Keep learning to earn enough XP for this item.";
   if (/already owned/i.test(message)) return "You already own this item.";
+  if (/finish a level/i.test(message)) return "Finish a level in that realm to unlock this kart.";
   if (/invalid|session|permission|authorized/i.test(message)) return "Your student session has expired. Please log in again.";
   if (/function .* does not exist|schema cache/i.test(message)) return "The Marketplace is being prepared. Please try again after the latest update.";
   return "That action could not be completed. Please try again.";
