@@ -6,7 +6,7 @@ import StatisticsExtensionLinks from "@/components/assessment/StatisticsExtensio
 import SpaceExtensionLinks from "@/components/assessment/SpaceExtensionLinks";
 import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtensionLinks";
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
-import { DoorOpen, Flag, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
+import { DoorOpen, Dribbble, Flag, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
@@ -30,7 +30,7 @@ export type WorldHUDContext = "central" | "tower" | "realm";
 
 type WorldHUDAction = {
   label: string;
-  icon?: "door" | "map" | "edit" | "home" | "flag";
+  icon?: "door" | "map" | "edit" | "home" | "flag" | "ball";
   onClick: () => void;
 };
 
@@ -259,7 +259,7 @@ export function WorldHUD({
           <WorldVoiceButton text={worldActionsSpeech} className="worldHudActionRead" label="Read world actions" />
           {contextAction ? (
             <button type="button" className="worldHudContext" onClick={contextAction.onClick}>
-              {contextAction.icon === "home" ? <Home size={17} /> : contextAction.icon === "flag" ? <Flag size={17} /> : <DoorOpen size={17} />}{contextAction.label}<kbd aria-hidden="true">E</kbd>
+              {contextAction.icon === "home" ? <Home size={17} /> : contextAction.icon === "flag" ? <Flag size={17} /> : contextAction.icon === "ball" ? <Dribbble size={17} /> : <DoorOpen size={17} />}{contextAction.label}<kbd aria-hidden="true">E</kbd>
             </button>
           ) : null}
           {!hubLayout && primaryAction ? (

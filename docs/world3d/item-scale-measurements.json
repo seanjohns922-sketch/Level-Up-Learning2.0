@@ -198,5 +198,6 @@
   {"key":"defence_drone_pad","name":"Security Drone Pad","native":[2.251666,1.174925,2.6],"size":[2.251666,1.174925,2.6],"footprint":[4,4]},
   {"key":"defence_guard_dog","name":"Robo Guard Dog","native":[4.226549,1.504532,4.530174],"size":[4.226549,1.504532,4.530174],"footprint":[6,6]},
   {"key":"defence_patrol_drone","name":"Patrol Drone","native":[3.389224,1.998485,2.755449],"size":[3.389224,1.998485,2.755449],"footprint":[6,6]},
-  {"key":"defence_sentry_bot","name":"Sentry Bot","native":[1.409014,1.627606,0.61864],"size":[1.409014,1.627606,0.61864],"footprint":[4,4]}
+  {"key":"defence_sentry_bot","name":"Sentry Bot","native":[1.409014,1.627606,0.61864],"size":[1.409014,1.627606,0.61864],"footprint":[4,4]},
+  {"key":"play_basketball","name":"Basketball Court","native":[7.27,3.97501,6],"size":[7.27,3.97501,6],"footprint":[12,16]}
 ]

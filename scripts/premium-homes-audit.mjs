@@ -11,7 +11,7 @@ const { PREMIUM_HOME_STYLES: ALL_STYLES, DEFENCE_STYLES, PREMIUM_HOME_SPECS, pre
 const PREMIUM_HOME_STYLES = ALL_STYLES.filter((style) => !DEFENCE_STYLES.includes(style));
 const isHomeRow = (row) => PREMIUM_HOME_STYLES.includes(row.metadata.premiumHome);
 const PREMIUM_HOME_SHOP_ITEMS = homes.PREMIUM_HOME_SHOP_ITEMS.filter(isHomeRow), PREMIUM_HOME_UPGRADE_ITEMS = homes.PREMIUM_HOME_UPGRADE_ITEMS.filter(isHomeRow);
-assert.deepEqual([...PREMIUM_HOME_STYLES], ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline"]);
+assert.deepEqual([...PREMIUM_HOME_STYLES], ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball"]);
 for (const style of PREMIUM_HOME_STYLES) {
   const spec = PREMIUM_HOME_SPECS[style];
   assert.equal(spec.levels.length, 4, `${style} needs four level names`);
@@ -19,8 +19,8 @@ for (const style of PREMIUM_HOME_STYLES) {
   assert.ok(existsSync(new URL(`../public/marketplace/world-renders/${spec.assetKey}.webp`, import.meta.url)), `${style} needs its shop render`);
 }
 const rows = [...PREMIUM_HOME_SHOP_ITEMS, ...PREMIUM_HOME_UPGRADE_ITEMS];
-assert.equal(rows.length, 24, "6 unlocks + 18 upgrades");
-assert.equal(new Set(rows.map((row) => row.item_key)).size, 24, "item keys must be unique");
+assert.equal(rows.length, 28, "7 unlocks + 21 upgrades");
+assert.equal(new Set(rows.map((row) => row.item_key)).size, 28, "item keys must be unique");
 assert.ok(PREMIUM_HOME_UPGRADE_ITEMS.every((row) => row.metadata.marketplaceHidden === true), "upgrades are sold from the home, not the Marketplace grid");
 assert.ok(PREMIUM_HOME_SHOP_ITEMS.every((row) => row.metadata.marketplaceCategory === PREMIUM_HOME_SPECS[row.metadata.premiumHome].marketplaceCategory && row.metadata.slot === "world_plot_1"), "unlocks are placeable world items in their shop category");
 // The live home rows keep their original keys.
@@ -42,13 +42,13 @@ assert.ok(TRAMPOLINE_BOUNCE[4].power > TRAMPOLINE_BOUNCE[1].power && TRAMPOLINE_
 assert.equal(trampolineBounceAt(0, 0, [], 4), 0);
 
 // The migrations must insert exactly these rows at these prices.
-const migration = read("supabase/migrations/20261120090000_premium_homes.sql") + read("supabase/migrations/20261120150000_fair_ride_and_trampoline.sql");
+const migration = read("supabase/migrations/20261120090000_premium_homes.sql") + read("supabase/migrations/20261120150000_fair_ride_and_trampoline.sql") + read("supabase/migrations/20261121150000_basketball_court.sql");
 for (const row of rows) {
   const line = migration.split("\n").find((entry) => entry.startsWith(`('${row.item_key}'`));
   assert.ok(line, `migration is missing ${row.item_key}`);
   assert.ok(line.includes(`, ${row.price}, `), `${row.item_key} price differs from the catalogue`);
 }
-assert.equal(migration.split("on conflict (item_key) do nothing").length - 1, 2, "both migrations must be additive");
+assert.equal(migration.split("on conflict (item_key) do nothing").length - 1, 3, "every premium migration must be additive");
 
 // Wiring: renderer, sizing, catalogue, Marketplace, demo ownership and the upgrade button.
 assert.ok(read("components/world3d/CentralWorldEnvironment.tsx").includes("<PlacedPremiumHome style={homeStyle} />"), "the world must draw premium homes");
@@ -60,4 +60,21 @@ const world = read("components/world3d/CentralWorld.tsx");
 assert.ok(world.includes("<PremiumHomeWorldContext.Provider value={homeWorld}>") && world.includes("<PremiumHomeUpgradeRows"), "the hub must pass home levels and offer the upgrade");
 assert.ok(world.includes("bounceAt={bounceAt}") && read("components/world3d/SharedWorldPlayer.tsx").includes("bounce={bounceAt ?"), "placed trampolines must reach the avatar jump");
 
-console.log(`PASS premium items: ${PREMIUM_HOME_STYLES.length} styles x 4 levels (homes, Fair Ride, trampoline), ${rows.length} shop rows match the migrations, trampoline bounce and world wiring in place`);
+// Basketball: lay-ups always go in, long shots are harder (never hopeless), threes count from outside the
+// line, and the ball's arc starts in the explorer's hands, rises above the rim and ends there.
+const ball = await import(new URL("../lib/world3d/basketball.ts", import.meta.url).href);
+assert.equal(ball.shotChance(1.5), 1);
+assert.ok(ball.shotChance(4) > ball.shotChance(7) && ball.shotChance(30) === 0.15);
+assert.deepEqual([ball.shotPoints(3), ball.shotPoints(ball.THREE_POINT_RADIUS + 0.1)], [2, 3]);
+const hoop = [0, -5.6];
+const make = ball.planShot([0, 1.9, 0], hoop, 0), miss = ball.planShot([0, 1.9, 0], hoop, 0.999);
+assert.ok(make.makes && make.points === 3 && !miss.makes && miss.points === 0);
+assert.deepEqual(ball.ballAt(make, 0), [0, 1.9, 0]);
+assert.deepEqual(ball.ballAt(make, 1).map((n) => Math.round(n * 100) / 100), [0, ball.RIM_HEIGHT, -5.6]);
+assert.ok(ball.ballAt(make, 0.5)[1] > ball.RIM_HEIGHT + 1, "the ball arcs above the rim");
+const turned = ball.courtInWorld({ gridX: 5, gridZ: 0, rotation: 90 }, 3, 2);
+assert.deepEqual(turned.hoops.map(([x, z]) => [Math.round(x * 100) / 100 + 0, Math.round(z * 100) / 100 + 0]), [[4.4, 0], [15.6, 0]], "hoops turn with the court");
+assert.deepEqual(ball.nearestHoop(14, 0, turned.hoops), turned.hoops[1]);
+const hub = read("components/world3d/CentralWorld.tsx");
+assert.ok(hub.includes('nearCourt ? { label: "SHOOT", icon: "ball"') && hub.includes("<ShotBall key={shot.id}") && hub.includes("<BasketballScoreContext.Provider value={hoopScore}>"), "courts offer Shoot, fly the ball and score");
+console.log(`PASS premium items: ${PREMIUM_HOME_STYLES.length} styles x 4 levels (homes, Fair Ride, trampoline, basketball), ${rows.length} shop rows match the migrations, trampoline bounce, hoop shooting and world wiring in place`);

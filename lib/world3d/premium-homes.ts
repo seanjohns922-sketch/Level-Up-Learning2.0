@@ -6,7 +6,7 @@ import type { EconomyItem } from "@/lib/economy";
  * checks the balance and records ownership. A style's level is the highest
  * upgrade the learner owns; every copy they place shows that level. */
 export const DEFENCE_STYLES = ["laser_fence", "laser_gate", "scanner", "trip_wire", "drone_pad", "guard_dog", "patrol_drone", "sentry_bot", "tower_shield"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", ...DEFENCE_STYLES] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -30,10 +30,12 @@ type StyleSpec = {
   fixed?: boolean;
   /** World metres to the top of the model (name tags sit just above); homes use the default. */
   height?: number;
+  /** Modelled in world metres already (the homes are modelled small and scaled up). */
+  metres?: boolean;
 };
 const HOME = { marketplaceCategory: "buildings", upgradePrefix: "central_world_home_upgrade_" } as const;
 const SET_PIECE = { marketplaceCategory: "pools_play", upgradePrefix: "central_world_set_upgrade_" } as const;
-const DEFENCE = { marketplaceCategory: "defence", upgradePrefix: "central_world_defence_upgrade_" } as const;
+const DEFENCE = { marketplaceCategory: "defence", upgradePrefix: "central_world_defence_upgrade_", metres: true } as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -101,6 +103,19 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     icon: "party-popper",
     assetKey: "play_trampoline",
     ...SET_PIECE,
+  },
+  basketball: {
+    name: "Basketball Court",
+    description: "Shoot hoops! Walk on, tap Shoot and score. Grows from a driveway hoop to a neon arena with a scoreboard.",
+    levels: ["Driveway Hoop", "Half Court", "Floodlit Full Court", "Neon Arena"],
+    prices: [300, 300, 600, 1200],
+    gridSize: "6x8",
+    accent: "#ff7a1a",
+    icon: "dribbble",
+    assetKey: "play_basketball",
+    ...SET_PIECE,
+    height: 7.5,
+    metres: true,
   },
   laser_fence: {
     name: "Laser Fence",
@@ -227,7 +242,6 @@ export function premiumHomeStyle(assetKey: unknown): PremiumHomeStyle | null {
 export function isPremiumHome(assetKey: unknown): boolean {
   return premiumHomeStyle(assetKey) !== null;
 }
-export const isDefenceStyle = (style: PremiumHomeStyle) => (DEFENCE_STYLES as readonly string[]).includes(style);
 
 /** The level a learner has reached for one style; 1 once unlocked. */
 export function premiumHomeLevel(style: PremiumHomeStyle, ownedItemKeys: ReadonlySet<string>): PremiumHomeLevel {

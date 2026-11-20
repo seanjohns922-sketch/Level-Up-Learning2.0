@@ -2,10 +2,11 @@
 // The sixteen premium home models: four styles, four levels each.
 import { Sparkles } from "@react-three/drei";
 import type { ReactElement } from "react";
-import { DEFENCE_STYLES, isDefenceStyle, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { DEFENCE_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { FAIR_RIDE_MODELS } from "@/components/world3d/premium-items/FairRide";
 import { TRAMPOLINE_MODELS } from "@/components/world3d/premium-items/TrampolineModels";
 import { DEFENCE_MODELS, type TechLevel } from "@/components/world3d/premium-items/TowerDefenceModels";
+import { BasketballCourt } from "@/components/world3d/premium-items/BasketballCourt";
 import { C, M, Apartment, Ball, BigTrunk, Block, Bush, Chimney, Deck, Door, FairyLights, FlatRoof, GableRoof, GlassRail, GlassWall, GoldSparkle, Lantern, LeafCloud, LedStrip, Mat, Picket, Planter, Pod, Pool, RopeLadder, Slats, Slide, Solar, Stones, Walls, Window , type V3 } from "./HomeKit";
 
 type Night = { night: boolean };
@@ -302,6 +303,11 @@ const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   apartment: [AptL1, AptL2, AptL3, AptL4],
   fair: FAIR_RIDE_MODELS,
   trampoline: TRAMPOLINE_MODELS,
+  basketball: ([1, 2, 3, 4] as const).map((level) => {
+    const Court = ({ night }: Night) => <BasketballCourt level={level} night={night} />;
+    Court.displayName = `BasketballLevel${level}`;
+    return Court;
+  }) as unknown as LevelModels,
   ...DEFENCE_LEVEL_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
@@ -316,8 +322,7 @@ const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, n
 export function PremiumHome({ style, level, night }: { style: PremiumHomeStyle; level: PremiumHomeLevel; night: boolean }) {
   const Model = MODELS[style][level - 1];
   return (
-    // The defence set is modelled in world metres already.
-    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={isDefenceStyle(style) ? 1 : PREMIUM_HOME_SCALE}>
+    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={PREMIUM_HOME_SPECS[style].metres ? 1 : PREMIUM_HOME_SCALE}>
       <group position={[CENTRE_OFFSET[`${style}-${level}`] ?? 0, 0, 0]}>
         <Model night={night} />
       </group>

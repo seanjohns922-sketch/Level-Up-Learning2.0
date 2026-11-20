@@ -18,6 +18,8 @@ import { RaceHud } from "@/components/world3d/premium-items/RaceHud";
 import { ExplorerPositionContext } from "@/components/world3d/premium-items/TowerDefenceModels";
 import { laserFenceBeams, laserFenceHit } from "@/lib/world3d/tower-defence";
 import { defenceSounds } from "@/lib/audio/defence-sfx";
+import { BasketballScoreContext } from "@/components/world3d/premium-items/BasketballCourt";
+import { ballAt, courtInWorld, nearestHoop, planShot, type Shot } from "@/lib/world3d/basketball";
 import { KartGarage, type KartGarageActions } from "@/components/world3d/premium-items/KartGarage";
 import { kartSetup, type KartParts, type KartStyle } from "@/lib/world3d/kart-garage";
 import { fetchFinishedRealms } from "@/lib/world3d/kart-garage-client";
@@ -335,7 +337,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused }: { kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone }: { courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -476,6 +478,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
           { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: homeAnchors.entrance, distance: hubV2 ? 6 : 4.8 },
           ...raceStarts.map(({ id, item }) => ({ id, position: gridToWorld(item.gridX, item.gridZ), distance: 6 })),
+          ...courts.map(({ id, court }) => ({ id, position: [court.x, 0, court.z] as [number, number, number], distance: court.reach })),
         ]}
         onNearestTargetId={handleNearestTarget}
         cameraDistance={11.5}
@@ -497,8 +500,31 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
       {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
       {fenceBeams.length ? <ZapSpark zap={zap} /> : null}
+      {shot ? <ShotBall key={shot.id} shot={shot.plan} onDone={onShotDone} /> : null}
     </ExplorerPositionContext.Provider>
   );
+}
+
+/** The ball in flight: up in an arc to the rim, then through the net or off the rim to the ground. */
+function ShotBall({ shot, onDone }: { shot: Shot; onDone: (shot: Shot) => void }) {
+  const ref = useRef<THREE.Group>(null);
+  const started = useRef<number | null>(null), done = useRef(false);
+  useFrame(({ clock }) => {
+    const ball = ref.current;
+    if (!ball) return;
+    started.current ??= clock.elapsedTime;
+    const t = (clock.elapsedTime - started.current) / shot.duration;
+    if (t <= 1) ball.position.set(...ballAt(shot, t));
+    else {
+      // After the rim: drop through the net, or bounce off to one side.
+      const k = Math.min(1, (t - 1) * shot.duration / 0.5);
+      const [x, y, z] = shot.to;
+      ball.position.set(shot.makes ? x : x + k * 1.4, Math.max(0.12, y - k * k * (y - 0.12)), shot.makes ? z : z + k * 0.9);
+      if (k >= 1 && !done.current) { done.current = true; onDone(shot); }
+    }
+    ball.rotation.x += 0.25;
+  });
+  return <group ref={ref} position={[...shot.from]}><mesh castShadow><sphereGeometry args={[0.13, 20, 14]} /><meshStandardMaterial color="#ff7a1a" roughness={0.6} /></mesh>{[0, Math.PI / 2].map((r) => <mesh key={r} rotation={[0, r, 0]}><torusGeometry args={[0.131, 0.007, 6, 24]} /><meshStandardMaterial color="#2a1a10" /></mesh>)}</group>;
 }
 
 /** A quick crackle of light where the explorer bumped the laser fence. */
@@ -528,6 +554,10 @@ const HUB_V2_ROAM = { centerZ: 0, radiusX: HUB_V2_PLAY_RADIUS, radiusZ: HUB_V2_P
 
 /** A start line the explorer can walk up to and race from. */
 type RaceStartTarget = { id: string; item: PlacedRaceItem };
+/** A basketball court the explorer can shoot from, and a shot in flight. */
+type CourtTarget = { id: string; court: ReturnType<typeof courtInWorld> };
+type ShotInFlight = { id: number; plan: Shot };
+const COURT_TARGET_PREFIX = "court:";
 /** A race in progress; the nonce restarts it. */
 type RaceSession = { start: PlacedRaceItem; nonce: number };
 const RACE_TARGET_PREFIX = "race-start:";
@@ -803,7 +833,33 @@ export default function CentralWorld() {
       return preview ? { ...state, inventory: Array.from(ownedItemKeys, (item_key) => ({ item_key, acquired_at: "", acquisition_type: "demo" })) } : state;
     }, "Done."),
   };
-  const hasAvailableAction = !race && (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null);
+  // Basketball: stand on a court and tap Shoot; points add up on its scoreboard for this visit.
+  const basketballLevel = homeWorld.levels.basketball;
+  const courts = useMemo(() => placedCustomisations.flatMap((placement): CourtTarget[] =>
+    premiumHomeStyle(itemsById.get(placement.itemId)?.metadata.worldAssetKey) === "basketball"
+      ? [{ id: `${COURT_TARGET_PREFIX}${placement.placementId ?? `${placement.gridX}:${placement.gridZ}`}`, court: courtInWorld(placement, basketballLevel, buildGrid.cellSize) }]
+      : []), [placedCustomisations, itemsById, basketballLevel, buildGrid.cellSize]);
+  const nearCourt = courts.find((court) => court.id === activeTargetId) ?? null;
+  const [shot, setShot] = useState<ShotInFlight | null>(null);
+  const [hoopScore, setHoopScore] = useState(0);
+  const [shotMessage, setShotMessage] = useState<{ text: string; good: boolean } | null>(null);
+  function shoot(court: CourtTarget) {
+    if (shot) return;
+    const { x, z } = avatarPosRef.current;
+    const hoop = nearestHoop(x, z, court.court.hoops);
+    if (hoop) setShot((current) => ({ id: (current?.id ?? 0) + 1, plan: planShot([x, 1.9, z], hoop, Math.random()) }));
+  }
+  const finishShot = useCallback((done: Shot) => {
+    setShot(null);
+    if (done.makes) setHoopScore((score) => score + done.points);
+    setShotMessage(done.makes ? { text: done.points === 3 ? "THREE! +3" : "SWISH! +2", good: true } : { text: "So close!", good: false });
+  }, []);
+  useEffect(() => {
+    if (!shotMessage) return;
+    const timer = window.setTimeout(() => setShotMessage(null), 1400);
+    return () => window.clearTimeout(timer);
+  }, [shotMessage]);
+  const hasAvailableAction = !race && (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null || nearCourt !== null);
   const editorItemKey = editorOpen ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const activeBuildItemKey = editorItemKey ?? requestedBuildItemKey;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
@@ -1396,6 +1452,7 @@ export default function CentralWorld() {
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance) enterMyHome();
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance) enterTower();
     if (nearRaceStart) startRace(nearRaceStart.item);
+    if (nearCourt) shoot(nearCourt);
   }
 
   function teleport(position: [number, number, number], yaw = 0) {
@@ -1411,6 +1468,7 @@ export default function CentralWorld() {
         <PremiumHomeWorldContext.Provider value={homeWorld}>
         <SkateKitWorldContext.Provider value={skateKitWorld}>
         <RaceKitWorldContext.Provider value={raceKitWorld}>
+        <BasketballScoreContext.Provider value={hoopScore}>
         <CentralWorldScene night={night} selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
           <div className="worldEditPicked" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
             <b>{selectedItem.name}</b>
@@ -1421,14 +1479,15 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} />
+        </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
         </SkateKitWorldContext.Provider>
         </PremiumHomeWorldContext.Provider>
       </Canvas>
       </div>
 
-      {!editorOpen && !buildPreview && !race ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !buildPreview && !race ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: "SHOOT", icon: "ball", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
@@ -1687,6 +1746,7 @@ export default function CentralWorld() {
       })() : null}
       <KeyboardWorldAction enabled={hasAvailableAction && !editorOpen && !buildPreview} onAction={runActiveAction} />
 
+      {shotMessage ? <div role="status" style={{ position: "absolute", top: "26%", left: 0, right: 0, zIndex: 32, textAlign: "center", pointerEvents: "none", fontSize: 44, fontWeight: 950, color: shotMessage.good ? "#ffcf3a" : "#ffffff", textShadow: shotMessage.good ? "0 0 24px #ff7a1a, 0 4px 0 rgba(0,0,0,.35)" : "0 4px 0 rgba(0,0,0,.35)" }}>{shotMessage.text}{hoopScore ? <div style={{ fontSize: 18, marginTop: 4 }}>{hoopScore} points</div> : null}</div> : null}
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
       {showIntro ? <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", background: "rgba(24,31,25,.22)", color: "#fff8e8", pointerEvents: "none", animation: "centralWorldReveal 2.3s ease both" }}><div style={{ textAlign: "center", textShadow: "0 3px 18px rgba(0,0,0,.4)", pointerEvents: "auto" }}><div style={{ fontSize: 13, fontWeight: 900, letterSpacing: "0.24em" }}>THE RELIQ WORLD</div><div style={{ marginTop: 8, fontSize: 30, fontWeight: 900 }}>Tower of Knowledge</div><div style={{ marginTop: 12 }}><WorldVoiceButton text="The RELIQ World. Tower of Knowledge." label="Read world title" /></div></div><style>{`@keyframes centralWorldReveal{0%{opacity:1;background:rgba(10,15,11,1)}25%,70%{opacity:1}100%{opacity:0}}`}</style></div> : null}
       <style>{`
