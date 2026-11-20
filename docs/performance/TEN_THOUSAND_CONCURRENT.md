@@ -1193,6 +1193,53 @@ Component ESLint had no errors and one existing unused-import warning.
 Build log: `/Users/seanjohns/reliq-audits/2026-11-20/student-pathway-wrap-build.log`.
 This is a CSS-only fix and does not require a database migration.
 
+### Completion freshness regression coverage — 20 November 2026
+
+Extended `scripts/teacher-live-tab-test.mjs` to supply a synthetic canonical
+lesson completion while the actual React panel is inactive. Returning displays
+the saved 8/10 score, 80% accuracy and scored-completion tooltip. A subsequent
+attempt updates to 9/10 and 90% on return without any realtime notification.
+Switching classes removes the previous student's score. The existing retained
+reader, inactive read pause and disposal assertions remain.
+
+The first completion-status assertion expected a Completed dot, but inspection
+confirmed the existing UI intentionally prioritises Active now for recent
+activity. The test checks the scored-completion tooltip instead; no application
+behaviour was changed. All 20 critical checks, QA lint and typecheck passed; the
+focused test passed again after adding the missed-notification scenario.
+
+This is a test-only change using mocked service responses and real React effects
+in JSDOM. It does not replace the pending real-browser/database freshness check,
+prove network timing or establish concurrent-user capacity. No production build
+was rerun because no shipped application code changed. No migration is required.
+
+### Browser completion freshness verified — 20 November 2026
+
+Ran the current safe checkout in the isolated development app on port 3100,
+with the existing synthetic Supabase stack on port 56521. Docker had stopped;
+restarted its existing containers, restored the documented local gateway setting,
+and passed the runtime/schema preflight. No hosted service or migration changed.
+
+In native Chrome, Synthetic Student1 initially showed attempt 35, 9/10 and 90%
+in the 26-student class. Switched to Students, then used an actual anon student
+session and `complete_realm_lesson` to save a 7/10 completion. Retried the same
+completion key and independently read back exactly one new canonical attempt
+(36). No explicit live-activity event was sent by the test script.
+
+Returned to Live Class without reloading. The retained row initially showed the
+previous result while the asynchronous refresh ran, then updated to attempt 36,
+7/10 and 70%; today's accuracy also became 70%. Opening the student's drawer
+showed Lesson 1 complete, final score 7/10, final accuracy 70% and Completed lesson.
+The temporary student session was removed; the synthetic completion remains in
+the local fixture history. Closed the test window and stopped the local app.
+
+Reproduction script and machine-readable save evidence are in the private audit
+directory `/Users/seanjohns/reliq-audits/2026-11-20/browser-freshness-save.mjs`
+and `browser-freshness-save.json`. This checks real database-to-browser freshness
+for one desktop class, not physical iPad/Safari, latency targets or capacity.
+No shipped application code changed. Next: repeat the sustained 100-student
+capacity gate with schema parity, integrity checks and resource monitoring.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate
