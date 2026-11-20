@@ -591,10 +591,14 @@ export function WorldLookJoystick({ onChange }: { onChange: (input: WorldLookInp
   return <WorldAnalogJoystick side="right" label="Camera joystick. Drag to look around." dataAttribute="look" onChange={onChange} />;
 }
 
+/** E (the key the dock shows) or Enter runs the nearby action, unless the learner is typing. */
 export function KeyboardWorldAction({ enabled, onAction }: { enabled: boolean; onAction: () => void }) {
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
-      if (event.key === "Enter" && enabled) onAction();
+      if (!enabled || event.repeat || event.ctrlKey || event.metaKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (event.key === "Enter" || event.key.toLowerCase() === "e") onAction();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
