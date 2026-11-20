@@ -1,7 +1,8 @@
 import { FREE_WORLD_ADDITIONS, worldCollectionFor } from "./world-expansion";
+import { SKATE_PIECES } from "./skate-kit";
 import type { EconomyItem } from "@/lib/economy";
 
-export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress";
+export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress" | "skate";
 
 function starter(
   item_key: string,
@@ -111,4 +112,6 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_stone_wall", "Garden Stone Wall", "stone_wall", "#929581", "fortress", "1x1", 1),
   starter("central_world_starter_wood_gate", "Timber Gate", "wood_gate", "#94704b", "fortress", "1x1", 1),
   ...FREE_WORLD_ADDITIONS.map(item => starter("central_world_starter_"+item.key,item.name,item.key,"#899b72",item.group,item.grid)),
+  // Skate Kit pieces: free to place once the learner's Skate Kit level reaches the piece's level.
+  ...SKATE_PIECES.map(piece => { const item = starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#ff4fd8", "skate", piece.gridSize); return { ...item, metadata: { ...item.metadata, skateKitLevel: piece.level } }; }),
 ];

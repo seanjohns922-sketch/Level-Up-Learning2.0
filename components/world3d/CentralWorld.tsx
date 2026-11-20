@@ -8,6 +8,9 @@ import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/v
 import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeLevels, premiumHomeStyle, PREMIUM_HOME_SPECS, trampolineBounceAt, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PremiumHomeWorldContext } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PremiumHomeUpgradeRows } from "@/components/world3d/premium-homes/PremiumHomeUpgradeRows";
+import { SkateKitWorldContext } from "@/components/world3d/premium-items/SkatePieces";
+import { nextSkateKitUpgrade, SKATE_KIT, skateHeightAt, skateKitLevel, skatePiece, type PlacedSkatePiece } from "@/lib/world3d/skate-kit";
+import { Bike } from "lucide-react";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
@@ -118,8 +121,11 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
   { key: "furniture_fun", label: "Décor", Icon: Lamp },
   { key: "animals", label: "Animals", Icon: PawPrint },
   { key: "fortress", label: "Fortress", Icon: Castle },
+  { key: "skate", label: "Skate", Icon: Bike },
 ];
 type TrayTab = "owned" | PaletteTab;
+/** How much faster the avatar rolls on skate pieces. */
+const SKATE_SPEED_BOOST = 1.35;
 const TRAY_TABS: Array<{ key: TrayTab; label: string }> = [
   { key: "owned", label: "My items" },
   ...PALETTE_TABS.map(({ key, label }) => ({ key, label })),
@@ -332,6 +338,19 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     return [{ x, z }];
   }), [placedCustomisations, itemsById]);
   const bounceAt = useMemo(() => trampolines.length ? (x: number, z: number) => trampolineBounceAt(x, z, trampolines, trampolineLevel) : undefined, [trampolines, trampolineLevel]);
+  // Placed skate pieces lift the avatar onto their ramps, on a board, a little faster.
+  const skatePieces = useMemo(() => placedCustomisations.flatMap((placement): PlacedSkatePiece[] => {
+    const piece = skatePiece(itemsById.get(placement.itemId)?.metadata.worldAssetKey);
+    if (!piece) return [];
+    const [x, , z] = gridToWorld(placement.gridX, placement.gridZ);
+    return [{ x, z, rotation: placement.rotation, piece }];
+  }), [placedCustomisations, itemsById]);
+  const rideHeightAt = useMemo(() => skatePieces.length ? (x: number, z: number) => skateHeightAt(x, z, skatePieces) : undefined, [skatePieces]);
+  const speedAt = useMemo(() => {
+    const terrain = hubV2 ? hubSpeedFactor : undefined;
+    if (!rideHeightAt) return terrain;
+    return (x: number, z: number) => (terrain ? terrain(x, z) : 1) * (rideHeightAt(x, z) === null ? 1 : SKATE_SPEED_BOOST);
+  }, [hubV2, rideHeightAt]);
   return (
     <>
       {hubV2 ? <>
@@ -407,8 +426,9 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         roamEllipse={hubV2 ? HUB_V2_ROAM : CENTRAL_WORLD_CONFIG.roamEllipse}
         groundHeightAt={hubV2 ? hubGroundHeight : undefined}
         canStandAt={hubV2 ? hubCanStand : undefined}
-        speedFactorAt={hubV2 ? hubSpeedFactor : undefined}
+        speedFactorAt={speedAt}
         bounceAt={bounceAt}
+        rideHeightAt={rideHeightAt}
         interactionTargets={[
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
           { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: homeAnchors.entrance, distance: hubV2 ? 6 : 4.8 },
@@ -602,20 +622,30 @@ export default function CentralWorld() {
   const [upgradingHome, setUpgradingHome] = useState(false);
   const homeWorld = useMemo(() => ({ levels: premiumHomeLevels(ownedItemKeys), night }), [ownedItemKeys, night]);
   // Upgrades are XP purchases checked by the server; every copy of the style shows the new level.
-  async function upgradeHome(style: PremiumHomeStyle) {
-    const next = nextPremiumHomeUpgrade(style, ownedItemKeys);
-    if (!next || upgradingHome) return;
-    if (!preview && !student?.studentId) return;
+  // In-world upgrades are XP purchases checked by the server.
+  async function buyWorldUpgrade(itemKey: string, success: string) {
+    if (upgradingHome || (!preview && !student?.studentId)) return;
     setUpgradingHome(true);
     try {
-      const state = await purchaseEconomyItem(student?.studentId ?? "demo-preview", next.itemKey, CENTRAL_WORLD_SHOP_ROWS, preview);
+      const state = await purchaseEconomyItem(student?.studentId ?? "demo-preview", itemKey, CENTRAL_WORLD_SHOP_ROWS, preview);
       setOwnedItemKeys(new Set(state.inventory.map((entry) => entry.item_key)));
-      setEconomyMessage(`${PREMIUM_HOME_SPECS[style].name} upgraded to Level ${next.level}: ${next.name}!`);
+      setEconomyMessage(success);
     } catch (error) {
       setEconomyMessage(economyErrorMessage(error));
     } finally {
       setUpgradingHome(false);
     }
+  }
+  // Every copy of a premium style shows its new level.
+  function upgradeHome(style: PremiumHomeStyle) {
+    const next = nextPremiumHomeUpgrade(style, ownedItemKeys);
+    if (next) void buyWorldUpgrade(next.itemKey, `${PREMIUM_HOME_SPECS[style].name} upgraded to Level ${next.level}: ${next.name}!`);
+  }
+  const skateLevel = skateKitLevel(ownedItemKeys);
+  const skateKitWorld = useMemo(() => ({ level: skateLevel, night }), [skateLevel, night]);
+  function upgradeSkateKit() {
+    const next = nextSkateKitUpgrade(ownedItemKeys);
+    if (next) void buyWorldUpgrade(next.itemKey, `Skate Kit upgraded to Level ${next.level}: ${next.name}! New pieces are in the Skate tab.`);
   }
   const historyRef = useRef(editHistory);
   useEffect(() => { historyRef.current = editHistory; }, [editHistory]);
@@ -1221,10 +1251,11 @@ export default function CentralWorld() {
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
         <PremiumHomeWorldContext.Provider value={homeWorld}>
+        <SkateKitWorldContext.Provider value={skateKitWorld}>
         <CentralWorldScene night={night} selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
           <div className="worldEditPicked" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
             <b>{selectedItem.name}</b>
-            <PremiumHomeUpgradeRows assetKey={selectedItem.metadata.worldAssetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={(style) => void upgradeHome(style)} />
+            <PremiumHomeUpgradeRows assetKey={selectedItem.metadata.worldAssetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={upgradeHome} />
             <button type="button" className="worldEditPickedMove" onClick={() => pickUpPlacement(selectedPlacement)}><Move size={20} aria-hidden="true" />Move</button>
             {selectedPlacement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
               <button type="button" onClick={() => turnPlaced(selectedPlacement, selectedItem)}><RotateCw size={20} aria-hidden="true" />Turn</button>
@@ -1232,6 +1263,7 @@ export default function CentralWorld() {
             </> : null}
           </div>
         ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} />
+        </SkateKitWorldContext.Provider>
         </PremiumHomeWorldContext.Provider>
       </Canvas>
       </div>
@@ -1262,7 +1294,7 @@ export default function CentralWorld() {
       {editorOpen ? (() => {
         const trayTab: TrayTab = librarySection === "owned" ? "owned" : paletteTab;
         const query = scenerySearch.trim().toLowerCase();
-        const sceneryInTab = paletteTab === "ground" ? [] : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(query));
+        const sceneryInTab = paletteTab === "ground" ? [] : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(query) && (paletteTab !== "skate" || Number(item.metadata.skateKitLevel) <= skateLevel));
         const holding = Boolean(heldItemKey);
         const placing = holding || isGroundTool;
         const isHome = buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY;
@@ -1443,6 +1475,16 @@ export default function CentralWorld() {
                   <span className="worldEditArt"><GroundSwatch tool={tool} /></span><b>{label}</b>
                 </button>
               )) : <>
+                {paletteTab === "skate" ? (() => {
+                  const next = nextSkateKitUpgrade(ownedItemKeys);
+                  return (
+                    <div className="worldEditKit" role="status">
+                      <b>{skateLevel ? `Skate Kit · Level ${skateLevel} of 4` : "Skate Kit"}</b>
+                      <span>{skateLevel ? SKATE_KIT.levels[skateLevel - 1] : "Unlock it in the Marketplace (Build kits) to build your own skate park and ride it."}</span>
+                      {next ? <button type="button" className="worldEditPickedUpgrade" disabled={upgradingHome} onClick={upgradeSkateKit}>{upgradingHome ? "Upgrading…" : `Unlock ${next.name} · ${next.price} XP`}</button> : null}
+                    </div>
+                  );
+                })() : null}
                 {sceneryInTab.map((item) => {
                   const art = freeBuildRender(String(item.metadata.worldAssetKey));
                   const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
@@ -1458,7 +1500,7 @@ export default function CentralWorld() {
                     <span className="worldEditArt"><GroundSwatch tool="water" /></span><b>Paint water</b>
                   </button>
                 ) : null}
-                {!sceneryInTab.length ? <p className="worldEditEmpty" role="status">No matching items.</p> : null}
+                {!sceneryInTab.length && !(paletteTab === "skate" && !skateLevel) ? <p className="worldEditEmpty" role="status">No matching items.</p> : null}
               </>}
             </div>
           ) : null}

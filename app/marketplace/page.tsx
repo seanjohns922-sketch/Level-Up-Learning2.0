@@ -16,7 +16,7 @@ import { DEMO_PREVIEW_SCOPE, useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { persistCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import {
-  CENTRAL_WORLD_CUSTOMISATION_CATALOG,
+  CENTRAL_WORLD_SHOP_ROWS,
   mergeCentralWorldCatalogue,
 } from "@/lib/world3d/central-world-customisation-catalog";
 
@@ -39,7 +39,7 @@ export default function MarketplacePage() {
   useEffect(() => {
     if (!studentId) return;
     const request = preview
-      ? fetchDemoEconomy(CENTRAL_WORLD_CUSTOMISATION_CATALOG)
+      ? fetchDemoEconomy(CENTRAL_WORLD_SHOP_ROWS)
       : fetchStudentEconomy(studentId);
     request.then((next) => {
       next = mergeCentralWorldCatalogue(next);
@@ -79,8 +79,8 @@ export default function MarketplacePage() {
         return;
       }
       const next = selectedOwned
-        ? await equipEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_CUSTOMISATION_CATALOG, preview)
-        : await purchaseEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_CUSTOMISATION_CATALOG, preview);
+        ? await equipEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_SHOP_ROWS, preview)
+        : await purchaseEconomyItem(studentId, selected.item_key, CENTRAL_WORLD_SHOP_ROWS, preview);
       const merged = mergeCentralWorldCatalogue(next);
       setState(merged);
       persistCanonicalAvatarAppearance(studentId, merged);

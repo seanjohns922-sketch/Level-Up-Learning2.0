@@ -1,5 +1,6 @@
 import { REALM_BUILDING_SHOP_ITEMS } from "./realm-building-collections";
 import { PREMIUM_HOME_ITEM_KEYS, PREMIUM_HOME_SHOP_ITEMS, PREMIUM_HOME_UPGRADE_ITEMS } from "./premium-homes";
+import { SKATE_KIT_ITEM_KEYS, SKATE_KIT_SHOP_ITEMS } from "./skate-kit";
 import { TRAIN_CATALOGUE } from "./train-catalogue";
 import { WORLD_SHOP_ART } from "./world-shop-art";
 import { isVillageBuilding, RETIRED_VILLAGE_HOME_KEYS } from "./village-buildings";
@@ -98,15 +99,15 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
   },
 })), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS, ...PREMIUM_HOME_SHOP_ITEMS];
 
-/** Everything the world can buy: placeable items plus home upgrades (which are not placeable). */
-export const CENTRAL_WORLD_SHOP_ROWS: EconomyItem[] = [...CENTRAL_WORLD_CUSTOMISATION_CATALOG, ...PREMIUM_HOME_UPGRADE_ITEMS];
+/** Everything the world can buy: placeable items plus upgrades and build kits (which are not placeable). */
+export const CENTRAL_WORLD_SHOP_ROWS: EconomyItem[] = [...CENTRAL_WORLD_CUSTOMISATION_CATALOG, ...PREMIUM_HOME_UPGRADE_ITEMS, ...SKATE_KIT_SHOP_ITEMS];
 
 export function mergeCentralWorldCatalogue(state: EconomyState): EconomyState {
   const existing = new Map(state.items.map((item) => [item.item_key, item]));
   for (const item of CENTRAL_WORLD_SHOP_ROWS) {
     // A live shop must not offer a new building before its database row exists.
     // Demo economy already supplies these rows through its explicit fallback catalogue.
-    if ((REALM_BUILDING_SHOP_ITEMS.some(building => building.item_key === item.item_key) || PREMIUM_HOME_ITEM_KEYS.has(item.item_key)) && !existing.has(item.item_key)) continue;
+    if ((REALM_BUILDING_SHOP_ITEMS.some(building => building.item_key === item.item_key) || PREMIUM_HOME_ITEM_KEYS.has(item.item_key) || SKATE_KIT_ITEM_KEYS.has(item.item_key)) && !existing.has(item.item_key)) continue;
     const current = existing.get(item.item_key) ?? item;
     const art = WORLD_SHOP_ART[item.item_key];
     existing.set(item.item_key, art ? { ...current, metadata: { ...current.metadata, marketplace_visual: { type: "asset", ...art, previewMode: "world" } } } : current);

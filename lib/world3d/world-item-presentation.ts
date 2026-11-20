@@ -3,6 +3,7 @@ import { TRAIN_DESIGNS } from "./train-catalogue";
 import { VILLAGE_INFRASTRUCTURE } from "./village-infrastructure";
 import { VILLAGE_BUILDINGS } from "./village-buildings";
 import { PREMIUM_HOME_SPECS, PREMIUM_HOME_STYLES, premiumHomeAssetKey } from "./premium-homes";
+import { SKATE_PIECES } from "./skate-kit";
 import { STATION_ROOF_HEIGHT } from "./world-scale";
 import type { EconomyItem } from "@/lib/economy";
 
@@ -32,6 +33,8 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   rail_train: {height:2.25, footprint:[2,2], sizing:"fixed", theme:"garden"},
   ...Object.fromEntries(TRAIN_DESIGNS.map(item=>[item.key,{height:2.7,footprint:[2,2] as [number,number],sizing:"fixed" as const,theme:"garden" as const}])),
   ...Object.fromEntries(VILLAGE_INFRASTRUCTURE.map(item=>[item.key,{height:item.height,width:"width" in item?item.width:undefined,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"garden" as const}])),
+  // Skate pieces are authored in world units (PlacedSkatePiece), matching the heights the avatar rides.
+  ...Object.fromEntries(SKATE_PIECES.map(piece=>[piece.assetKey,{height:2,sizing:"fixed" as const,footprint:piece.gridSize.split("x").map(n=>Number(n)*2) as [number,number],theme:"garden" as const}])),
   // Premium homes scale themselves (PremiumHome), so each upgrade grows in place.
   ...Object.fromEntries(PREMIUM_HOME_STYLES.map(style=>[premiumHomeAssetKey(style),{height:8,sizing:"fixed" as const,footprint:PREMIUM_HOME_SPECS[style].gridSize.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),
   ...Object.fromEntries(VILLAGE_BUILDINGS.map(item=>[item.key,{height:item.height,footprint:item.grid.split("x").map(n=>Number(n)*2) as [number,number],theme:"australian_reward" as const}])),

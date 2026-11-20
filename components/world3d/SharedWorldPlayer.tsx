@@ -126,6 +126,16 @@ function collectStandableMeshes(scene: THREE.Object3D, player: THREE.Object3D) {
   return meshes;
 }
 
+/** The board the avatar rides on skate pieces. */
+function SkateboardUnderfoot() {
+  return (
+    <group position={[0, 0.06, 0]}>
+      <mesh castShadow><boxGeometry args={[0.42, 0.05, 1.15]} /><meshStandardMaterial color="#ff4fd8" roughness={0.5} /></mesh>
+      {[-0.4, 0.4].flatMap((z) => [-0.15, 0.15].map((x) => <mesh key={`${x}${z}`} position={[x, -0.06, z]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.06, 0.06, 0.06, 12]} /><meshStandardMaterial color="#ffe14d" /></mesh>))}
+    </group>
+  );
+}
+
 export function SharedThirdPersonPlayer({
   initialPosition,
   spawnTarget,
@@ -151,6 +161,7 @@ export function SharedThirdPersonPlayer({
   canStandAt,
   speedFactorAt,
   bounceAt,
+  rideHeightAt,
 }: {
   initialPosition: [number, number, number];
   spawnTarget?: [number, number, number] | null;
@@ -180,10 +191,13 @@ export function SharedThirdPersonPlayer({
   speedFactorAt?: (x: number, z: number) => number;
   /** Optional trampolines: bounce power at a spot (0 means no bounce). */
   bounceAt?: (x: number, z: number) => number;
+  /** Optional ride-on pieces (skate ramps): surface height at a spot, or null off them. The avatar rides on a board there. */
+  rideHeightAt?: (x: number, z: number) => number | null;
 }) {
   const keys = useRef(new Set<string>());
   const baseY = useRef(initialPosition[1]);
   const playerRef = useRef<THREE.Group | null>(null);
+  const board = useRef<THREE.Group | null>(null);
   const movingRef = useRef(false);
   const sprintingRef = useRef(false);
   const nearestIdRef = useRef<string | null>(null);
@@ -292,19 +306,25 @@ export function SharedThirdPersonPlayer({
       }
     }
 
-    if (groundHeightAt) player.position.y = baseY.current + groundHeightAt(player.position.x, player.position.z);
-    else {
+    const ride = rideHeightAt?.(player.position.x, player.position.z) ?? null;
+    if (board.current) board.current.visible = ride !== null;
+    if (groundHeightAt) {
+      // Terrain alone stays exact; with ride-on pieces the climb is eased so ramps never jolt.
+      const target = groundHeightAt(player.position.x, player.position.z) + (ride ?? 0);
+      surfaceY.current = rideHeightAt ? surfaceY.current + (target - surfaceY.current) * Math.min(1, delta * 14) : target;
+      player.position.y = baseY.current + surfaceY.current;
+    } else {
       // Step onto low flat surfaces; the list of candidates refreshes every 1.5 s.
       const now = performance.now();
       if (now - standable.current.refreshedAt > 1500) standable.current = { meshes: collectStandableMeshes(scene, player), refreshedAt: now };
       const ray = raycaster.current;
       ray.set(new THREE.Vector3(player.position.x, surfaceY.current + STEP_HEIGHT, player.position.z), UP);
       ray.far = STEP_HEIGHT + surfaceY.current + 0.5;
-      let target = 0;
+      let target = ride ?? 0;
       for (const hit of ray.intersectObjects(standable.current.meshes, false)) {
         if (!hit.face) continue;
         const normalY = hit.face.normal.clone().transformDirection(hit.object.matrixWorld).y;
-        if (normalY > 0.6) { target = Math.max(0, hit.point.y); break; }
+        if (normalY > 0.6) { target = Math.max(target, hit.point.y); break; }
       }
       surfaceY.current += (target - surfaceY.current) * Math.min(1, delta * (target > surfaceY.current ? 12 : 16));
       player.position.y = baseY.current + surfaceY.current;
@@ -344,7 +364,11 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group></WorldAvatarJump></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group><group ref={board} visible={false}><SkateboardUnderfoot /></group>{rideHeightAt ? <group ref={board} visible={false}>
+        {/* Skateboard under the avatar on ride-on pieces. */}
+        <mesh position={[0, 0.06, 0]} castShadow><boxGeometry args={[0.38, 0.05, 1.05]} /><meshStandardMaterial color="#ff4fd8" roughness={0.5} /></mesh>
+        {[-0.34, 0.34].flatMap((z) => [-0.13, 0.13].map((x) => <mesh key={`${x}${z}`} position={[x, 0.03, z]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.045, 0.045, 0.05, 12]} /><meshStandardMaterial color="#ffe14d" /></mesh>))}
+      </group> : null}</WorldAvatarJump></group>;
 }
 
 function WorldJumpButton({ onJump }: { onJump: () => void }) {

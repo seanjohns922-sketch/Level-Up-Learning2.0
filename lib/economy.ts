@@ -150,9 +150,9 @@ function demoSlotFor(item: EconomyItem | undefined): string | null {
 }
 
 function isCentralWorldReward(item: EconomyItem) {
-  const metadata = item.metadata as { marketplaceCategory?: unknown; slot?: unknown; premiumHome?: unknown };
-  // Premium home upgrades have no plot slot but are still bought, never given.
-  if (typeof metadata.premiumHome === "string") return true;
+  const metadata = item.metadata as { marketplaceCategory?: unknown; slot?: unknown; premiumHome?: unknown; buildKit?: unknown };
+  // Premium upgrades and build kits have no plot slot but are still bought, never given.
+  if (typeof metadata.premiumHome === "string" || typeof metadata.buildKit === "string") return true;
   return typeof metadata.marketplaceCategory === "string"
     && typeof metadata.slot === "string"
     && metadata.slot.startsWith("world_plot_");

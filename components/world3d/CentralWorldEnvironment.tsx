@@ -23,6 +23,8 @@ import { VillageBuilding } from "./VillageBuildings";
 import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buildings";
 import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PlacedPremiumHome } from "@/components/world3d/premium-homes/PremiumHomeContext";
+import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
+import { SKATE_PIECE_KEYS } from "@/lib/world3d/skate-kit";
 import { CollectionReward, COLLECTION_REWARD_KEYS } from "./CollectionRewards";
 import { FortressScenery, FORTRESS_SCENERY_KEYS } from "@/components/world3d/FortressScenery";
 import { WildlifeScenery, WILDLIFE_KEYS, AustralianHabitat } from "@/components/world3d/WildlifeScenery";
@@ -349,6 +351,7 @@ function StarterGum({ canopyColor = "#8fae86" }: { canopyColor?: string }) {
 // foliage, canopy, cloth, cap, water, glow…). Structural parts — trunks, poles,
 // posts, stems, basins — keep their fixed colours so the recolour always reads.
 function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string }) {
+  if (SKATE_PIECE_KEYS.has(assetKey)) return <PlacedSkatePiece assetKey={assetKey} />;
   if (RAIL_KEYS.has(assetKey)) return <group><RailTrack asset={assetKey}/>{assetKey === "rail_train" && <StarterTrain/>}</group>;
   if (COLLECTION_SCENERY_KEYS.has(assetKey)) return <CollectionScenery assetKey={assetKey} tint={tint} />;
   if (FORTRESS_SCENERY_KEYS.has(assetKey)) return <FortressScenery assetKey={assetKey} tint={tint} />;

@@ -271,3 +271,9 @@
 .worldEditPicked .worldEditPickedLevel { font: 800 13px var(--font-sans); color: rgba(255, 255, 255, 0.72); padding: 0 2px; }
 .worldEditPicked .worldEditPickedUpgrade { background: linear-gradient(#ffd84d, #ffb81c); color: #4a2f00; box-shadow: 0 4px 0 #d18a00; }
 .worldEditPicked .worldEditPickedUpgrade:disabled { opacity: 0.7; cursor: progress; }
+
+/* Skate Kit header in the Skate tab: level, what it is, and the next upgrade */
+.worldEditKit { display: grid; gap: 6px; align-content: start; min-width: 220px; max-width: 260px; padding: 12px; border-radius: 16px; background: rgba(255, 79, 216, 0.14); border: 1px solid rgba(255, 79, 216, 0.35); color: #fff; }
+.worldEditKit b { font: 900 15px var(--font-display); }
+.worldEditKit span { font: 700 13px var(--font-sans); color: rgba(255, 255, 255, 0.78); }
+.worldEditKit .worldEditPickedUpgrade { display: flex; align-items: center; justify-content: center; min-height: 44px; border: 0; border-radius: 12px; font: 800 14px var(--font-display); cursor: pointer; background: linear-gradient(#ffd84d, #ffb81c); color: #4a2f00; box-shadow: 0 4px 0 #d18a00; }
