@@ -73,7 +73,7 @@ const censusOrSample: Form[] = [
   },
   (r) => {
     const made = 500 * r(2, 12), pct = pick(r, [2, 4, 5, 10]), tested = (made * pct) / 100, faulty = r(1, Math.max(2, Math.floor(tested / 20)));
-    return { prompt: `A factory makes ${made} batteries today. It tests a sample of ${tested} and finds ${faulty} faulty. Estimate how many of today's batteries are faulty.`, answer: (faulty / tested) * made, unit: "batteries", steps: [`The sample is ${pct}% of the population, so ${faulty} faulty in the sample suggests ${faulty} × ${made / tested} for the population.`, `${faulty} × ${made / tested} = ${(faulty / tested) * made}.`] };
+    return { prompt: `A factory makes ${made} batteries today. It tests a sample of ${tested} and finds ${faulty} faulty. Estimate how many of today's batteries are faulty.`, answer: (faulty / tested) * made, unit: "batteries", steps: [`The sample is ${pct}% of the population: the population is ${made} ÷ ${tested} = ${made / tested} times as large.`, `Expect ${faulty} × ${made / tested} = ${(faulty / tested) * made} faulty batteries.`] };
   },
 ];
 const EXPERIMENT_OR_OBSERVATION: [string, "Experiment" | "Observation", string][] = [
@@ -618,7 +618,7 @@ const changeMedianRange: Form[] = [
   (r) => {
     const prices = [52, 47, 63, 58, 79, 54, 71, 66].map((p) => p + r(-3, 3)), mansion = r(80, 95) * 10;
     const all = [...prices, mansion];
-    return { prompt: `House prices in a street (in $10 000s) include one mansion at ${mansion}. What is the median price, in $10 000s?`, answer: median(all), steps: [`Order the ${all.length} prices; the median is the 5th.`, `Median = ${median(all)}. The mean (${rounded(sum(all) / all.length, 1)}) is pulled up by the mansion.`], visual: dataVisual("House prices ($10 000s)", all) };
+    return { prompt: `House prices in a street (in $10,000s) include one mansion at ${mansion}. What is the median price, in $10,000s?`, answer: median(all), steps: [`Order the ${all.length} prices; the median is the 5th.`, `Median = ${median(all)}. The mean (${rounded(sum(all) / all.length, 1)}) is pulled up by the mansion.`], visual: dataVisual("House prices ($10,000s)", all) };
   },
   (r) => {
     const cases: [string, string, string][] = [
@@ -628,7 +628,7 @@ const changeMedianRange: Form[] = [
       ["The smallest value is made even smaller.", "Mean only", "The mean drops, but the middle value stays the same."],
     ];
     const [text, answer, why] = pick(r, cases.slice(0, 2).concat(cases.slice(3)));
-    return { prompt: `${text} Which of the mean and median change?`, answer, choices: ["Mean only", "Median only", "Both", "Neither"], steps: [why, "The median depends only on the middle position."] };
+    return { prompt: `${text} Which of the mean and median change?`, answer, choices: ["Mean only", "Median only", "Both", "Neither"], steps: [why, answer === "Both" ? "Shifting every value moves the middle value too." : "The median depends only on the middle position."] };
   },
 ];
 const chooseSummary: Form[] = [

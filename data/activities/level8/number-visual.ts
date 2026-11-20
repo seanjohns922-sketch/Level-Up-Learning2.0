@@ -16,7 +16,7 @@ export function number8VisualSpeech(v: Number8Visual): string {
     case "tally": return `${v.title}. ${v.groups} crossed groups of five marks, followed by ${v.singles} single marks.`;
     case "lengths": return `${v.title}. Labels from left to right: ${v.labels.join(", ")}. ${v.caption}`;
     case "numberline":
-      return `${v.title}. A number line from ${said(v.min)} to ${said(v.max)}${v.labelTicks === false ? "" : `, marked every ${v.step}`}. ${v.points.map((p) => `Point ${p.label}`).join(", ")} ${v.points.length === 1 ? "is" : "are"} marked.${v.interval ? ` The section from ${said(v.interval[0])} to ${said(v.interval[1])} is shaded.` : ""}`;
+      return `${v.title}. A number line from ${said(v.min)} to ${said(v.max)}${v.labelTicks === false ? "" : `, marked every ${v.step}`}.${v.points.length ? ` ${v.points.map((p) => `Point ${p.label}`).join(", ")} ${v.points.length === 1 ? "is" : "are"} marked.` : ""}${v.interval ? ` The section from ${said(v.interval[0])} to ${said(v.interval[1])} is shaded.` : ""}`;
     case "squares":
       return `${v.title}. ${v.squares.map((s) => `A square labelled ${s.label.replace("cm²", "square centimetres")}${s.sideLabel?`, side labelled ${s.sideLabel}`:""}`).join(". ")}.`;
     case "factors":

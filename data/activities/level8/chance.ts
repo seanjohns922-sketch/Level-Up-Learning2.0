@@ -429,7 +429,7 @@ const readTree: Form[] = [
   (r) => {
     const f = range(1, r(2, 3)).map(String), s = range(1, 4).map(String), k = r(3, 5);
     const hits = f.flatMap((a) => s.filter((b) => Number(a) + Number(b) > k)).length;
-    return { prompt: `How many outcomes on this tree have a total greater than ${k}?`, answer: hits, steps: ["Add the two numbers on each path.", `${hits} paths have a total greater than ${k}.`], ...tree("Two spinners", "Spinner A", "Spinner B", f, s) };
+    return { prompt: `How many outcomes on this tree have a total greater than ${k}?`, answer: hits, steps: ["Add the two numbers on each path.", `${hits} ${hits === 1 ? "path has" : "paths have"} a total greater than ${k}.`], ...tree("Two spinners", "Spinner A", "Spinner B", f, s) };
   },
   (r) => {
     const n = r(2, 3);
@@ -459,7 +459,7 @@ const treeProbability: Form[] = [
   (r) => {
     const f = range(1, 3).map(String), s = range(1, r(3, 4)).map(String), k = r(3, 5);
     const hits = f.flatMap((a) => s.filter((b) => Number(a) + Number(b) > k)).length, n = f.length * s.length;
-    return { prompt: `Both spinners are fair. What is the probability that the total is greater than ${k}?`, answer: fraction(hits, n), steps: [`${hits} of the ${n} paths have a total greater than ${k}.`, `P = ${pf(hits, n)}.`], ...tree("Two spinners", "Spinner A", "Spinner B", f, s) };
+    return { prompt: `Both spinners are fair. What is the probability that the total is greater than ${k}?`, answer: fraction(hits, n), steps: [`${hits} of the ${n} paths ${hits === 1 ? "has" : "have"} a total greater than ${k}.`, `P = ${pf(hits, n)}.`], ...tree("Two spinners", "Spinner A", "Spinner B", f, s) };
   },
   (r) => {
     const [text, ways] = pick(r, [["two girls", 1], ["one girl and one boy", 2], ["at least one boy", 3]] as const);
@@ -562,7 +562,7 @@ const atLeastOne: Form[] = [
   },
   (r) => {
     const a = r(3, 6), b = r(3, 6);
-    return { ...grid("Two spinners","Spinner A","Spinner B",range(1,a).map(i=>i===1?"Red":String(i)),range(1,b).map(i=>i===1?"Red":String(i)),"pair"), prompt: `Two fair spinners have ${a} and ${b} equal sections. Each has one red section. What is P(at least one red)?`, answer: fraction(a * b - (a - 1) * (b - 1), a * b), steps: [`No red: ${a - 1} × ${b - 1} = ${(a - 1) * (b - 1)} of the ${a * b} outcomes.`, `At least one red: ${pf(a * b - (a - 1) * (b - 1), a * b)}.`] };
+    return { ...grid("Two spinners","Spinner A","Spinner B",range(1,a).map(i=>i===1?"Red":String(i)),range(1,b).map(i=>i===1?"Red":String(i)),"pair"), prompt: `${a === b ? `Two fair spinners each have ${a} equal sections.` : `Two fair spinners have ${a} and ${b} equal sections.`} Each has one red section. What is P(at least one red)?`, answer: fraction(a * b - (a - 1) * (b - 1), a * b), steps: [`No red: ${a - 1} × ${b - 1} = ${(a - 1) * (b - 1)} of the ${a * b} outcomes.`, `At least one red: ${pf(a * b - (a - 1) * (b - 1), a * b)}.`] };
   },
   (r) => {
     const [ev, answer] = pick(r, [["at least one head", "No heads"], ["at least one six", "No sixes"], ["at least one red", "No reds"]] as const);
@@ -587,7 +587,7 @@ const designSimulation: Form[] = [
   },
   (r) => {
     const p = r(5, 95);
-    return { prompt: `Random whole numbers from 1 to 100 simulate an event with probability ${p / 100}. A trial counts as a success when the number is at most what?`, answer: p, steps: [`${p / 100} = ${p} out of 100 equally likely numbers.`, `Use 1 to ${p} for a success.`] };
+    return { prompt: `Random whole numbers from 1 to 100 simulate an event with probability ${p / 100}. A trial counts as a success when the number is at most what?`, answer: p, steps: [`A probability of ${p / 100} means ${p} out of 100 equally likely numbers.`, `Use 1 to ${p} for a success.`] };
   },
   (r) => {
     const CASES: [string, boolean, string][] = [
@@ -708,7 +708,7 @@ const explainVariation: Form[] = [
       ["If a simulation is far from the theory after thousands of trials, the model should be checked.", true, "Large runs should be close; a big gap suggests a faulty model."],
     ];
     const [text, yes, why] = pick(r, CASES);
-    return yesNo(`Is this statement true? “${text}”`, yes, ["Compare the size of the gap with the number of trials.", why]);
+    return yesNo(`Is this statement true? “${text}”`, yes, ["Check the claim against how chance behaves.", why]);
   },
   () => {
     const answer = "Run many more trials";

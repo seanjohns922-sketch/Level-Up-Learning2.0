@@ -445,7 +445,7 @@ const verify: Form[] = [
     let a = 0, c = 0;
     while (a === c) [a, c] = [r(2, 6), r(2, 6)];
     const x = r(1, 9), b = r(1, 12), d = (a - c) * x + b, tried = r(0, 1) ? x : x + pick(r, [-1, 1, 2]);
-    return yesNo(`Is x = ${tried} a solution of ${a}x + ${b} = ${poly([c, "x"], [d, ""])}?`, tried === x, [`Left: ${a} × ${tried} + ${b} = ${a * tried + b}. Right: ${c} × ${tried} ${d < 0 ? "−" : "+"} ${Math.abs(d)} = ${c * tried + d}.`, tried === x ? "Both sides are equal." : "The sides differ, so it is not a solution."]);
+    return yesNo(`Is x = ${tried} a solution of ${a}x + ${b} = ${poly([c, "x"], [d, ""])}?`, tried === x, [`Left: ${a} × ${tried} + ${b} = ${a * tried + b}. Right: ${c} × ${tried}${d ? ` ${d < 0 ? "−" : "+"} ${Math.abs(d)}` : ""} = ${c * tried + d}.`, tried === x ? "Both sides are equal." : "The sides differ, so it is not a solution."]);
   },
   (r) => {
     const a = r(2, 6), b = r(1, 7), x = r(1, 9);
@@ -466,7 +466,7 @@ const verify: Form[] = [
   },
   (r) => {
     const a = r(2, 9), b = r(1, 9);
-    return { prompt: `Solve ${a}x + ${b} = ${a}x + ${b + r(1, 6)}. How many solutions does it have?`, answer: 0, steps: [`Subtract ${a}x from both sides: ${b} = a different number.`, "That is never true, so there are 0 solutions."] };
+    const other = b + r(1, 6); return { prompt: `Solve ${a}x + ${b} = ${a}x + ${other}. How many solutions does it have?`, answer: 0, steps: [`Subtract ${a}x from both sides: ${b} = ${other}.`, "That is never true, so there are 0 solutions."] };
   },
 ];
 
@@ -495,7 +495,7 @@ const bothSides: Form[] = [
   },
   (r) => {
     const c = r(2, 5), a = c + r(1, 3), x = r(4, 12), b = r(2, Math.min(15,a*x-1)), d = (a - c) * x - b;
-    return { ...geometry("rectangle",[`${a}x − ${b}`,"",poly([c,"x"],[d,""]),""]), prompt: `Opposite sides of a rectangle are (${a}x − ${b}) cm and (${poly([c, "x"], [d, ""])}) cm. Find x.`, answer: x, steps: [`Opposite sides are equal: ${a}x − ${b} = ${poly([c, "x"], [d, ""])}.`, `${a - c}x = ${d + b}, so x = ${x}.`] };
+    return { ...geometry("rectangle",[`${a}x − ${b}`,"",poly([c,"x"],[d,""]),""]), prompt: `Opposite sides of a rectangle are (${a}x − ${b}) cm and (${poly([c, "x"], [d, ""])}) cm. Find x.`, answer: x, steps: [`Opposite sides are equal: ${a}x − ${b} = ${poly([c, "x"], [d, ""])}.`, a - c === 1 ? `x = ${d + b}.` : `${a - c}x = ${d + b}, so x = ${x}.`] };
   },
   (r) => {
     const c = r(2, 5), a = c + r(1, 4), x = r(5, Math.min(25,Math.floor(170/a))), b = r(1, 10), d = (a - c) * x - b;
@@ -691,7 +691,7 @@ const differences: Form[] = [
   },
   (r) => {
     const m = nz(r, -6, 7), c = r(-5, 10);
-    return { prompt: "What is the constant first difference in this table?", answer: m, steps: [`Subtract consecutive y-values: ${n(m + c)} − ${n(c)} = ${n(m)}.`, `It is ${n(m)} every time.`], visual: linearTable(m, c) };
+    return { prompt: "What is the constant first difference in this table?", answer: m, steps: [`Subtract consecutive y-values: ${n(m + c)} − ${c < 0 ? `(${n(c)})` : c} = ${n(m)}.`, `It is ${n(m)} every time.`], visual: linearTable(m, c) };
   },
   (r) => {
     const m = r(2, 5), c = r(-3, 6), xs = [-2, -1, 0, 1, 2, 3], wrong = r(1, 4), ys = xs.map((x) => m * x + c);
@@ -708,7 +708,7 @@ const differences: Form[] = [
   },
   (r) => {
     const m = nz(r, -5, 6), c = r(-4, 9), x = r(6, 10);
-    return { prompt: `The table is linear. What is y when x = ${x}?`, answer: m * x + c, steps: [`y changes by ${n(m)} for each step of 1.`, `From x = 4 to ${x} is ${x - 4} steps: ${n(m * 4 + c)} + ${x - 4} × ${n(m)} = ${n(m * x + c)}.`], visual: linearTable(m, c) };
+    return { prompt: `The table is linear. What is y when x = ${x}?`, answer: m * x + c, steps: [`y changes by ${n(m)} for each step of 1.`, `From x = 4 to ${x} is ${x - 4} steps: ${n(m * 4 + c)} + ${x - 4} × ${m < 0 ? `(${n(m)})` : m} = ${n(m * x + c)}.`], visual: linearTable(m, c) };
   },
 ];
 const plotLinear: Form[] = [
@@ -859,7 +859,7 @@ const readSolution: Form[] = [
   },
   (r) => {
     const m = pick(r, [1, 2, -1, -2]), c = r(-2, 3), x = nz(r, -2, 3);
-    return { prompt: `Point P on the graph shows the solution x = ${n(x)} of ${poly([m, "x"], [c, ""])} = k. What is k?`, answer: m * x + c, steps: ["Follow the dashed line from P across to the y-axis.", `k = ${n(m * x + c)}. Check: ${n(m)} × ${x < 0 ? `(${n(x)})` : x} ${c < 0 ? "−" : "+"} ${Math.abs(c)} = ${n(m * x + c)}.`], algebraVisual: graph("Read the graph", [{ m, c, label: rule(m, c) }], { points: [{ x, y: m * x + c, label: "P", guide: true }] }) };
+    return { prompt: `Point P on the graph shows the solution x = ${n(x)} of ${poly([m, "x"], [c, ""])} = k. What is k?`, answer: m * x + c, steps: ["Follow the dashed line from P across to the y-axis.", `k = ${n(m * x + c)}. Check: ${m === 1 ? "" : `${n(m)} × `}${x < 0 ? `(${n(x)})` : x} ${c < 0 ? "−" : "+"} ${Math.abs(c)} = ${n(m * x + c)}.`], algebraVisual: graph("Read the graph", [{ m, c, label: rule(m, c) }], { points: [{ x, y: m * x + c, label: "P", guide: true }] }) };
   },
   (r) => {
     const rate = pick(r, [2, 3, 4, 5]), t = r(1, 4), start = rate * r(5, 6), target = start - rate * t;
@@ -875,7 +875,7 @@ const intersections: Form[] = [
   },
   (r) => {
     const m = nz(r, -4, 4), c1 = r(-5, 5), c2 = c1 + nz(r, -5, 5), same = r(0, 1) === 1, m2 = same ? m : m + nz(r, -2, 2);
-    return ({...yesNo(`Do the lines ${rule(m, c1)} and ${rule(m2, c2)} intersect?`, !same, [same ? "Both have the same x-coefficient, so they are parallel." : "Their x-coefficients differ, so they must cross.", same ? "Parallel lines with different starting values never meet." : "So they intersect at exactly one point."]), ...lessonPlot([{m,c:c1,label:rule(m,c1)},{m:m2,c:c2,label:rule(m2,c2)}])});
+    return ({...yesNo(`Do the lines ${rule(m, c1)} and ${rule(m2, c2)} intersect?`, !same, [same ? "Both have the same x-coefficient, so they are parallel." : "Their x-coefficients differ, so the lines are not parallel.", same ? "Parallel lines with different starting values never meet." : "They intersect at exactly one point."]), ...lessonPlot([{m,c:c1,label:rule(m,c1)},{m:m2,c:c2,label:rule(m2,c2)}])});
   },
   (r) => {
     const a = r(2, 4), b = a + r(1, 3), t = r(3, 9), sb = r(5, 15), sa = sb + (b - a) * t;
@@ -900,7 +900,7 @@ const graphInequality: Form[] = [
   (r) => {
     const k = nz(r, -3, 4), sym = pick(r, SYMS), vertical = r(0, 1) === 1, v = vertical ? "x" : "y";
     const side = vertical ? (sym === ">" || sym === "≥" ? "right" : "left") : sym === ">" || sym === "≥" ? "above" : "below";
-    return { prompt: "Which inequality describes the shaded region? A dashed boundary is not included.", answer: `${v} ${sym} ${n(k)}`, choices: SYMS.map((s) => `${v} ${s} ${n(k)}`), steps: [`The boundary is ${v} = ${n(k)}; it is ${sym === ">" || sym === "<" ? "dashed, so not included" : "solid, so included"}.`, `The shading is ${side} it: ${v} ${sym} ${n(k)}.`], algebraVisual: graph("Shaded region", [vertical ? { x: k, label: `x = ${n(k)}` } : { m: 0, c: k, label: `y = ${n(k)}` }], { shade: { line: 0, side, strict: sym === ">" || sym === "<" } }) };
+    return { prompt: "Which inequality describes the shaded region? A dashed boundary is not included.", answer: `${v} ${sym} ${n(k)}`, choices: SYMS.map((s) => `${v} ${s} ${n(k)}`), steps: [`The boundary is ${v} = ${n(k)}; it is ${sym === ">" || sym === "<" ? "dashed, so not included" : "solid, so included"}.`, `The shading is ${side === "left" || side === "right" ? `to the ${side} of` : side} it: ${v} ${sym} ${n(k)}.`], algebraVisual: graph("Shaded region", [vertical ? { x: k, label: `x = ${n(k)}` } : { m: 0, c: k, label: `y = ${n(k)}` }], { shade: { line: 0, side, strict: sym === ">" || sym === "<" } }) };
   },
   (r) => {
     const px = r(-4, 4), py = r(-4, 7), vertical = r(0, 1) === 1, k = (vertical ? px : py) + pick(r, [-1, 0, 1, 2]), sym = pick(r, SYMS), val = vertical ? px : py;
@@ -970,7 +970,7 @@ const useModel: Form[] = [
     const c = 5 * r(-2, 8), inverse = r(0, 1) === 1;
     return inverse
       ? { prompt: `Use F = 1.8C + 32. Find C when F = ${rounded(1.8 * c + 32, 1)}.`, answer: c, unit: "°C", steps: [`${rounded(1.8 * c + 32, 1)} − 32 = ${rounded(1.8 * c, 1)}.`, `${rounded(1.8 * c, 1)} ÷ 1.8 = ${c}.`] }
-      : { prompt: `Use F = 1.8C + 32 to convert ${n(c)}°C to Fahrenheit.`, answer: rounded(1.8 * c + 32, 1), unit: "°F", steps: [`1.8 × ${c} = ${rounded(1.8 * c, 1)}.`, `Add 32: ${rounded(1.8 * c + 32, 1)}.`] };
+      : { prompt: `Use F = 1.8C + 32 to convert ${n(c)}°C to Fahrenheit.`, answer: rounded(1.8 * c + 32, 1), unit: "°F", steps: [`1.8 × ${c < 0 ? `(${n(c)})` : c} = ${n(rounded(1.8 * c, 1))}.`, `Add 32: ${rounded(1.8 * c + 32, 1)}.`] };
   },
   (r) => {
     const rate = r(2, 5), t = r(2, 5), start = rate * (t + r(1, 4));
@@ -1045,11 +1045,11 @@ const budgetTarget: Form[] = [
   },
   (r) => {
     const rate = r(16, 28), target = 50 * r(6, 16);
-    return { prompt: `Sam earns $${rate} per hour and needs at least $${target}. What is the smallest whole number of hours Sam must work?`, answer: Math.ceil(target / rate), unit: "hours", steps: [`${rate}h ≥ ${target}, so h ≥ ${rounded(target / rate, 2)}.`, `Round up: ${Math.ceil(target / rate)} hours.`] };
+    return { prompt: `Sam earns $${rate} per hour and needs at least $${target}. What is the smallest whole number of hours Sam must work?`, answer: Math.ceil(target / rate), unit: "hours", steps: [`${rate}h ≥ ${target}, so h ≥ ${rounded(target / rate, 2)}.`, target % rate ? `Round up: ${Math.ceil(target / rate)} hours.` : `Exactly ${target / rate} hours.`] };
   },
   (r) => {
     const speed = pick(r, [60, 75, 80, 90, 100]), mins = pick(r, [12, 18, 24, 30, 36, 48]);
-    return { prompt: `A car travels at ${speed} km/h. How many minutes does it take to travel ${(speed * mins) / 60} km?`, answer: mins, unit: "min", steps: [`${speed} km/h is ${speed / 60} km per minute.`, `${(speed * mins) / 60} ÷ ${speed / 60} = ${mins} minutes.`] };
+    return { prompt: `A car travels at ${speed} km/h. How many minutes does it take to travel ${(speed * mins) / 60} km?`, answer: mins, unit: "min", steps: ["Time = distance ÷ speed, in hours. Multiply by 60 to change hours to minutes.", `${(speed * mins) / 60} ÷ ${speed} × 60 = ${mins} minutes.`] };
   },
   (r) => {
     const use = r(6, 9), tank = use * r(5, 8);
@@ -1057,7 +1057,7 @@ const budgetTarget: Form[] = [
   },
   (r) => {
     const has = 5 * r(4, 20), weekly = 5 * r(3, 8), target = has + 5 * r(15, 60);
-    return { prompt: `Lia has $${has} and saves $${weekly} per week. After how many whole weeks will she first have at least $${target}?`, answer: Math.ceil((target - has) / weekly), unit: "weeks", steps: [`${has} + ${weekly}w ≥ ${target}, so w ≥ ${rounded((target - has) / weekly, 2)}.`, `Round up: ${Math.ceil((target - has) / weekly)} weeks.`] };
+    return { prompt: `Lia has $${has} and saves $${weekly} per week. After how many whole weeks will she first have at least $${target}?`, answer: Math.ceil((target - has) / weekly), unit: "weeks", steps: [`${has} + ${weekly}w ≥ ${target}, so w ≥ ${rounded((target - has) / weekly, 2)}.`, (target - has) % weekly ? `Round up: ${Math.ceil((target - has) / weekly)} weeks.` : `Exactly ${(target - has) / weekly} weeks.`] };
   },
 ];
 const unitsAssumptions: Form[] = [
