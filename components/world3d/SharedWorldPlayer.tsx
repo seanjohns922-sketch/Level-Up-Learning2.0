@@ -364,11 +364,7 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group><group ref={board} visible={false}><SkateboardUnderfoot /></group>{rideHeightAt ? <group ref={board} visible={false}>
-        {/* Skateboard under the avatar on ride-on pieces. */}
-        <mesh position={[0, 0.06, 0]} castShadow><boxGeometry args={[0.38, 0.05, 1.05]} /><meshStandardMaterial color="#ff4fd8" roughness={0.5} /></mesh>
-        {[-0.34, 0.34].flatMap((z) => [-0.13, 0.13].map((x) => <mesh key={`${x}${z}`} position={[x, 0.03, z]} rotation={[0, 0, Math.PI / 2]}><cylinderGeometry args={[0.045, 0.045, 0.05, 12]} /><meshStandardMaterial color="#ffe14d" /></mesh>))}
-      </group> : null}</WorldAvatarJump></group>;
+  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group><group ref={board} visible={false}><SkateboardUnderfoot /></group></WorldAvatarJump></group>;
 }
 
 function WorldJumpButton({ onJump }: { onJump: () => void }) {
@@ -584,8 +580,11 @@ function WorldAnalogJoystick({ side, label, dataAttribute, onChange }: { side: "
   );
 }
 
-export function WorldJoystick({ input, onChange }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void }) {
-  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><WorldJumpButton onJump={() => onChange({ ...input, jumpRequest: (input.jumpRequest ?? 0) + 1 })} /><WorldAnalogJoystick side="left" label="Movement joystick. Drag in any direction to move." dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} /><WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
+/** The move joystick, with Run and Jump. While driving a kart it steers and accelerates, without Run or Jump. */
+export function WorldJoystick({ input, onChange, driving = false }: { input: WorldMoveInput; onChange: (input: WorldMoveInput) => void; driving?: boolean }) {
+  const stick = <WorldAnalogJoystick side="left" label={driving ? "Driving joystick. Push up to go, down to brake, left and right to steer." : "Movement joystick. Drag in any direction to move."} dataAttribute="move" onChange={({ x, y, magnitude }) => onChange({ ...input, up: false, down: false, left: false, right: false, analogX: x, analogY: y, magnitude })} />;
+  if (driving) return stick;
+  return <><WorldDoubleTapSprint input={input} onChange={onChange} /><WorldJumpButton onJump={() => onChange({ ...input, jumpRequest: (input.jumpRequest ?? 0) + 1 })} />{stick}<WorldSprintButton active={Boolean(input.sprint)} onChange={(sprint) => onChange({ ...input, sprint })} /></>;
 }
 
 export function WorldLookJoystick({ onChange }: { onChange: (input: WorldLookInput) => void }) {

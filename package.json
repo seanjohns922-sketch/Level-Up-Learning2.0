@@ -319,6 +319,7 @@
     "qa:remove-empty-class": "node scripts/remove-empty-class-db-test.mjs",
     "qa:week-page-look": "node scripts/week-page-look-audit.mjs",
     "qa:measurelands-ruler-objects": "node scripts/measurelands-ruler-objects-audit.mjs",
+    "qa:race-driving": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/race-driving-test.mjs",
     "qa:race-kit": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/race-kit-audit.mjs",
     "qa:skate-kit": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/skate-kit-audit.mjs",
     "qa:premium-homes": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/premium-homes-audit.mjs",

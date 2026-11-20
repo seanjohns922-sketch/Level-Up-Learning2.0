@@ -38,4 +38,8 @@ assert.equal(pieces.length, RACE_PIECES.length);
 assert.ok(pieces.every((item) => item.price === 0 && !item.purchasable && Number(item.metadata.kitPieceLevel) >= 1));
 for (const piece of RACE_PIECES) assert.ok(existsSync(new URL(`../public/marketplace/world-renders/free/${piece.assetKey}.webp`, import.meta.url)), `${piece.name} needs its tray picture`);
 
-console.log(`PASS Race Kit: ${RACE_PIECES.length} pieces over 4 kit levels, tarmac saved and gated by the kit, 4 shop rows match the migration, hub wiring in place`);
+// Racing: start lines are Race targets, the kart replaces the explorer, and the overlay shows laps.
+assert.ok(world.includes('assetKey === "race_start"') && world.includes('label: "RACE", icon: "flag"'), "a start line must offer the Race button");
+assert.ok(world.includes("<RaceKartDriver key={race.nonce}") && world.includes("hidden={!roaming}"), "racing must swap the explorer for the kart");
+assert.ok(world.includes("<RaceHud hud={raceHud}") && world.includes("driving={Boolean(race)}"), "racing must show the lap overlay and drive from the joystick");
+console.log(`PASS Race Kit: ${RACE_PIECES.length} pieces over 4 kit levels, tarmac saved and gated by the kit, 4 shop rows match the migration, hub wiring and racing in place`);

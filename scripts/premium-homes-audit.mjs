@@ -51,7 +51,7 @@ assert.ok(read("components/world3d/CentralWorldEnvironment.tsx").includes("<Plac
 assert.ok(read("lib/world3d/world-item-presentation.ts").includes("premiumHomeAssetKey(style)"), "premium homes need fixed sizing so upgrades grow in place");
 assert.ok(read("lib/world3d/central-world-customisation-catalog.ts").includes("PREMIUM_HOME_ITEM_KEYS.has(item.item_key)"), "the live shop must wait for the database rows");
 assert.ok(read("lib/marketplace-visuals.ts").includes("marketplaceHidden === true"), "the Marketplace must hide upgrade rows");
-assert.ok(read("lib/economy.ts").includes('typeof metadata.premiumHome === "string"'), "demo upgrades must be bought, not given");
+assert.ok(read("lib/economy.ts").includes('premiumHomeLevel === "number"'), "demo upgrades must be bought, not given");
 const world = read("components/world3d/CentralWorld.tsx");
 assert.ok(world.includes("<PremiumHomeWorldContext.Provider value={homeWorld}>") && world.includes("<PremiumHomeUpgradeRows"), "the hub must pass home levels and offer the upgrade");
 assert.ok(world.includes("bounceAt={bounceAt}") && read("components/world3d/SharedWorldPlayer.tsx").includes("bounce={bounceAt ?"), "placed trampolines must reach the avatar jump");

@@ -11,11 +11,12 @@ import { PremiumHomeUpgradeRows } from "@/components/world3d/premium-homes/Premi
 import { SkateKitWorldContext } from "@/components/world3d/premium-items/SkatePieces";
 import { SKATE_KIT, skateHeightAt, skatePiece, type PlacedSkatePiece } from "@/lib/world3d/skate-kit";
 import { buildKitLevel, nextBuildKitUpgrade, type BuildKit } from "@/lib/world3d/build-kits";
-import { RACE_KIT } from "@/lib/world3d/race-kit";
+import { RACE_KIT, RACE_PIECE_KEYS } from "@/lib/world3d/race-kit";
+import { buildRaceCourse, raceExitPosition, raceStartLine, type KartWorld, type PlacedRaceItem } from "@/lib/world3d/race-driving";
+import { newRaceHud, RaceKartDriver, type RaceHud as RaceHudState } from "@/components/world3d/premium-items/RaceKartDriver";
+import { RaceHud } from "@/components/world3d/premium-items/RaceHud";
 import { RaceKitWorldContext } from "@/components/world3d/premium-items/RacePieces";
 import { KitTrayHeader } from "@/components/world3d/premium-items/KitTrayHeader";
-import { Flag as FlagIcon } from "lucide-react";
-import { Bike } from "lucide-react";
 import { newWorldPlacementId, gridStroke, CONNECTED_BOUNDARY_KEYS } from "@/lib/world3d/world-connections";
 import { waterBrushCells } from "@/lib/world3d/world-water";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
@@ -24,7 +25,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -127,7 +128,7 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
   { key: "animals", label: "Animals", Icon: PawPrint },
   { key: "fortress", label: "Fortress", Icon: Castle },
   { key: "skate", label: "Skate", Icon: Bike },
-  { key: "race", label: "Race", Icon: FlagIcon },
+  { key: "race", label: "Race", Icon: Flag },
 ];
 type TrayTab = "owned" | PaletteTab;
 /** How much faster the avatar rolls on skate pieces. */
@@ -328,7 +329,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules }: { night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap }: { raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -358,6 +359,20 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     if (!rideHeightAt) return terrain;
     return (x: number, z: number) => (terrain ? terrain(x, z) : 1) * (rideHeightAt(x, z) === null ? 1 : SKATE_SPEED_BOOST);
   }, [hubV2, rideHeightAt]);
+  // Racing: the course is the painted tarmac plus the placed Race Kit pieces.
+  const raceCourse = useMemo(() => race ? buildRaceCourse(raceItems, groundTiles) : null, [race, raceItems, groundTiles]);
+  const raceStart = useMemo(() => race ? raceStartLine(race.start) : null, [race]);
+  const kartWorld = useMemo<KartWorld>(() => {
+    const bounds = hubV2 ? HUB_V2_BOUNDS : CENTRAL_WORLD_CONFIG.playableBounds, roam = hubV2 ? HUB_V2_ROAM : CENTRAL_WORLD_CONFIG.roamEllipse;
+    return {
+      groundHeightAt: hubV2 ? hubGroundHeight : undefined,
+      canDriveAt: (x, z) => x >= bounds.minX && x <= bounds.maxX && z >= bounds.minZ && z <= bounds.maxZ
+        && (x / roam.radiusX) ** 2 + ((z - roam.centerZ) / roam.radiusZ) ** 2 <= 1
+        && (!hubV2 || hubCanStand(x, z)),
+    };
+  }, [hubV2]);
+  const racing = Boolean(raceCourse && raceStart);
+  const roaming = !editing && !buildPreview && !racing;
   return (
     <>
       {hubV2 ? <>
@@ -439,16 +454,18 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         interactionTargets={[
           { id: CENTRAL_WORLD_ANCHORS.towerMainEntrance, position: CENTRAL_WORLD_CONFIG.towerMainEntrance, distance: 6.2 },
           { id: CENTRAL_WORLD_ANCHORS.myHomeEntrance, position: homeAnchors.entrance, distance: hubV2 ? 6 : 4.8 },
+          ...raceStarts.map(({ id, item }) => ({ id, position: gridToWorld(item.gridX, item.gridZ), distance: 6 })),
         ]}
         onNearestTargetId={handleNearestTarget}
         cameraDistance={11.5}
         cameraTargetHeight={3.6}
-        cameraEnabled={!editing && !buildPreview}
-        movementEnabled={!editing && !buildPreview}
-        hidden={editing || Boolean(buildPreview)}
+        cameraEnabled={roaming}
+        movementEnabled={roaming}
+        hidden={!roaming}
         speed={hubV2 ? 5.6 : 4.2}
         positionRef={avatarPosRef}
       />
+      {race && raceCourse && raceStart ? <RaceKartDriver key={race.nonce} course={raceCourse} start={raceStart} world={kartWorld} moveInput={moveInput} hud={raceHud} night={night} onBestLap={onBestLap} /> : null}
       <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
       <BuildModeSurface grid={buildRules.grid} active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
       {selection ? <>
@@ -464,6 +481,19 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
 
 const HUB_V2_BOUNDS = { minX: -HUB_V2_PLAY_RADIUS, maxX: HUB_V2_PLAY_RADIUS, minZ: -HUB_V2_PLAY_RADIUS, maxZ: HUB_V2_PLAY_RADIUS };
 const HUB_V2_ROAM = { centerZ: 0, radiusX: HUB_V2_PLAY_RADIUS, radiusZ: HUB_V2_PLAY_RADIUS };
+
+/** A start line the explorer can walk up to and race from. */
+type RaceStartTarget = { id: string; item: PlacedRaceItem };
+/** A race in progress; the nonce restarts it. */
+type RaceSession = { start: PlacedRaceItem; nonce: number };
+const RACE_TARGET_PREFIX = "race-start:";
+const raceBestKey = (scope: string) => `lul:central-world:race-best:v1:${scope}`;
+function readRaceBest(scope: string): number | null {
+  try {
+    const value = Number(window.localStorage.getItem(raceBestKey(scope)));
+    return Number.isFinite(value) && value > 0 ? value : null;
+  } catch { return null; }
+}
 
 /** The bigger hub drops to 1x resolution if a device can't keep a smooth frame rate, and restores it when it recovers. */
 function HubAdaptiveResolution() {
@@ -658,7 +688,32 @@ export default function CentralWorld() {
   }
   const historyRef = useRef(editHistory);
   useEffect(() => { historyRef.current = editHistory; }, [editHistory]);
-  const hasAvailableAction = activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance;
+  // Every placed start line is somewhere to race from.
+  const raceItems = useMemo(() => placedCustomisations.flatMap((placement): PlacedRaceItem[] => {
+    const assetKey = itemsById.get(placement.itemId)?.metadata.worldAssetKey;
+    return typeof assetKey === "string" && RACE_PIECE_KEYS.has(assetKey) ? [{ assetKey, gridX: placement.gridX, gridZ: placement.gridZ, rotation: placement.rotation }] : [];
+  }), [placedCustomisations, itemsById]);
+  const raceStarts = useMemo(() => raceItems.filter((item) => item.assetKey === "race_start").map((item) => ({ id: `${RACE_TARGET_PREFIX}${item.gridX}:${item.gridZ}`, item })), [raceItems]);
+  const [race, setRace] = useState<RaceSession | null>(null);
+  const raceHud = useRef<RaceHudState>(newRaceHud(null));
+  const nearRaceStart = raceStarts.find((start) => start.id === activeTargetId) ?? null;
+  function startRace(start: PlacedRaceItem) {
+    raceHud.current = newRaceHud(readRaceBest(placementScope));
+    setRace((current) => ({ start, nonce: (current?.nonce ?? 0) + 1 }));
+    void speak("Get ready. Three, two, one, go!", undefined, "manual", { rate: 1 });
+  }
+  function exitRace() {
+    if (!race) return;
+    const { x, z } = raceExitPosition(raceStartLine(race.start));
+    setRace(null);
+    teleport([x, CENTRAL_WORLD_CONFIG.spawnPoint[1], z]);
+  }
+  const saveRaceBest = useCallback((seconds: number) => {
+    const best = readRaceBest(placementScope);
+    if (best !== null && best <= seconds) return;
+    try { window.localStorage.setItem(raceBestKey(placementScope), String(seconds)); } catch { /* the best lap just isn't kept */ }
+  }, [placementScope]);
+  const hasAvailableAction = !race && (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null);
   const editorItemKey = editorOpen ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const activeBuildItemKey = editorItemKey ?? requestedBuildItemKey;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
@@ -1247,6 +1302,7 @@ export default function CentralWorld() {
     if (!activeTargetId || transitioning) return;
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance) enterMyHome();
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance) enterTower();
+    if (nearRaceStart) startRace(nearRaceStart.item);
   }
 
   function teleport(position: [number, number, number], yaw = 0) {
@@ -1272,20 +1328,21 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} />
         </RaceKitWorldContext.Provider>
         </SkateKitWorldContext.Provider>
         </PremiumHomeWorldContext.Provider>
       </Canvas>
       </div>
 
-      {!editorOpen && !buildPreview ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !buildPreview && !race ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
       ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
-      {!buildPreview && !editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} /><WorldLookJoystick onChange={setLookInput} /></> : null}
+      {!buildPreview && !editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race)} />{race ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
+      {race ? <RaceHud hud={raceHud} onRestart={() => startRace(race.start)} onExit={exitRace} /> : null}
       {buildPreview && !editorOpen ? (
         <section aria-label="Build mode controls" style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", zIndex: 35, width: "min(94vw, 560px)", border: `2px solid ${buildValid ? "#4ade80" : "#fb7185"}`, borderRadius: 8, background: "rgba(18,28,24,.94)", color: "#fff", padding: 12, boxShadow: "0 14px 40px rgba(0,0,0,.35)" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}><div><div style={{ color: "#f6c862", fontSize: 11, fontWeight: 950, letterSpacing: ".16em" }}>BUILD MODE</div><div style={{ marginTop: 2, fontSize: 18, fontWeight: 950 }}>{buildPreview.item.name}</div></div><WorldVoiceButton compact label="Read build instructions" text={`${buildPreview.item.name}. Use the arrow buttons to choose a place. Rotate it if you want. Green means it can be placed. Red means choose another space.`} /></div>
