@@ -38,6 +38,14 @@ assert.equal(pieces.length, RACE_PIECES.length);
 assert.ok(pieces.every((item) => item.price === 0 && !item.purchasable && Number(item.metadata.kitPieceLevel) >= 1));
 for (const piece of RACE_PIECES) assert.ok(existsSync(new URL(`../public/marketplace/world-renders/free/${piece.assetKey}.webp`, import.meta.url)), `${piece.name} needs its tray picture`);
 
+// Turns are rounded: a cell joined ahead and to one side is a corner; straights, ends and junctions aren't.
+const { trackCorner } = await import(new URL("../lib/world3d/race-kit.ts", import.meta.url).href);
+const cells = new Set(["0:0", "1:0", "0:1", "5:5", "6:5", "7:5", "9:9", "10:9", "8:9", "9:10"]);
+assert.deepEqual(trackCorner(0, 0, cells), [1, 1], "an L turn rounds round its inside corner");
+assert.equal(trackCorner(6, 5, cells), null, "a straight stays square");
+assert.equal(trackCorner(5, 5, cells), null, "an end stays square");
+assert.equal(trackCorner(9, 9, cells), null, "a junction stays square");
+assert.ok(read("components/world3d/premium-items/RacePieces.tsx").includes("<CornerTile corner={corner}"), "turns draw as rounded corners");
 // Racing: start lines are Race targets, the kart replaces the explorer, and the overlay shows laps.
 assert.ok(world.includes('assetKey === "race_start"') && world.includes('label: "RACE", icon: "flag"'), "a start line must offer the Race button");
 assert.ok(world.includes("<RaceKartDriver key={race.nonce}") && world.includes("hidden={!roaming}"), "racing must swap the explorer for the kart");

@@ -6,7 +6,7 @@ import { createContext, useContext, useMemo, useRef } from "react";
 import type { Group, Mesh } from "three";
 import { Ball, Block, C, M, Mat } from "@/components/world3d/premium-homes/HomeKit";
 import type { KitLevel } from "@/lib/world3d/build-kits";
-import { RACE_SCALE } from "@/lib/world3d/race-kit";
+import { RACE_SCALE, trackCorner } from "@/lib/world3d/race-kit";
 import { CENTRAL_WORLD_GRID, gridToWorld, type CentralWorldGroundTile } from "@/lib/world3d/central-world-layout";
 
 const NEON_PINK = "#ff4fd8";
@@ -75,7 +75,28 @@ export function PlacedRacePiece({ assetKey }: { assetKey: string }) {
   return piece ? <group scale={RACE_SCALE}>{piece}</group> : null;
 }
 
-/** Painted tarmac: one slab per cell, white dashes, red-and-white kerbs on open edges from Level 2, neon edges at Level 4. */
+/** A turn: a quarter-disc of tarmac pivoting on the inside corner, its kerbs (or neon) following the curve.
+ * A cylinder segment's angle θ points at (sin θ, cos θ) on the ground. */
+function CornerTile({ corner, cell, neon, kerbs, night, parity }: { corner: [number, number]; cell: number; neon: boolean; kerbs: boolean; night: boolean; parity: number }) {
+  const [ix, iz] = corner;
+  const towardCentre = Math.atan2(-ix, -iz), start = towardCentre - Math.PI / 4;
+  const segments = 6, r = cell - 0.1;
+  return (
+    <group position={[ix * cell * 0.5, 0, iz * cell * 0.5]}>
+      <mesh position={[0, 0.07, 0]} receiveShadow><cylinderGeometry args={[cell + 0.01, cell + 0.01, 0.1, 24, 1, false, start, Math.PI / 2]} /><Mat color={neon ? "#241c45" : "#3a3f4a"} rough={0.85} /></mesh>
+      {neon || kerbs ? Array.from({ length: segments }, (_, i) => {
+        const theta = start + ((i + 0.5) / segments) * (Math.PI / 2), length = (r * Math.PI / 2) / segments + 0.02;
+        const pos: [number, number, number] = [Math.sin(theta) * (neon ? cell : r), neon ? 0.15 : 0.12, Math.cos(theta) * (neon ? cell : r)];
+        return neon
+          ? <mesh key={i} position={pos} rotation={[0, theta, 0]}><boxGeometry args={[length, 0.1, 0.12]} /><Glowing color={i % 2 ? NEON_PINK : NEON_BLUE} night={night} /></mesh>
+          : <Block key={i} size={[length, 0.12, 0.2]} pos={pos} rot={[0, theta, 0]} color={(i + parity) % 2 ? C.red : C.white} r={0.03} />;
+      }) : null}
+    </group>
+  );
+}
+
+/** Painted tarmac: one slab per cell, white dashes, red-and-white kerbs on open edges from Level 2, neon edges at Level 4.
+ * Turns are drawn as rounded corners. */
 export function RaceTrackTiles({ tiles }: { tiles: CentralWorldGroundTile[] }) {
   const { level, night } = useContext(RaceKitWorldContext);
   const cell = CENTRAL_WORLD_GRID.cellSize;
@@ -86,6 +107,8 @@ export function RaceTrackTiles({ tiles }: { tiles: CentralWorldGroundTile[] }) {
     <group>
       {track.map((tile) => {
         const [x, , z] = gridToWorld(tile.gridX, tile.gridZ);
+        const corner = trackCorner(tile.gridX, tile.gridZ, occupied);
+        if (corner) return <group key={`${tile.gridX}:${tile.gridZ}`} position={[x, 0, z]}><CornerTile corner={corner} cell={cell} neon={neon} kerbs={kerbs} night={night} parity={(tile.gridX + tile.gridZ) % 2} /></group>;
         const edges = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).filter(([dx, dz]) => !occupied.has(`${tile.gridX + dx}:${tile.gridZ + dz}`));
         return (
           <group key={`${tile.gridX}:${tile.gridZ}`} position={[x, 0, z]}>

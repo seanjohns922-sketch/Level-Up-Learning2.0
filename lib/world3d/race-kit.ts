@@ -37,3 +37,14 @@ export const RACE_KIT_ITEM_KEYS = new Set(RACE_KIT_SHOP_ITEMS.map((item) => item
 
 /** Painted track cells are a ground tile type, like paths and water. */
 export const TRACK_TILE = "track" as const;
+
+/** A track cell that joins exactly one neighbour ahead and one to the side is a turn: it is drawn as a
+ * rounded corner. Returns the grid direction of the corner it turns round (the sum of the two
+ * neighbour directions), or null for a straight, an end, a junction or a lone cell. */
+export function trackCorner(gridX: number, gridZ: number, track: ReadonlySet<string>): [number, number] | null {
+  const joined = ([[1, 0], [-1, 0], [0, 1], [0, -1]] as const).filter(([dx, dz]) => track.has(`${gridX + dx}:${gridZ + dz}`));
+  if (joined.length !== 2) return null;
+  const [a, b] = joined;
+  if (a[0] + b[0] === 0 && a[1] + b[1] === 0) return null;
+  return [a[0] + b[0], a[1] + b[1]];
+}
