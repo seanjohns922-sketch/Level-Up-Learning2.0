@@ -3,8 +3,8 @@
 // laser gate, scanner tower, trip wire alarm, drone pad, robo guard dogs, patrol drone, sentry bot,
 // and the Tower Shield over the real Tower. Units are world metres (the explorer is about 2 tall).
 import { useFrame } from "@react-three/fiber";
-import { createContext, useContext, useRef, type MutableRefObject, type ReactNode } from "react";
-import { AdditiveBlending, DoubleSide, Quaternion, Vector3, type Group, type Mesh, type MeshBasicMaterial } from "three";
+import { createContext, useContext, useEffect, useMemo, useRef, type MutableRefObject, type ReactNode } from "react";
+import { AdditiveBlending, BufferGeometry, DoubleSide, Float32BufferAttribute, Quaternion, Vector3, type Group, type Mesh, type MeshBasicMaterial } from "three";
 import { Block } from "@/components/world3d/premium-homes/HomeKit";
 import { defenceSounds } from "@/lib/audio/defence-sfx";
 import { DEFENCE_REACT_DISTANCE, insideTripWire } from "@/lib/world3d/tower-defence";
@@ -219,11 +219,20 @@ function LockOnSpin({ speed, lock, offset = 0, children }: { speed: number; lock
   return <group ref={ref}>{children}</group>;
 }
 /** A fan-shaped laser sheet from the scanner head down to the ground, sweeping round. */
-function LaserFan({ color, length = 3.4, lock, offset }: { color: string; length?: number; lock?: MutableRefObject<Nearby>; offset?: number }) {
+/** A laser sheet from the emitter down to the ground and out to `reach`, sweeping round: the beam always
+ * lands on the ground, however high the emitter is (`drop` is its height above the ground). */
+function LaserFan({ color, reach, drop, lock, offset }: { color: string; reach: number; drop: number; lock?: MutableRefObject<Nearby>; offset?: number }) {
+  const sheet = useMemo(() => {
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 0, -drop, 0, reach, -drop, 0], 3));
+    return geometry;
+  }, [reach, drop]);
+  useEffect(() => () => sheet.dispose(), [sheet]);
   return (
     <LockOnSpin speed={1.4} lock={lock} offset={offset}>
-      <mesh><circleGeometry args={[length, 24, -Math.PI * 0.5, Math.PI * 0.32]} /><meshBasicMaterial color={color} transparent opacity={0.26} blending={AdditiveBlending} side={DoubleSide} depthWrite={false} toneMapped={false} /></mesh>
-      <Laser from={[0, 0, 0]} to={[Math.cos(-Math.PI * 0.18) * length, Math.sin(-Math.PI * 0.18) * length, 0]} color={color} width={0.02} />
+      <mesh geometry={sheet}><meshBasicMaterial color={color} transparent opacity={0.26} blending={AdditiveBlending} side={DoubleSide} depthWrite={false} toneMapped={false} /></mesh>
+      <Laser from={[0, 0, 0]} to={[reach, -drop, 0]} color={color} width={0.02} />
+      <mesh position={[reach, -drop + 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[0.18, 20]} /><meshBasicMaterial color={color} transparent opacity={0.8} blending={AdditiveBlending} depthWrite={false} toneMapped={false} /></mesh>
     </LockOnSpin>
   );
 }
@@ -252,6 +261,8 @@ export function ScannerTower({ level }: { level: TechLevel }) {
   const h = [5.4, 5.2, 5.0, 4.8][level - 1];
   const color = level === 4 ? PINK : CYAN, accent = level === 4 ? AMBER : WHITE;
   const globe = [0.38, 0.46, 0.56, 0.66][level - 1];
+  // The head sits here, so the laser sweeps fall exactly this far to reach the ground.
+  const headHeight = h + globe * 0.9;
   const rings = level + 1;
   // Come close and every laser sweep swings round to lock on to the explorer.
   const { group, state } = useExplorer(DEFENCE_REACT_DISTANCE.scanner);
@@ -274,9 +285,9 @@ export function ScannerTower({ level }: { level: TechLevel }) {
         {level >= 2 ? <Spin speed={-1.4}><group rotation={[0.35, 0, 0]}><mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[globe + 0.28, 0.035, 8, 40]} /><meshBasicMaterial color={accent} toneMapped={false} /></mesh></group></Spin> : null}
         {level >= 3 ? <Satellites radius={globe + 0.55} color={accent} count={level === 4 ? 4 : 3} /> : null}
         {level === 4 ? <Bob amount={0.1} speed={1.5}><group position={[0, globe + 0.45, 0]}><Spin speed={1}>{Array.from({ length: 10 }, (_, i) => { const a = (i / 10) * Math.PI * 2; return <Block key={i} size={[0.34, 0.14, 0.12]} pos={[Math.cos(a) * 0.9, 0, Math.sin(a) * 0.9]} rot={[0, -a, 0]} color={AMBER} r={0.03} glow={1.5} />; })}</Spin></group></Bob> : null}
-        <LaserFan color={color} length={[4.2, 5.0, 6.0, 7.0][level - 1]} lock={state} />
-        {level >= 2 ? <group rotation={[0, Math.PI, 0]}><LaserFan color={level === 4 ? AMBER : GREEN} length={[0, 4.4, 5.4, 6.4][level - 1]} lock={state} offset={-Math.PI} /></group> : null}
-        {level === 4 ? <group rotation={[0, Math.PI / 2, 0]}><LaserFan color={CYAN} length={6.4} lock={state} offset={-Math.PI / 2} /></group> : null}
+        <LaserFan color={color} reach={[3.2, 3.8, 4.4, 5.0][level - 1]} drop={headHeight} lock={state} />
+        {level >= 2 ? <group rotation={[0, Math.PI, 0]}><LaserFan color={level === 4 ? AMBER : GREEN} reach={[0, 3.2, 3.8, 4.4][level - 1]} drop={headHeight} lock={state} offset={-Math.PI} /></group> : null}
+        {level === 4 ? <group rotation={[0, Math.PI / 2, 0]}><LaserFan color={CYAN} reach={4.4} drop={headHeight} lock={state} offset={-Math.PI / 2} /></group> : null}
       </group>
       {level >= 3 ? <group position={[0, h * 0.62, 0]}><SensorArm side={1} color={accent} length={0.9} /><SensorArm side={-1} color={accent} length={0.9} /></group> : null}
       {level === 4 ? <Laser from={[0, h + globe * 1.9, 0]} to={[0, h + 40, 0]} color={PINK} width={0.08} pulse={2.5} /> : null}
@@ -552,7 +563,8 @@ function QuadDrone({ level }: { level: TechLevel }) {
       ))}
       <group position={[0, -0.14, 0.15]}><Gimbal color={glow} /></group>
       {level >= 2 ? <group position={[0, -0.16, 0.15]}><Cone length={2.6} radius={0.7} color="#fff6c8" opacity={0.12} /></group> : null}
-      {level === 3 ? <group position={[0, -0.16, 0]}><LaserFan color={GREEN} length={2.2} /></group> : null}
+      {/* The patrol drone flies about 3.4 of its own units up, so its scan reaches the ground below. */}
+      {level === 3 ? <group position={[0, -0.16, 0]}><LaserFan color={GREEN} reach={2.2} drop={3.3} /></group> : null}
     </group>
   );
 }
