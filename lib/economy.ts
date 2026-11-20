@@ -149,13 +149,10 @@ function demoSlotFor(item: EconomyItem | undefined): string | null {
   return (item.metadata as { slot?: string })?.slot ?? item.category;
 }
 
-function isCentralWorldReward(item: EconomyItem) {
-  const metadata = item.metadata as { marketplaceCategory?: unknown; slot?: unknown; premiumHome?: unknown; buildKit?: unknown };
-  // Premium upgrades and build kits have no plot slot but are still bought, never given.
-  if (typeof metadata.premiumHome === "string" || typeof metadata.buildKit === "string") return true;
-  return typeof metadata.marketplaceCategory === "string"
-    && typeof metadata.slot === "string"
-    && metadata.slot.startsWith("world_plot_");
+/** Demo mode owns every world item, home, ride and build kit (at its top level), so every object
+ * can be shown. Only the premium upgrade steps stay to be bought, so the Upgrade button can be shown too. */
+function demoKeepsToBuy(item: EconomyItem) {
+  return typeof (item.metadata as { premiumHomeLevel?: unknown }).premiumHomeLevel === "number";
 }
 
 function readDemoPurchasedKeys() {
@@ -184,7 +181,7 @@ function buildDemoEconomyState(items: EconomyItem[]): EconomyState {
   const equipped = readDemoJson<Record<string, string>>(DEMO_EQUIPPED_STORAGE_KEY, {});
   const purchased = readDemoPurchasedKeys();
   const inventory = items
-    .filter((item) => !isCentralWorldReward(item) || purchased.has(item.item_key) || Object.values(equipped).includes(item.item_key))
+    .filter((item) => !demoKeepsToBuy(item) || purchased.has(item.item_key) || Object.values(equipped).includes(item.item_key))
     .map((item) => ({ item_key: item.item_key, acquired_at: now, acquisition_type: "demo" }));
   return {
     wallet: { ...DEMO_WALLET },

@@ -10,9 +10,9 @@ const legendsHall = read("app/legends/page.tsx");
 const demoMode = read("lib/demo-mode.ts");
 
 const checks = [
-  ["Demo economy keeps central-world rewards purchasable", economy.includes("isCentralWorldReward") && economy.includes("DEMO_PURCHASED_STORAGE_KEY")],
+  ["Demo owns every world object and build kit; only premium upgrade steps stay purchasable", economy.includes("function demoKeepsToBuy(item: EconomyItem)") && economy.includes("premiumHomeLevel === \"number\"") && economy.includes("DEMO_PURCHASED_STORAGE_KEY")],
   ["Demo purchases persist locally", economy.includes("purchased.add(itemKey)") && economy.includes("writeDemoPurchasedKeys(purchased)")],
-  ["Demo placed world rewards persist by slot", economy.includes("equipped[slot] = itemKey") && economy.includes("world_plot_")],
+  ["Demo placed world rewards persist by slot", economy.includes("equipped[slot] = itemKey") && economy.includes("(item.metadata as { slot?: string })?.slot")],
   ["Demo economy has a showcase wallet", economy.includes("xp_balance: 999999")],
   ["Demo gem vault marks every active definition owned", gems.includes("owned: activeDefinitions.map")],
   ["Demo gem progress is complete", gems.includes("Number(definition.target ?? 1)")],
