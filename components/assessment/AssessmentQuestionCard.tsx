@@ -323,6 +323,9 @@ function isMeasurelandsVisualOption(label: string) {
   return measurelandsEmojiFor(label) !== "📦" || measurelandsConceptIcon(label) !== null;
 }
 
+/** Year 8 Number "classification" items draw nothing, so they get the full-width choice layout instead of an empty panel. */
+const isBlankYear8NumberVisual = (visual: Record<string, unknown>) => visual.type === "number_y8_panel" && visual.kind === "classification";
+
 export default function AssessmentQuestionCard({
   question,
   value,
@@ -388,7 +391,7 @@ export default function AssessmentQuestionCard({
   const groundItem=groundNumberReleaseItem(question);
   if (groundItem) return <PrepNumberCandidateCard key={question.id} item={groundItem} value={value} onChange={onChange}/>;
 
-  const renderedVisual = visual?.type === "measurement_year8_panel" ? <Year8MeasurementAssessmentVisual visual={visual as unknown as Measurement8Visual}/> : visual?.type === "measurement_year7_panel" ? <Year7MeasurementAssessmentVisual visual={visual as unknown as Measurement7Visual}/> : visual?.type === "measurement_year6_panel" ? <Year6MeasurementAssessmentVisual visual={visual as unknown as Measurement6Visual}/> : visual?.type === "measurement_year5_panel" ? <Year5MeasurementAssessmentVisual visual={visual as unknown as Measurement5Visual} value={value} onChange={onChange}/> : visual?.type === "measurement_year4_panel" ? <Year4MeasurementAssessmentVisual visual={visual as unknown as Measurement4Visual}/> : visual?.type === "measurement_year3_panel" ? <Year3MeasurementAssessmentVisual visual={visual as unknown as Measurement3Visual}/> : visual?.type === "measurement_year2_panel" ? <Year2MeasurementAssessmentVisual visual={visual as unknown as Measurement2Visual}/> : visual?.type === "measurement_year1_panel" ? <Year1MeasurementAssessmentVisual visual={visual as unknown as Measurement1Visual}/> : visual?.type === "measurement_ground_panel" ? <GroundMeasurementAssessmentVisual visual={visual as unknown as GroundMeasurementVisual}/> : visual ? (
+  const renderedVisual = visual?.type === "measurement_year8_panel" ? <Year8MeasurementAssessmentVisual visual={visual as unknown as Measurement8Visual}/> : visual?.type === "measurement_year7_panel" ? <Year7MeasurementAssessmentVisual visual={visual as unknown as Measurement7Visual}/> : visual?.type === "measurement_year6_panel" ? <Year6MeasurementAssessmentVisual visual={visual as unknown as Measurement6Visual}/> : visual?.type === "measurement_year5_panel" ? <Year5MeasurementAssessmentVisual visual={visual as unknown as Measurement5Visual} value={value} onChange={onChange}/> : visual?.type === "measurement_year4_panel" ? <Year4MeasurementAssessmentVisual visual={visual as unknown as Measurement4Visual}/> : visual?.type === "measurement_year3_panel" ? <Year3MeasurementAssessmentVisual visual={visual as unknown as Measurement3Visual}/> : visual?.type === "measurement_year2_panel" ? <Year2MeasurementAssessmentVisual visual={visual as unknown as Measurement2Visual}/> : visual?.type === "measurement_year1_panel" ? <Year1MeasurementAssessmentVisual visual={visual as unknown as Measurement1Visual}/> : visual?.type === "measurement_ground_panel" ? <GroundMeasurementAssessmentVisual visual={visual as unknown as GroundMeasurementVisual}/> : visual && !isBlankYear8NumberVisual(visual) ? (
     <>
       {realmId === "chance" && typeof visual.type === "string" ? (
         <ChanceVisual visual={visual as unknown as ChanceVisualData} />

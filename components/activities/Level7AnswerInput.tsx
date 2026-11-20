@@ -32,7 +32,7 @@ function Level7TypedInput({spec,onAnswer,realm='number',disabled=false,initialVa
  :<div className={spec.kind==='fraction'&&!alternate?'flex w-44 flex-col gap-2':'flex w-full min-w-0 flex-wrap items-center gap-3'}>
  {Array.from({length:alternate?1:count},(_,i)=><div key={i} className="flex min-w-0 max-w-full items-center gap-3">
  {i>0&&spec.kind==='ratio'&&<span className="text-3xl">:</span>}
- <label className={`flex flex-col gap-1 ${spec.kind==='expression'||spec.kind==='set'?'w-72 max-w-full':''} ${spec.kind==='fraction'&&i===1&&!alternate?'border-t-2 border-slate-800 pt-2':''}`}><span className="text-sm">{alternate?'Decimal answer':labels[i]??`Value ${i+1}`}</span>{field(i,spec.kind==='expression'||spec.kind==='set'?'w-full':spec.kind==='list'?'w-24':'w-40')}</label></div>)}
+ <label className={`flex flex-col gap-1 ${spec.kind==='expression'||spec.kind==='set'||spec.kind==='text'?'w-72 max-w-full':''} ${spec.kind==='fraction'&&i===1&&!alternate?'border-t-2 border-slate-800 pt-2':''}`}><span className="text-sm">{alternate?'Decimal answer':labels[i]??`Value ${i+1}`}</span>{field(i,spec.kind==='expression'||spec.kind==='set'||spec.kind==='text'?'w-full':spec.kind==='list'?'w-24':'w-40')}</label></div>)}
  </div>}{spec.unit&&spec.unit!=='$'&&<span className="text-xl font-bold">{spec.unit}</span>}</div>
  {spec.kind==='fraction'&&!spec.format&&<button type="button" disabled={disabled} className="mt-3 block underline" onClick={()=>{setAlternate(!alternate);setValues(Array(count).fill(''));setWhole('');setError('');setTip(null);setShowHow(false);onEditing?.();}}>{alternate?'Use fraction boxes':'Use a decimal instead'}</button>}
  {tip&&<aside className="mt-4 rounded-xl border p-4" style={{borderColor:t.ctaFrom,background:t.surfaceTint}}>
