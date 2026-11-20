@@ -1,0 +1,238 @@
+{
+  "environment": "isolated local instrumented 100-student/four-teacher startup; no config changes",
+  "durationSeconds": 61,
+  "verifiedStudents": 100,
+  "verifiedWrites": 200,
+  "expectedEvents": 200,
+  "observedEvents": 200,
+  "failures": [],
+  "failedRequests": 0,
+  "gatePassed": false,
+  "latencies": [
+    {
+      "name": "teacher_login",
+      "requests": 4,
+      "p95Ms": 178,
+      "p99Ms": 178
+    },
+    {
+      "name": "student_login_lookup",
+      "requests": 100,
+      "p95Ms": 711,
+      "p99Ms": 763
+    },
+    {
+      "name": "get_student_runtime_context_secure",
+      "requests": 100,
+      "p95Ms": 575,
+      "p99Ms": 794
+    },
+    {
+      "name": "dashboard_daily_activity",
+      "requests": 12,
+      "p95Ms": 751,
+      "p99Ms": 751
+    },
+    {
+      "name": "upsert_live_student_activity_secure",
+      "requests": 100,
+      "p95Ms": 477,
+      "p99Ms": 621
+    },
+    {
+      "name": "dashboard_live_activity",
+      "requests": 12,
+      "p95Ms": 449,
+      "p99Ms": 449
+    },
+    {
+      "name": "get_student_activity_daily_secure",
+      "requests": 200,
+      "p95Ms": 448,
+      "p99Ms": 555
+    },
+    {
+      "name": "dashboard_assessments",
+      "requests": 12,
+      "p95Ms": 1068,
+      "p99Ms": 1068
+    },
+    {
+      "name": "dashboard_lesson_attempts",
+      "requests": 12,
+      "p95Ms": 1133,
+      "p99Ms": 1133
+    },
+    {
+      "name": "dashboard_quiz_attempts",
+      "requests": 12,
+      "p95Ms": 708,
+      "p99Ms": 708
+    },
+    {
+      "name": "touch_live_student_presence_secure",
+      "requests": 200,
+      "p95Ms": 414,
+      "p99Ms": 654
+    },
+    {
+      "name": "upsert_student_activity_daily_secure",
+      "requests": 200,
+      "p95Ms": 429,
+      "p99Ms": 531
+    },
+    {
+      "name": "insert_live_activity_event_secure",
+      "requests": 200,
+      "p95Ms": 292,
+      "p99Ms": 436
+    },
+    {
+      "name": "dashboard_events_initial",
+      "requests": 4,
+      "p95Ms": 1984,
+      "p99Ms": 1984
+    },
+    {
+      "name": "dashboard_refresh",
+      "requests": 12,
+      "p95Ms": 1986,
+      "p99Ms": 1986
+    },
+    {
+      "name": "dashboard_events_incremental",
+      "requests": 8,
+      "p95Ms": 173,
+      "p99Ms": 173
+    },
+    {
+      "name": "get_live_student_activity_secure",
+      "requests": 100,
+      "p95Ms": 163,
+      "p99Ms": 216
+    }
+  ],
+  "settings": {
+    "pg_stat_statements.track_planning": "off",
+    "track_io_timing": "off",
+    "track_wal_io_timing": "off"
+  },
+  "statementGroups": [
+    {
+      "role": "teacher authenticated",
+      "category": "teacher compact event page RPC",
+      "calls": 27,
+      "executionMs": 1594.6724189999986,
+      "averageExecutionMs": 59.06194144444439
+    },
+    {
+      "role": "student anon",
+      "category": "daily activity RPC",
+      "calls": 400,
+      "executionMs": 1493.677969999997,
+      "averageExecutionMs": 3.7341949249999926
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "lesson attempts table",
+      "calls": 40,
+      "executionMs": 995.1080410000022,
+      "averageExecutionMs": 24.877701025000057
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "assessment table",
+      "calls": 40,
+      "executionMs": 802.817420000003,
+      "averageExecutionMs": 20.070435500000077
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "quiz attempts table",
+      "calls": 28,
+      "executionMs": 728.0914129999996,
+      "averageExecutionMs": 26.00326474999999
+    },
+    {
+      "role": "student anon",
+      "category": "live activity RPC",
+      "calls": 200,
+      "executionMs": 506.9291589999998,
+      "averageExecutionMs": 2.534645794999999
+    },
+    {
+      "role": "student anon",
+      "category": "student event insert RPC",
+      "calls": 200,
+      "executionMs": 495.3816020000013,
+      "averageExecutionMs": 2.4769080100000065
+    },
+    {
+      "role": "student anon",
+      "category": "presence RPC",
+      "calls": 200,
+      "executionMs": 467.00270499999897,
+      "averageExecutionMs": 2.335013524999995
+    },
+    {
+      "role": "student anon",
+      "category": "student context RPC",
+      "calls": 100,
+      "executionMs": 274.9430790000001,
+      "averageExecutionMs": 2.7494307900000012
+    },
+    {
+      "role": "student anon",
+      "category": "student login RPC",
+      "calls": 100,
+      "executionMs": 171.59887099999992,
+      "averageExecutionMs": 1.715988709999999
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "live activity RPC",
+      "calls": 12,
+      "executionMs": 118.08079300000009,
+      "averageExecutionMs": 9.84006608333334
+    },
+    {
+      "role": "student anon",
+      "category": "session configuration",
+      "calls": 1200,
+      "executionMs": 88.50754099999892,
+      "averageExecutionMs": 0.07375628416666577
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "event history table",
+      "calls": 12,
+      "executionMs": 27.279584,
+      "averageExecutionMs": 2.273298666666667
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "teacher daily activity RPC",
+      "calls": 12,
+      "executionMs": 21.06316700000002,
+      "averageExecutionMs": 1.7552639166666684
+    },
+    {
+      "role": "teacher authenticated",
+      "category": "session configuration",
+      "calls": 175,
+      "executionMs": 4.130206000000015,
+      "averageExecutionMs": 0.02360117714285723
+    }
+  ],
+  "connectionSamples": 1501,
+  "maximumObservedTransactionAgeMs": 116.65,
+  "maximumObservedBlockerCount": 0,
+  "limitations": [
+    "Profiling adds observer overhead; not comparable as a performance improvement.",
+    "Statement totals include the sampled interval, preparation and background activity.",
+    "Planning and IO timing disabled: zeros are not evidence of zero cost.",
+    "50ms samples miss short transactions; observed age is not full transaction duration.",
+    "SQL and client timings are independent distributions and cannot be subtracted.",
+    "No exact acquisition/request correlation; no hosted or 10000-user claim."
+  ]
+}

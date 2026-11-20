@@ -1450,6 +1450,40 @@ All child runs completed; exit code 1 on simultaneous runs records the expected
 latency-gate failures. The comparison stopped on any correctness/transport
 failure (none occurred). Aggregate JSON assertions and diff checks passed.
 
+### Mixed-startup database trace — 20 November 2026
+
+The next 60-second simultaneous-start run added the existing transaction and
+50-ms connection samplers (75-second collection windows). All 100 students,
+200 activity increments and 200 new events passed the existing integrity checks;
+there were no failed requests. The latency gate failed: initial events p95
+1,984 ms, whole dashboard 1,986 ms and student login 711 ms. Observer overhead
+and host variation mean this is not evidence of a regression from the unprofiled
+startup pairs. No production or local runtime settings changed.
+
+The largest individual teacher SQL entry was compact event paging: 27 calls,
+1,594.7 ms aggregate execution, 59.1 ms average. Several attempt-table statements
+also contributed measurable execution time. Among 1,501 connection snapshots,
+maximum observed transaction age was 116.65 ms and no blocking PID was observed.
+Sampled states included idle-in-transaction/ClientRead and WAL waits. Samples
+miss short operations, and observed age is not the complete transaction lifetime.
+Planning and I/O timing were off; their zero counters must not be treated as
+evidence of no planning or disk cost. Aggregate SQL averages cannot be subtracted
+from independent client p95s to calculate waiting time.
+
+This narrows but does not resolve the startup bottleneck. Earlier exact acquisition
+instrumentation covered student-only traffic on a custom runtime, not this mixed
+official-runtime workload. Reuse that work deliberately; repeating undifferentiated
+load tests or increasing a production pool would not establish the missing causal
+link. Next targeted work is request-correlated acquisition/connection-use timing
+for teacher head/page reads alongside student login, and profiling compact paging
+without changing its complete-history semantics. Keep the 250-student gate closed.
+
+Aggregate: `startup-trace-summary-2026-11-20.json`. Private source reports:
+`/Users/seanjohns/reliq-audits/2026-11-20/startup-trace/`. Both samplers and the
+workload exited; the workload's exit 1 denotes the latency-gate failure. The
+aggregate consistency and whitespace checks passed. No application source,
+schema, permission, lesson or visual changes; no migration is needed.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate
