@@ -45,11 +45,22 @@ for (const table of ['student_lesson_attempts','student_weekly_quiz_attempts','s
   assert(test.calls.every(c => c.filters.completed === (table === 'student_lesson_attempts' ? true : undefined)));
 }
 const empty = fixture();
+// Full-sized summary pages reduce round trips while still draining all history.
+for (const cap of [500, 1000]) {
+  const test = fixture({cap});
+  assert.deepEqual((await fetchLiveClassAttempts(test.client,'student_lesson_attempts',['ours'])).data,rows);
+  assert.equal(test.calls.length, cap === 1000 ? 3 : 4, 'Bounded head plus complete pages, including a lower server cap');
+}
+const largePageFailure = fixture({cap:1000,failAt:3});
+assert.equal((await fetchLiveClassAttempts(largePageFailure.client,'student_lesson_attempts',['ours'])).data,null,'Failure after a full summary page must not expose partial results');
 // Report details must survive pagination without increasing routine class payloads.
 const reportRows = rows.map(row => ({ ...row, question_results: [{ correct: true, curriculum_codes: ['AC9M3N01'] }] }));
 const report = fixture({ data: reportRows });
 assert.deepEqual((await fetchLiveClassAttempts(report.client,'student_realm_assessments',['ours'],()=>true,{includeQuestionResults:true})).data,reportRows);
 assert(report.calls.slice(1).every(call => call.projection.includes('question_results')));
+const detailedPages = fixture({data:reportRows,cap:1000});
+assert.deepEqual((await fetchLiveClassAttempts(detailedPages.client,'student_realm_assessments',['ours'],()=>true,{includeQuestionResults:true})).data,reportRows);
+assert.equal(detailedPages.calls.length,4,'Detailed answer payloads keep their smaller page bound');
 const summary = fixture();
 await fetchLiveClassAttempts(summary.client,'student_realm_assessments',['ours']);
 assert(summary.calls.every(call => !call.projection.includes('question_results')));

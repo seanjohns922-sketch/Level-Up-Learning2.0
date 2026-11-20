@@ -1,10 +1,11 @@
-// Read-only local experiment. Production page sizes and permissions stay unchanged.
+// Read-only local comparison of page sizes; never alters application configuration.
 /* global performance, fetch */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
 import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
+import { attemptPageClient } from './attempt-page-client.mjs';
 
 const config = localConfig();
 const tables = ['student_lesson_attempts', 'student_weekly_quiz_attempts', 'student_realm_assessments'];
@@ -18,19 +19,15 @@ for (let groupIndex = 0; groupIndex < 4; groupIndex++) {
   });
   assert.equal((await client.auth.signInWithPassword({ email: group.email, password: group.password })).error, null);
   const ids = group.students.map(student => student.studentId);
-  // Override only the existing reader's page-size request, keeping its bounded
+  // Override only the reader's page-size request, keeping its bounded
   // UUID cursor, short-page handling, projection, cancellation and RLS path.
-  const candidate = { from(table) { return { select(...args) {
-    const query = client.from(table).select(...args);
-    const limit = query.limit.bind(query);
-    query.limit = size => limit(size === 500 ? 1000 : size);
-    return query;
-  } }; } };
+  const candidate = attemptPageClient(client, 1000);
+  const baseline = attemptPageClient(client, 500);
   for (let round = 0; round < 3; round++) {
     const snapshots = {};
     for (const pageSize of round % 2 ? [1000, 500] : [500, 1000]) {
       const before = requests, start = performance.now();
-      const outcomes = await Promise.allSettled(tables.map(table => fetchLiveClassAttempts(pageSize === 500 ? client : candidate, table, ids)));
+      const outcomes = await Promise.allSettled(tables.map(table => fetchLiveClassAttempts(pageSize === 500 ? baseline : candidate, table, ids)));
       const rows = outcomes.map(outcome => {
         assert.equal(outcome.status, 'fulfilled');
         assert.equal(outcome.value.error, null);

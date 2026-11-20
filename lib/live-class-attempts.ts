@@ -49,7 +49,10 @@ export async function fetchLiveClassAttempts<T extends AttemptTable>(
     // Detailed answers are only needed for on-demand assessment reports.
     const detail = table === "student_realm_assessments" && options.includeQuestionResults ? ",question_results" : "";
     let request = query(head ? "id" : `id,${columns[table]}${detail}`)
-      .order("id", { ascending: !head }).limit(head ? 1 : 500);
+      // Summary rows are small; larger pages reduce repeated authenticated reads.
+      // Detailed answer reports retain the smaller payload bound. The shared
+      // reader still drains short pages if the server enforces a lower cap.
+      .order("id", { ascending: !head }).limit(head ? 1 : options.includeQuestionResults ? 500 : 1000);
     if (through) request = request.lte("id", through);
     if (after) request = request.gt("id", after);
     const result = await request;

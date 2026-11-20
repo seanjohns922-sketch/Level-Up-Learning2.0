@@ -1315,6 +1315,43 @@ HTTP profiles, authenticated plans and page-size results. Next: compare page
 sizes under the same mixed workload before deciding on an application change;
 then rerun the short gate before the sustained test.
 
+### Mixed-load history page comparison — 20 November 2026
+
+Pushed the prior index-parity guard and static comparison as `918e149e`.
+Added an explicit local-only `SCALE_ATTEMPT_PAGE_SIZE` (500 or 1000) and shared
+test adapter so both sizes use the production reader, projections, UUID bounds
+and existing table RLS. Reports label the size and use separate output filenames.
+
+Consecutive 60-second compact-dashboard runs used 100 synthetic students and
+four teachers with resource monitoring. At 500 rows, dashboard refresh p95 was
+1,532 ms with 204 teacher HTTP requests. At 1000 rows it was 879 ms with 156
+teacher HTTP requests; the latter passed the short preliminary latency gate.
+Both verified all 100 students, 200 exact activity writes, complete attempt
+counts, emitted events and scope checks, with no failed requests. The 500-row run
+preceded the 1000-row run; these small samples and evolving local event history
+do not isolate all warm-cache/system effects or certify sustained capacity.
+
+Applied 1000-row pages to summary reads in `lib/live-class-attempts.ts`.
+Detailed answer reports retain 500-row pages. The bounded UUID pagination,
+lower-server-cap handling, cancellation, access filters and all-or-nothing error
+behaviour are unchanged. Regression checks cover both server caps, failure after
+a full large page, and retaining the smaller detailed-answer payload bound.
+The local dashboard runner now defaults to the shipped 1000-row summary size;
+500 remains available for comparisons. No migration is required.
+
+Private paired reports and resources are in
+`/Users/seanjohns/reliq-audits/2026-11-20/page-size-pair-*`; HTTP profiles and logs
+use `page-size-500-*` and `page-size-1000-*`. Canonical completion/retry under
+concurrent load, realtime delivery, physical-device rendering and the 30-minute
+sustained gate remain separate outstanding checks.
+
+Validation for the summary-page change: all 20 critical checks, QA lint, targeted
+staging-script lint, typecheck and the full production build passed. Reran the
+history reader check after adding the detailed-page bound assertion. The first
+sandbox build failed DNS access to Google Fonts and was stopped; the complete
+network-enabled build passed. Logs are `history-page-size-build.log` and
+`history-page-size-build-network.log` in the same private audit directory.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate
