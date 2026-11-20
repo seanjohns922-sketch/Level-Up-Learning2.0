@@ -481,8 +481,9 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
           ...courts.map(({ id, court }) => ({ id, position: [court.x, 0, court.z] as [number, number, number], distance: court.reach })),
         ]}
         onNearestTargetId={handleNearestTarget}
-        cameraDistance={11.5}
-        cameraTargetHeight={3.6}
+        initialPitch={-0.1}
+        cameraDistance={13}
+        cameraTargetHeight={3.3}
         cameraEnabled={roaming}
         movementEnabled={roaming}
         hidden={!roaming}
