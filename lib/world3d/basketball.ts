@@ -1,7 +1,10 @@
 // The basketball court's shooting game: where the hoops are at each level, how likely a shot is to go
 // in from a distance, and the arc the ball flies. Pure, so it can be tested. Units are world metres.
-import type { PremiumHomeLevel } from "./premium-homes";
+import { PREMIUM_HOME_SPECS, type PremiumHomeLevel } from "./premium-homes";
 
+/** The court is modelled at real size (a 3.05 m rim) and drawn bigger in the hub to match the explorer. */
+export const COURT_SCALE = PREMIUM_HOME_SPECS.basketball.scale ?? 1;
+/** Rim height in the court model; in the hub it is RIM_HEIGHT x COURT_SCALE. */
 export const RIM_HEIGHT = 3.05;
 /** The three-point line on our kid-sized court. */
 export const THREE_POINT_RADIUS = 3.6;
@@ -34,10 +37,12 @@ export type Shot = { from: readonly [number, number, number]; to: readonly [numb
 /** Plans a shot from the explorer's hands to a hoop. `roll` is a random number in [0, 1). */
 export function planShot(from: readonly [number, number, number], hoop: readonly [number, number], roll: number): Shot {
   const distance = Math.hypot(hoop[0] - from[0], hoop[1] - from[2]);
-  const makes = roll < shotChance(distance);
+  // Distances are in the hub, so judge them as if on the real-size court.
+  const makes = roll < shotChance(distance / COURT_SCALE);
+  const rim = RIM_HEIGHT * COURT_SCALE;
   // A miss clangs off the rim, a little short and to one side.
-  const to: [number, number, number] = makes ? [hoop[0], RIM_HEIGHT, hoop[1]] : [hoop[0] + 0.32, RIM_HEIGHT + 0.08, hoop[1] + 0.25];
-  return { from, to, makes, points: makes ? shotPoints(distance) : 0, duration: 0.7 + distance * 0.06 };
+  const to: [number, number, number] = makes ? [hoop[0], rim, hoop[1]] : [hoop[0] + 0.32, rim + 0.08, hoop[1] + 0.25];
+  return { from, to, makes, points: makes ? shotPoints(distance / COURT_SCALE) : 0, duration: 0.7 + distance * 0.06 };
 }
 /** Where the ball is part-way through a shot (t from 0 to 1): a straight line plus a high arc. */
 export function ballAt(shot: Shot, t: number): [number, number, number] {
@@ -63,7 +68,7 @@ export function nearestHoop(x: number, z: number, hoops: readonly (readonly [num
 export function courtInWorld(placement: { gridX: number; gridZ: number; rotation: number }, level: PremiumHomeLevel, cellSize: number) {
   const x = placement.gridX * cellSize, z = placement.gridZ * cellSize, a = (placement.rotation * Math.PI) / 180;
   const cos = Math.cos(a), sin = Math.sin(a);
-  const toWorld = (hx: number, hz: number): [number, number] => [x + hx * cos + hz * sin, z - hx * sin + hz * cos];
+  const toWorld = (hx: number, hz: number): [number, number] => [x + (hx * cos + hz * sin) * COURT_SCALE, z + (-hx * sin + hz * cos) * COURT_SCALE];
   const [cx, cz] = toWorld(0, COURT_AREA[level].z);
-  return { x: cx, z: cz, hoops: HOOPS[level].map(([hx, hz]) => toWorld(hx, hz)), reach: courtReach(level) };
+  return { x: cx, z: cz, hoops: HOOPS[level].map(([hx, hz]) => toWorld(hx, hz)), reach: courtReach(level) * COURT_SCALE };
 }

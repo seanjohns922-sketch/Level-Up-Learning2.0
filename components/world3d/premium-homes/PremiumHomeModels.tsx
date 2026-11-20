@@ -283,8 +283,10 @@ function AptL4({ night }: Night) {
   );
 }
 
-/** Model units to world metres: a 0.86 door becomes about 2 m, beside the 1.98 m avatar. */
-export const PREMIUM_HOME_SCALE = 2.4;
+/** Model units to world metres: a 0.86 door becomes about 2.6 m, comfortably above the 1.98 m explorer. */
+export const PREMIUM_HOME_SCALE = 3.0;
+/** Taller storeys for the apartments (their floors are modelled short), stretching the whole block evenly. */
+const STYLE_STRETCH: Partial<Record<PremiumHomeStyle, number>> = { apartment: 1.3 };
 
 type LevelModels = readonly [(p: Night) => ReactElement, (p: Night) => ReactElement, (p: Night) => ReactElement, (p: Night) => ReactElement];
 /** The defence models take their level directly; give each level its own component like the homes. */
@@ -322,7 +324,7 @@ const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   ...EVERYDAY_LEVEL_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
-const STYLE_DEPTH_OFFSET: Partial<Record<PremiumHomeStyle, number>> = { cottage: -1.3, modern: -0.75, treehouse: -1.15, apartment: -0.6 };
+const STYLE_DEPTH_OFFSET: Partial<Record<PremiumHomeStyle, number>> = { cottage: -1.63, modern: -0.94, treehouse: -1.44, apartment: -0.75 };
 /** Wider levels add a wing or a second tree to one side; this keeps each level centred on its plot. */
 const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, number>> = {
   "cottage-4": -0.6,
@@ -333,7 +335,7 @@ const CENTRE_OFFSET: Partial<Record<`${PremiumHomeStyle}-${PremiumHomeLevel}`, n
 export function PremiumHome({ style, level, night }: { style: PremiumHomeStyle; level: PremiumHomeLevel; night: boolean }) {
   const Model = MODELS[style][level - 1];
   return (
-    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={PREMIUM_HOME_SPECS[style].metres ? PREMIUM_HOME_SPECS[style].scale ?? 1 : PREMIUM_HOME_SCALE}>
+    <group position={[0, 0, STYLE_DEPTH_OFFSET[style] ?? 0]} scale={PREMIUM_HOME_SPECS[style].metres ? PREMIUM_HOME_SPECS[style].scale ?? 1 : [PREMIUM_HOME_SCALE, PREMIUM_HOME_SCALE * (STYLE_STRETCH[style] ?? 1), PREMIUM_HOME_SCALE]}>
       <group position={[CENTRE_OFFSET[`${style}-${level}`] ?? 0, 0, 0]}>
         <Model night={night} />
       </group>

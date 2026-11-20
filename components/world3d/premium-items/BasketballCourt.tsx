@@ -145,7 +145,7 @@ function Level4({ night }: { night: boolean }) {
       {HOOPS[4].map(([x, z]) => <Hoop key={z} x={x} z={z} facing={z < 0 ? 1 : -1} glow={NEON_PINK} />)}
       <Stands x={-5.2} rows={4} length={10} neon />
       <Stands x={5.2} rows={4} length={10} neon />
-      <Scoreboard x={0} z={-7.4} neon facing={0} />
+      <Scoreboard x={0} z={-7.25} neon facing={0} />
       {[-6.6, 6.6].map((z) => [-4.4, 4.4].map((x) => <group key={`${x}${z}`}><Block size={[0.12, 7.2, 0.12]} pos={[x, 3.6, z]} color="#1d1f2b" r={0.04} /><Block size={[0.04, 6.8, 0.04]} pos={[x, 3.6, z + (z < 0 ? 0.08 : -0.08)]} color={NEON_BLUE} r={0.01} glow={2} /></group>))}
       {[-6.6, 6.6].map((z) => <group key={z}><Block size={[9, 0.14, 0.14]} pos={[0, 7.2, z]} color="#1d1f2b" r={0.04} /><Block size={[8.8, 0.04, 0.04]} pos={[0, 7.1, z]} color={NEON_PINK} r={0.01} glow={2} /></group>)}
       {[-4.4, 4.4].map((x) => <group key={x}><Block size={[0.14, 0.14, 13.5]} pos={[x, 7.2, 0]} color="#1d1f2b" r={0.04} /><Block size={[0.04, 0.04, 13.2]} pos={[x, 7.1, 0]} color={NEON_PINK} r={0.01} glow={2} /></group>)}

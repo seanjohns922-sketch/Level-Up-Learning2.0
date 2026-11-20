@@ -70,10 +70,10 @@ const hoop = [0, -5.6];
 const make = ball.planShot([0, 1.9, 0], hoop, 0), miss = ball.planShot([0, 1.9, 0], hoop, 0.999);
 assert.ok(make.makes && make.points === 3 && !miss.makes && miss.points === 0);
 assert.deepEqual(ball.ballAt(make, 0), [0, 1.9, 0]);
-assert.deepEqual(ball.ballAt(make, 1).map((n) => Math.round(n * 100) / 100), [0, ball.RIM_HEIGHT, -5.6]);
-assert.ok(ball.ballAt(make, 0.5)[1] > ball.RIM_HEIGHT + 1, "the ball arcs above the rim");
+assert.deepEqual(ball.ballAt(make, 1).map((n) => Math.round(n * 100) / 100), [0, Math.round(ball.RIM_HEIGHT * ball.COURT_SCALE * 100) / 100, -5.6]);
+assert.ok(ball.ballAt(make, 0.5)[1] > ball.RIM_HEIGHT * ball.COURT_SCALE + 1, "the ball arcs above the rim");
 const turned = ball.courtInWorld({ gridX: 5, gridZ: 0, rotation: 90 }, 3, 2);
-assert.deepEqual(turned.hoops.map(([x, z]) => [Math.round(x * 100) / 100 + 0, Math.round(z * 100) / 100 + 0]), [[4.4, 0], [15.6, 0]], "hoops turn with the court");
+assert.deepEqual(turned.hoops.map(([x, z]) => [Math.round(x * 100) / 100 + 0, Math.round(z * 100) / 100 + 0]), [[10 - 5.6 * ball.COURT_SCALE, 0], [10 + 5.6 * ball.COURT_SCALE, 0]].map(([x, z]) => [Math.round(x * 100) / 100, z]), "hoops turn and scale with the court");
 assert.deepEqual(ball.nearestHoop(14, 0, turned.hoops), turned.hoops[1]);
 // Court markings stay on the playing surface at every level (the three-point arc and key included).
 for (const level of [1, 2, 3, 4]) {

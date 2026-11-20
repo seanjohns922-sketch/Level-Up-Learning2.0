@@ -27,7 +27,7 @@ export type ItemPresentation = {
 export const CASTLE_WALL_HEIGHT = 7.436;
 // Native mesh stays fixed; presentation fitting controls its world height.
 export const CASTLE_WALL_NATIVE_HEIGHT = 26;
-export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
+const BASE_PRESENTATION: Record<string, ItemPresentation> = {
   ...REALM_DESIGN_PRESENTATIONS,
   rail_straight: {height:.13, footprint:[2,2], sizing:"fixed", theme:"garden"},
   rail_corner: {height:.13, footprint:[2,2], sizing:"fixed", theme:"garden"},
@@ -49,11 +49,11 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   seesaw: {height:1.3, footprint:[4,2], width:3.8, theme:"garden"},
   small_slide: {height:2.4, footprint:[2,4], theme:"garden"},
   shield_decoration: {height:1.5, footprint:[2,2], theme:"fortress"},
-  supply_wagon: {height:1.4, footprint:[4,4], theme:"fortress"},
+  supply_wagon: {height:1.7, footprint:[4,4], theme:"fortress"},
   training_dummy: {height:1.9, footprint:[2,2], theme:"fortress"},
   stone_steps: {height:1, footprint:[2,2], theme:"fortress"},
   small_jetty: {height:1.2, footprint:[4,4], width:2, theme:"garden"},
-  rowboat: {height:0.7, footprint:[4,4], width:2.1, theme:"garden"},
+  rowboat: {height:0.7, footprint:[4,4], width:2.7, theme:"garden"},
   fishing_rod_stand: {height:2.1, footprint:[2,2], theme:"garden"},
   lifebuoy: {height:1.7, footprint:[2,2], theme:"garden"},
 
@@ -86,9 +86,9 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   signpost: {height:2.4, footprint:[4,2], theme:"garden"},
   balloons: {height:3, footprint:[4,4], theme:"garden"},
   picnic_table: {height:1.1, footprint:[4,4], theme:"garden"},
-  garden_arch: {height:3.4, footprint:[4,4], theme:"garden"},
-  gazebo: {height:4.5, footprint:[8,8], theme:"garden"},
-  market_stall: {height:3.5, footprint:[6,6], theme:"garden"},
+  garden_arch: {height:3.55, footprint:[4,4], theme:"garden"},
+  gazebo: {height:5.6, footprint:[8,8], theme:"garden"},
+  market_stall: {height:4.4, footprint:[6,6], theme:"garden"},
   swing: {height:3.8, footprint:[8,6], theme:"garden"},
   birdhouse: {height:3.2, footprint:[2,2], theme:"garden"},
   fire_pit: {height:.65, footprint:[4,4], width:2.2, resizeHeight:true, theme:"garden"},
@@ -141,7 +141,7 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   buoy: {height:1.2, footprint:[2,2], theme:"garden"},
   stone_planter: {height:0.5005, footprint:[2,2], theme:"fortress"},
   stone_bench: {height:0.65, footprint:[4,2], theme:"fortress"},
-  arched_window: {height:1.43, footprint:[4,2], theme:"fortress"},
+  arched_window: {height:3, footprint:[4,2], theme:"fortress"},
   sundial: {height:1.1, footprint:[2,2], theme:"fortress"},
   clubhouse: {height:7, footprint:[12,12], theme:"australian_reward"},
   games_room: {height:4, footprint:[8,8], theme:"australian_reward"},
@@ -177,6 +177,20 @@ export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = {
   windmill_garden: {height:10, footprint:[8,8], theme:"australian_reward"},
   bush_camp: {height:2.8, footprint:[8,8], theme:"australian_reward"},
 };
+
+/** Buildings the explorer walks up to are drawn 25% bigger than their first sizing, so doors clear the
+ * 1.98 m explorer comfortably (about 2.5 m) like a real door clears a person. Plots grow to match.
+ * Realm houses, big landmarks, pools, yards and trains already read correctly and keep their size. */
+export const BUILDING_SCALE = 1.25;
+const SCALED_BUILDING_KEYS = new Set<string>([
+  ...VILLAGE_BUILDINGS.map((item) => item.key),
+  "clubhouse", "games_room", "training_centre", "workshop", "country_bakery", "arcade", "party_house",
+]);
+const scaled = (n: number | undefined) => (n === undefined ? undefined : n * BUILDING_SCALE);
+const evenMetres = (n: number) => Math.ceil(n / 2) * 2;
+export const WORLD_ITEM_PRESENTATION: Record<string, ItemPresentation> = Object.fromEntries(Object.entries(BASE_PRESENTATION).map(([key, p]) => [key, SCALED_BUILDING_KEYS.has(key)
+  ? { ...p, height: p.height * BUILDING_SCALE, width: scaled(p.width), horizontalHeight: scaled(p.horizontalHeight), footprint: p.footprint && (p.footprint.map((n) => evenMetres(n * BUILDING_SCALE)) as [number, number]) }
+  : p]));
 export function getItemPresentation(item: EconomyItem): ItemPresentation {
   return WORLD_ITEM_PRESENTATION[String(item.metadata.worldAssetKey)] ?? {height:3, theme:"garden"};
 }

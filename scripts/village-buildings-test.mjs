@@ -7,7 +7,7 @@ import ts from 'typescript';
 import * as THREE from 'three';
 import * as village from '../lib/world3d/village-buildings.ts';
 import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as catalogue } from '../lib/world3d/central-world-customisation-catalog.ts';
-import { WORLD_ITEM_PRESENTATION, fitWorldItemScale } from '../lib/world3d/world-item-presentation.ts';
+import { BUILDING_SCALE, WORLD_ITEM_PRESENTATION, fitWorldItemScale } from '../lib/world3d/world-item-presentation.ts';
 import { selectCentralWorldInventoryPlacement, parseGridSize, writeCentralWorldPlacements, readCentralWorldPlacements, validateCentralWorldPlacement } from '../lib/world3d/central-world-layout.ts';
 // Evaluate the actual stateless JSX models in a Three scene without a GPU.
 // Unsupported elements fail rather than silently omitting geometry from bounds.
@@ -54,7 +54,8 @@ for(const spec of village.VILLAGE_BUILDINGS){
   const footprint=parseGridSize(item).map(n=>n*2),scale=fitWorldItemScale(size,footprint,WORLD_ITEM_PRESENTATION[spec.key]);
   const actual=size.toArray().map((v,i)=>v*scale[i]);
   assert(actual.every(v=>v>0&&Number.isFinite(v)));
-  assert(Math.abs(actual[1]-spec.height)<1e-5,'Every style reaches height without footprint shrink: '+spec.key+style);
+  // Village buildings stand BUILDING_SCALE times their catalogue height so doors clear the explorer.
+  assert(Math.abs(actual[1]-spec.height*BUILDING_SCALE)<1e-5,'Every style reaches height without footprint shrink: '+spec.key+style);
   assert(actual[0]<=footprint[0]&&actual[2]<=footprint[1],'Full balconies and steps fit reservation');
   let recoloured=false;root.traverse(o=>{if(o.isMesh&&o.material.color.getHexString()==='a855f7')recoloured=true;});assert(recoloured);
   const first={placementId:spec.key+'-a',itemId:item.item_key,gridX:20,gridZ:20,rotation:90,buildingStyle:style,tint:'#a855f7'};

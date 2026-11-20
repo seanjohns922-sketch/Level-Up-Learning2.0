@@ -21,11 +21,12 @@ function Glowing({ color, night, day = 0.6 }: { color: string; night: boolean; d
 function StartLine({ w = 1, night, neon = false }: { w?: number; night: boolean; neon?: boolean }) {
   return (
     <group>
-      {[-1, 1].map((s) => <Block key={s} size={[0.08, 1.1, 0.08]} pos={[s * (w / 2 + 0.15), 0.55, 0]} color={M.charcoal} r={0.03} />)}
-      <Block size={[w + 0.5, 0.24, 0.12]} pos={[0, 1.1, 0]} color="#16181f" r={0.03} />
-      {Array.from({ length: 5 }, (_, i) => <Ball key={i} pos={[-0.3 + i * 0.15, 1.1, 0.07]} r={0.04} color={i < 3 ? C.red : "#3dff6a"} glow={night ? 3 : 1} />)}
+      {/* The gantry clears a kart with the explorer in it (about 3.6 m in the hub). */}
+      {[-1, 1].map((s) => <Block key={s} size={[0.1, 1.8, 0.1]} pos={[s * (w / 2 + 0.15), 0.9, 0]} color={M.charcoal} r={0.03} />)}
+      <Block size={[w + 0.5, 0.24, 0.12]} pos={[0, 1.8, 0]} color="#16181f" r={0.03} />
+      {Array.from({ length: 5 }, (_, i) => <Ball key={i} pos={[-0.3 + i * 0.15, 1.8, 0.07]} r={0.04} color={i < 3 ? C.red : "#3dff6a"} glow={night ? 3 : 1} />)}
       {Array.from({ length: 10 }, (_, i) => <Block key={`c${i}`} size={[w / 10, 0.01, 0.1]} pos={[-w / 2 + (i + 0.5) * (w / 10), 0.09, (i % 2) * 0.1 - 0.05]} color={i % 2 ? C.white : "#111"} r={0.002} />)}
-      {neon ? <mesh position={[0, 1.25, 0]}><boxGeometry args={[w + 0.5, 0.04, 0.04]} /><Glowing color={NEON_PINK} night={night} /></mesh> : null}
+      {neon ? <mesh position={[0, 1.95, 0]}><boxGeometry args={[w + 0.5, 0.04, 0.04]} /><Glowing color={NEON_PINK} night={night} /></mesh> : null}
     </group>
   );
 }
