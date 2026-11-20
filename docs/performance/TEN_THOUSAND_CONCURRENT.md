@@ -1280,6 +1280,41 @@ The 30-minute test was deliberately not started after the latency precheck faile
 Next: profile complete attempt-history reads and their pagination before changing
 the app, then repeat this gate without losing historical results or access checks.
 
+### Local class-index parity and page-size experiment — 20 November 2026
+
+Index inspection found the synthetic database lacked the previously prepared
+`20261117090000_index_student_current_class.sql`. Applied that existing index
+migration locally and retained it for future rehearsals. No hosted change was
+made; the user's earlier hosted application remains unverified here. Updated
+preflight to require a valid, ready, unfiltered `students_class_id_idx` on the
+expected table/column, so future comparisons cannot silently omit this index.
+This is selected schema parity, not a complete production-schema comparison.
+
+The identical 60-second compact workload with the index preserved all 100 student
+presence checks, 200 activity writes and teacher histories with zero failures.
+Dashboard refresh p95 fell from 2,348 to 1,180 ms; lesson history was 1,180 ms,
+assessment history 953 ms, quiz history 1,024 ms and initial compact events
+1,097 ms. The preliminary latency gate still failed. These are single local
+samples with evolving synthetic event history, not a guaranteed production gain.
+Representative first-page EXPLAIN ANALYZE reads under the authenticated synthetic
+teacher role used the class index and took 14.337/10.134/9.285 ms for lesson,
+quiz and assessment histories respectively. Inspection transactions rolled back.
+
+Added `scripts/staging/attempt-page-size-local.mjs`, a read-only experiment using
+the production reader with only its 500-row limit intercepted to request 1,000.
+Four teachers, three alternating-order pairs each, returned identical complete
+rows and values with correct scopes. Across those 12 reads per mode, HTTP request
+count fell from 144 to 96; mean elapsed time was 415 vs 229 ms, maximum 1,107 vs
+591 ms. This static comparison does not establish performance under concurrent
+writes or synchronized load. The shipped 500-row page size is unchanged.
+
+Targeted lint, local preflight, complete-history equality and diff checks passed.
+No shipped code changed, so no production build was rerun. Audit artifacts are
+`/Users/seanjohns/reliq-audits/2026-11-20/indexed-*`, including resource samples,
+HTTP profiles, authenticated plans and page-size results. Next: compare page
+sizes under the same mixed workload before deciding on an application change;
+then rerun the short gate before the sustained test.
+
 Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate

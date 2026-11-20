@@ -27,6 +27,17 @@ SELECT to_regclass('public.student_realm_locks') IS NOT NULL
   AND NOT has_function_privilege('service_role','public.run_school_year_rollover()','EXECUTE');
 `]);
 assert.equal(schema, 't', 'Expected local November schema/manual-year guard is missing.');
+const classIndex = docker(['exec', 'supabase_db_reliq-scale-local', 'psql', '-X', '-U', 'postgres', '-d', 'postgres', '-At', '-v', 'ON_ERROR_STOP=1', '-c', `
+SELECT EXISTS (
+  SELECT 1 FROM pg_index i
+  WHERE i.indexrelid = to_regclass('public.students_class_id_idx')
+    AND i.indrelid = 'public.students'::regclass
+    AND i.indisvalid AND i.indisready AND i.indpred IS NULL
+    AND i.indnkeyatts = 1
+    AND pg_get_indexdef(i.indexrelid, 1, true) = 'class_id'
+);
+`]);
+assert.equal(classIndex, 't', 'Local class index is missing or invalid. Apply existing migration 20261117090000_index_student_current_class.sql locally before comparing capacity results.');
 const response = await fetch(`${config.API_URL}/rest/v1/`, {
   headers: { apikey: config.ANON_KEY, Authorization: `Bearer ${config.ANON_KEY}` },
   signal: AbortSignal.timeout(10000),
