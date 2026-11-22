@@ -51,6 +51,7 @@ import {
   DEFAULT_HOME_PLACEMENT,
   gridToWorld,
   placementGroundCells,
+  placementCentre,
   type CentralWorldGroundTile,
   type CentralWorldGroundType,
   type CentralWorldPlacement,
@@ -782,7 +783,7 @@ function Drawbridge({ state, tint, onToggle }: { state?: "up" | "down"; tint?: s
 export function PlacedWorldObject({ item, placement, items, neighbours = [], preview = false, animate = false, onToggle }: { item: EconomyItem; placement: CentralWorldPlacement; items: Map<string, EconomyItem>; neighbours?: CentralWorldPlacement[]; preview?: boolean; animate?: boolean; onToggle?: (placementId: string) => void }) {
   const groupRef = useRef<THREE.Group>(null);
   const tier = Number(item.metadata.tier ?? 1);
-  const position = gridToWorld(placement.gridX, placement.gridZ);
+  const position = placementCentre(placement, item);
   const assetKey = typeof item.metadata.worldAssetKey === "string" ? item.metadata.worldAssetKey : "";
   const trainSupport = isTrainAsset(assetKey) ? trainTrackSupport(placement, neighbours, items) : null;
   const gait = animate && !preview && item.metadata.worldSceneryGroup === "animals" ? ANIMAL_GAITS[assetKey] : undefined;
@@ -831,6 +832,79 @@ const FOOTPRINT_TONES = {
   selected: { fill: "#ffffff", edge: "#ffffff", opacity: 0.18 },
 } as const;
 
+/** Moves its children smoothly to wherever they are drawn: a held item glides from square to square, hovering as if carried. */
+const GLIDE_RATE = 16;
+const HOVER_HEIGHT = 0.28;
+const HOVER_BOB = 0.07;
+const GLIDE_SNAP_METRES = 14;
+function Glide({ x, z, children }: { x: number; z: number; children: React.ReactNode }) {
+  const group = useRef<THREE.Group>(null);
+  const glide = useRef<{ x: number; z: number; offsetX: number; offsetZ: number } | null>(null);
+  useFrame(({ clock }, delta) => {
+    const g = group.current;
+    if (!g) return;
+    const state = glide.current ?? (glide.current = { x, z, offsetX: 0, offsetZ: 0 });
+    if (state.x !== x || state.z !== z) {
+      state.offsetX += state.x - x;
+      state.offsetZ += state.z - z;
+      state.x = x;
+      state.z = z;
+      // A long jump (a teleport, the planner opening) moves straight there.
+      if (Math.hypot(state.offsetX, state.offsetZ) > GLIDE_SNAP_METRES) { state.offsetX = 0; state.offsetZ = 0; }
+    }
+    const ease = Math.exp(-delta * GLIDE_RATE);
+    state.offsetX *= ease;
+    state.offsetZ *= ease;
+    g.position.set(state.offsetX, HOVER_HEIGHT + HOVER_BOB * Math.sin(clock.elapsedTime * 3), state.offsetZ);
+  });
+  return <group ref={group}>{children}</group>;
+}
+
+const LANDING_SECONDS = 0.45;
+/** A newly placed item drops in with a little bounce and a ring of dust; everything else just stands there. */
+function PlaceLanding({ placement, item, pop, children }: { placement: CentralWorldPlacement; item: EconomyItem; pop: boolean; children: React.ReactNode }) {
+  const bounce = useRef<THREE.Group>(null);
+  const ring = useRef<THREE.Mesh>(null);
+  const startedAt = useRef<number | null>(null);
+  const done = useRef(!pop);
+  const [x, , z] = placementCentre(placement, item);
+  const radius = useMemo(() => {
+    const cells = placementGroundCells(placement, item);
+    const span = Math.max(...cells.map((cell) => cell.gridX)) - Math.min(...cells.map((cell) => cell.gridX)) + 1;
+    const depth = Math.max(...cells.map((cell) => cell.gridZ)) - Math.min(...cells.map((cell) => cell.gridZ)) + 1;
+    return (Math.max(span, depth) * CENTRAL_WORLD_GRID.cellSize) / 2;
+  }, [placement, item]);
+  useFrame(({ clock }) => {
+    if (done.current || !bounce.current) return;
+    startedAt.current ??= clock.elapsedTime;
+    const t = Math.min(1, (clock.elapsedTime - startedAt.current) / LANDING_SECONDS);
+    // Ease out with a small overshoot, a touch taller than wide while it lands.
+    const back = 1 + 2.4 * (t - 1) ** 3 + 1.4 * (t - 1) ** 2;
+    const size = 0.6 + 0.4 * back;
+    bounce.current.scale.set(size, size * (1 + 0.12 * Math.sin(t * Math.PI)), size);
+    if (ring.current) {
+      ring.current.scale.setScalar(radius * (0.7 + 0.9 * t));
+      (ring.current.material as THREE.MeshBasicMaterial).opacity = 0.65 * (1 - t);
+    }
+    if (t === 1) {
+      done.current = true;
+      bounce.current.scale.set(1, 1, 1);
+      if (ring.current) ring.current.visible = false;
+    }
+  });
+  return (
+    <group position={[x, 0, z]}>
+      <group ref={bounce}><group position={[-x, 0, -z]}>{children}</group></group>
+      {pop ? (
+        <mesh ref={ring} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.16, 0]}>
+          <ringGeometry args={[0.78, 1, 48]} />
+          <meshBasicMaterial color="#fff6dc" transparent opacity={0.65} depthWrite={false} toneMapped={false} />
+        </mesh>
+      ) : null}
+    </group>
+  );
+}
+
 /** The squares an item stands on: green when it fits, red when it doesn't, white when picked. */
 export function BuildFootprint({ placement, item, tone }: { placement: CentralWorldPlacement; item: EconomyItem; tone: keyof typeof FOOTPRINT_TONES }) {
   const cells = placementGroundCells(placement, item);
@@ -852,8 +926,8 @@ function ReservedCellsOverlay({ cursor, cells, reservedCell }: { cursor: { gridX
   const ref = useRef<THREE.InstancedMesh>(null);
   const reserved = useMemo(() => {
     const out: Array<[number, number]> = [];
-    const half = cells / 2;
-    for (let dx = -half; dx < half; dx++) for (let dz = -half; dz < half; dz++) if (reservedCell(cursor.gridX + dx, cursor.gridZ + dz)) out.push([dx, dz]);
+    const half = Math.floor(cells / 2);
+    for (let dx = -half; dx <= half; dx++) for (let dz = -half; dz <= half; dz++) if (reservedCell(cursor.gridX + dx, cursor.gridZ + dz)) out.push([dx, dz]);
     return out;
   }, [cursor.gridX, cursor.gridZ, cells, reservedCell]);
   useLayoutEffect(() => {
@@ -872,14 +946,16 @@ function ReservedCellsOverlay({ cursor, cells, reservedCell }: { cursor: { gridX
   );
 }
 
-function BuildModeGrid({ cursor, cells, reservedCell }: { cursor: { gridX: number; gridZ: number }; cells: number; reservedCell?: (gridX: number, gridZ: number) => boolean }) {
+function BuildModeGrid({ cursor, cells: across, ring, reservedCell }: { cursor: { gridX: number; gridZ: number }; cells: number; ring: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean }) {
   const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
+  // Squares are centred on their grid point, so an odd count puts the lines on the squares' edges.
+  const cells = across % 2 ? across : across + 1;
   const size = cells * CENTRAL_WORLD_GRID.cellSize;
   return (
     <group position={[x, 0.115, z]}>
       <gridHelper args={[size, cells, "#eafff3", "#67d5b5"]} />
       {reservedCell ? <ReservedCellsOverlay cursor={cursor} cells={cells} reservedCell={reservedCell} /> : null}
-      <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.72, 0.94, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.95} depthWrite={false} /></mesh>
+      {ring ? <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.72, 0.94, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.95} depthWrite={false} /></mesh> : null}
     </group>
   );
 }
@@ -1243,7 +1319,7 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, buildGridCells = 16, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; /** How many squares across the build grid shows round the cursor. */ buildGridCells?: number; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, buildGridCells = 16, justPlacedId = null, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; /** How many squares across the build grid shows round the cursor. */ buildGridCells?: number; /** The item just put down, which lands with a bounce. */ justPlacedId?: string | null; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   const reducedMotion = usePrefersReducedMotion();
   return (
     <group>
@@ -1261,15 +1337,22 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
-      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} cells={buildGridCells} reservedCell={reservedCell} /> : null}
+      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} cells={buildGridCells} ring={!buildPreview} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);
-        return item ? <PlacedWorldObject key={placement.placementId ?? `${placement.itemId}-${index}`} item={item} placement={placement} items={itemsById} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} /> : null;
+        return item ? (
+          <PlaceLanding key={placement.placementId ?? `${placement.itemId}-${index}`} placement={placement} item={item} pop={Boolean(justPlacedId) && placement.placementId === justPlacedId}>
+            <PlacedWorldObject item={item} placement={placement} items={itemsById} neighbours={placedCustomisations} animate={!editing} onToggle={onToggleDrawbridge} />
+          </PlaceLanding>
+        ) : null;
       })}
       {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
         <BuildFootprint placement={buildPreview.placement} item={buildPreview.item} tone={buildPreview.valid ? "fits" : "blocked"} />
-        <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} items={itemsById} neighbours={placedCustomisations} preview />
+        {/* The ghost glides between squares; its footprint snaps to the square it will land on. */}
+        <Glide x={placementCentre(buildPreview.placement, buildPreview.item)[0]} z={placementCentre(buildPreview.placement, buildPreview.item)[2]}>
+          <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} items={itemsById} neighbours={placedCustomisations} preview />
+        </Glide>
       </> : null}
       {groundPreview ? groundPreview.cells?.map(cell => <GroundTile key={cell.gridX+":"+cell.gridZ} tile={{...groundPreview.tile,...cell}} preview valid={cell.valid}/>) ?? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
     </group>

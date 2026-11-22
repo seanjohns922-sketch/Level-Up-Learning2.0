@@ -6,7 +6,7 @@ import {
   rememberHotbarEntry, standBehind, togglePin,
 } from "../lib/world3d/walk-build.ts";
 import { CENTRAL_WORLD_STARTER_SCENERY } from "../lib/world3d/central-world-editor-catalog.ts";
-import { itemGroundSize } from "../lib/world3d/central-world-layout.ts";
+import { itemGroundSize, placementCentre, placementGroundCells } from "../lib/world3d/central-world-layout.ts";
 
 const CELL = 2;
 const facingNorth = Math.PI; // rotation π faces -z, towards the Tower
@@ -56,5 +56,17 @@ assert.ok(!slots.includes("gone"));
 assert.deepEqual(togglePin(bar, "b").pins, []);
 for (let i = 0; i < 20; i += 1) bar = rememberHotbarEntry(bar, `r${i}`);
 assert.equal(bar.recent.length, HOTBAR_SLOTS);
+
+// Every item is drawn in the middle of the squares it covers, even ones an even number of squares wide.
+for (const key of ["lamp_post", "bench", "campfire", "log", "tree", "pond", "defence_laser_gate"]) {
+  for (const rotation of [0, 90, 180, 270]) {
+    const item = scenery(key);
+    const placement = { itemId: item.item_key, gridX: 3, gridZ: -2, rotation };
+    const cells = placementGroundCells(placement, item);
+    const mid = (axis) => ((Math.min(...cells.map((c) => c[axis])) + Math.max(...cells.map((c) => c[axis]))) / 2) * CELL;
+    const [x, , z] = placementCentre(placement, item);
+    assert.deepEqual([x, z], [mid("gridX"), mid("gridZ")], `${key} at ${rotation}°`);
+  }
+}
 
 console.log("walk-build: all checks passed");

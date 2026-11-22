@@ -160,6 +160,16 @@ function occupiedCells(placement: CentralWorldPlacement, item: EconomyItem) {
   return cells;
 }
 
+/**
+ * Where a placed item stands in the world: the middle of the squares it covers. Squares are centred
+ * on grid points, so an item an even number of squares wide sits between two of them.
+ */
+export function placementCentre(placement: CentralWorldPlacement, item: EconomyItem): [number, number, number] {
+  const [width, depth] = itemGroundSize(item, placement.rotation);
+  const middle = (at: number, span: number) => (at - Math.floor(span / 2) + (span - 1) / 2) * CENTRAL_WORLD_GRID.cellSize;
+  return [middle(placement.gridX, width), 0, middle(placement.gridZ, depth)];
+}
+
 /** The squares a placement stands on and needs clear: what the build preview colours in. */
 export function placementGroundCells(placement: CentralWorldPlacement, item: EconomyItem): Array<{ gridX: number; gridZ: number }> {
   return occupiedCells(placement, item).map((key) => {

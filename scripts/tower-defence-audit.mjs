@@ -68,7 +68,7 @@ assert.ok(env.includes("if (defence) return <PlacedPremiumHome style={defence} /
 assert.ok(read("lib/world3d/world-connections.ts").includes('"defence_laser_fence"') && read("components/world3d/ConnectedBoundary.tsx").includes("<LaserFenceRun"));
 assert.ok(world.includes("canStandAt={canStandAt}") && world.includes("<ExplorerPositionContext.Provider value={avatarPosRef}>") && world.includes('towerShield: ownedItemKeys.has(premiumHomeItemKey("tower_shield"))'));
 assert.ok(world.includes('{ key: "fortress", label: "Defence", Icon: Shield }'));
-assert.ok(read("lib/audio/defence-sfx.ts").includes("if (typeof window === \"undefined\" || !streakSoundsEnabled()) return null;"), "defence sounds stay off unless sounds are turned on");
+assert.ok(read("lib/audio/synth.ts").includes("if (typeof window === \"undefined\" || !streakSoundsEnabled()) return null;") && read("lib/audio/defence-sfx.ts").includes("from \"./synth\""), "defence sounds stay off unless sounds are turned on");
 for (const key of Object.keys(DEFENCE_STARTER_KEYS)) assert.ok(existsSync(new URL(`../public/marketplace/world-renders/free/${PREMIUM_HOME_SPECS[key].assetKey}.webp`, import.meta.url)), `${key} tray picture`);
 
 console.log(`PASS Protect the Tower: ${DEFENCE_STYLES.length} items (3 free, 5 unlocks, Tower Shield), ${rows.length} shop rows match the migration, castle pieces convert, fences block, hub wiring in place`);

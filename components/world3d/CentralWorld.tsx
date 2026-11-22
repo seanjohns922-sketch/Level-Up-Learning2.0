@@ -18,6 +18,7 @@ import { RaceHud } from "@/components/world3d/premium-items/RaceHud";
 import { ExplorerPositionContext } from "@/components/world3d/premium-items/TowerDefenceModels";
 import { laserFenceBeams, laserFenceHit } from "@/lib/world3d/tower-defence";
 import { defenceSounds } from "@/lib/audio/defence-sfx";
+import { buildSounds } from "@/lib/audio/build-sfx";
 import { BasketballScoreContext } from "@/components/world3d/premium-items/BasketballCourt";
 import { ballAt, courtInWorld, nearestHoop, planShot, type Shot } from "@/lib/world3d/basketball";
 import { KartGarage, type KartGarageActions } from "@/components/world3d/premium-items/KartGarage";
@@ -83,6 +84,7 @@ import {
   getCentralWorldHomeAnchors,
   gridToWorld,
   itemGroundSize,
+  placementCentre,
   placementOccupiesCell,
   readCentralWorldGroundTiles,
   readCentralWorldPlacements,
@@ -344,7 +346,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, facingRef }: { walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; facingRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId }: { justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -356,16 +358,18 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
   // Placed trampolines make the avatar bounce; higher trampoline levels bounce higher.
   const trampolineLevel = useContext(PremiumHomeWorldContext).levels.trampoline;
   const trampolines = useMemo(() => placedCustomisations.flatMap((placement) => {
-    if (premiumHomeStyle(itemsById.get(placement.itemId)?.metadata.worldAssetKey) !== "trampoline") return [];
-    const [x, , z] = gridToWorld(placement.gridX, placement.gridZ);
+    const item = itemsById.get(placement.itemId);
+    if (!item || premiumHomeStyle(item.metadata.worldAssetKey) !== "trampoline") return [];
+    const [x, , z] = placementCentre(placement, item);
     return [{ x, z }];
   }), [placedCustomisations, itemsById]);
   const bounceAt = useMemo(() => trampolines.length ? (x: number, z: number) => trampolineBounceAt(x, z, trampolines, trampolineLevel) : undefined, [trampolines, trampolineLevel]);
   // Placed skate pieces lift the avatar onto their ramps, on a board, a little faster.
   const skatePieces = useMemo(() => placedCustomisations.flatMap((placement): PlacedSkatePiece[] => {
-    const piece = skatePiece(itemsById.get(placement.itemId)?.metadata.worldAssetKey);
-    if (!piece) return [];
-    const [x, , z] = gridToWorld(placement.gridX, placement.gridZ);
+    const item = itemsById.get(placement.itemId);
+    const piece = skatePiece(item?.metadata.worldAssetKey);
+    if (!item || !piece) return [];
+    const [x, , z] = placementCentre(placement, item);
     return [{ x, z, rotation: placement.rotation, piece }];
   }), [placedCustomisations, itemsById]);
   const rideHeightAt = useMemo(() => skatePieces.length ? (x: number, z: number) => skateHeightAt(x, z, skatePieces) : undefined, [skatePieces]);
@@ -465,6 +469,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         editing={editing}
         editCursor={walkCursor ?? focusCell}
         buildGridCells={walkCursor ? walkGridCells : 16}
+        justPlacedId={justPlacedId}
         onEnterTower={onEnterTower}
         onEnterHome={onEnterHome}
         onToggleDrawbridge={onToggleDrawbridge}
@@ -501,14 +506,14 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         hidden={!roaming}
         speed={hubV2 ? 5.6 : 4.2}
         positionRef={avatarPosRef}
-        facingRef={facingRef}
+        aimRef={aimRef}
       />
       {race && raceCourse && raceStart ? <RaceKartDriver key={race.nonce} course={raceCourse} start={raceStart} world={kartWorld} moveInput={moveInput} hud={raceHud} kart={kart} paused={racePaused} night={night} onBestLap={onBestLap} /> : null}
       <BuildModeCamera active={frozen} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
       <BuildModeSurface grid={buildRules.grid} active={frozen} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
       {selection ? <>
         <BuildFootprint placement={selection.placement} item={selection.item} tone="selected" />
-        <Html position={gridToWorld(selection.placement.gridX, selection.placement.gridZ)} zIndexRange={[37, 37]}>{selection.menu}</Html>
+        <Html position={placementCentre(selection.placement, selection.item)} zIndexRange={[37, 37]}>{selection.menu}</Html>
       </> : null}
       {eraseTarget ? <BuildFootprint placement={eraseTarget.placement} item={eraseTarget.item} tone="blocked" /> : null}
       {hubV2 && !frozen ? <HubWadingRipples positionRef={avatarPosRef} /> : null}
@@ -684,9 +689,15 @@ export default function CentralWorld() {
   const [brushOn, setBrushOn] = useState(false);
   const [hotbar, setHotbar] = useState(() => readHotbar(placementScope));
   const [placeViews, setPlaceViews] = useState(() => readPlaceViews(placementScope));
-  const facingRef = useRef(Math.PI);
+  // Where the camera looks: held items sit ahead of the explorer that way, so they
+  // stay put when the explorer turns to walk sideways.
+  const aimRef = useRef(Math.PI);
   // "More" opens the planner's tray to choose something to carry.
   const pickForWalk = useRef(false);
+  // The item just put down lands with a bounce.
+  const [justPlacedId, setJustPlacedId] = useState<string | null>(null);
+  // Where it went: while walking, the next one in hand stays hidden until the explorer moves on.
+  const [lastPlacedCell, setLastPlacedCell] = useState<{ gridX: number; gridZ: number } | null>(null);
   const resetDialog = useRef<HTMLDialogElement>(null);
   const resetCancel = useRef<HTMLButtonElement>(null);
   const [trayOpen, setTrayOpen] = useState(true);
@@ -787,9 +798,13 @@ export default function CentralWorld() {
   useEffect(() => { historyRef.current = editHistory; }, [editHistory]);
   // Every placed start line is somewhere to race from.
   const raceItems = useMemo(() => placedCustomisations.flatMap((placement): PlacedRaceItem[] => {
-    const assetKey = itemsById.get(placement.itemId)?.metadata.worldAssetKey;
-    return typeof assetKey === "string" && RACE_PIECE_KEYS.has(assetKey) ? [{ assetKey, gridX: placement.gridX, gridZ: placement.gridZ, rotation: placement.rotation }] : [];
-  }), [placedCustomisations, itemsById]);
+    const item = itemsById.get(placement.itemId);
+    const assetKey = item?.metadata.worldAssetKey;
+    if (!item || typeof assetKey !== "string" || !RACE_PIECE_KEYS.has(assetKey)) return [];
+    // Race logic works from where the piece is drawn: the middle of its squares.
+    const [x, , z] = placementCentre(placement, item);
+    return [{ assetKey, gridX: x / buildGrid.cellSize, gridZ: z / buildGrid.cellSize, rotation: placement.rotation }];
+  }), [placedCustomisations, itemsById, buildGrid.cellSize]);
   const raceStarts = useMemo(() => raceItems.filter((item) => item.assetKey === "race_start").map((item) => ({ id: `${RACE_TARGET_PREFIX}${item.gridX}:${item.gridZ}`, item })), [raceItems]);
   const [race, setRace] = useState<RaceSession | null>(null);
   const raceHud = useRef<RaceHudState>(newRaceHud(null));
@@ -892,6 +907,7 @@ export default function CentralWorld() {
   const buildProblem = buildItem && buildPlacement ? centralWorldPlacementProblem(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules) : null;
   const buildValid = Boolean(buildItem && buildPlacement) && buildProblem === null;
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
+  const restingOnPlaced = walking && Boolean(buildPlacement && lastPlacedCell && buildPlacement.gridX === lastPlacedCell.gridX && buildPlacement.gridZ === lastPlacedCell.gridZ);
   const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
   const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone" || editTool === "water" || (editTool === "track" && raceLevel > 0));
   const isEraseTool = !heldItemKey && editTool === "erase";
@@ -1151,7 +1167,7 @@ export default function CentralWorld() {
     setStrokeActive(false);
   }
   const avatarCell = () => footCell(avatarPosRef.current.x, avatarPosRef.current.z, buildGrid.cellSize);
-  const facingCell = (size: [number, number]) => frontCell(avatarPosRef.current.x, avatarPosRef.current.z, facingRef.current, size, buildGrid.cellSize);
+  const facingCell = (size: [number, number]) => frontCell(avatarPosRef.current.x, avatarPosRef.current.z, aimRef.current, size, buildGrid.cellSize);
 
   function startWalkBuild() {
     setSelectedPlacementId(null);
@@ -1206,6 +1222,7 @@ export default function CentralWorld() {
     speakWalkPick(buildItem);
   }
   function holdItem(item: EconomyItem) {
+    buildSounds.pick();
     const at = facingCell(itemGroundSize(item));
     const view = viewFor(item);
     if (view === "plan") openPlanner(at);
@@ -1243,8 +1260,9 @@ export default function CentralWorld() {
   }
   function walkMain() {
     if (buildPlacement && buildItem) {
+      if (restingOnPlaced) return;
       if (buildValid) confirmBuildPlacement();
-      else if (buildProblem) void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 });
+      else if (buildProblem) { buildSounds.blocked(); void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 }); }
       return;
     }
     if (isGroundTool) { toggleBrush(); return; }
@@ -1429,6 +1447,9 @@ export default function CentralWorld() {
     const next = [...placementsWithoutBuildItem, buildPlacement];
     writeCentralWorldPlacements(placementScope, next);
     setPlacedCustomisations(next);
+    setJustPlacedId(buildPlacement.placementId ?? null);
+    setLastPlacedCell({ gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ });
+    buildSounds.place();
     void speak(`${buildItem.name} added.`, undefined, "manual", { rate: 0.9 });
     // A Marketplace "place it" link is used up once its item is down.
     if (buildPlacement.itemId === requestedBuildItemKey) router.replace(preview ? "/world?teacher_preview=1" : "/world");
@@ -1499,6 +1520,8 @@ export default function CentralWorld() {
       return;
     }
     recordWorldEdit();
+    setJustPlacedId(candidate.placementId ?? null);
+    buildSounds.place();
     setPlacedCustomisations(current => {
       const remaining=current.filter(p=>p.placementId!==candidate.placementId);
       if(!validateCentralWorldPlacement(candidate,buildItem,remaining,itemsById,groundTiles,buildRules)) return current;
@@ -1531,7 +1554,7 @@ export default function CentralWorld() {
     if (buildPlacement && buildItem) {
       if (!placementOccupiesCell(buildPlacement, buildItem, gridX, gridZ)) { moveFocus({ gridX, gridZ }); return; }
       if (buildValid) confirmBuildPlacement();
-      else if (buildProblem) void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 });
+      else if (buildProblem) { buildSounds.blocked(); void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 }); }
       return;
     }
     if (editorOpen && isMoveTool) selectPlacedAt(gridX, gridZ);
@@ -1624,16 +1647,15 @@ export default function CentralWorld() {
   useEffect(() => {
     walkTick.current = () => {
       const { x, z } = avatarPosRef.current;
-      if (buildItem) {
-        setBuildPlacement((held) => {
-          if (!held) return held;
-          const next = frontCell(x, z, facingRef.current, itemGroundSize(buildItem, held.rotation), buildGrid.cellSize);
-          return next.gridX === held.gridX && next.gridZ === held.gridZ ? held : { ...held, ...next };
-        });
+      if (buildItem && buildPlacement) {
+        const next = frontCell(x, z, aimRef.current, itemGroundSize(buildItem, buildPlacement.rotation), buildGrid.cellSize);
+        // Moving on from the square just built on brings the next one back into view.
+        if (lastPlacedCell && (next.gridX !== lastPlacedCell.gridX || next.gridZ !== lastPlacedCell.gridZ)) setLastPlacedCell(null);
+        setBuildPlacement((held) => (held && (next.gridX !== held.gridX || next.gridZ !== held.gridZ) ? { ...held, ...next } : held));
         return;
       }
       if (!isGroundTool && !isEraseTool) return;
-      const target = isEraseTool ? frontCell(x, z, facingRef.current, [1, 1], buildGrid.cellSize) : footCell(x, z, buildGrid.cellSize);
+      const target = isEraseTool ? frontCell(x, z, aimRef.current, [1, 1], buildGrid.cellSize) : footCell(x, z, buildGrid.cellSize);
       if (target.gridX === editCursor.gridX && target.gridZ === editCursor.gridZ) return;
       setEditCursor(target);
       if (isGroundTool && brushOn) applyGroundAt(target.gridX, target.gridZ);
@@ -1660,7 +1682,7 @@ export default function CentralWorld() {
   });
   useEffect(() => {
     if (!walking) return;
-    const timer = window.setInterval(() => walkTick.current(), 90);
+    const timer = window.setInterval(() => walkTick.current(), 60);
     const onKey = (event: KeyboardEvent) => walkKeys.current(event);
     window.addEventListener("keydown", onKey);
     return () => { window.clearInterval(timer); window.removeEventListener("keydown", onKey); };
@@ -1739,7 +1761,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} facingRef={facingRef} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} />
         </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
         </SkateKitWorldContext.Provider>
@@ -1765,10 +1787,12 @@ export default function CentralWorld() {
           pinned={new Set(hotbar.pins)}
           mode={buildPreview ? "item" : isGroundTool ? "brush" : isEraseTool ? "erase" : "none" satisfies WalkBuildMode}
           heldName={buildItem?.name ?? null}
-          valid={buildPreview ? buildValid : Boolean(eraseItem || eraseTile)}
+          valid={buildPreview ? buildValid && !restingOnPlaced : Boolean(eraseItem || eraseTile)}
           brushOn={brushOn}
           hint={buildPreview && buildItem
-            ? buildProblem
+            ? restingOnPlaced
+              ? { text: `${buildItem.name} placed · walk on to place another`, tone: "ok" }
+              : buildProblem
               ? { text: PLACEMENT_PROBLEM_TEXT[buildProblem], tone: "bad" }
               : { text: CONNECTED_BOUNDARY_KEYS.has(String(buildItem.metadata.worldAssetKey)) ? `${buildItem.name} · Place at each step and it joins up` : `${buildItem.name} · ${touchFirst ? "tap" : "press"} Place to put it down`, tone: "ok" }
             : isGroundTool

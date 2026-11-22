@@ -26,6 +26,7 @@ type Bridge = Frame & { halfWidth: number; halfLength: number; height: number };
 export type RaceStart = Frame & { halfWidth: number };
 export type RaceCourse = { track: ReadonlySet<string>; boosts: Box[]; jumps: Box[]; bridges: Bridge[]; solids: Box[] };
 
+/** A placed piece; gridX/gridZ is the middle of its squares, so a piece an even number of squares wide sits on a half square. */
 export type PlacedRaceItem = { assetKey: string; gridX: number; gridZ: number; rotation: CentralWorldPlacement["rotation"] };
 
 const cell = CENTRAL_WORLD_GRID.cellSize;

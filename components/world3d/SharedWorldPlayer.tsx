@@ -158,7 +158,7 @@ export function SharedThirdPersonPlayer({
   hidden = false,
   speed = 4.6,
   positionRef,
-  facingRef,
+  aimRef,
   groundHeightAt,
   canStandAt,
   speedFactorAt,
@@ -187,8 +187,8 @@ export function SharedThirdPersonPlayer({
   hidden?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
-  /** Written each frame: the way the avatar faces (its rotation; 0 faces +z). */
-  facingRef?: React.MutableRefObject<number>;
+  /** Written each frame: the way the camera looks, as a heading (0 looks along +z). Steady while the avatar turns to walk. */
+  aimRef?: React.MutableRefObject<number>;
   /** Optional terrain: ground height under the player (added to the spawn height). */
   groundHeightAt?: (x: number, z: number) => number;
   /** Optional blocking: return false where the player may not walk (water, trees). */
@@ -343,7 +343,7 @@ export function SharedThirdPersonPlayer({
       positionRef.current.x = player.position.x;
       positionRef.current.z = player.position.z;
     }
-    if (facingRef) facingRef.current = player.rotation.y;
+    if (aimRef) aimRef.current = yaw.current + Math.PI;
 
     if (cameraEnabled) {
       const cosPitch = Math.cos(pitch.current);
