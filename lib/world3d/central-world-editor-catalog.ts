@@ -94,6 +94,8 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter(DEFENCE_STARTER_KEYS.laser_gate, "Laser Gate", "defence_laser_gate", "#3fe6ff", "fortress", "3x1", 1.0),
   starter(DEFENCE_STARTER_KEYS.scanner, "Scanner Tower", "defence_scanner", "#3fe6ff", "fortress", "2x2", 1.0),
   starter("central_world_starter_torch", "Torch", "torch", "#f59e0b", "furniture_fun", "1x1", 1.15),
+  // Where a car parks and the explorer gets in (Roads & Cars). Free, like a driveway.
+  starter("central_world_starter_carport", "Carport", "carport", "#2c3440", "furniture_fun", "3x2", 1.0),
   starter("central_world_starter_chest", "Treasure Chest", "chest", "#b8863f", "furniture_fun", "1x1", 1.2),
   starter("central_world_starter_well", "Well", "well", "#9a8d7c", "furniture_fun", "2x2", 1.15),
   // Garden, wildlife and outdoor living additions. Existing item keys stay stable.

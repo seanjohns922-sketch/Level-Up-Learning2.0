@@ -17,6 +17,7 @@ const FREE_BUILD_RENDER_KEYS = new Set<string>([
   "bottlebrush",
   "boulder",
   "bridge",
+  "carport",
   "buoy",
   "camp_lantern",
   "campfire",

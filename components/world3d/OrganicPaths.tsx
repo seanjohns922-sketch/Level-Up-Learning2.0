@@ -3,11 +3,10 @@ import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { buildOrganicPath } from "@/lib/world3d/organic-path";
 import type { CentralWorldGroundTile } from "@/lib/world3d/central-world-layout";
-export function OrganicPaths({ tiles, road = false }: {
+export function OrganicPaths({ tiles }: {
     tiles: CentralWorldGroundTile[];
-    road?: boolean;
 }) {
-    const geometry = useMemo(() => buildOrganicPath(road ? tiles.map(tile => ({...tile,tileType:tile.tileType==="road"?"path":"stone"})) : tiles), [tiles, road]);
+    const geometry = useMemo(() => buildOrganicPath(tiles), [tiles]);
     const gravel = useMemo(() => {
         const data = new Uint8Array(128 * 128 * 4);
         let seed = 47;
@@ -28,7 +27,7 @@ export function OrganicPaths({ tiles, road = false }: {
     useEffect(() => () => { geometry.surface.dispose(); geometry.edge.dispose(); }, [geometry]);
     useEffect(() => () => gravel.dispose(), [gravel]);
     return <group>
-    <mesh geometry={geometry.edge} receiveShadow><meshStandardMaterial color={road?"#8d948c":"#806b4d"} roughness={1}/></mesh>
-    <mesh geometry={geometry.surface} receiveShadow><meshStandardMaterial color={road?"#555f60":"#b29a73"} map={gravel} bumpMap={gravel} bumpScale={road?.012:.045} roughness={0.98}/></mesh>
+    <mesh geometry={geometry.edge} receiveShadow><meshStandardMaterial color="#806b4d" roughness={1}/></mesh>
+    <mesh geometry={geometry.surface} receiveShadow><meshStandardMaterial color="#b29a73" map={gravel} bumpMap={gravel} bumpScale={0.045} roughness={0.98}/></mesh>
   </group>;
 }

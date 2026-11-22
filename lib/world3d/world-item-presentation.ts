@@ -30,6 +30,7 @@ export const CASTLE_WALL_NATIVE_HEIGHT = 26;
 const BASE_PRESENTATION: Record<string, ItemPresentation> = {
   ...REALM_DESIGN_PRESENTATIONS,
   rail_straight: {height:.13, footprint:[2,2], sizing:"fixed", theme:"garden"},
+  carport: {height:2.9, footprint:[6,4], sizing:"fixed", theme:"garden"},
   rail_corner: {height:.13, footprint:[2,2], sizing:"fixed", theme:"garden"},
   rail_train: {height:2.25, footprint:[2,2], sizing:"fixed", theme:"garden"},
   ...Object.fromEntries(TRAIN_DESIGNS.map(item=>[item.key,{height:2.7,footprint:[2,2] as [number,number],sizing:"fixed" as const,theme:"garden" as const}])),

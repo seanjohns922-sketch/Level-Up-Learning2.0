@@ -24,6 +24,8 @@ import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buil
 import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PlacedPremiumHome, TowerShieldAtTower } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
+import { PlacedCarport, RoadNetwork } from "@/components/world3d/premium-items/RoadsAndCars";
+import { CARPORT_ASSET_KEY } from "@/lib/world3d/cars";
 import { PlacedRacePiece, RaceTrackTiles } from "@/components/world3d/premium-items/RacePieces";
 import { RACE_PIECE_KEYS } from "@/lib/world3d/race-kit";
 import { SKATE_PIECE_KEYS } from "@/lib/world3d/skate-kit";
@@ -360,6 +362,7 @@ function StarterScenery({ assetKey, tint }: { assetKey: string; tint?: string })
   if (SKATE_PIECE_KEYS.has(assetKey)) return <PlacedSkatePiece assetKey={assetKey} />;
   if (RACE_PIECE_KEYS.has(assetKey)) return <PlacedRacePiece assetKey={assetKey} />;
   if (RAIL_KEYS.has(assetKey)) return <group><RailTrack asset={assetKey}/>{assetKey === "rail_train" && <StarterTrain/>}</group>;
+  if (assetKey === CARPORT_ASSET_KEY) return <PlacedCarport />;
   if (COLLECTION_SCENERY_KEYS.has(assetKey)) return <CollectionScenery assetKey={assetKey} tint={tint} />;
   if (FORTRESS_SCENERY_KEYS.has(assetKey)) return <FortressScenery assetKey={assetKey} tint={tint} />;
   if (WILDLIFE_KEYS.has(assetKey)) return <WildlifeScenery assetKey={assetKey} tint={tint} />;
@@ -1002,9 +1005,9 @@ function GroundTileBatch({ tiles, tileType }: { tiles: CentralWorldGroundTile[];
   return <instancedMesh ref={ref} args={[undefined, undefined, tiles.length]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize, 0.08, CENTRAL_WORLD_GRID.cellSize]} /><meshStandardMaterial color={GROUND_TILE_COLORS[tileType]} roughness={water ? 0.18 : 0.95} metalness={water ? 0.25 : 0} /></instancedMesh>;
 }
 
-function PaintedGround({ tiles }: { tiles: CentralWorldGroundTile[] }) {
+function PaintedGround({ tiles, night }: { tiles: CentralWorldGroundTile[]; night: boolean }) {
   const batches = useMemo(() => (["stone"] as const).map(tileType => ({ tileType, tiles: tiles.filter(tile => tile.tileType === tileType) })), [tiles]);
-  return <group><OrganicPaths tiles={tiles} /><OrganicPaths tiles={tiles} road /><WorldWater tiles={tiles} /><RaceTrackTiles tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
+  return <group><OrganicPaths tiles={tiles} /><RoadNetwork tiles={tiles} night={night} /><WorldWater tiles={tiles} /><RaceTrackTiles tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
 }
 
 function MeadowGround() {
@@ -1344,7 +1347,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
         </Suspense>
         <GrassTufts quality={quality} groundTiles={groundTiles} />
       </>}
-      <PaintedGround tiles={groundTiles} />
+      <PaintedGround tiles={groundTiles} night={night} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}

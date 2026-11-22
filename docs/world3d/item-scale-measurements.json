@@ -208,5 +208,6 @@
   {"key":"city_outdoor_setting","name":"Outdoor Setting","native":[2.170499,1.16,1.38522],"size":[2.170499,1.16,1.38522],"footprint":[6,6]},
   {"key":"city_bus_stop","name":"Bus Stop","native":[9.60001,3.17001,6],"size":[9.60001,3.17001,6],"footprint":[10,6]},
   {"key":"city_food_truck","name":"Food Truck","native":[2.66,2.77,2],"size":[2.66,2.77,2],"footprint":[8,6]},
-  {"key":"city_vending_kiosk","name":"Vending & ATM","native":[1.80001,2.36001,1.4],"size":[1.80001,2.36001,1.4],"footprint":[4,4]}
+  {"key":"city_vending_kiosk","name":"Vending & ATM","native":[1.80001,2.36001,1.4],"size":[1.80001,2.36001,1.4],"footprint":[4,4]},
+  {"key":"carport","name":"Carport","native":[5.96,2.81,3.96],"size":[5.96,2.81,3.96],"footprint":[6,4]}
 ]

@@ -329,7 +329,8 @@
     "qa:premium-homes": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/premium-homes-audit.mjs",
     "qa:lesson-statements": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/lesson-statements-audit.mjs --check",
     "qa:walk-build": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/walk-build-test.mjs",
-    "qa:city-life": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/city-life-audit.mjs"
+    "qa:city-life": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/city-life-audit.mjs",
+    "qa:cars": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/cars-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -49,5 +49,5 @@ assert.ok(read("components/world3d/premium-items/RacePieces.tsx").includes("<Cor
 // Racing: start lines are Race targets, the kart replaces the explorer, and the overlay shows laps.
 assert.ok(world.includes('assetKey === "race_start"') && world.includes('label: "RACE", icon: "flag"'), "a start line must offer the Race button");
 assert.ok(world.includes("<RaceKartDriver key={race.nonce}") && world.includes("hidden={!roaming}"), "racing must swap the explorer for the kart");
-assert.ok(world.includes("<RaceHud hud={raceHud}") && world.includes("driving={Boolean(race)}"), "racing must show the lap overlay and drive from the joystick");
+assert.ok(world.includes("<RaceHud hud={raceHud}") && world.includes("driving={Boolean(race || drive)}"), "racing (and driving a car) must show its overlay and drive from the joystick");
 console.log(`PASS Race Kit: ${RACE_PIECES.length} pieces over 4 kit levels, tarmac saved and gated by the kit, 4 shop rows match the migration, hub wiring and racing in place`);

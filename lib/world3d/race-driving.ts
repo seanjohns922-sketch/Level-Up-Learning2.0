@@ -100,6 +100,10 @@ export function onTrack(course: RaceCourse, x: number, z: number) {
   return course.track.has(cellKey(x, z)) || course.bridges.some((b) => bridgeDeck(b, x, z) !== null);
 }
 
+/** Top speeds in world metres per second: on tarmac or road, off it, and backwards. */
+export type Handling = { top: number; offRoad: number; reverse: number };
+export const KART_HANDLING: Handling = { top: KART_TOP_SPEED, offRoad: KART_OFF_TRACK_SPEED, reverse: KART_REVERSE_SPEED };
+
 export type KartState = { x: number; z: number; y: number; heading: number; speed: number; vy: number; airborne: boolean; boost: number };
 export type KartInput = { throttle: number; steer: number };
 export type KartWorld = { groundHeightAt?: (x: number, z: number) => number; canDriveAt: (x: number, z: number) => boolean };
@@ -111,17 +115,17 @@ export function newKart(x: number, z: number, heading: number): KartState {
 const approach = (value: number, target: number, rate: number) => value < target ? Math.min(target, value + rate) : Math.max(target, value - rate);
 
 /** One frame of driving. Throttle and steer run from -1 to 1 (steer +1 turns right). */
-export function stepKart(kart: KartState, input: KartInput, course: RaceCourse, world: KartWorld, dt: number): KartState {
+export function stepKart(kart: KartState, input: KartInput, course: RaceCourse, world: KartWorld, dt: number, handling: Handling = KART_HANDLING): KartState {
   const throttle = Math.max(-1, Math.min(1, input.throttle)), steer = Math.max(-1, Math.min(1, input.steer));
   const tarmac = onTrack(course, kart.x, kart.z);
   let boost = Math.max(0, kart.boost - dt);
   if (!kart.airborne && course.boosts.some((b) => inBox(b, kart.x, kart.z))) boost = BOOST_SECONDS;
-  const top = boost > 0 ? KART_BOOST_SPEED : tarmac ? KART_TOP_SPEED : KART_OFF_TRACK_SPEED;
+  const top = boost > 0 ? KART_BOOST_SPEED : tarmac ? handling.top : handling.offRoad;
 
   let speed = kart.speed;
   if (boost > 0 && speed < top) speed = approach(speed, top, ACCELERATION * 3 * dt);
   else if (throttle > 0) speed = speed < 0 ? approach(speed, 0, BRAKING * dt) : approach(speed, top * throttle, (speed > top ? BRAKING : ACCELERATION) * dt);
-  else if (throttle < 0) speed = speed > 0 ? approach(speed, 0, BRAKING * dt) : approach(speed, -KART_REVERSE_SPEED, ACCELERATION * dt);
+  else if (throttle < 0) speed = speed > 0 ? approach(speed, 0, BRAKING * dt) : approach(speed, -handling.reverse, ACCELERATION * dt);
   else speed = approach(speed, 0, (speed > top ? BRAKING : COASTING) * dt);
 
   // Steering needs the kart to be rolling, and flips when reversing, like a real car.

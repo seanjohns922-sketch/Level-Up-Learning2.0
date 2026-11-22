@@ -84,6 +84,8 @@ const freeRenderers=new Set([
  ...(await import('../lib/world3d/race-kit.ts')).RACE_PIECES.map(piece=>piece.assetKey),
  // Free Defence pieces render as upgradeable set pieces.
  ...PREMIUM_HOME_STYLES.filter(style=>PREMIUM_HOME_SPECS[style].free).map(premiumHomeAssetKey),
+ // Roads & Cars: the carport shows the learner's car parked under it.
+ (await import('../lib/world3d/cars.ts')).CARPORT_ASSET_KEY,
 ]);
 const rewardRenderers=new Set([
  ...WORLD_REWARD_ADDITIONS.map(i=>i.key), ...VILLAGE_BUILDING_KEYS, ...REALM_BUILDING_KEYS, ...RAIL_KEYS,

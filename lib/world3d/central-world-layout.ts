@@ -213,7 +213,7 @@ const FULL_SPACE_SCENERY = new Set([
   "pond", "lily_pond", "bridge", "fountain", "small_jetty", "rowboat", "boardwalk",
   "rail_straight", "rail_corner", "rail_train",
   "gazebo", "market_stall", "campsite", "garden_arch", "hedge_arch",
-  "sandpit", "hopscotch", "seesaw", "small_slide", "swing",
+  "sandpit", "hopscotch", "seesaw", "small_slide", "swing", "carport",
 ]);
 const COMPACT_GROUPS = new Set(["trees_plants", "rocks_water", "furniture_fun", "animals"]);
 
