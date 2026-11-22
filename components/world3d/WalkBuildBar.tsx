@@ -1,7 +1,7 @@
 "use client";
 // Walk-and-place building: a hotbar of recent and pinned items, and the buttons
 // to place, turn, erase or switch to the bird's-eye planner.
-import { Check, Eraser, Map as MapIcon, PaintRoller, Pin, Plus, RotateCw, Undo2, X } from "lucide-react";
+import { Check, Eraser, Map as MapIcon, PaintRoller, Plus, RotateCw, Star, Undo2, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { WorldVoiceButton } from "./WorldVoiceButton";
 
@@ -44,20 +44,23 @@ export function WalkBuildBar({
         <button type="button" className="walkBuildDone" onClick={onDone} aria-label="Stop building"><X size={18} />Done</button>
       </div>
 
-      <div className="walkBuildBar" role="toolbar" aria-label="Build hotbar">
-        {slots.map((slot, index) => (
-          <div key={slot.entry} className="walkBuildSlotWrap">
-            <button type="button" className="walkBuildSlot" aria-pressed={active === slot.entry} aria-label={`Hold ${slot.name}`} title={`${slot.name} (${index + 1})`} onClick={() => onPick(slot.entry)}>
-              <span className="walkBuildArt" aria-hidden="true">{slot.art}</span>
-              <b>{slot.name}</b>
-              <kbd>{index + 1}</kbd>
-            </button>
-            {active === slot.entry ? (
-              <button type="button" className="walkBuildPin" aria-pressed={pinned.has(slot.entry)} aria-label={pinned.has(slot.entry) ? `Unpin ${slot.name}` : `Pin ${slot.name} to the bar`} onClick={() => onPin(slot.entry)}><Pin size={13} /></button>
-            ) : null}
-          </div>
-        ))}
-        <button type="button" className="walkBuildSlot walkBuildMore" onClick={onMore} aria-label="More things to build"><span className="walkBuildArt" aria-hidden="true"><Plus size={28} /></span><b>More</b></button>
+      <div className="walkBuildBar" role="toolbar" aria-label="Build hotbar: your favourites, then recent picks">
+        {slots.map((slot, index) => {
+          const favourite = pinned.has(slot.entry);
+          return (
+            <div key={slot.entry} className="walkBuildSlotWrap">
+              <button type="button" className="walkBuildSlot" aria-pressed={active === slot.entry} aria-label={`Hold ${slot.name}${favourite ? " (favourite)" : ""}`} title={index < 10 ? `${slot.name} (${(index + 1) % 10})` : slot.name} onClick={() => onPick(slot.entry)}>
+                <span className="walkBuildArt" aria-hidden="true">{slot.art}</span>
+                <b>{slot.name}</b>
+                {index < 10 ? <kbd>{(index + 1) % 10}</kbd> : null}
+              </button>
+              {active === slot.entry ? (
+                <button type="button" className="walkBuildStar" aria-pressed={favourite} aria-label={favourite ? `Take ${slot.name} out of favourites` : `Add ${slot.name} to favourites`} onClick={() => onPin(slot.entry)}><Star size={14} fill={favourite ? "currentColor" : "none"} /></button>
+              ) : favourite ? <span className="walkBuildFavourite" aria-hidden="true"><Star size={10} fill="currentColor" /></span> : null}
+            </div>
+          );
+        })}
+        <button type="button" className="walkBuildSlot walkBuildMore" onClick={onMore} aria-label="More things to build"><span className="walkBuildArt" aria-hidden="true"><Plus size={26} /></span><b>More</b></button>
       </div>
 
       <div className="walkBuildTools" aria-label={heldName ? `Building with ${heldName}` : "Build tools"}>
@@ -79,15 +82,16 @@ export function WalkBuildBar({
         .walkBuildHint[data-tone="ok"]{border-color:#4ade80}.walkBuildHint[data-tone="bad"]{border-color:#fb7185}
         .walkBuildHint span{min-width:0}
         .walkBuildDone{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-weight:900!important;font-size:13px!important;white-space:nowrap}
-        .walkBuildBar{position:absolute;left:0;right:0;margin-inline:auto;width:fit-content;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));display:flex;gap:6px;max-width:calc(100vw - 520px);overflow-x:auto;padding:7px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(18,22,30,.84);pointer-events:auto;scrollbar-width:none;box-shadow:0 12px 30px rgba(0,0,0,.3)}
-        .walkBuildSlotWrap{position:relative;flex:none}
-        .walkBuildSlot{position:relative;flex:none;width:68px;height:78px;display:grid;justify-items:center;align-content:center;gap:2px;padding:4px;border-radius:12px;border:3px solid transparent;background:rgba(255,255,255,.08);color:#fff}
+        .walkBuildBar{--slot:60px;--slot-h:66px;position:absolute;left:0;right:0;margin-inline:auto;width:fit-content;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));display:grid;grid-template-columns:repeat(8,var(--slot));gap:6px;padding:7px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(18,22,30,.84);pointer-events:auto;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+        .walkBuildSlotWrap{position:relative}
+        .walkBuildSlot{position:relative;width:var(--slot);height:var(--slot-h);display:grid;justify-items:center;align-content:center;gap:1px;padding:3px;border-radius:12px;border:3px solid transparent;background:rgba(255,255,255,.08);color:#fff}
         .walkBuildSlot[aria-pressed="true"]{background:#7c3aed;border-color:#c4b5fd}
-        .walkBuildSlot b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:850}
-        .walkBuildSlot kbd{position:absolute;left:6px;top:4px}
-        .walkBuildArt{position:relative;width:50px;height:44px;display:grid;place-items:center;overflow:hidden;border-radius:8px}
-        .walkBuildPin{position:absolute;right:-4px;top:-6px;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;border:2px solid #c4b5fd;background:#1e1b2e;color:#c4b5fd}
-        .walkBuildPin[aria-pressed="true"]{background:#c4b5fd;color:#2e1065}
+        .walkBuildSlot b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:850}
+        .walkBuildSlot kbd{position:absolute;left:5px;top:3px}
+        .walkBuildArt{position:relative;width:calc(var(--slot) - 16px);height:calc(var(--slot-h) - 26px);display:grid;place-items:center;overflow:hidden;border-radius:8px}
+        .walkBuildStar{position:absolute;right:-5px;top:-7px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;border:2px solid #fcd34d;background:#1e1b2e;color:#fcd34d}
+        .walkBuildStar[aria-pressed="true"]{background:#fcd34d;color:#78350f}
+        .walkBuildFavourite{position:absolute;right:4px;top:4px;color:#fcd34d;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
         .walkBuildTools{position:absolute;right:max(24px,calc(env(safe-area-inset-right) + 18px));bottom:max(178px,calc(env(safe-area-inset-bottom) + 172px));display:grid;gap:8px;width:252px;pointer-events:none}
         .walkBuildMain{display:flex;align-items:center;justify-content:center;gap:8px;min-height:62px;border-radius:16px;border:0;background:#22c55e;color:#fff;font-weight:950!important;font-size:21px!important;letter-spacing:.04em;box-shadow:0 6px 0 rgba(0,0,0,.25)}
         .walkBuildMain kbd{color:#fff}
@@ -99,19 +103,20 @@ export function WalkBuildBar({
         .walkBuildRow button:disabled{opacity:.45;cursor:default}
         .walkBuildRow button[aria-pressed="true"]{background:#e5484d;border-color:#fecaca}
         @media (max-width:999px){
-          .walkBuildBar{bottom:max(164px,calc(env(safe-area-inset-bottom) + 158px));max-width:calc(100vw - 32px)}
-          .walkBuildTools{bottom:max(262px,calc(env(safe-area-inset-bottom) + 256px))}
-          .walkBuildSlot{width:58px;height:68px}.walkBuildArt{width:44px;height:38px}
+          .walkBuildBar{--slot:54px;--slot-h:60px;bottom:max(164px,calc(env(safe-area-inset-bottom) + 158px))}
+          .walkBuildTools{bottom:max(314px,calc(env(safe-area-inset-bottom) + 308px))}
         }
         @media (max-width:999px) and (max-height:520px){
-          .walkBuildBar{bottom:max(10px,calc(env(safe-area-inset-bottom) + 6px));max-width:calc(100vw - 500px)}
+          .walkBuildBar{--slot:36px;--slot-h:38px;gap:4px;padding:6px;bottom:max(8px,calc(env(safe-area-inset-bottom) + 4px))}
           .walkBuildTools{bottom:max(156px,calc(env(safe-area-inset-bottom) + 150px));width:220px}
-          .walkBuildSlot{width:50px;height:56px}.walkBuildSlot b{display:none}.walkBuildMain{min-height:50px;font-size:17px!important}.walkBuildRow button{min-height:44px}
+          .walkBuildSlot b,.walkBuildSlot kbd{display:none}.walkBuildArt{width:28px;height:28px}.walkBuildMain{min-height:50px;font-size:17px!important}.walkBuildRow button{min-height:44px}
           .walkBuildHint{top:max(58px,calc(env(safe-area-inset-top) + 50px));font-size:13px}
         }
         @media (max-width:560px){
           .walkBuildHint{font-size:13px;padding-left:12px}
-          .walkBuildTools{left:16px;right:16px;width:auto;grid-template-columns:1.2fr 2fr;align-items:stretch}
+          .walkBuildBar{--slot:calc((100vw - 74px) / 8);--slot-h:46px;gap:4px}
+          .walkBuildSlot b,.walkBuildSlot kbd{display:none}.walkBuildArt{width:calc(var(--slot) - 10px);height:34px}
+          .walkBuildTools{left:16px;right:16px;width:auto;grid-template-columns:1.2fr 2fr;align-items:stretch;bottom:max(282px,calc(env(safe-area-inset-bottom) + 276px))}
           .walkBuildMain{font-size:17px!important;min-height:52px}
           .walkBuildRow button{min-height:52px}
         }

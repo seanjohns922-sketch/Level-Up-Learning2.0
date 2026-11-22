@@ -1178,9 +1178,10 @@ export default function CentralWorld() {
   }
   function pinEntry(entry: HotbarEntry) {
     const next = togglePin(hotbar, entry);
+    if (next === hotbar) { buildSounds.blocked(); void speak(`Your favourites are full. Take one away first: tap its star.`, undefined, "manual", { rate: 0.9 }); return; }
     setHotbar(next);
     writeHotbar(placementScope, next);
-    void speak(next.pins.includes(entry) ? "Pinned to your bar." : "Unpinned.", undefined, "manual", { rate: 0.9 });
+    void speak(next.pins.includes(entry) ? "Added to your favourites." : "Taken out of your favourites.", undefined, "manual", { rate: 0.9 });
   }
   // A fresh pick in the planner stays there, unless "More" was choosing something to carry.
   function pickView(item: EconomyItem): PlaceView {
@@ -1723,7 +1724,8 @@ export default function CentralWorld() {
       const key = event.key.toLowerCase();
       if ((event.metaKey || event.ctrlKey) && key === "z") { event.preventDefault(); undoWorldEdit(); return; }
       if (event.metaKey || event.ctrlKey) return;
-      const slot = /^[1-8]$/.test(key) ? walkSlots[Number(key) - 1] : undefined;
+      // 1 to 9 pick the first nine slots; 0 picks the tenth.
+      const slot = /^[0-9]$/.test(key) ? walkSlots[(Number(key) + 9) % 10] : undefined;
       const run: Record<string, () => void> = {
         e: walkMain, enter: walkMain,
         r: () => { if (buildPlacement) rotateHeld(); },

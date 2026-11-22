@@ -78,7 +78,8 @@ export function standBehind(gridX: number, gridZ: number, gridSize: [number, num
 
 // The hotbar: an item key, or a ground brush written "tool:path".
 export type HotbarEntry = string;
-export const HOTBAR_SLOTS = 8;
+/** Slots on the hotbar (two rows), which is also how many favourites a builder can keep. */
+export const HOTBAR_SLOTS = 15;
 const TOOL_PREFIX = "tool:";
 export const hotbarTool = (tool: CentralWorldGroundType): HotbarEntry => `${TOOL_PREFIX}${tool}`;
 export function hotbarToolOf(entry: HotbarEntry): CentralWorldGroundType | null {
@@ -109,10 +110,12 @@ export function rememberHotbarEntry(hotbar: Hotbar, entry: HotbarEntry): Hotbar 
   return { pins: hotbar.pins, recent: [entry, ...hotbar.recent.filter((other) => other !== entry)].slice(0, HOTBAR_SLOTS) };
 }
 
+export const favouritesFull = (hotbar: Hotbar) => hotbar.pins.length >= HOTBAR_SLOTS;
+
+/** Adds a favourite (unless all 15 are taken) or takes one away. */
 export function togglePin(hotbar: Hotbar, entry: HotbarEntry): Hotbar {
-  return hotbar.pins.includes(entry)
-    ? { pins: hotbar.pins.filter((other) => other !== entry), recent: hotbar.recent }
-    : { pins: [...hotbar.pins, entry].slice(0, HOTBAR_SLOTS), recent: hotbar.recent };
+  if (hotbar.pins.includes(entry)) return { pins: hotbar.pins.filter((other) => other !== entry), recent: hotbar.recent };
+  return favouritesFull(hotbar) ? hotbar : { pins: [...hotbar.pins, entry], recent: hotbar.recent };
 }
 
 /**
@@ -123,6 +126,8 @@ export function togglePin(hotbar: Hotbar, entry: HotbarEntry): Hotbar {
 export const HOTBAR_STARTERS: readonly HotbarEntry[] = [
   hotbarTool("path"), "central_world_starter_lamp", "central_world_starter_fence", "central_world_starter_bench",
   "central_world_starter_shrub", "central_world_starter_tree", "central_world_starter_flowers", "central_world_starter_mailbox",
+  hotbarTool("water"), "central_world_starter_pine", "central_world_starter_boulder", "central_world_starter_campfire",
+  "central_world_starter_picnic_table", "central_world_starter_flag", "central_world_starter_kangaroo",
 ];
 
 export function hotbarSlots(hotbar: Hotbar, starters: readonly HotbarEntry[], available: (entry: HotbarEntry) => boolean): HotbarEntry[] {

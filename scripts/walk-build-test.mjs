@@ -53,11 +53,18 @@ bar = rememberHotbarEntry(bar, "b");
 bar = rememberHotbarEntry(bar, "a");
 assert.deepEqual(bar.recent, ["a", "b"]);
 bar = togglePin(bar, "b");
-const slots = hotbarSlots(bar, ["s1", "a", "s2", "gone", "s3", "s4", "s5", "s6", "s7"], (entry) => entry !== "gone");
+const starters = ["s1", "a", "gone", ...Array.from({ length: 20 }, (_, i) => `s${i + 2}`)];
+const slots = hotbarSlots(bar, starters, (entry) => entry !== "gone");
 assert.deepEqual(slots.slice(0, 3), ["b", "a", "s1"]);
 assert.equal(slots.length, HOTBAR_SLOTS);
 assert.ok(!slots.includes("gone"));
 assert.deepEqual(togglePin(bar, "b").pins, []);
+// Fifteen favourites at most: a sixteenth is refused, not swapped in.
+let full = { pins: [], recent: [] };
+for (let i = 0; i < 15; i += 1) full = togglePin(full, `f${i}`);
+assert.equal(full.pins.length, 15);
+assert.equal(togglePin(full, "extra"), full);
+assert.equal(HOTBAR_STARTERS.length, HOTBAR_SLOTS, "a new builder's bar starts full");
 for (let i = 0; i < 20; i += 1) bar = rememberHotbarEntry(bar, `r${i}`);
 assert.equal(bar.recent.length, HOTBAR_SLOTS);
 
