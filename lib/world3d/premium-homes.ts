@@ -8,7 +8,9 @@ import type { EconomyItem } from "@/lib/economy";
 export const DEFENCE_STYLES = ["laser_fence", "laser_gate", "scanner", "trip_wire", "drone_pad", "guard_dog", "patrol_drone", "sentry_bot", "tower_shield"] as const;
 /** The everyday keepers: free at Level 1 (they are the editor's long-standing free items), upgraded with XP. */
 export const EVERYDAY_STYLES = ["lamp_post", "bench", "fence", "mailbox", "campfire"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES] as const;
+/** City Life: everyday places, unlocked with XP. */
+export const CITY_LIFE_STYLES = ["playground", "cricket_nets", "park_bbq", "cubby_house", "outdoor_setting", "bus_stop", "food_truck", "vending_kiosk"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -24,7 +26,7 @@ type StyleSpec = {
   icon: string;
   /** World model key; the shop row is central_world_plot_1_<assetKey>. */
   assetKey: string;
-  marketplaceCategory: "buildings" | "pools_play" | "defence";
+  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life";
   upgradePrefix: string;
   /** Level 1 is free in the editor's Defence tab (it replaced a free castle piece); only upgrades cost XP. */
   free?: boolean;
@@ -42,6 +44,9 @@ const HOME = { marketplaceCategory: "buildings", upgradePrefix: "central_world_h
 const SET_PIECE = { marketplaceCategory: "pools_play", upgradePrefix: "central_world_set_upgrade_" } as const;
 const DEFENCE = { marketplaceCategory: "defence", upgradePrefix: "central_world_defence_upgrade_", metres: true } as const;
 const EVERYDAY = { marketplaceCategory: "buildings", upgradePrefix: "central_world_everyday_upgrade_", metres: true, free: true } as const;
+const CITY = { marketplaceCategory: "city_life", upgradePrefix: "central_world_city_upgrade_", metres: true } as const;
+const CITY_SMALL_PRICES = [200, 200, 400, 800] as const;
+const CITY_BIG_PRICES = [350, 350, 700, 1400] as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -306,6 +311,103 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     assetKey: "campfire",
     height: 2.6,
     ...EVERYDAY,
+  },
+  // City Life models live in components/world3d/premium-items/CityLifeItems.tsx.
+  playground: {
+    name: "Playground",
+    description: "Swings, slides and climbing towers, growing into an adventure playground with a flying fox.",
+    levels: ["Swing Set", "Swings & Slide", "Climbing Frame", "Adventure Playground"],
+    prices: CITY_BIG_PRICES,
+    gridSize: "5x5",
+    accent: "#22c3b3",
+    icon: "ferris-wheel",
+    assetKey: "city_playground",
+    height: 4.6,
+    ...CITY,
+  },
+  cricket_nets: {
+    name: "Cricket Nets",
+    description: "Backyard stumps up to floodlit nets with a bowling machine that really bowls.",
+    levels: ["Backyard Stumps", "Cricket Pitch", "Practice Net", "Floodlit Nets"],
+    prices: CITY_BIG_PRICES,
+    gridSize: "4x6",
+    accent: "#2f8f4a",
+    icon: "target",
+    assetKey: "city_cricket_nets",
+    height: 6,
+    ...CITY,
+  },
+  park_bbq: {
+    name: "Park BBQ",
+    description: "An Aussie park barbie that sizzles, up to a pavilion with festoon lights.",
+    levels: ["Brick BBQ", "BBQ & Table", "BBQ Shelter", "BBQ Pavilion"],
+    prices: CITY_SMALL_PRICES,
+    gridSize: "3x3",
+    accent: "#b5553c",
+    icon: "flame",
+    assetKey: "city_park_bbq",
+    height: 3.6,
+    ...CITY,
+  },
+  cubby_house: {
+    name: "Cubby House",
+    description: "A box fort that grows into a two-storey lookout cubby with a slide.",
+    levels: ["Box Fort", "Timber Cubby", "Cubby with Slide", "Lookout Cubby"],
+    prices: CITY_SMALL_PRICES,
+    gridSize: "3x3",
+    accent: "#9a63ff",
+    icon: "house",
+    assetKey: "city_cubby_house",
+    height: 5,
+    ...CITY,
+  },
+  outdoor_setting: {
+    name: "Outdoor Setting",
+    description: "Deck chairs up to an outdoor kitchen with a glowing pizza oven.",
+    levels: ["Deck Chairs", "Table & Umbrella", "Pergola", "Outdoor Kitchen"],
+    prices: CITY_SMALL_PRICES,
+    gridSize: "3x3",
+    accent: "#c98a52",
+    icon: "sofa",
+    assetKey: "city_outdoor_setting",
+    height: 3.4,
+    ...CITY,
+  },
+  bus_stop: {
+    name: "Bus Stop",
+    description: "A bus stop with its own kerb, up to a transit hub where the bus pulls in.",
+    levels: ["Bus Stop Sign", "Bus Shelter", "Smart Shelter", "Transit Hub"],
+    prices: CITY_BIG_PRICES,
+    gridSize: "5x3",
+    accent: "#1f8f4e",
+    icon: "bus",
+    assetKey: "city_bus_stop",
+    height: 4,
+    ...CITY,
+  },
+  food_truck: {
+    name: "Food Truck",
+    description: "A coffee cart that grows into a neon night-market food truck.",
+    levels: ["Coffee Cart", "Food Truck", "Truck & Seating", "Night-Market Truck"],
+    prices: CITY_BIG_PRICES,
+    gridSize: "4x3",
+    accent: "#ff9f45",
+    icon: "truck",
+    assetKey: "city_food_truck",
+    height: 4.4,
+    ...CITY,
+  },
+  vending_kiosk: {
+    name: "Vending & ATM",
+    description: "A glowing vending machine up to a 24/7 corner kiosk with an ATM.",
+    levels: ["Vending Machine", "Drinks & Snacks", "Kiosk", "24/7 Corner Kiosk"],
+    prices: CITY_SMALL_PRICES,
+    gridSize: "2x2",
+    accent: "#d83a3a",
+    icon: "store",
+    assetKey: "city_vending_kiosk",
+    height: 3.8,
+    ...CITY,
   },
 };
 

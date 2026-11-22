@@ -5,54 +5,14 @@
 import { useFrame } from "@react-three/fiber";
 import { Sparkles } from "@react-three/drei";
 import { useRef, type ReactNode } from "react";
-import { AdditiveBlending, CanvasTexture, Color, DoubleSide, type Group, type Mesh, type MeshBasicMaterial, type MeshStandardMaterial } from "three";
+import { Color, DoubleSide, type Group, type Mesh, type MeshStandardMaterial } from "three";
 import { Ball, Block, C, M, Mat } from "@/components/world3d/premium-homes/HomeKit";
+import { Bob, Glow, LightPool, Puffs, Spin, StringLights, WARM } from "./ItemKit";
 import type { PremiumHomeLevel } from "@/lib/world3d/premium-homes";
 
 type Level = PremiumHomeLevel;
 type Props = { level: Level; night: boolean };
-const IRON = "#24302b", GOLD = "#ffc933", WARM = "#ffd27a", CRYSTAL = "#7df9ff", PINK = "#ff4fd8", TIMBER = "#a8703f", TIMBER_DARK = "#7a4d28";
-
-/** A white-to-clear radial gradient, made once and shared by every light pool. */
-let poolTexture: CanvasTexture | null = null;
-function lightPoolTexture() {
-  if (poolTexture || typeof document === "undefined") return poolTexture;
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = 128;
-  const g = canvas.getContext("2d")!, gradient = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gradient.addColorStop(0, "rgba(255,255,255,1)");
-  gradient.addColorStop(0.45, "rgba(255,255,255,0.45)");
-  gradient.addColorStop(1, "rgba(255,255,255,0)");
-  g.fillStyle = gradient;
-  g.fillRect(0, 0, 128, 128);
-  poolTexture = new CanvasTexture(canvas);
-  return poolTexture;
-}
-/** A soft pool of light on the ground under a lamp, after dark only. */
-function LightPool({ r, color, night }: { r: number; color: string; night: boolean }) {
-  if (!night) return null;
-  return <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[r * 2, r * 2]} /><meshBasicMaterial map={lightPoolTexture()} color={color} transparent opacity={0.55} blending={AdditiveBlending} depthWrite={false} toneMapped={false} /></mesh>;
-}
-/** A glowing pane or bulb: brighter after dark. */
-function Glow({ size, pos, color, night, round = false }: { size: [number, number, number]; pos: [number, number, number]; color: string; night: boolean; round?: boolean }) {
-  return round
-    ? <mesh position={pos}><sphereGeometry args={[size[0], 18, 14]} /><meshStandardMaterial color={color} emissive={color} emissiveIntensity={night ? 3 : 0.8} roughness={0.3} /></mesh>
-    : <Block size={size} pos={pos} color={color} r={Math.min(...size) / 3} glow={night ? 3 : 0.8} />;
-}
-function Spin({ speed, children }: { speed: number; children: ReactNode }) {
-  const ref = useRef<Group>(null);
-  useFrame((_, d) => { if (ref.current) ref.current.rotation.y += d * speed; });
-  return <group ref={ref}>{children}</group>;
-}
-function Bob({ amount = 0.08, speed = 1.6, children }: { amount?: number; speed?: number; children: ReactNode }) {
-  const ref = useRef<Group>(null);
-  useFrame(({ clock }) => { if (ref.current) ref.current.position.y = Math.sin(clock.elapsedTime * speed) * amount; });
-  return <group ref={ref}>{children}</group>;
-}
-/** Little bulbs strung between two points, sagging in the middle. */
-function StringLights({ from, to, night, n = 9, sag = 0.18, colors = [WARM] }: { from: [number, number, number]; to: [number, number, number]; night: boolean; n?: number; sag?: number; colors?: string[] }) {
-  return <group>{Array.from({ length: n }, (_, i) => { const t = (i + 0.5) / n; return <Ball key={i} pos={[from[0] + (to[0] - from[0]) * t, from[1] + (to[1] - from[1]) * t - Math.sin(t * Math.PI) * sag, from[2] + (to[2] - from[2]) * t]} r={0.035} color={colors[i % colors.length]} glow={night ? 3 : 0.6} />; })}</group>;
-}
+const IRON = "#24302b", GOLD = "#ffc933", CRYSTAL = "#7df9ff", PINK = "#ff4fd8", TIMBER = "#a8703f", TIMBER_DARK = "#7a4d28";
 
 /* ───────── Lamp post ───────── */
 function Lantern({ night, color = WARM, s = 1 }: { night: boolean; color?: string; s?: number }) {
@@ -360,23 +320,11 @@ function Marshmallow({ angle }: { angle: number }) {
 function FireGlow({ night, color = "#ff8a3d", strength = 1 }: { night: boolean; color?: string; strength?: number }) {
   return <>{night ? <pointLight position={[0, 0.8, 0]} color={color} intensity={6 * strength} distance={7} /> : null}<LightPool r={1.6 * strength} color={color} night={night} /></>;
 }
-function Smoke() {
-  const ref = useRef<Group>(null);
-  useFrame(({ clock }) => {
-    ref.current?.children.forEach((child, i) => {
-      const t = (clock.elapsedTime * 0.35 + i / 4) % 1;
-      child.position.set(Math.sin(t * 4 + i) * 0.08, 0.7 + t * 1.4, 0);
-      child.scale.setScalar(0.06 + t * 0.16);
-      ((child as Mesh).material as MeshBasicMaterial).opacity = 0.22 * (1 - t);
-    });
-  });
-  return <group ref={ref}>{[0, 1, 2, 3].map((i) => <mesh key={i}><sphereGeometry args={[1, 10, 8]} /><meshBasicMaterial color="#d8d8d8" transparent opacity={0.3} depthWrite={false} /></mesh>)}</group>;
-}
 function Campfire({ level, night }: Props) {
-  if (level === 1) return <group><StoneRing r={0.42} n={10} /><Logs /><Flames size={1} magic={false} night={night} /><Smoke /><FireGlow night={night} /></group>;
+  if (level === 1) return <group><StoneRing r={0.42} n={10} /><Logs /><Flames size={1} magic={false} night={night} /><Puffs pos={[0, 0.7, 0]} /><FireGlow night={night} /></group>;
   if (level === 2) return (
     <group>
-      <StoneRing r={0.45} n={11} /><Logs /><Flames size={1.1} magic={false} night={night} /><Smoke />
+      <StoneRing r={0.45} n={11} /><Logs /><Flames size={1.1} magic={false} night={night} /><Puffs pos={[0, 0.7, 0]} />
       <LogSeat angle={0.3} r={1.35} /><LogSeat angle={Math.PI + 0.3} r={1.35} />
       <Marshmallow angle={0.6} /><Marshmallow angle={2.8} />
       <FireGlow night={night} strength={1.1} />
@@ -387,7 +335,7 @@ function Campfire({ level, night }: Props) {
       {/* A stone fire pit, a seat circle, a kettle on a tripod and string lights on poles. */}
       <mesh position={[0, 0.14, 0]}><cylinderGeometry args={[0.62, 0.68, 0.28, 18, 1, true]} /><meshStandardMaterial color="#8b8f97" side={DoubleSide} roughness={0.9} /></mesh>
       <mesh position={[0, 0.28, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.5, 0.68, 24]} /><Mat color="#a3a7ae" /></mesh>
-      <group position={[0, 0.15, 0]}><Logs /><Flames size={1.2} magic={false} night={night} /></group><Smoke />
+      <group position={[0, 0.15, 0]}><Logs /><Flames size={1.2} magic={false} night={night} /></group><Puffs pos={[0, 0.7, 0]} />
       {[[-1, 1], [1, 1], [0, -1]].map(([sx, sz], i) => <group key={i}><Block size={[0.03, 1.0, 0.03]} pos={[sx * 0.22, 0.6, sz * 0.13]} rot={[sz * -0.2, 0, sx * -0.2]} color={IRON} r={0.01} /></group>)}
       <group position={[0, 0.98, 0]}><mesh position={[0, 0.0, 0]}><sphereGeometry args={[0.12, 16, 12]} /><Mat color={M.slate} metal={0.5} /></mesh><Block size={[0.12, 0.03, 0.03]} pos={[0.13, 0.03, 0]} rot={[0, 0, 0.5]} color={M.slate} r={0.01} /></group>
       {[0, 1, 2, 3, 4].map((i) => { const a = (i / 5) * Math.PI * 2 + 0.3; return <group key={i} position={[Math.cos(a) * 1.5, 0, Math.sin(a) * 1.5]}><Block size={[0.62, 0.36, 0.36]} pos={[0, 0.18, 0]} rot={[0, -a, 0]} color="#9ea2a9" r={0.08} /></group>; })}

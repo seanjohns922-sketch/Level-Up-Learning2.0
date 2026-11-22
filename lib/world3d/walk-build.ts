@@ -3,7 +3,7 @@
 // planner instead; kids can switch either way and the hub remembers their choice.
 import type { EconomyItem } from "@/lib/economy";
 import { CENTRAL_WORLD_HOME_KEY, type CentralWorldGroundType } from "./central-world-layout";
-import { EVERYDAY_STYLES, premiumHomeStyle } from "./premium-homes";
+import { PREMIUM_HOME_SPECS, premiumHomeStyle } from "./premium-homes";
 import { isRealmBuilding } from "./realm-building-collections";
 import { isTrainAsset } from "./train-catalogue";
 import { isVillageBuilding } from "./village-buildings";
@@ -22,10 +22,10 @@ export function itemSize(item: EconomyItem, gridSize: [number, number]): ItemSiz
   // The Tower's defences are planned round it; the laser fence is laid like any fence.
   if (assetKey === "defence_laser_fence") return "small";
   if (item.metadata.worldSceneryGroup === "fortress") return "big";
-  // Premium homes and rides are big; the upgradeable everyday pieces (lamp, bench, fence...) are not.
+  // Premium homes and rides are big; the everyday pieces and City Life places go by their size.
   const premium = premiumHomeStyle(assetKey);
-  const everyday = (EVERYDAY_STYLES as readonly string[]).includes(String(premium));
-  if (isVillageBuilding(assetKey) || isRealmBuilding(assetKey) || (premium && !everyday) || isTrainAsset(assetKey)) return "big";
+  const homeOrRide = premium !== null && !PREMIUM_HOME_SPECS[premium].free && ["buildings", "pools_play"].includes(PREMIUM_HOME_SPECS[premium].marketplaceCategory);
+  if (isVillageBuilding(assetKey) || isRealmBuilding(assetKey) || homeOrRide || isTrainAsset(assetKey)) return "big";
   return Math.max(gridSize[0], gridSize[1]) > SMALL_ITEM_MAX_SQUARES ? "big" : "small";
 }
 

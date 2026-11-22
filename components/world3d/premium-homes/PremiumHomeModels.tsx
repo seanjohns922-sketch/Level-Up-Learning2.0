@@ -2,12 +2,13 @@
 // The sixteen premium home models: four styles, four levels each.
 import { Sparkles } from "@react-three/drei";
 import type { ReactElement } from "react";
-import { DEFENCE_STYLES, EVERYDAY_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { CITY_LIFE_STYLES, DEFENCE_STYLES, EVERYDAY_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { FAIR_RIDE_MODELS } from "@/components/world3d/premium-items/FairRide";
 import { TRAMPOLINE_MODELS } from "@/components/world3d/premium-items/TrampolineModels";
 import { DEFENCE_MODELS, type TechLevel } from "@/components/world3d/premium-items/TowerDefenceModels";
 import { BasketballCourt } from "@/components/world3d/premium-items/BasketballCourt";
 import { EVERYDAY_MODELS } from "@/components/world3d/premium-items/EverydayItems";
+import { CITY_LIFE_MODELS } from "@/components/world3d/premium-items/CityLifeItems";
 import { C, M, Apartment, Ball, BigTrunk, Block, Bush, Chimney, Deck, Door, FairyLights, FlatRoof, GableRoof, GlassRail, GlassWall, GoldSparkle, Lantern, LeafCloud, LedStrip, Mat, Picket, Planter, Pod, Pool, RopeLadder, Slats, Slide, Solar, Stones, Walls, Window , type V3 } from "./HomeKit";
 
 type Night = { night: boolean };
@@ -307,6 +308,7 @@ function byLevelAndNight(Model: (p: { level: PremiumHomeLevel; night: boolean })
   }) as unknown as LevelModels;
 }
 const EVERYDAY_LEVEL_MODELS = Object.fromEntries(EVERYDAY_STYLES.map((style) => [style, byLevelAndNight(EVERYDAY_MODELS[style])])) as Record<(typeof EVERYDAY_STYLES)[number], LevelModels>;
+const CITY_LIFE_LEVEL_MODELS = Object.fromEntries(CITY_LIFE_STYLES.map((style) => [style, byLevelAndNight(CITY_LIFE_MODELS[style])])) as Record<(typeof CITY_LIFE_STYLES)[number], LevelModels>;
 
 const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   cottage: [HomeL1, HomeL2, HomeL3, HomeL4],
@@ -322,6 +324,7 @@ const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   }) as unknown as LevelModels,
   ...DEFENCE_LEVEL_MODELS,
   ...EVERYDAY_LEVEL_MODELS,
+  ...CITY_LIFE_LEVEL_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
 const STYLE_DEPTH_OFFSET: Partial<Record<PremiumHomeStyle, number>> = { cottage: -1.63, modern: -0.94, treehouse: -1.44, apartment: -0.75 };

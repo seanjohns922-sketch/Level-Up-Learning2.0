@@ -29,5 +29,5 @@ assert.ok(migration.includes("on conflict (item_key) do nothing"));
 const env = read("components/world3d/CentralWorldEnvironment.tsx");
 for (const key of ["lamp_post", "bench", "fence", "mailbox"]) assert.ok(!env.includes(`if (assetKey === "${key}") return`), `old ${key} model removed`);
 assert.ok(read("components/world3d/ConnectedBoundary.tsx").includes('if(assetKey==="fence")return') && read("lib/world3d/world-connections.ts").includes('"fence"'));
-assert.ok(read("components/world3d/premium-items/EverydayItems.tsx").includes("if (!night) return null;"), "lamp light pools only show after dark");
+assert.ok(read("components/world3d/premium-items/ItemKit.tsx").includes("if (!night) return null;") && read("components/world3d/premium-items/EverydayItems.tsx").includes('from "./ItemKit"'), "lamp light pools only show after dark");
 console.log(`PASS everyday items: ${EVERYDAY_STYLES.length} items free at Level 1 with ${rows.length} XP upgrades, upgraded in place, fence joins up`);

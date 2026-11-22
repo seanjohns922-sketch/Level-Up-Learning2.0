@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import * as Icons from "lucide-react";
-import { centralWorldCategory, marketplaceDepartment, marketplaceCategory, MARKETPLACE_CATEGORIES, type MarketplaceDepartment } from "@/lib/marketplace-categories";
+import { centralWorldCategory, marketplaceDepartment, worldCategoryLabel, marketplaceCategory, MARKETPLACE_CATEGORIES, type MarketplaceDepartment } from "@/lib/marketplace-categories";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import TreehouseBackLink from "@/components/world3d/treehouse/TreehouseBackLink";
 import MarketplaceItemImage from "@/components/economy/MarketplaceItemImage";
@@ -136,7 +136,7 @@ export default function MarketplacePage() {
                 <MarketplaceItemImage key={selected.item_key} item={selected} context="preview" avatarOutfit={previewOutfit} onArtworkError={(itemKey) => setBrokenArtworkIds((current) => new Set(current).add(itemKey))} />
                 <span className="absolute left-3 top-3 rounded bg-black/40 px-2 py-1 text-[10px] font-black uppercase text-white">{selectedIsWorldReward ? "World item" : "Try the look"}</span>
               </div>
-              <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{centralWorldCategory(selected)?.replace("_", " & ") ?? selected.category.replace("_", " ")}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
+              <div className="mt-5 flex items-center justify-between gap-3"><p className="text-xs font-black uppercase tracking-[0.16em]" style={{ color: selected.accent }}>{worldCategoryLabel(selected) ?? selected.category.replace("_", " ")}</p><span className="rounded px-2 py-1 text-[10px] font-black uppercase" style={{ color: RARITY_STYLES[selected.rarity].color, background: RARITY_STYLES[selected.rarity].background }}>{RARITY_STYLES[selected.rarity].label}</span></div>
               <h2 className="mt-1 text-2xl font-black">{selected.name}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{selected.description}</p>
               {selected.metadata?.slot === "avatar_outfit" && ["top", "bottom", "footwear"].some(slot => state?.equipped[slot]) ? <p className="mt-2 text-sm text-slate-600">Your separately equipped clothing overrides parts of this outfit. Remove those pieces in the wardrobe to wear the full set.</p> : null}
               {typeof selected.metadata?.gridSize === "string" ? <p className="mt-3 inline-flex items-center gap-2 rounded bg-slate-100 px-2 py-1 text-[11px] font-black uppercase text-slate-600"><Icons.Grid3X3 className="h-3.5 w-3.5" /> {selected.metadata.gridSize}</p> : null}

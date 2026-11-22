@@ -46,7 +46,10 @@ function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void})
 }
 const sceneryItems = CENTRAL_WORLD_STARTER_SCENERY.filter(item=>item.metadata.worldAssetKey!=="rail_train");
 export default function MarketplaceArtReview({infrastructure=false,realms=false,scenery=false}:{infrastructure?:boolean;realms?:boolean;scenery?:boolean}){
- const items=scenery?sceneryItems:realms?REALM_BUILDING_REVIEW_ITEMS.filter(item=>SIGNATURE_REALM_BUILDING_KEYS.includes(String(item.metadata.worldAssetKey))):infrastructure?infrastructureItems:shopItems;
+ // ?only=city_ re-shoots just the items whose world key starts with that, after a set changes.
+ const [only]=useState(()=>new URLSearchParams(window.location.search).get("only"));
+ const all=scenery?sceneryItems:realms?REALM_BUILDING_REVIEW_ITEMS.filter(item=>SIGNATURE_REALM_BUILDING_KEYS.includes(String(item.metadata.worldAssetKey))):infrastructure?infrastructureItems:shopItems;
+ const items=only?all.filter(item=>String(item.metadata.worldAssetKey).startsWith(only)):all;
  const [rows,setRows]=useState<Exported[]>([]),[running,setRunning]=useState(false);
  const capture=useCallback((row:Exported)=>setRows(previous=>previous.some(r=>r.key===row.key)?previous:[...previous,row]),[]);
  const current=items[rows.length];

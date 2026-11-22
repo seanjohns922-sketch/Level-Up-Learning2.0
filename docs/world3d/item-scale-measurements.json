@@ -200,5 +200,13 @@
   {"key":"defence_patrol_drone","name":"Patrol Drone","native":[1.00002,0.24002,1],"size":[1.00002,0.24002,1],"footprint":[6,6]},
   {"key":"defence_sentry_bot","name":"Sentry Bot","native":[2.279825,3.150722,1.147712],"size":[2.279825,3.150722,1.147712],"footprint":[6,6]},
   {"key":"play_basketball","name":"Basketball Court","native":[9.600012,4.770012,8.16],"size":[9.600012,4.770012,8.16],"footprint":[18,18]},
-  {"key":"campfire","name":"Campfire","native":[1.104,0.623559,1.018888],"size":[1.104,0.623559,1.018888],"footprint":[4,4]}
+  {"key":"campfire","name":"Campfire","native":[1.104,0.623559,1.018888],"size":[1.104,0.623559,1.018888],"footprint":[4,4]},
+  {"key":"city_playground","name":"Playground","native":[5.40001,3.151057,4],"size":[5.40001,3.151057,4],"footprint":[10,10]},
+  {"key":"city_cricket_nets","name":"Cricket Nets","native":[3.40001,0.923962,8],"size":[3.40001,0.923962,8],"footprint":[8,12]},
+  {"key":"city_park_bbq","name":"Park BBQ","native":[2.20001,1.025005,1.6],"size":[2.20001,1.025005,1.6],"footprint":[6,6]},
+  {"key":"city_cubby_house","name":"Cubby House","native":[2.40001,2.702315,1.4],"size":[2.40001,2.702315,1.4],"footprint":[6,6]},
+  {"key":"city_outdoor_setting","name":"Outdoor Setting","native":[2.170499,1.16,1.38522],"size":[2.170499,1.16,1.38522],"footprint":[6,6]},
+  {"key":"city_bus_stop","name":"Bus Stop","native":[9.60001,3.17001,6],"size":[9.60001,3.17001,6],"footprint":[10,6]},
+  {"key":"city_food_truck","name":"Food Truck","native":[2.66,2.77,2],"size":[2.66,2.77,2],"footprint":[8,6]},
+  {"key":"city_vending_kiosk","name":"Vending & ATM","native":[1.80001,2.36001,1.4],"size":[1.80001,2.36001,1.4],"footprint":[4,4]}
 ]
