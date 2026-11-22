@@ -46,26 +46,34 @@ export function writePlaceViews(scope: string, views: Record<ItemSize, PlaceView
   try { localStorage.setItem(`${VIEW_KEY}:${scope}`, JSON.stringify(views)); } catch { /* the choice just isn't remembered */ }
 }
 
-/** Squares between the explorer and a held item's near edge: far enough that their body never hides it. */
-const FRONT_GAP = 1.9;
+/** The eight ways a held item can sit from the explorer: straight ahead, behind, either side, or diagonal. */
+function snappedStep(aim: number): [number, number] {
+  const eighth = Math.round(aim / (Math.PI / 4)) * (Math.PI / 4);
+  return [Math.round(Math.sin(eighth)), Math.round(Math.cos(eighth))];
+}
+
+/** Squares from the explorer's square to an item's middle, so its near edge is on the very next square. */
+const stepsOut = (gridSize: [number, number]) => 1 + Math.floor(Math.max(gridSize[0], gridSize[1]) / 2);
 
 /**
- * The square an item of this size goes on: just past the explorer's toes in the
- * direction they face, with its near edge about two squares away.
- * `facing` is the avatar's rotation (0 faces +z).
+ * The square an item of this size goes on: the next square in front of the one the explorer
+ * stands on (bigger items reach further, so their near edge is still that next square).
+ * `aim` is a heading where 0 looks along +z; it snaps to the nearest of eight directions.
  */
-export function frontCell(x: number, z: number, facing: number, gridSize: [number, number], cellSize: number) {
-  const reach = cellSize * (FRONT_GAP + Math.max(gridSize[0], gridSize[1]) / 2);
-  return { gridX: Math.round((x + Math.sin(facing) * reach) / cellSize), gridZ: Math.round((z + Math.cos(facing) * reach) / cellSize) };
+export function frontCell(x: number, z: number, aim: number, gridSize: [number, number], cellSize: number) {
+  const foot = footCell(x, z, cellSize);
+  const [stepX, stepZ] = snappedStep(aim);
+  const steps = stepsOut(gridSize);
+  return { gridX: foot.gridX + stepX * steps, gridZ: foot.gridZ + stepZ * steps };
 }
 
 export function footCell(x: number, z: number, cellSize: number) {
   return { gridX: Math.round(x / cellSize), gridZ: Math.round(z / cellSize) };
 }
 
-/** Standing this far behind an item (in metres) puts it back in front of the explorer. */
+/** Where to stand (in metres), looking towards the Tower, so an item is back in front of the explorer. */
 export function standBehind(gridX: number, gridZ: number, gridSize: [number, number], cellSize: number): [number, number] {
-  return [gridX * cellSize, (gridZ + FRONT_GAP + Math.max(gridSize[0], gridSize[1]) / 2) * cellSize];
+  return [gridX * cellSize, (gridZ + stepsOut(gridSize)) * cellSize];
 }
 
 // The hotbar: an item key, or a ground brush written "tool:path".

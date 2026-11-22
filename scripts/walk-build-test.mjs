@@ -11,15 +11,19 @@ import { itemGroundSize, placementCentre, placementGroundCells } from "../lib/wo
 const CELL = 2;
 const facingNorth = Math.PI; // rotation π faces -z, towards the Tower
 
-// A one-square item lands two squares ahead (clear of the explorer's body), in each direction faced.
-assert.deepEqual(frontCell(0, 18, facingNorth, [1, 1], CELL), { gridX: 0, gridZ: 7 });
-assert.deepEqual(frontCell(0, 18, 0, [1, 1], CELL), { gridX: 0, gridZ: 11 });
-assert.deepEqual(frontCell(0, 18, Math.PI / 2, [1, 1], CELL), { gridX: 2, gridZ: 9 });
-// A 9 × 9 court is pushed out so its near edge is a square or two away, not under the explorer.
+// A one-square item goes on the very next square, in each of the eight directions.
+assert.deepEqual(frontCell(0, 18, facingNorth, [1, 1], CELL), { gridX: 0, gridZ: 8 });
+assert.deepEqual(frontCell(0, 18, 0, [1, 1], CELL), { gridX: 0, gridZ: 10 });
+assert.deepEqual(frontCell(0, 18, Math.PI / 2, [1, 1], CELL), { gridX: 1, gridZ: 9 });
+assert.deepEqual(frontCell(0, 18, Math.PI / 4, [1, 1], CELL), { gridX: 1, gridZ: 10 });
+// Standing anywhere in a square, or aiming a little off straight, still picks the same next square.
+for (const [x, z, aim] of [[0.9, 18.9, facingNorth], [-0.9, 17.1, facingNorth], [0, 18, facingNorth + 0.3], [0, 18, facingNorth - 0.3]]) {
+  assert.deepEqual(frontCell(x, z, aim, [1, 1], CELL), { gridX: 0, gridZ: 8 }, `from ${x},${z} aiming ${aim}`);
+}
+// A 9 × 9 court reaches out so its near edge is the next square: never under the explorer.
 const court = frontCell(0, 18, facingNorth, [9, 9], CELL);
-assert.equal(court.gridX, 0);
-assert.ok(court.gridZ + 4 < 9 - 1, `court centre ${court.gridZ} must leave a clear square`);
-assert.ok(court.gridZ + 4 >= 9 - 3, `court centre ${court.gridZ} must stay close`);
+assert.deepEqual(court, { gridX: 0, gridZ: 4 });
+assert.equal(court.gridZ + 4, 8, "court's near edge is the next square");
 // Standing behind a held item puts it back in front.
 for (const size of [[1, 1], [3, 2], [9, 9]]) {
   const [x, z] = standBehind(4, -6, size, CELL);

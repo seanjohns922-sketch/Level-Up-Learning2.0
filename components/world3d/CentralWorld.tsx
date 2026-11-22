@@ -148,6 +148,8 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
 type TrayTab = "owned" | PaletteTab;
 /** How steeply the camera looks down while building on foot. */
 const WALK_BUILD_CAMERA_PITCH = -0.6;
+/** Where the camera aims while building on foot (lower than usual, so the explorer sits higher on screen). */
+const WALK_BUILD_CAMERA_TARGET = 0.6;
 /** How much faster the avatar rolls on skate pieces. */
 const SKATE_SPEED_BOOST = 1.35;
 const TRAY_TABS: Array<{ key: TrayTab; label: string }> = [
@@ -498,9 +500,11 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         onNearestTargetId={handleNearestTarget}
         initialPitch={-0.1}
         cameraDistance={walking && walkGridCells > 10 ? 20 : 13}
-        // Building on foot looks down a little more, so the explorer never hides what they're placing.
+        // Building on foot: the camera looks down more and frames the explorer higher (clear of the
+        // build buttons), and the explorer fades so the square in front of them always shows.
         cameraMaxPitch={walking ? WALK_BUILD_CAMERA_PITCH : undefined}
-        cameraTargetHeight={3.3}
+        cameraTargetHeight={walking ? WALK_BUILD_CAMERA_TARGET : 3.3}
+        seeThrough={walking && Boolean(buildPreview)}
         cameraEnabled={roaming}
         movementEnabled={roaming}
         hidden={!roaming}

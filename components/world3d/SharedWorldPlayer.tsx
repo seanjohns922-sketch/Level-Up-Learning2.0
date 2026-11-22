@@ -136,6 +136,9 @@ function SkateboardUnderfoot() {
   );
 }
 
+/** How solid the avatar stays while it is see-through. */
+const SEE_THROUGH_OPACITY = 0.4;
+
 export function SharedThirdPersonPlayer({
   initialPosition,
   spawnTarget,
@@ -156,6 +159,7 @@ export function SharedThirdPersonPlayer({
   cameraEnabled = true,
   movementEnabled = true,
   hidden = false,
+  seeThrough = false,
   speed = 4.6,
   positionRef,
   aimRef,
@@ -185,6 +189,8 @@ export function SharedThirdPersonPlayer({
   cameraEnabled?: boolean;
   movementEnabled?: boolean;
   hidden?: boolean;
+  /** Fades the avatar so the ground right in front of it shows through (while building). */
+  seeThrough?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
   /** Written each frame: the way the camera looks, as a heading (0 looks along +z). Steady while the avatar turns to walk. */
@@ -266,6 +272,25 @@ export function SharedThirdPersonPlayer({
     // Arrive facing the way the camera looks.
     playerRef.current.rotation.y = initialYaw + Math.PI;
   }, [initialPitch, initialYaw, spawnNonce, spawnTarget]);
+
+  useEffect(() => {
+    playerRef.current?.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      for (const material of Array.isArray(child.material) ? child.material : [child.material]) {
+        const saved = material.userData.solid as { transparent: boolean; opacity: number; depthWrite: boolean } | undefined;
+        if (seeThrough) {
+          if (!saved) material.userData.solid = { transparent: material.transparent, opacity: material.opacity, depthWrite: material.depthWrite };
+          material.transparent = true;
+          material.opacity = SEE_THROUGH_OPACITY * (saved?.opacity ?? material.opacity);
+          material.depthWrite = false;
+        } else if (saved) {
+          Object.assign(material, saved);
+          delete material.userData.solid;
+        }
+        material.needsUpdate = true;
+      }
+    });
+  }, [seeThrough]);
 
   useFrame((_, delta) => {
     const player = playerRef.current;
