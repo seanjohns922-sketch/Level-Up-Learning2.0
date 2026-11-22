@@ -872,9 +872,8 @@ function ReservedCellsOverlay({ cursor, cells, reservedCell }: { cursor: { gridX
   );
 }
 
-function BuildModeGrid({ cursor, reservedCell }: { cursor: { gridX: number; gridZ: number }; reservedCell?: (gridX: number, gridZ: number) => boolean }) {
+function BuildModeGrid({ cursor, cells, reservedCell }: { cursor: { gridX: number; gridZ: number }; cells: number; reservedCell?: (gridX: number, gridZ: number) => boolean }) {
   const [x, , z] = gridToWorld(cursor.gridX, cursor.gridZ);
-  const cells = 16;
   const size = cells * CENTRAL_WORLD_GRID.cellSize;
   return (
     <group position={[x, 0.115, z]}>
@@ -1244,7 +1243,7 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, buildGridCells = 16, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; /** How many squares across the build grid shows round the cursor. */ buildGridCells?: number; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   const reducedMotion = usePrefersReducedMotion();
   return (
     <group>
@@ -1262,7 +1261,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
-      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} reservedCell={reservedCell} /> : null}
+      {editing || buildPreview ? <BuildModeGrid cursor={editCursor} cells={buildGridCells} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);

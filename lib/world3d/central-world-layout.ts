@@ -144,13 +144,14 @@ export function placementOccupiesCell(placement: CentralWorldPlacement, item: Ec
 // else takes its whole footprint.
 const COMPACT_BASE_LIMIT = 2;
 
-function groundSize(item: EconomyItem, rotation: CentralWorldPlacement["rotation"]): [number, number] {
+/** The squares an item stands on (a tree's trunk, not its canopy), turned to its rotation. */
+export function itemGroundSize(item: EconomyItem, rotation: CentralWorldPlacement["rotation"] = 0): [number, number] {
   const [width, depth] = rotatedGridSize(item, rotation);
   return isCompactScenery(item) ? [Math.min(width, COMPACT_BASE_LIMIT), Math.min(depth, COMPACT_BASE_LIMIT)] : [width, depth];
 }
 
 function occupiedCells(placement: CentralWorldPlacement, item: EconomyItem) {
-  const [width, depth] = groundSize(item, placement.rotation);
+  const [width, depth] = itemGroundSize(item, placement.rotation);
   const cells: string[] = [];
   const startX = placement.gridX - Math.floor(width / 2);
   const startZ = placement.gridZ - Math.floor(depth / 2);

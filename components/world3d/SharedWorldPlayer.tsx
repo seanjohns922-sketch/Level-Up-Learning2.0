@@ -152,11 +152,13 @@ export function SharedThirdPersonPlayer({
   cameraTargetHeight = 1.55,
   cameraLookAhead = 0,
   cameraMinY = 0.85,
+  cameraMaxPitch,
   cameraEnabled = true,
   movementEnabled = true,
   hidden = false,
   speed = 4.6,
   positionRef,
+  facingRef,
   groundHeightAt,
   canStandAt,
   speedFactorAt,
@@ -178,11 +180,15 @@ export function SharedThirdPersonPlayer({
   cameraTargetHeight?: number;
   cameraLookAhead?: number;
   cameraMinY?: number;
+  /** When set, the camera eases down to look at least this steeply (more negative looks further down). */
+  cameraMaxPitch?: number;
   cameraEnabled?: boolean;
   movementEnabled?: boolean;
   hidden?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
+  /** Written each frame: the way the avatar faces (its rotation; 0 faces +z). */
+  facingRef?: React.MutableRefObject<number>;
   /** Optional terrain: ground height under the player (added to the spawn height). */
   groundHeightAt?: (x: number, z: number) => number;
   /** Optional blocking: return false where the player may not walk (water, trees). */
@@ -257,6 +263,8 @@ export function SharedThirdPersonPlayer({
     surfaceY.current = 0;
     yaw.current = initialYaw;
     pitch.current = initialPitch;
+    // Arrive facing the way the camera looks.
+    playerRef.current.rotation.y = initialYaw + Math.PI;
   }, [initialPitch, initialYaw, spawnNonce, spawnTarget]);
 
   useFrame((_, delta) => {
@@ -268,6 +276,7 @@ export function SharedThirdPersonPlayer({
     const lookY = lookDirectionLength > 0 ? lookInput.y / lookDirectionLength : 0;
     yaw.current -= lookX * lookIntensity * 2.1 * delta;
     pitch.current = THREE.MathUtils.clamp(pitch.current + lookY * lookIntensity * 1.65 * delta, -1.05, 1.2);
+    if (cameraMaxPitch !== undefined && pitch.current > cameraMaxPitch) pitch.current += (cameraMaxPitch - pitch.current) * Math.min(1, delta * 4);
     const sinYaw = Math.sin(yaw.current);
     const cosYaw = Math.cos(yaw.current);
     const forward = new THREE.Vector3(-sinYaw, 0, -cosYaw);
@@ -334,6 +343,7 @@ export function SharedThirdPersonPlayer({
       positionRef.current.x = player.position.x;
       positionRef.current.z = player.position.z;
     }
+    if (facingRef) facingRef.current = player.rotation.y;
 
     if (cameraEnabled) {
       const cosPitch = Math.cos(pitch.current);

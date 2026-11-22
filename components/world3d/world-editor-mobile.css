@@ -155,7 +155,7 @@
 .worldEditHoldExtras select { min-height: 44px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; font: 700 13px var(--font-sans); }
 .worldEditHoldExtras select option { color: #16121f; }
 .worldEditHoldExtras .worldEditDanger { display: grid; place-items: center; height: 44px; border: 0; border-radius: 999px; color: #fff; }
-.worldEditHoldButtons { display: grid; grid-template-columns: 1fr 1.7fr 64px; gap: 10px; }
+.worldEditHoldButtons { display: grid; grid-template-columns: 1fr 1fr 1.7fr 64px; gap: 10px; }
 .worldEditHoldButtons button {
   display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 64px; border: 0; border-radius: 18px;
   background: rgba(255, 255, 255, 0.12); color: #fff; font: 800 18px var(--font-display) !important;
@@ -242,7 +242,7 @@
   .worldEditViewGrid { grid-template-columns: 1fr; gap: 6px; padding-top: 0; }
   .worldEditViewGrid button { min-height: 44px; }
   .worldEditHold { width: calc(100vw - 20px); bottom: max(10px, env(safe-area-inset-bottom)); padding: 10px; border-radius: 20px; }
-  .worldEditHoldButtons { grid-template-columns: 1fr 1.6fr 56px; gap: 8px; }
+  .worldEditHoldButtons { grid-template-columns: 1fr 1fr 1.6fr 56px; gap: 8px; }
   .worldEditHoldButtons button { min-height: 56px; font-size: 16px !important; }
   .worldEditHoldButtons .worldEditHoldPlace { font-size: 19px !important; }
   .worldEditHoldName b { font-size: 15px; }

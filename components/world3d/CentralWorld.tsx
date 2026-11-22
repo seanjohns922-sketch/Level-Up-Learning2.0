@@ -5,7 +5,7 @@ import "./world-editor-mobile.css";
 import { isRealmBuilding } from "@/lib/world3d/realm-building-collections";
 import { isTrainAsset } from "@/lib/world3d/train-catalogue";
 import { isVillageBuilding, VILLAGE_STYLES, villageStyle } from "@/lib/world3d/village-buildings";
-import { isPremiumHome, nextPremiumHomeUpgrade, premiumHomeItemKey, premiumHomeLevels, premiumHomeStyle, PREMIUM_HOME_SPECS, trampolineBounceAt, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { nextPremiumHomeUpgrade, premiumHomeItemKey, premiumHomeLevels, premiumHomeStyle, PREMIUM_HOME_SPECS, trampolineBounceAt, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { PremiumHomeWorldContext } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PremiumHomeUpgradeRows } from "@/components/world3d/premium-homes/PremiumHomeUpgradeRows";
 import { SkateKitWorldContext } from "@/components/world3d/premium-items/SkatePieces";
@@ -33,7 +33,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { Map as MapIcon, Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -42,6 +42,8 @@ import { HubNightGlow, HubSkyLights, readHubNight, writeHubNight } from "@/compo
 import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
+import { WalkBuildBar, type WalkBuildMode, type WalkBuildSlot } from "@/components/world3d/WalkBuildBar";
+import { footCell, frontCell, HOTBAR_STARTERS, hotbarSlots, hotbarTool, hotbarToolOf, itemSize, readHotbar, readPlaceViews, rememberHotbarEntry, standBehind, togglePin, writeHotbar, writePlaceViews, type HotbarEntry, type PlaceView } from "@/lib/world3d/walk-build";
 import {
   EMPTY_WORLD_MOVE_INPUT,
   EMPTY_WORLD_LOOK_INPUT,
@@ -80,6 +82,7 @@ import {
   freshCentralWorldLayout,
   getCentralWorldHomeAnchors,
   gridToWorld,
+  itemGroundSize,
   placementOccupiesCell,
   readCentralWorldGroundTiles,
   readCentralWorldPlacements,
@@ -100,6 +103,8 @@ import {
 
 const ARROW_CONTROLS_KEY = "lul:world-edit:arrow-controls:v1";
 type WorldEditTool = CentralWorldGroundType | "move" | "scenery" | "erase";
+const GROUND_BRUSHES: ReadonlySet<WorldEditTool> = new Set(["path", "road", "stone", "water", "track"]);
+const isGroundBrush = (tool: WorldEditTool): tool is CentralWorldGroundType => GROUND_BRUSHES.has(tool);
 const EDIT_TOOL_NAMES: Record<WorldEditTool, string> = { move: "Move", path: "Path", road: "Road", stone: "Stone", water: "Water", track: "Tarmac", scenery: "Scenery", erase: "Eraser" };
 // Three set camera angles, so nobody has to fiddle with tilting to see their build.
 type BuildView = "close" | "normal" | "above";
@@ -139,6 +144,8 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
   { key: "race", label: "Race", Icon: Flag },
 ];
 type TrayTab = "owned" | PaletteTab;
+/** How steeply the camera looks down while building on foot. */
+const WALK_BUILD_CAMERA_PITCH = -0.6;
 /** How much faster the avatar rolls on skate pieces. */
 const SKATE_SPEED_BOOST = 1.35;
 const TRAY_TABS: Array<{ key: TrayTab; label: string }> = [
@@ -337,7 +344,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone }: { courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, facingRef }: { walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; facingRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -395,7 +402,9 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     };
   }, [hubV2, canStandAt]);
   const racing = Boolean(raceCourse && raceStart);
-  const roaming = !editing && !buildPreview && !racing;
+  // The build camera takes over in the planner; walking builders keep their own view.
+  const frozen = editing || (Boolean(buildPreview) && !walking);
+  const roaming = !frozen && !racing;
   return (
     <ExplorerPositionContext.Provider value={avatarPosRef}>
       {hubV2 ? <>
@@ -454,7 +463,8 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         buildPreview={buildPreview}
         groundPreview={groundPreview}
         editing={editing}
-        editCursor={focusCell}
+        editCursor={walkCursor ?? focusCell}
+        buildGridCells={walkCursor ? walkGridCells : 16}
         onEnterTower={onEnterTower}
         onEnterHome={onEnterHome}
         onToggleDrawbridge={onToggleDrawbridge}
@@ -482,22 +492,26 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         ]}
         onNearestTargetId={handleNearestTarget}
         initialPitch={-0.1}
-        cameraDistance={13}
+        cameraDistance={walking && walkGridCells > 10 ? 20 : 13}
+        // Building on foot looks down a little more, so the explorer never hides what they're placing.
+        cameraMaxPitch={walking ? WALK_BUILD_CAMERA_PITCH : undefined}
         cameraTargetHeight={3.3}
         cameraEnabled={roaming}
         movementEnabled={roaming}
         hidden={!roaming}
         speed={hubV2 ? 5.6 : 4.2}
         positionRef={avatarPosRef}
+        facingRef={facingRef}
       />
       {race && raceCourse && raceStart ? <RaceKartDriver key={race.nonce} course={raceCourse} start={raceStart} world={kartWorld} moveInput={moveInput} hud={raceHud} kart={kart} paused={racePaused} night={night} onBestLap={onBestLap} /> : null}
-      <BuildModeCamera active={editing || Boolean(buildPreview)} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
-      <BuildModeSurface grid={buildRules.grid} active={editing || Boolean(buildPreview)} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
+      <BuildModeCamera active={frozen} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
+      <BuildModeSurface grid={buildRules.grid} active={frozen} paint={paintMode} onStrokeState={onStrokeState} continuous={!buildPreview || CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey))} gestureRef={gestureRef} handlers={surfaceHandlers} />
       {selection ? <>
         <BuildFootprint placement={selection.placement} item={selection.item} tone="selected" />
         <Html position={gridToWorld(selection.placement.gridX, selection.placement.gridZ)} zIndexRange={[37, 37]}>{selection.menu}</Html>
       </> : null}
-      {hubV2 && !editing && !buildPreview ? <HubWadingRipples positionRef={avatarPosRef} /> : null}
+      {eraseTarget ? <BuildFootprint placement={eraseTarget.placement} item={eraseTarget.item} tone="blocked" /> : null}
+      {hubV2 && !frozen ? <HubWadingRipples positionRef={avatarPosRef} /> : null}
       {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
       {fenceBeams.length ? <ZapSpark zap={zap} /> : null}
@@ -576,8 +590,6 @@ function HubAdaptiveResolution() {
   const initialDpr = useThree((state) => state.viewport.initialDpr);
   return <PerformanceMonitor onDecline={() => setDpr(1)} onIncline={() => setDpr(initialDpr)} />;
 }
-
-const debugButton: React.CSSProperties = { border: "1px solid rgba(64,42,25,.2)", borderRadius: 5, padding: "9px 11px", background: "rgba(255,250,237,.94)", color: "#3f2b1e", fontWeight: 900, cursor: "pointer", boxShadow: "0 8px 24px rgba(45,31,19,.16)" };
 
 /** The little picture of the held item in the placing bar. */
 function HeldItemArt({ item }: { item: EconomyItem }) {
@@ -665,6 +677,16 @@ export default function CentralWorld() {
     return () => { cancelled = true; };
   }, [placementScope, preview]);
   const [editorOpen, setEditorOpen] = useState(false);
+  // Walk-and-place building: carry an item and it goes on the square in front of
+  // the explorer. Planning from above (Edit World) opens on top and returns here.
+  const [walkBuild, setWalkBuild] = useState(false);
+  const walking = walkBuild && !editorOpen;
+  const [brushOn, setBrushOn] = useState(false);
+  const [hotbar, setHotbar] = useState(() => readHotbar(placementScope));
+  const [placeViews, setPlaceViews] = useState(() => readPlaceViews(placementScope));
+  const facingRef = useRef(Math.PI);
+  // "More" opens the planner's tray to choose something to carry.
+  const pickForWalk = useRef(false);
   const resetDialog = useRef<HTMLDialogElement>(null);
   const resetCancel = useRef<HTMLButtonElement>(null);
   const [trayOpen, setTrayOpen] = useState(true);
@@ -861,8 +883,7 @@ export default function CentralWorld() {
     return () => window.clearTimeout(timer);
   }, [shotMessage]);
   const hasAvailableAction = !race && (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null || nearCourt !== null);
-  const editorItemKey = editorOpen ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
-  const activeBuildItemKey = editorItemKey ?? requestedBuildItemKey;
+  const activeBuildItemKey = editorOpen || walkBuild ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
   // Exclude the item currently in hand by its unique placementId (not itemId),
   // so moving one of several identical scenery items leaves the others intact.
@@ -884,7 +905,7 @@ export default function CentralWorld() {
   const selectedPlacement = editorOpen && !buildPlacement && selectedPlacementId ? placedCustomisations.find((placement) => placement.placementId === selectedPlacementId) ?? null : null;
   const selectedItem = selectedPlacement ? itemsById.get(selectedPlacement.itemId) ?? null : null;
   const [buildNotice, setBuildNotice] = useState<string | null>(null);
-  const groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null = editorOpen && (isGroundTool || isEraseTool) ? {
+  const groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null = (editorOpen || walking) && (isGroundTool || isEraseTool) ? {
     cells: isGroundTool && editTool === "water" ? waterBrushCells(editCursor.gridX, editCursor.gridZ, waterBrushWidth).map(cell => ({...cell, valid: validateCentralWorldGroundCell(cell.gridX, cell.gridZ, placedCustomisations, "water", buildRules)})) : undefined,
     tile: { ...editCursor, tileType: isGroundTool ? editTool : groundTiles.find((tile) => tile.gridX === editCursor.gridX && tile.gridZ === editCursor.gridZ)?.tileType ?? "stone" },
     valid: editTool !== "erase" && validateCentralWorldGroundCell(editCursor.gridX, editCursor.gridZ, placedCustomisations, isGroundTool ? editTool : undefined, buildRules),
@@ -894,6 +915,35 @@ export default function CentralWorld() {
     // The Tower Shield is never placed; it stands round the Tower.
     .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
+
+  // The walk-build hotbar: free scenery the learner's kits allow, their owned items, and ground brushes.
+  const sceneryByKey = useMemo(() => new Map(CENTRAL_WORLD_STARTER_SCENERY.map((item) => [item.item_key, item])), []);
+  const ownedWorldKeys = useMemo(() => new Set(ownedWorldItems.map((item) => item.item_key)), [ownedWorldItems]);
+  function hotbarItem(entry: HotbarEntry): EconomyItem | null {
+    const scenery = sceneryByKey.get(entry);
+    if (scenery) {
+      const group = scenery.metadata.worldSceneryGroup;
+      const kitLevel = group === "skate" ? skateLevel : group === "race" ? raceLevel : null;
+      return scenery.metadata.worldAssetKey === "rail_train" || (kitLevel !== null && Number(scenery.metadata.kitPieceLevel) > kitLevel) ? null : scenery;
+    }
+    return ownedWorldKeys.has(entry) ? itemsById.get(entry) ?? null : null;
+  }
+  const walkSlots: WalkBuildSlot[] = walkBuild
+    ? hotbarSlots(hotbar, HOTBAR_STARTERS, (entry) => {
+      const tool = hotbarToolOf(entry);
+      return tool ? tool !== "track" || raceLevel > 0 : hotbarItem(entry) !== null;
+    }).map((entry) => {
+      const tool = hotbarToolOf(entry);
+      if (tool) return { entry, name: EDIT_TOOL_NAMES[tool], art: <GroundSwatch tool={tool} /> };
+      const item = hotbarItem(entry)!;
+      return { entry, name: item.name, art: <HeldItemArt item={item} /> };
+    })
+    : [];
+  // Walking with the eraser: whatever stands on the square in front, else the ground tile there.
+  const facedPlacement = walking && isEraseTool ? placementAt(editCursor.gridX, editCursor.gridZ) : null;
+  const eraseTarget = facedPlacement && !(hubV2 && facedPlacement.itemId === CENTRAL_WORLD_HOME_KEY) ? facedPlacement : null;
+  const eraseItem = eraseTarget ? itemsById.get(eraseTarget.itemId) ?? null : null;
+  const eraseTile = walking && isEraseTool && !eraseTarget ? groundTiles.find((tile) => tile.gridX === editCursor.gridX && tile.gridZ === editCursor.gridZ) ?? null : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -918,15 +968,21 @@ export default function CentralWorld() {
         if (requestedBuildItemKey && nextItemsById.has(requestedBuildItemKey) && ownedKeys.has(requestedBuildItemKey)) {
           const requestedItem = nextItemsById.get(requestedBuildItemKey)!;
           const nextBuildPlacement = selectCentralWorldInventoryPlacement(requestedItem, nextPlacements, { gridX: -5, gridZ: 5 });
-          if (isVillageBuilding(requestedItem.metadata.worldAssetKey) || isRealmBuilding(requestedItem.metadata.worldAssetKey) || isPremiumHome(requestedItem.metadata.worldAssetKey) || isTrainAsset(requestedItem.metadata.worldAssetKey)) {
-            setEditorOpen(true);
-            setLibrarySection("owned");
-            setSelectedInventoryItemKey(requestedBuildItemKey);
-          }
-          const [worldX, , worldZ] = gridToWorld(nextBuildPlacement.gridX, nextBuildPlacement.gridZ);
+          const size = itemGroundSize(requestedItem);
+          const cell = { gridX: nextBuildPlacement.gridX, gridZ: nextBuildPlacement.gridZ };
+          setSelectedInventoryItemKey(requestedBuildItemKey);
           setBuildPlacement(nextBuildPlacement);
-          setEditCursor({ gridX: nextBuildPlacement.gridX, gridZ: nextBuildPlacement.gridZ });
-          setSpawnTarget([worldX, 0.75, worldZ + 8]);
+          setEditCursor(cell);
+          if (readPlaceViews(placementScope)[itemSize(requestedItem, size)] === "plan") {
+            setLibrarySection("owned");
+            setCameraFocus(cell);
+            setEditorOpen(true);
+          } else {
+            setWalkBuild(true);
+          }
+          const [standX, standZ] = standBehind(cell.gridX, cell.gridZ, size, buildGrid.cellSize);
+          setSpawnTarget([standX, 0.75, standZ]);
+          setSpawnYaw(0);
           setSpawnNonce((value) => value + 1);
         } else if (requestedBuildItemKey) {
           setEconomyMessage("Unlock this item in the Marketplace before placing it.");
@@ -938,7 +994,7 @@ export default function CentralWorld() {
     return () => {
       cancelled = true;
     };
-  }, [placementScope, preview, requestedBuildItemKey, student?.studentId]);
+  }, [placementScope, preview, requestedBuildItemKey, student?.studentId, buildGrid.cellSize]);
 
   // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
   // longer teleports it to follow the cursor — and the cursor is clamped to the
@@ -972,7 +1028,7 @@ export default function CentralWorld() {
   // when nothing is held. Swallowed so they neither scroll the page nor walk the avatar.
   //   R turn item · Q/E turn view · +/- zoom · Delete remove item · Esc put it down
   //   M move tool · X erase · Ctrl/Cmd+Z undo
-  const inBuildMode = editorOpen || Boolean(buildPreview);
+  const inBuildMode = editorOpen;
   const keyActions = useRef({ rotate: rotateHeld, remove: () => {}, cancel: () => {}, undo: () => {}, tool: (() => {}) as (tool: WorldEditTool) => void });
   useEffect(() => {
     if (!inBuildMode) return;
@@ -1046,6 +1102,7 @@ export default function CentralWorld() {
   }
 
   function closeWorldEditor() {
+    pickForWalk.current = false;
     setStrokeActive(false);
     setMenuOpen(false);
     setEditorOpen(false);
@@ -1053,13 +1110,162 @@ export default function CentralWorld() {
     setSelectedPlacementId(null);
   }
 
-  function chooseEditTool(tool: WorldEditTool) {
+  // ---- Walk-and-place building ----
+  const viewFor = (item: EconomyItem): PlaceView => placeViews[itemSize(item, itemGroundSize(item))];
+  // Kids can switch any item between walking and planning; the hub remembers it for that size of thing.
+  function rememberView(item: EconomyItem, view: PlaceView) {
+    const size = itemSize(item, itemGroundSize(item));
+    if (placeViews[size] === view) return;
+    const next = { ...placeViews, [size]: view };
+    setPlaceViews(next);
+    writePlaceViews(placementScope, next);
+  }
+  function rememberPick(entry: HotbarEntry) {
+    const next = rememberHotbarEntry(hotbar, entry);
+    setHotbar(next);
+    writeHotbar(placementScope, next);
+  }
+  function pinEntry(entry: HotbarEntry) {
+    const next = togglePin(hotbar, entry);
+    setHotbar(next);
+    writeHotbar(placementScope, next);
+    void speak(next.pins.includes(entry) ? "Pinned to your bar." : "Unpinned.", undefined, "manual", { rate: 0.9 });
+  }
+  // A fresh pick in the planner stays there, unless "More" was choosing something to carry.
+  function pickView(item: EconomyItem): PlaceView {
+    if (!editorOpen) return "walk";
+    if (!pickForWalk.current) return "plan";
+    pickForWalk.current = false;
+    const view = viewFor(item);
+    if (view === "walk") setEditorOpen(false);
+    return view;
+  }
+  function speakWalkPick(item: EconomyItem) {
+    void speak(CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey))
+      ? `${item.name}. Press Place at each step and it joins up as you walk.`
+      : `${item.name}. Walk to where it should go, then press Place.`, undefined, "manual", { rate: 0.9 });
+  }
+  function stopBrush() {
+    if (!brushOn) return;
+    setBrushOn(false);
+    setStrokeActive(false);
+  }
+  const avatarCell = () => footCell(avatarPosRef.current.x, avatarPosRef.current.z, buildGrid.cellSize);
+  const facingCell = (size: [number, number]) => frontCell(avatarPosRef.current.x, avatarPosRef.current.z, facingRef.current, size, buildGrid.cellSize);
+
+  function startWalkBuild() {
+    setSelectedPlacementId(null);
+    setBuildNotice(null);
+    setWalkBuild(true);
+    void speak("Build. Pick something from the bar, walk to where it should go, then press Place.", undefined, "manual", { rate: 0.9 });
+  }
+  function stopWalkBuild() {
+    stopBrush();
+    pickForWalk.current = false;
+    setWalkBuild(false);
+    setBuildPlacement(null);
+    setSelectedInventoryItemKey(null);
+    setSelectedSceneryItemKey(null);
+    setEditTool("move");
+    if (requestedBuildItemKey) router.replace(preview ? "/world?teacher_preview=1" : "/world");
+  }
+  // The planner opens on the held item (or the explorer) and Done comes back to walking.
+  function openPlanner(at: { gridX: number; gridZ: number }) {
+    stopBrush();
+    setCameraFocus(at);
+    setEditCursor(at);
+    setSelectedPlacementId(null);
+    setBuildView("normal");
+    setMenuOpen(false);
+    setTrayOpen(true);
+    setEditorOpen(true);
+  }
+  function planFromWalk() {
+    if (buildItem && buildPlacement) rememberView(buildItem, "plan");
+    openPlanner(buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : avatarCell());
+    void speak("Plan view. Drag the ground to move around. Press Walk to carry it again.", undefined, "manual", { rate: 0.9 });
+  }
+  function openMore() {
+    if (heldItemKey || isGroundTool || isEraseTool) chooseEditTool("move", true);
+    pickForWalk.current = true;
+    openPlanner(avatarCell());
+    void speak("Choose something to carry.", undefined, "manual", { rate: 0.9 });
+  }
+  // Back to walking with whatever is in hand, standing just behind it.
+  function walkFromPlanner() {
+    pickForWalk.current = false;
+    setStrokeActive(false);
+    setMenuOpen(false);
+    setSelectedPlacementId(null);
+    setEditorOpen(false);
+    setWalkBuild(true);
+    if (!buildPlacement || !buildItem) return;
+    rememberView(buildItem, "walk");
+    const [x, z] = standBehind(buildPlacement.gridX, buildPlacement.gridZ, itemGroundSize(buildItem, buildPlacement.rotation), buildGrid.cellSize);
+    if (!hubV2 || hubCanStand(x, z)) teleport([x, CENTRAL_WORLD_CONFIG.spawnPoint[1], z], 0);
+    speakWalkPick(buildItem);
+  }
+  function holdItem(item: EconomyItem) {
+    const at = facingCell(itemGroundSize(item));
+    const view = viewFor(item);
+    if (view === "plan") openPlanner(at);
+    if (sceneryByKey.has(item.item_key)) chooseSceneryItem(item, at, view);
+    else chooseInventoryItem(item, at, view);
+  }
+  function pickHotbar(entry: HotbarEntry) {
+    const tool = hotbarToolOf(entry);
+    if (tool) {
+      if (!heldItemKey && editTool === tool) { chooseEditTool("move", true); return; }
+      chooseEditTool(tool, true);
+      setEditCursor(avatarCell());
+      void speak(`${EDIT_TOOL_NAMES[tool]} brush. Press Paint, then walk to lay it.`, undefined, "manual", { rate: 0.9 });
+      return;
+    }
+    // Tapping what you hold puts it down.
+    if (heldItemKey === entry) { chooseEditTool("move", true); return; }
+    const item = hotbarItem(entry);
+    if (item) holdItem(item);
+  }
+  function toggleBrush() {
+    if (brushOn) { stopBrush(); void speak("Stopped painting.", undefined, "manual", { rate: 0.9 }); return; }
+    const cell = avatarCell();
+    setBrushOn(true);
+    setStrokeActive(true);
+    setEditCursor(cell);
+    applyGroundAt(cell.gridX, cell.gridZ);
+    void speak(`Painting ${EDIT_TOOL_NAMES[editTool].toLowerCase()}. Walk to lay it.`, undefined, "manual", { rate: 0.9 });
+  }
+  function toggleWalkErase() {
+    if (isEraseTool) { chooseEditTool("move", true); return; }
+    chooseEditTool("erase", true);
+    setEditCursor(facingCell([1, 1]));
+    void speak("Eraser. Face something and press Remove.", undefined, "manual", { rate: 0.9 });
+  }
+  function walkMain() {
+    if (buildPlacement && buildItem) {
+      if (buildValid) confirmBuildPlacement();
+      else if (buildProblem) void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 });
+      return;
+    }
+    if (isGroundTool) { toggleBrush(); return; }
+    if (isEraseTool && (eraseTarget || eraseTile)) applyGroundAt(editCursor.gridX, editCursor.gridZ, true);
+  }
+
+  function chooseEditTool(tool: WorldEditTool, quiet = false) {
+    stopBrush();
     setSelectedPlacementId(null);
     setBuildNotice(null);
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(null);
     setEditTool(tool);
     if (tool === "water") setWaterBrushWidth(1);
+    if (isGroundBrush(tool)) {
+      rememberPick(hotbarTool(tool));
+      // "More" was choosing a brush to carry: back to walking with it.
+      if (editorOpen && pickForWalk.current) { pickForWalk.current = false; setEditorOpen(false); quiet = true; }
+    }
+    setBuildPlacement(null);
+    if (quiet) return;
     void speak(
       tool === "move"
         ? "Move selected. Tap anything you have placed to move it, turn it or put it away."
@@ -1072,18 +1278,21 @@ export default function CentralWorld() {
       "manual",
       { rate: 0.9 },
     );
-    setBuildPlacement(null);
   }
 
-  function chooseSceneryItem(item: EconomyItem) {
+  function chooseSceneryItem(item: EconomyItem, at = focusCell(), view?: PlaceView) {
+    const placeView = view ?? pickView(item);
+    stopBrush();
+    rememberPick(item.item_key);
     setSelectedInventoryItemKey(null);
     setSelectedSceneryItemKey(item.item_key);
     setEditTool("scenery");
 
     setSelectedPlacementId(null);
     setBuildNotice(null);
-    setBuildPlacement({ placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...focusCell(), rotation: 0 });
+    setBuildPlacement({ placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...at, rotation: 0 });
     liftViewForPlacing();
+    if (placeView === "walk") { speakWalkPick(item); return; }
     void speak(CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey))
       ? `${item.name} selected. Drag along the ground to build a line. Use two fingers to move around.`
       : `${item.name} selected. Drag the ground to move it, then press Place. It stays in your hand so you can place more.`, undefined, "manual", { rate: 0.9 });
@@ -1093,22 +1302,21 @@ export default function CentralWorld() {
     setBuildPlacement((current) => (current ? { ...current, tint } : current));
   }
 
-  function chooseInventoryItem(item: EconomyItem) {
+  function chooseInventoryItem(item: EconomyItem, at = focusCell(), view?: PlaceView) {
+    const placeView = view ?? pickView(item);
+    stopBrush();
+    rememberPick(item.item_key);
     setSelectedSceneryItemKey(null);
     setSelectedInventoryItemKey(item.item_key);
     setSelectedPlacementId(null);
     setBuildNotice(null);
-    const held = selectCentralWorldInventoryPlacement(item, placedCustomisations, focusCell());
+    const held = selectCentralWorldInventoryPlacement(item, placedCustomisations, at);
     setBuildPlacement(held);
     // An item already in the world is picked up where it stands; bring the view to it.
     moveFocus({ gridX: held.gridX, gridZ: held.gridZ });
     liftViewForPlacing();
+    if (placeView === "walk") { speakWalkPick(item); return; }
     void speak(isTrainAsset(item.metadata.worldAssetKey) ? `${item.name} selected. Move it onto an empty railway track, then press Place. The train follows the track direction.` : `${item.name} selected. Drag the ground to move it, then press Place. Turn it first if you need to.`, undefined, "manual", { rate: 0.9 });
-  }
-
-  function closeBuildMode() {
-    setBuildPlacement(null);
-    router.replace(preview ? "/world?teacher_preview=1" : "/world");
   }
 
   // The placed item under a tap. Big trees overlap their neighbours, so the one
@@ -1222,12 +1430,14 @@ export default function CentralWorld() {
     writeCentralWorldPlacements(placementScope, next);
     setPlacedCustomisations(next);
     void speak(`${buildItem.name} added.`, undefined, "manual", { rate: 0.9 });
-    if (editorOpen && selectedSceneryItemKey) {
-
+    // A Marketplace "place it" link is used up once its item is down.
+    if (buildPlacement.itemId === requestedBuildItemKey) router.replace(preview ? "/world?teacher_preview=1" : "/world");
+    // Free scenery stays in hand for the next one; an owned item is placed once.
+    if (selectedSceneryItemKey) {
       setBuildPlacement({ ...buildPlacement, placementId: newWorldPlacementId(buildPlacement.itemId) });
-    } else if (editorOpen) {
+    } else {
       setBuildPlacement(null); setSelectedInventoryItemKey(null); setSelectedSceneryItemKey(null); setEditTool("move");
-    } else closeBuildMode();
+    }
   }
 
   function toggleDrawbridge(placementId: string) {
@@ -1240,7 +1450,7 @@ export default function CentralWorld() {
   }
 
   function applyGroundAt(gridX: number, gridZ: number, announce = false) {
-    if (!editorOpen || heldItemKey) return;
+    if ((!editorOpen && !walking) || heldItemKey) return;
     if (editTool === "erase") {
       if (!validateCentralWorldGroundCell(gridX, gridZ, placedCustomisations, undefined, buildRules)) return;
       // Remove the item the tapped cell belongs to (anywhere inside its footprint,
@@ -1348,7 +1558,7 @@ export default function CentralWorld() {
     setStrokeActive(false);
   }
   const surfaceHandlers: BuildSurfaceHandlers = { onCell: selectBuildCell, onTap: tapBuildCell, onHover: hoverAt };
-  const gestureRef = useBuildGestures(canvasWrapRef, editorOpen || Boolean(buildPreview), {
+  const gestureRef = useBuildGestures(canvasWrapRef, editorOpen, {
     // One finger is busy painting, so two fingers move around; otherwise they tilt.
     twoFingerSlide: paintMode ? "pan" : "tilt",
     onPan: panView,
@@ -1406,6 +1616,55 @@ export default function CentralWorld() {
       tool: chooseEditTool,
     };
   });
+
+  // While walking, the held item rides on the square in front of the explorer and
+  // the brush paints the square under their feet.
+  const walkTick = useRef(() => {});
+  const walkKeys = useRef<(event: KeyboardEvent) => void>(() => {});
+  useEffect(() => {
+    walkTick.current = () => {
+      const { x, z } = avatarPosRef.current;
+      if (buildItem) {
+        setBuildPlacement((held) => {
+          if (!held) return held;
+          const next = frontCell(x, z, facingRef.current, itemGroundSize(buildItem, held.rotation), buildGrid.cellSize);
+          return next.gridX === held.gridX && next.gridZ === held.gridZ ? held : { ...held, ...next };
+        });
+        return;
+      }
+      if (!isGroundTool && !isEraseTool) return;
+      const target = isEraseTool ? frontCell(x, z, facingRef.current, [1, 1], buildGrid.cellSize) : footCell(x, z, buildGrid.cellSize);
+      if (target.gridX === editCursor.gridX && target.gridZ === editCursor.gridZ) return;
+      setEditCursor(target);
+      if (isGroundTool && brushOn) applyGroundAt(target.gridX, target.gridZ);
+    };
+    walkKeys.current = (event) => {
+      if (event.repeat || event.altKey || resetDialog.current?.open) return;
+      if (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable=true]")) return;
+      const key = event.key.toLowerCase();
+      if ((event.metaKey || event.ctrlKey) && key === "z") { event.preventDefault(); undoWorldEdit(); return; }
+      if (event.metaKey || event.ctrlKey) return;
+      const slot = /^[1-8]$/.test(key) ? walkSlots[Number(key) - 1] : undefined;
+      const run: Record<string, () => void> = {
+        e: walkMain, enter: walkMain,
+        r: () => { if (buildPlacement) rotateHeld(); },
+        x: toggleWalkErase,
+        p: planFromWalk,
+        escape: () => (heldItemKey || isGroundTool || isEraseTool ? chooseEditTool("move", true) : stopWalkBuild()),
+      };
+      const action = slot ? () => pickHotbar(slot.entry) : run[key];
+      if (!action) return;
+      event.preventDefault();
+      action();
+    };
+  });
+  useEffect(() => {
+    if (!walking) return;
+    const timer = window.setInterval(() => walkTick.current(), 90);
+    const onKey = (event: KeyboardEvent) => walkKeys.current(event);
+    window.addEventListener("keydown", onKey);
+    return () => { window.clearInterval(timer); window.removeEventListener("keydown", onKey); };
+  }, [walking]);
   useEffect(() => {
     const key = "lul:central-world:intro-seen:v1";
     try {
@@ -1480,7 +1739,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={buildPreview || editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={buildPreview || editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} facingRef={facingRef} />
         </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
         </SkateKitWorldContext.Provider>
@@ -1488,30 +1747,46 @@ export default function CentralWorld() {
       </Canvas>
       </div>
 
-      {!editorOpen && !buildPreview && !race ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={{ label: "EDIT WORLD", icon: "edit", onClick: openWorldEditor }} contextAction={hasAvailableAction ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: "SHOOT", icon: "ball", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !race ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: "SHOOT", icon: "ball", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
+        // Edit World: plan the whole world from above.
+        ...(walkBuild ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
       ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
-      {!buildPreview && !editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race)} />{race ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
+      {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race)} />{race ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
       {race && !garageOpen ? <RaceHud hud={raceHud} onRestart={() => startRace(race.start)} onGarage={openGarage} onExit={exitRace} /> : null}
       {garageOpen ? <KartGarage style={kart.style} parts={kart.parts} owned={ownedItemKeys} finishedRealms={finishedRealms} xp={xpBalance} busy={garageBusy} message={garageMessage} actions={garageActions} onClose={closeGarage} /> : null}
-      {buildPreview && !editorOpen ? (
-        <section aria-label="Build mode controls" style={{ position: "absolute", left: "50%", bottom: 22, transform: "translateX(-50%)", zIndex: 35, width: "min(94vw, 560px)", border: `2px solid ${buildValid ? "#4ade80" : "#fb7185"}`, borderRadius: 8, background: "rgba(18,28,24,.94)", color: "#fff", padding: 12, boxShadow: "0 14px 40px rgba(0,0,0,.35)" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}><div><div style={{ color: "#f6c862", fontSize: 11, fontWeight: 950, letterSpacing: ".16em" }}>BUILD MODE</div><div style={{ marginTop: 2, fontSize: 18, fontWeight: 950 }}>{buildPreview.item.name}</div></div><WorldVoiceButton compact label="Read build instructions" text={`${buildPreview.item.name}. Use the arrow buttons to choose a place. Rotate it if you want. Green means it can be placed. Red means choose another space.`} /></div>
-          <div style={{ marginTop: 10, display: "grid", gridTemplateColumns: "auto 1fr auto", alignItems: "center", gap: 10 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 42px)", gridTemplateRows: "repeat(2, 42px)", gap: 4 }}>
-              <button type="button" aria-label="Move building forward" title="Move forward" onClick={() => moveBuildPlacement(0, -1)} style={{ ...debugButton, gridColumn: 2, gridRow: 1, padding: 0 }}><ArrowUp size={20} /></button>
-              <button type="button" aria-label="Move building left" title="Move left" onClick={() => moveBuildPlacement(-1, 0)} style={{ ...debugButton, gridColumn: 1, gridRow: 2, padding: 0 }}><ArrowLeft size={20} /></button>
-              <button type="button" aria-label="Move building backward" title="Move backward" onClick={() => moveBuildPlacement(0, 1)} style={{ ...debugButton, gridColumn: 2, gridRow: 2, padding: 0 }}><ArrowDown size={20} /></button>
-              <button type="button" aria-label="Move building right" title="Move right" onClick={() => moveBuildPlacement(1, 0)} style={{ ...debugButton, gridColumn: 3, gridRow: 2, padding: 0 }}><ArrowRight size={20} /></button>
-            </div>
-            <button type="button" onClick={() => setBuildPlacement((current) => current ? { ...current, rotation: ((current.rotation + 90) % 360) as CentralWorldPlacement["rotation"] } : current)} style={{ ...debugButton, minHeight: 46, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7 }}><RotateCw size={18} /> Rotate</button>
-            <div style={{ display: "grid", gap: 6 }}><button type="button" disabled={!buildValid} onClick={confirmBuildPlacement} style={{ ...debugButton, minHeight: 46, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 7, background: buildValid ? "#22c55e" : "#64748b", color: "white", opacity: buildValid ? 1 : .65 }}><Check size={19} /> Place</button><button type="button" onClick={closeBuildMode} style={{ ...debugButton, minHeight: 36, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}><X size={17} /> Cancel</button></div>
-          </div>
-          <div role="status" style={{ marginTop: 8, textAlign: "center", color: buildValid ? "#86efac" : "#fda4af", fontSize: 12, fontWeight: 850 }}>{buildProblem ? PLACEMENT_PROBLEM_TEXT[buildProblem] : "This space is ready."}</div>
-        </section>
+      {walking && !race && !garageOpen ? (
+        <WalkBuildBar
+          slots={walkSlots}
+          active={heldItemKey ?? (isGroundTool && isGroundBrush(editTool) ? hotbarTool(editTool) : null)}
+          pinned={new Set(hotbar.pins)}
+          mode={buildPreview ? "item" : isGroundTool ? "brush" : isEraseTool ? "erase" : "none" satisfies WalkBuildMode}
+          heldName={buildItem?.name ?? null}
+          valid={buildPreview ? buildValid : Boolean(eraseItem || eraseTile)}
+          brushOn={brushOn}
+          hint={buildPreview && buildItem
+            ? buildProblem
+              ? { text: PLACEMENT_PROBLEM_TEXT[buildProblem], tone: "bad" }
+              : { text: CONNECTED_BOUNDARY_KEYS.has(String(buildItem.metadata.worldAssetKey)) ? `${buildItem.name} · Place at each step and it joins up` : `${buildItem.name} · ${touchFirst ? "tap" : "press"} Place to put it down`, tone: "ok" }
+            : isGroundTool
+              ? { text: brushOn ? `Painting ${EDIT_TOOL_NAMES[editTool].toLowerCase()} as you walk` : `${EDIT_TOOL_NAMES[editTool]} brush · press Paint, then walk`, tone: brushOn ? "ok" : "info" }
+              : isEraseTool
+                ? eraseItem ? { text: `Facing ${eraseItem.name} · press Remove`, tone: "bad" } : eraseTile ? { text: `Facing ${EDIT_TOOL_NAMES[eraseTile.tileType].toLowerCase()} · press Remove`, tone: "bad" } : { text: "Face something to remove it", tone: "info" }
+                : { text: "Pick something from the bar, then walk to where it goes", tone: "info" }}
+          canUndo={editHistory.length > 0}
+          onPick={pickHotbar}
+          onPin={pinEntry}
+          onMore={openMore}
+          onPlace={walkMain}
+          onTurn={rotateHeld}
+          onErase={toggleWalkErase}
+          onPlan={planFromWalk}
+          onUndo={undoWorldEdit}
+          onDone={stopWalkBuild}
+        />
       ) : null}
       {editorOpen ? (() => {
         const trayTab: TrayTab = librarySection === "owned" ? "owned" : paletteTab;
@@ -1647,6 +1922,7 @@ export default function CentralWorld() {
             </div>
             <div className="worldEditHoldButtons">
               <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn (R)"><RotateCw size={22} />Turn</button>
+              <button type="button" onClick={walkFromPlanner} aria-label="Carry it and walk" title="Walk with it"><PersonStanding size={22} />Walk</button>
               <button type="button" className="worldEditHoldPlace" disabled={!buildValid} onClick={confirmBuildPlacement}><Check size={26} strokeWidth={3} />Place</button>
               <button type="button" className="worldEditHoldCancel" onClick={() => chooseEditTool("move")} aria-label={repeatPlacing || laysLine ? "Stop placing" : "Cancel"} title={repeatPlacing || laysLine ? "Stop placing (Esc)" : "Cancel (Esc)"}><X size={24} /></button>
             </div>
@@ -1751,7 +2027,7 @@ export default function CentralWorld() {
         </>
         );
       })() : null}
-      <KeyboardWorldAction enabled={hasAvailableAction && !editorOpen && !buildPreview} onAction={runActiveAction} />
+      <KeyboardWorldAction enabled={hasAvailableAction && !editorOpen && !walkBuild} onAction={runActiveAction} />
 
       {shotMessage ? <div role="status" style={{ position: "absolute", top: "26%", left: 0, right: 0, zIndex: 32, textAlign: "center", pointerEvents: "none", fontSize: 44, fontWeight: 950, color: shotMessage.good ? "#ffcf3a" : "#ffffff", textShadow: shotMessage.good ? "0 0 24px #ff7a1a, 0 4px 0 rgba(0,0,0,.35)" : "0 4px 0 rgba(0,0,0,.35)" }}>{shotMessage.text}{hoopScore ? <div style={{ fontSize: 18, marginTop: 4 }}>{hoopScore} points</div> : null}</div> : null}
       {economyMessage ? <div style={{ position: "absolute", left: 16, bottom: 126, maxWidth: 360, zIndex: 30, border: "1px solid rgba(146,64,14,.28)", borderRadius: 6, background: "rgba(255,251,235,.94)", color: "#78350f", padding: "10px 12px", fontSize: 12, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><span>{economyMessage}</span><WorldVoiceButton text={economyMessage} compact label="Read message" /></div> : null}
