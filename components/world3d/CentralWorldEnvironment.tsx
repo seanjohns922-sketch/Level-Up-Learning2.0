@@ -832,18 +832,20 @@ const FOOTPRINT_TONES = {
   selected: { fill: "#ffffff", edge: "#ffffff", opacity: 0.18 },
 } as const;
 
-/** Moves its children smoothly to wherever they are drawn: a held item glides from square to square, hovering as if carried. */
+/** Moves its children smoothly to wherever they are drawn: a held item glides from square to square, spins when turned, and hovers as if carried. */
 const GLIDE_RATE = 16;
+const GLIDE_SNAP_METRES = 14;
 const HOVER_HEIGHT = 0.28;
 const HOVER_BOB = 0.07;
-const GLIDE_SNAP_METRES = 14;
-function Glide({ x, z, children }: { x: number; z: number; children: React.ReactNode }) {
-  const group = useRef<THREE.Group>(null);
-  const glide = useRef<{ x: number; z: number; offsetX: number; offsetZ: number } | null>(null);
+type GlideState = { x: number; z: number; turn: number; offsetX: number; offsetZ: number; offsetTurn: number };
+function Glide({ x, z, rotation, children }: { x: number; z: number; rotation: number; children: React.ReactNode }) {
+  const pivot = useRef<THREE.Group>(null);
+  const back = useRef<THREE.Group>(null);
+  const glide = useRef<GlideState | null>(null);
   useFrame(({ clock }, delta) => {
-    const g = group.current;
-    if (!g) return;
-    const state = glide.current ?? (glide.current = { x, z, offsetX: 0, offsetZ: 0 });
+    if (!pivot.current || !back.current) return;
+    const turn = (rotation * Math.PI) / 180;
+    const state = glide.current ?? (glide.current = { x, z, turn, offsetX: 0, offsetZ: 0, offsetTurn: 0 });
     if (state.x !== x || state.z !== z) {
       state.offsetX += state.x - x;
       state.offsetZ += state.z - z;
@@ -852,12 +854,21 @@ function Glide({ x, z, children }: { x: number; z: number; children: React.React
       // A long jump (a teleport, the planner opening) moves straight there.
       if (Math.hypot(state.offsetX, state.offsetZ) > GLIDE_SNAP_METRES) { state.offsetX = 0; state.offsetZ = 0; }
     }
+    if (state.turn !== turn) {
+      // Spin the short way round from where it was showing.
+      state.offsetTurn = Math.atan2(Math.sin(state.turn + state.offsetTurn - turn), Math.cos(state.turn + state.offsetTurn - turn));
+      state.turn = turn;
+    }
     const ease = Math.exp(-delta * GLIDE_RATE);
     state.offsetX *= ease;
     state.offsetZ *= ease;
-    g.position.set(state.offsetX, HOVER_HEIGHT + HOVER_BOB * Math.sin(clock.elapsedTime * 3), state.offsetZ);
+    state.offsetTurn *= ease;
+    // Turn about the item's own middle, then put it back where it is drawn.
+    pivot.current.position.set(x + state.offsetX, HOVER_HEIGHT + HOVER_BOB * Math.sin(clock.elapsedTime * 3), z + state.offsetZ);
+    pivot.current.rotation.y = state.offsetTurn;
+    back.current.position.set(-x, 0, -z);
   });
-  return <group ref={group}>{children}</group>;
+  return <group ref={pivot}><group ref={back}>{children}</group></group>;
 }
 
 const LANDING_SECONDS = 0.45;
@@ -1350,7 +1361,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       {buildPreview && buildPreview.placement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
         <BuildFootprint placement={buildPreview.placement} item={buildPreview.item} tone={buildPreview.valid ? "fits" : "blocked"} />
         {/* The ghost glides between squares; its footprint snaps to the square it will land on. */}
-        <Glide x={placementCentre(buildPreview.placement, buildPreview.item)[0]} z={placementCentre(buildPreview.placement, buildPreview.item)[2]}>
+        <Glide x={placementCentre(buildPreview.placement, buildPreview.item)[0]} z={placementCentre(buildPreview.placement, buildPreview.item)[2]} rotation={buildPreview.placement.rotation}>
           <PlacedWorldObject item={buildPreview.item} placement={buildPreview.placement} items={itemsById} neighbours={placedCustomisations} preview />
         </Glide>
       </> : null}
