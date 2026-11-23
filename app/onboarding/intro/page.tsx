@@ -4,47 +4,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getActiveStudentProfile, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen, restoreStudentStateFromServer } from "@/lib/student-progress-sync";
-import { supabase } from "@/lib/supabase";
-
-// The intro film is a self-contained page in public/intro (see film.js for its inputs and messages).
-const FILM_PATH = "/intro/film.html";
-const FILM_MESSAGE_SOURCE = "reliq-intro";
-
-type FilmMessage = { source: typeof FILM_MESSAGE_SOURCE; type: "ended" | "finish" };
-
-function isFilmMessage(data: unknown): data is FilmMessage {
-  if (!data || typeof data !== "object") return false;
-  const { source, type } = data as Record<string, unknown>;
-  return source === FILM_MESSAGE_SOURCE && (type === "ended" || type === "finish");
-}
-
-function filmSrc(details: { name?: string | null; code?: string | null; year?: string | null }) {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(details)) {
-    if (value?.trim()) params.set(key, value.trim());
-  }
-  // A fragment, not a query string: the name and explorer code never reach server logs.
-  const fragment = params.toString();
-  return fragment ? `${FILM_PATH}#${fragment}` : FILM_PATH;
-}
-
-async function fetchExplorerCode(studentId: string) {
-  try {
-    const { data, error } = await supabase.rpc("get_student_explorer_code_secure", { p_student_id: studentId });
-    return !error && typeof data === "string" ? data : null;
-  } catch {
-    return null;
-  }
-}
+import IntroFilmFrame from "@/components/onboarding/IntroFilmFrame";
 
 export default function IntroPage() {
   const router = useRouter();
-  const filmRef = useRef<HTMLIFrameElement>(null);
   const [ended, setEnded] = useState(false);
   const [verifying, setVerifying] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [explorerCode, setExplorerCode] = useState<string | null>(null);
   const [studentProfile] = useState(getActiveStudentProfile);
   const studentId = studentProfile?.studentId;
 
@@ -54,15 +21,11 @@ export default function IntroPage() {
       return;
     }
     let cancelled = false;
-    void Promise.all([restoreStudentStateFromServer(studentId, "number"), fetchExplorerCode(studentId)])
-      .then(([restored, code]) => {
+    void restoreStudentStateFromServer(studentId, "number")
+      .then((restored) => {
         if (cancelled) return;
-        if (restored.introSeen) {
-          router.replace("/home");
-          return;
-        }
-        setExplorerCode(code);
-        setVerifying(false);
+        if (restored.introSeen) router.replace("/home");
+        else setVerifying(false);
       })
       .catch((restoreError) => {
         console.warn("[Intro] Could not verify canonical onboarding state", restoreError);
@@ -92,28 +55,18 @@ export default function IntroPage() {
     }
   }, [router, studentId]);
 
-  useEffect(() => {
-    function onMessage(event: MessageEvent) {
-      if (event.origin !== window.location.origin || event.source !== filmRef.current?.contentWindow) return;
-      if (!isFilmMessage(event.data)) return;
-      if (event.data.type === "ended") setEnded(true);
-      else void finish();
-    }
-    window.addEventListener("message", onMessage);
-    return () => window.removeEventListener("message", onMessage);
-  }, [finish]);
-
-  if (verifying) {
+  if (verifying || !studentId) {
     return <main className="fixed inset-0 z-50 grid place-items-center bg-black font-bold text-white">Loading your journey...</main>;
   }
 
   return (
     <main className="fixed inset-0 z-50 bg-black">
-      <iframe
-        ref={filmRef}
-        src={filmSrc({ name: studentProfile?.displayName, code: explorerCode, year: studentProfile?.yearLevel })}
-        title="Welcome to RELIQ"
-        allow="autoplay; fullscreen"
+      <IntroFilmFrame
+        studentId={studentId}
+        name={studentProfile?.displayName}
+        year={studentProfile?.yearLevel}
+        onFinish={() => void finish()}
+        onEnded={() => setEnded(true)}
         className="absolute inset-0 h-full w-full border-0"
       />
       <button

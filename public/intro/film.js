@@ -1,5 +1,5 @@
 /*
- * RELIQ intro film, shown once on a student's first sign-in by app/onboarding/intro.
+ * RELIQ intro film, shown on a student's first sign-in (app/home) via components/onboarding/IntroFilmFrame.
  *
  * Every animation is paused and driven from one clock (t, in seconds), so the film
  * renders identically whether it plays, pauses or jumps. Sound effects are made live

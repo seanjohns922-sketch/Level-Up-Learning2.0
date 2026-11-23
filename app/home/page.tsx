@@ -10,6 +10,7 @@ import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupe
 import { supabase } from "@/lib/supabase";
 import { resolveStudentDestination } from "@/lib/student-destination";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
+import IntroFilmFrame from "@/components/onboarding/IntroFilmFrame";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 import { isDiagnosticHandoffPaused } from "@/lib/diagnostic-handoff";
 
@@ -176,15 +177,15 @@ export default function StudentHomePage() {
 
         <div className="rounded-[28px] border border-dashed border-teal-300/90 bg-teal-50/70 p-5 md:p-6 mb-8">
           <div className="aspect-video w-full overflow-hidden rounded-[22px] border border-slate-700/60 bg-slate-950 shadow-[0_12px_28px_rgba(2,23,22,0.18)]">
-            <video
-              className="h-full w-full object-cover"
-              controls
-              playsInline
-              preload="metadata"
-            >
-              <source src="/videos/tower-intro.mp4" type="video/mp4" />
-              Your browser does not support the intro video.
-            </video>
+            {studentProfile?.studentId ? (
+              <IntroFilmFrame
+                studentId={studentProfile.studentId}
+                name={studentProfile.displayName}
+                year={studentProfile.yearLevel}
+                onFinish={beginJourney}
+                className="h-full w-full border-0"
+              />
+            ) : null}
           </div>
         </div>
 
