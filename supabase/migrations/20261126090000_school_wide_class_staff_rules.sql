@@ -1,5 +1,4 @@
 -- School admins and co-teachers can do the class jobs that were still owner-only:
--- add a student to a legacy (non-school) class, regenerate a student's QR login,
 -- open, close and read the whole-maths diagnostic window and its results, and read
 -- the live maths tracker. Before this, each check was "the class's own teacher",
 -- so a school admin or a second teacher got "Unauthorized" or "Not authorized
@@ -11,7 +10,10 @@
 -- lead or co-teacher on the class). It is a strict superset of the old checks,
 -- so nobody loses access.
 --
--- The seven functions are patched in place from their live definitions: only the
+-- create_student_for_class and regenerate_student_qr (20260420090000) were never
+-- applied in production, so they are not patched here.
+--
+-- The five functions are patched in place from their live definitions: only the
 -- ownership test is swapped, the rest of each body, its grants and security
 -- settings stay as they are. If a live body does not contain the expected test
 -- exactly once, the whole migration stops and nothing changes.
@@ -50,12 +52,6 @@ begin
   for v_patch in
     select *
     from (values
-      ('public.create_student_for_class(uuid,text,text)'::regprocedure,
-       'c.id = class_uuid and c.teacher_id = auth.uid()',
-       'c.id = class_uuid and public.can_teach_class(c.id)'),
-      ('public.regenerate_student_qr(uuid)'::regprocedure,
-       'where s.id = student_uuid and c.teacher_id = auth.uid()',
-       'where s.id = student_uuid and public.can_teach_class(c.id)'),
       ('public.teacher_open_whole_math_diagnostic_session(uuid,text,integer)'::regprocedure,
        'public.teacher_belongs_to_auth(class.teacher_id)',
        'public.can_teach_class(class.id)'),

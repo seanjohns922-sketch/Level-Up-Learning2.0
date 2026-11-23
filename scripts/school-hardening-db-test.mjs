@@ -20,7 +20,7 @@ function fn(file, name) {
 const id = (n) => `00000000-0000-0000-0000-${String(n).padStart(12, '0')}`;
 const SCHOOL = id(1), OTHER_SCHOOL = id(2);
 const OWNER = id(11), ADMIN = id(12), CO_TEACHER = id(13), OTHER_TEACHER = id(14), OTHER_ADMIN = id(15);
-const CLASS = id(21), OTHER_CLASS = id(22), LEGACY_CLASS = id(23);
+const CLASS = id(21), OTHER_CLASS = id(22);
 const STUDENT = id(31), HOME_STUDENT = id(32), CLASSMATE = id(33);
 
 const fixture = `
@@ -36,7 +36,6 @@ CREATE TABLE students(id uuid PRIMARY KEY, class_id uuid, school_id uuid, displa
   username text, pin text, qr_token text, user_id uuid, school_year_level text, working_level text, year_level text,
   archived_at timestamptz, identity_status text DEFAULT 'active');
 CREATE TABLE class_enrollments(student_id uuid, class_id uuid, status text DEFAULT 'active', ended_at timestamptz, UNIQUE(student_id, class_id));
-CREATE TABLE student_access_credentials(student_id uuid, credential_type text, credential_secret text, created_by uuid, revoked_at timestamptz);
 CREATE TABLE student_access_sessions(student_id uuid, token_hash text, expires_at timestamptz);
 CREATE TABLE student_access_entitlements(student_id uuid, access_source text, status text, starts_at timestamptz, ends_at timestamptz);
 CREATE TABLE whole_math_diagnostic_school_sessions(id uuid PRIMARY KEY DEFAULT gen_random_uuid(), class_id uuid, checkpoint text,
@@ -46,12 +45,8 @@ CREATE FUNCTION has_school_role(p_school_id uuid, p_roles text[]) RETURNS boolea
   SELECT EXISTS (SELECT 1 FROM school_memberships WHERE school_id=p_school_id AND user_id=auth.uid() AND status='active' AND role=ANY(p_roles)) $$;
 CREATE FUNCTION can_manage_school(p_school_id uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path=public AS $$
   SELECT is_platform_admin() OR has_school_role(p_school_id, array['school_admin']) $$;
-CREATE FUNCTION generate_student_claim_code() RETURNS text LANGUAGE sql AS $$ SELECT 'CLAIM-' || substr(md5(random()::text),1,6) $$;
-CREATE FUNCTION generate_qr_token() RETURNS text LANGUAGE sql AS $$ SELECT md5(random()::text) $$;
 ${fn('20260514093000_mvp_safe_rls_policies.sql', 'teacher_belongs_to_auth')}
 ${fn('20260803101000_restore_legacy_class_owner_management.sql', 'can_manage_class')}
-${fn('20260420090000_account_linking_foundation.sql', 'create_student_for_class')}
-${fn('20260420090000_account_linking_foundation.sql', 'regenerate_student_qr')}
 ${fn('20260911153000_supervised_adaptive_whole_maths_diagnostic.sql', 'teacher_open_whole_math_diagnostic_session')}
 ${fn('20260911153000_supervised_adaptive_whole_maths_diagnostic.sql', 'teacher_close_whole_math_diagnostic_session')}
 ${fn('20260911153000_supervised_adaptive_whole_maths_diagnostic.sql', 'get_teacher_whole_math_diagnostic_session')}
@@ -66,8 +61,7 @@ ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Fixture staff read and write" ON students FOR SELECT TO authenticated USING (true);
 ${migration('20260526090000_add_student_delete_policy.sql')}
 
-INSERT INTO classes VALUES ('${CLASS}','${SCHOOL}','${OWNER}','active'), ('${OTHER_CLASS}','${OTHER_SCHOOL}','${OTHER_ADMIN}','active'),
-  ('${LEGACY_CLASS}',null,'${OWNER}','active');
+INSERT INTO classes VALUES ('${CLASS}','${SCHOOL}','${OWNER}','active'), ('${OTHER_CLASS}','${OTHER_SCHOOL}','${OTHER_ADMIN}','active');
 INSERT INTO school_memberships(school_id,user_id,role,status) VALUES ('${SCHOOL}','${OWNER}','teacher','active'),
   ('${SCHOOL}','${ADMIN}','school_admin','active'), ('${SCHOOL}','${CO_TEACHER}','teacher','active'),
   ('${SCHOOL}','${OTHER_TEACHER}','teacher','active'), ('${OTHER_SCHOOL}','${OTHER_ADMIN}','school_admin','active');
@@ -85,36 +79,24 @@ const allowed = (sql) => `DO $t$BEGIN PERFORM ${sql}; END$t$;`;
 const denied = (sql, label) => `DO $t$BEGIN PERFORM ${sql}; RAISE EXCEPTION '${label} was allowed';
   EXCEPTION WHEN insufficient_privilege OR raise_exception THEN
     IF SQLERRM LIKE '%was allowed' THEN RAISE; END IF; END$t$;`;
-const staffJobs = (classId, studentId) => [
+const staffJobs = (classId) => [
   `teacher_open_whole_math_diagnostic_session('${classId}','start',60)`,
   `get_teacher_whole_math_diagnostic_session('${classId}')`,
   `teacher_close_whole_math_diagnostic_session('${classId}')`,
-  `regenerate_student_qr('${studentId}')`,
 ];
 
 const staffTests = `
-${[OWNER, ADMIN, CO_TEACHER].map((user) => `${as(user)}\n${staffJobs(CLASS, STUDENT).map(allowed).join('\n')}`).join('\n')}
-${[OTHER_TEACHER, OTHER_ADMIN].map((user) => `${as(user)}\n${staffJobs(CLASS, STUDENT).map((job) => denied(job, `${user} ${job.split('(')[0]}`)).join('\n')}`).join('\n')}
-${as(OWNER)}
--- The repo copy of create_student_for_class fails after its permission check
--- (ambiguous student_id in ON CONFLICT), so the owner must get past the check
--- and hit that, not 'Unauthorized'.
-DO $t$BEGIN PERFORM create_student_for_class('${LEGACY_CLASS}','Legacy Kid',null);
-  EXCEPTION WHEN raise_exception THEN RAISE EXCEPTION 'Owner refused: %', SQLERRM;
-  WHEN ambiguous_column THEN NULL; END$t$;
-${as(OTHER_TEACHER)}
-${denied(`create_student_for_class('${LEGACY_CLASS}','Sneaky Kid',null)`, 'other teacher legacy add')}
+${[OWNER, ADMIN, CO_TEACHER].map((user) => `${as(user)}\n${staffJobs(CLASS).map(allowed).join('\n')}`).join('\n')}
+${[OTHER_TEACHER, OTHER_ADMIN].map((user) => `${as(user)}\n${staffJobs(CLASS).map((job) => denied(job, `${user} ${job.split('(')[0]}`)).join('\n')}`).join('\n')}
 RESET ROLE;
 DO $t$BEGIN
   IF (SELECT count(*) FROM whole_math_diagnostic_school_sessions) <> 3 THEN RAISE EXCEPTION 'Expected one diagnostic window per allowed staff member'; END IF;
   IF EXISTS (SELECT 1 FROM whole_math_diagnostic_school_sessions WHERE closed_at IS NULL) THEN RAISE EXCEPTION 'Close did not close'; END IF;
-  IF (SELECT count(*) FROM student_access_credentials WHERE student_id='${STUDENT}' AND credential_type='qr_token' AND revoked_at IS NULL) <> 1 THEN RAISE EXCEPTION 'QR history wrong'; END IF;
-  IF (SELECT count(*) FROM students WHERE display_name='Sneaky Kid') <> 0 THEN RAISE EXCEPTION 'Denied create wrote a student'; END IF;
   IF pg_get_functiondef('get_teacher_whole_math_diagnostics(uuid)'::regprocedure) NOT LIKE '%can_teach_class(class.id)%'
     OR pg_get_functiondef('get_teacher_live_maths_progression(uuid)'::regprocedure) NOT LIKE '%can_teach_class(class.id)%'
     OR pg_get_functiondef('get_teacher_live_maths_progression(uuid)'::regprocedure) LIKE '%teacher_belongs_to_auth(class.teacher_id)%'
     THEN RAISE EXCEPTION 'Read functions not switched to can_teach_class'; END IF;
-  IF NOT (SELECT prosecdef FROM pg_proc WHERE oid='regenerate_student_qr(uuid)'::regprocedure) THEN RAISE EXCEPTION 'Patched function lost security definer'; END IF;
+  IF NOT (SELECT prosecdef FROM pg_proc WHERE oid='teacher_open_whole_math_diagnostic_session(uuid,text,integer)'::regprocedure) THEN RAISE EXCEPTION 'Patched function lost security definer'; END IF;
 END$t$;
 SET ROLE anon;
 ${denied(`can_teach_class('${CLASS}')`, 'anon can_teach_class')}
@@ -177,7 +159,7 @@ try {
   docker(psql, staffTests);
   docker(psql, deleteTests);
   docker(psql, loginTests);
-  console.log('PASS school hardening: owner, school admin and co-teacher run diagnostics and QR resets; other teachers and other schools refused; browser student delete gone; 10 wrong codes pause one login name for 15 minutes, school and home, without touching classmates; correct login clears it.');
+  console.log('PASS school hardening: owner, school admin and co-teacher run diagnostics; other teachers and other schools refused; browser student delete gone; 10 wrong codes pause one login name for 15 minutes, school and home, without touching classmates; correct login clears it.');
 } finally {
   docker(['rm', '-f', container]);
 }
