@@ -12,6 +12,7 @@ import {
   ChevronDown,
   Copy,
   Gem,
+  Footprints,
   KeyRound,
   LayoutDashboard,
   LogOut,
@@ -25,6 +26,8 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { sendRex } from "@/lib/rex-client";
+import { REX_QUESTIONS, REX_XP } from "@/lib/rex";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import { stoneForGem } from "@/lib/gem-stones";
 import LegendCardArtwork from "@/components/legends/LegendCardArtwork";
@@ -393,9 +396,38 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
               } : undefined}
             />
           ) : null}
+          {activeChild ? <ParentSendRex key={`rex-${activeChild.studentId}`} child={activeChild} preview={Boolean(preview)} /> : null}
         </>
       )}
     </div>
+  );
+}
+
+/** Rex the maths T-rex: the parent wakes him in their child's hub; easy questions, then a lesson sends him home. */
+function ParentSendRex({ child, preview }: { child: ParentChild; preview: boolean }) {
+  const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const send = async () => {
+    if (preview) { setMessage(`Rex is on his way to ${child.firstName}'s hub.`); return; }
+    setBusy(true);
+    try {
+      const sent = await sendRex({ studentId: child.studentId });
+      setMessage(sent ? `Rex is on his way to ${child.firstName}'s hub.` : `Rex is already visiting ${child.firstName}.`);
+    } catch {
+      setMessage("Rex couldn't be sent just now. Try again in a moment.");
+    }
+    setBusy(false);
+  };
+  return (
+    <section aria-labelledby="send-rex-title" className="flex flex-wrap items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+      <Footprints className="h-8 w-8 shrink-0 text-[#121314]" aria-hidden="true" />
+      <div className="min-w-0 flex-1">
+        <h2 id="send-rex-title" className="font-display text-lg font-black uppercase tracking-wide">Send Rex</h2>
+        <p className="mt-1 text-sm text-slate-600">Rex the maths T-rex wakes in {child.firstName}&apos;s world. {REX_QUESTIONS} easy questions at their level tame him (+{REX_XP} XP), then finishing a lesson sends him home.</p>
+        {message ? <p role="status" className="mt-2 text-sm font-bold text-[#121314]">{message}</p> : null}
+      </div>
+      <button type="button" disabled={busy} onClick={() => void send()} className="min-h-11 rounded-lg bg-[var(--reliq-lime)] px-5 font-bold text-[#121314] hover:bg-[var(--reliq-lime-hover)] disabled:opacity-60">Send Rex</button>
+    </section>
   );
 }
 

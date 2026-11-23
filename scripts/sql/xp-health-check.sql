@@ -113,7 +113,8 @@ join public.students s on s.id = t.student_id
 where t.transaction_type = 'earn'
   and ((t.source_type = 'lesson_completion' and t.xp_delta > 40)
     or (t.source_type = 'quiz_completion' and t.xp_delta > 60)
-    or (t.source_type = 'brain_break' and t.xp_delta > 10))
+    or (t.source_type = 'brain_break' and t.xp_delta > 10)
+    or (t.source_type = 'rex' and t.xp_delta > 50))
 union all
 select bb.student_id, s.display_name, 'brain_break (daily count)', bb.awards::int, bb.day::text, null
 from (

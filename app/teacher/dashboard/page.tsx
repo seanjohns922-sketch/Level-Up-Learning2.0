@@ -3,7 +3,9 @@
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Footprints, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
+import { sendRex } from "@/lib/rex-client";
+import { REX_QUESTIONS, REX_XP } from "@/lib/rex";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -629,6 +631,18 @@ export default function TeacherDashboardPage() {
     window.setTimeout(() => setPinToast(null), 2600);
   }
 
+  // Rex the maths T-rex: wakes in every student's hub; they answer easy questions, then do a lesson.
+  async function sendRexToClass() {
+    if (!selectedClassId) return;
+    try {
+      const sent = await sendRex({ classId: selectedClassId });
+      setPinToast(sent ? `Rex is on his way to ${sent} explorer${sent === 1 ? "" : "s"}.` : "Rex is already visiting everyone in this class.");
+    } catch {
+      setPinToast("Rex couldn't be sent just now. Try again in a moment.");
+    }
+    window.setTimeout(() => setPinToast(null), 3200);
+  }
+
   // Brain-break frequency: class default + per-student override (null = inherit).
   async function setClassBrainBreak(value: BrainBreakFrequency) {
     if (!selectedClassId) return;
@@ -1069,6 +1083,7 @@ export default function TeacherDashboardPage() {
                         <>
                           <ClassMenuItem icon={SquareCheck} title="Placements" detail="Set each student's starting level and realm" onClick={() => { setShowClassMenu(false); setShowPlacements(true); }} />
                           <ClassMenuItem icon={ClipboardList} title="Login details" detail="Print or share student login cards" onClick={() => { setShowClassMenu(false); setShowLoginDetailsActions(true); }} />
+                          <ClassMenuItem icon={Footprints} title="Send Rex" detail={`The maths T-rex wakes in every hub: ${REX_QUESTIONS} easy questions (+${REX_XP} XP), then a lesson sends him home`} onClick={() => { setShowClassMenu(false); void sendRexToClass(); }} />
                         </>
                       ) : null}
                       <ClassMenuItem icon={UserPlus} title="Add / edit students" detail="Names, levels and class list" onClick={() => { setShowClassMenu(false); router.push("/teacher/classes"); }} />
