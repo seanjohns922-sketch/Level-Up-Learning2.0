@@ -1603,3 +1603,57 @@ for this test-tool-only change. The 250-student gate remains closed.
 
 Aggregate: `read-concurrency-summary-2026-11-23.json`. Private profiles, reports and
 source snapshots: `/Users/seanjohns/reliq-audits/2026-11-23/read-concurrency/`.
+
+### Official-runtime pool comparison stopped on timeouts — 23 November 2026
+
+Compared temporary stateless API containers using the exact existing official
+PostgREST 14.8 image, with pool sizes planned as 10/20/20/10. Each run kept the
+100-student/four-teacher simultaneous-start workload, six concurrent teacher
+sources, compact events and 1,000-row attempt pages. No schema, role, data-access
+or production settings changed. A 50-ms-target connection sampler and streaming
+Docker resource collector were present in each measured run.
+
+| Round | Pool | Login p95 | Dashboard p95 | Integrity outcome |
+| --- | ---: | ---: | ---: | --- |
+| 1 | 10 | 771 ms | 2,749 ms | 100 journeys; 200 writes/events verified |
+| 2 | 20 | 1,650 ms | 6,076 ms | 100 journeys; 200 writes/events verified |
+| 3 | 20 | 1,601 ms | 18,454 ms including failures | 31 journeys verified; test stopped |
+| 4 | 10 | Not run | Not run | Stopped after round 3 failures |
+
+The third report contains 84 failed recorded operations and 73 journey failures
+(69 students/four teachers). Operation records include overlapping logical
+source/refresh timings, so 84 is not a distinct HTTP-failure count. Errors included
+PostgREST acquisition timeouts, statement cancellations and client timeouts. Only
+62 activity increments were verified; do not assert integrity of all attempted
+writes or reuse this run as a passing data baseline. No production students were
+involved. All three latency gates failed; the experiment halted on correctness/
+request failure instead of continuing the final repeat.
+
+Observed PostgREST connection maxima were 11/21/21 (including a non-workload
+connection), with active maxima 10/19/20. Maximum sampled transaction ages rose
+from 634 ms to 4,732 ms and 11,309 ms; blocked observations were 0/0/3. Connection
+samples span each workload window but miss short waits and acquisition waiting.
+Docker memory maxima were about 341/460/417 MiB for the database. CPU counters
+sometimes exceeded the nominal eight-CPU allocation, reaching above 2,500%; these
+are uncalibrated/inconsistent resource readings, not proof of a particular CPU
+saturation percentage. Missing `--` counters are recorded as unavailable, not zero.
+Profiler overhead, shared-host variation, growing history and the missing final
+reverse control prevent attributing the entire deterioration to pool size.
+
+Decision: do not increase the production pool or advance beyond the 100-student
+gate. Reconcile the failed local fixture/workload state and validate resource
+measurement before further capacity claims. Then evaluate the existing shared
+attempt-scope prototype against the complete workload and permission/fallback
+matrix; its earlier SQL-only speedup is not yet an application improvement.
+
+An initial measurement attempt stopped because Docker's streamed JSON contained
+terminal escape prefixes. After verifying the corrected parser, the measured
+comparison above ran. Both exits restored the exact original container ID, image
+and environment, and automatic network addressing. Final preflight and the
+25-student/175-request smoke passed. No application changes or migration. The
+smoke validates recovery for its fixture, not every incomplete workload journey.
+
+Aggregate consistency/coverage checks and whitespace checks passed. This is local
+diagnostic documentation only; no app build required. Aggregate:
+`official-pool-summary-2026-11-23.json`. Private scripts and samples:
+`/Users/seanjohns/reliq-audits/2026-11-23/official-pool/`.

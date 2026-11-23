@@ -1,0 +1,295 @@
+{
+  "provenance": {
+    "image": "sha256:4173b72e0be29cf15349dc827798c3e464c5f2cc7f9c1697022f9cd1874b4c36",
+    "tag": "public.ecr.aws/supabase/postgrest:v14.8",
+    "poolOrder": [
+      10,
+      20,
+      20,
+      10
+    ],
+    "workloadCommit": "6a753bd40d80f582940c02c25d98d92f7053a757"
+  },
+  "runs": [
+    {
+      "round": 1,
+      "pool": 10,
+      "gatePassed": false,
+      "students": 100,
+      "teachers": 4,
+      "durationSeconds": 62,
+      "failedRecordedOperations": 0,
+      "verifiedStudentJourneys": 100,
+      "journeyFailureCount": 0,
+      "integrityFullyVerified": true,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "latencyP95Ms": {
+        "teacher_login": 418,
+        "student_login_lookup": 771,
+        "get_student_runtime_context_secure": 940,
+        "dashboard_daily_activity": 498,
+        "upsert_live_student_activity_secure": 1020,
+        "dashboard_live_activity": 1309,
+        "get_student_activity_daily_secure": 761,
+        "touch_live_student_presence_secure": 659,
+        "dashboard_lesson_attempts": 1838,
+        "dashboard_assessments": 2124,
+        "dashboard_quiz_attempts": 1449,
+        "upsert_student_activity_daily_secure": 753,
+        "insert_live_activity_event_secure": 608,
+        "dashboard_events_initial": 2743,
+        "dashboard_refresh": 2749,
+        "dashboard_events_incremental": 1564,
+        "get_live_student_activity_secure": 417
+      },
+      "connections": {
+        "sampleCount": 1234,
+        "coverage": {
+          "firstSampleOffsetMs": -2556.02,
+          "lastSampleOffsetFromEndMs": 10688.58,
+          "fullWindow": true
+        },
+        "counts": {
+          "samples": 1234,
+          "p95": 11,
+          "max": 11
+        },
+        "active": {
+          "samples": 1234,
+          "p95": 6,
+          "max": 10
+        },
+        "blockedObservations": 0,
+        "ioWaitObservations": 51,
+        "maxObservedTransactionAgeMs": 634.12
+      },
+      "resources": {
+        "supabase_db_reliq-scale-local": {
+          "cpuPercent": {
+            "samples": 125,
+            "p95": 392.07,
+            "max": 875.21
+          },
+          "memoryMiB": {
+            "samples": 125,
+            "p95": 340.2,
+            "max": 340.6
+          },
+          "unavailableCpuSamples": 0,
+          "unavailableMemorySamples": 0
+        },
+        "supabase_rest_reliq-scale-local": {
+          "cpuPercent": {
+            "samples": 125,
+            "p95": 249.65,
+            "max": 364.22
+          },
+          "memoryMiB": {
+            "samples": 125,
+            "p95": 82.62,
+            "max": 86.95
+          },
+          "unavailableCpuSamples": 0,
+          "unavailableMemorySamples": 0
+        }
+      },
+      "cpuCountersExceedNominalAllocation": true
+    },
+    {
+      "round": 2,
+      "pool": 20,
+      "gatePassed": false,
+      "students": 100,
+      "teachers": 4,
+      "durationSeconds": 72,
+      "failedRecordedOperations": 0,
+      "verifiedStudentJourneys": 100,
+      "journeyFailureCount": 0,
+      "integrityFullyVerified": true,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "latencyP95Ms": {
+        "teacher_login": 1092,
+        "student_login_lookup": 1650,
+        "get_student_runtime_context_secure": 2250,
+        "dashboard_daily_activity": 1777,
+        "dashboard_live_activity": 2154,
+        "upsert_live_student_activity_secure": 1561,
+        "get_student_activity_daily_secure": 2220,
+        "touch_live_student_presence_secure": 907,
+        "upsert_student_activity_daily_secure": 920,
+        "dashboard_quiz_attempts": 3636,
+        "dashboard_assessments": 4029,
+        "insert_live_activity_event_secure": 702,
+        "dashboard_lesson_attempts": 4173,
+        "dashboard_events_initial": 6075,
+        "dashboard_refresh": 6076,
+        "dashboard_events_incremental": 2826,
+        "get_live_student_activity_secure": 1309
+      },
+      "connections": {
+        "sampleCount": 1213,
+        "coverage": {
+          "firstSampleOffsetMs": -14025.76,
+          "lastSampleOffsetFromEndMs": 1440.24,
+          "fullWindow": true
+        },
+        "counts": {
+          "samples": 1213,
+          "p95": 21,
+          "max": 21
+        },
+        "active": {
+          "samples": 1213,
+          "p95": 11,
+          "max": 19
+        },
+        "blockedObservations": 0,
+        "ioWaitObservations": 53,
+        "maxObservedTransactionAgeMs": 4731.74
+      },
+      "resources": {
+        "supabase_db_reliq-scale-local": {
+          "cpuPercent": {
+            "samples": 141,
+            "p95": 931.66,
+            "max": 1213.64
+          },
+          "memoryMiB": {
+            "samples": 141,
+            "p95": 451.0,
+            "max": 460.4
+          },
+          "unavailableCpuSamples": 3,
+          "unavailableMemorySamples": 3
+        },
+        "supabase_rest_reliq-scale-local": {
+          "cpuPercent": {
+            "samples": 142,
+            "p95": 277.74,
+            "max": 375.78
+          },
+          "memoryMiB": {
+            "samples": 142,
+            "p95": 91.57,
+            "max": 91.57
+          },
+          "unavailableCpuSamples": 2,
+          "unavailableMemorySamples": 2
+        }
+      },
+      "cpuCountersExceedNominalAllocation": true
+    },
+    {
+      "round": 3,
+      "pool": 20,
+      "gatePassed": false,
+      "students": 100,
+      "teachers": 4,
+      "durationSeconds": 60,
+      "failedRecordedOperations": 84,
+      "verifiedStudentJourneys": 31,
+      "journeyFailureCount": 73,
+      "integrityFullyVerified": false,
+      "verifiedActivityWrites": 62,
+      "expectedNewEvents": 62,
+      "latencyP95Ms": {
+        "teacher_login": 363,
+        "student_login_lookup": 1601,
+        "get_student_runtime_context_secure": 10266,
+        "dashboard_daily_activity": 1010,
+        "dashboard_live_activity": 2414,
+        "upsert_live_student_activity_secure": 14879,
+        "get_student_activity_daily_secure": 14754,
+        "touch_live_student_presence_secure": 15144,
+        "dashboard_quiz_attempts": 18645,
+        "upsert_student_activity_daily_secure": 14646,
+        "insert_live_activity_event_secure": 12412,
+        "dashboard_assessments": 18454,
+        "dashboard_lesson_attempts": 20122,
+        "dashboard_refresh": 18454,
+        "dashboard_events_initial": 22561,
+        "get_live_student_activity_secure": 156
+      },
+      "connections": {
+        "sampleCount": 871,
+        "coverage": {
+          "firstSampleOffsetMs": -2787.74,
+          "lastSampleOffsetFromEndMs": 28680.92,
+          "fullWindow": true
+        },
+        "counts": {
+          "samples": 871,
+          "p95": 21,
+          "max": 21
+        },
+        "active": {
+          "samples": 871,
+          "p95": 13,
+          "max": 20
+        },
+        "blockedObservations": 3,
+        "ioWaitObservations": 64,
+        "maxObservedTransactionAgeMs": 11309.32
+      },
+      "resources": {
+        "supabase_db_reliq-scale-local": {
+          "cpuPercent": {
+            "samples": 119,
+            "p95": 2143.38,
+            "max": 2523.96
+          },
+          "memoryMiB": {
+            "samples": 119,
+            "p95": 409.7,
+            "max": 416.6
+          },
+          "unavailableCpuSamples": 2,
+          "unavailableMemorySamples": 2
+        },
+        "supabase_rest_reliq-scale-local": {
+          "cpuPercent": {
+            "samples": 119,
+            "p95": 807.8,
+            "max": 1052.48
+          },
+          "memoryMiB": {
+            "samples": 119,
+            "p95": 77.27,
+            "max": 77.5
+          },
+          "unavailableCpuSamples": 2,
+          "unavailableMemorySamples": 2
+        }
+      },
+      "cpuCountersExceedNominalAllocation": true
+    }
+  ],
+  "limitations": [
+    "Official local image on one Mac; not hosted or 10,000-user capacity evidence.",
+    "Profiler and resource collection overhead applies to every run.",
+    "50ms samples miss short waits and exclude waiting before acquiring a database connection.",
+    "CPU percentage can exceed 100% across multiple cores; streamed Docker samples can miss startup peaks.",
+    "Closed-loop traffic and evolving caches/history; exact write counts may vary.",
+    "Docker CPU counters exceeded the nominal eight-CPU allocation (some above 2,500%). Keep raw values for diagnosis; they are not calibrated CPU-capacity measurements and cannot establish saturation by themselves.",
+    "The fourth reversed-pair run was not executed after request failures; pool size cannot be isolated from worsening shared-host/observer conditions."
+  ],
+  "decision": "Stopped at third run after timeouts; final pool-10 repeat not run. Do not change production pool. Causality remains limited by profiling and shared-host contention.",
+  "dockerResources": {
+    "cpus": 8,
+    "memoryBytes": 8321798144
+  },
+  "restoration": {
+    "originalContainerImageEnvironmentVerified": true,
+    "preflightPassed": true,
+    "smokeRequests": 175,
+    "smokeFailures": 0
+  },
+  "abortedInitialAttempt": "Streaming Docker output contained terminal escape prefixes; no usable resource samples. Original API restored and smoke passed before correcting parser and restarting comparison.",
+  "failureCategories": {
+    "connection acquisition timeout": 44,
+    "client timeout": 20,
+    "statement timeout": 9
+  }
+}
