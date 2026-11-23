@@ -8,7 +8,7 @@ export const REX_QUESTIONS = 5;
 /** XP for taming him (set by the server; shown here). */
 export const REX_XP = 50;
 /** Paid at most this many times a day (set by the server). */
-export const REX_XP_VISITS_PER_DAY = 3;
+export const REX_XP_VISITS_PER_DAY = 8;
 /** Minutes in the hub without a lesson before Rex wakes by himself (the server holds the same gap). */
 export const REX_WAKE_MINUTES = 15;
 

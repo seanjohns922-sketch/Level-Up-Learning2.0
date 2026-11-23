@@ -3,7 +3,7 @@
  *    Lesson     40 XP the first time it is finished
  *    Weekly quiz 60 XP when it is passed (80%+), the first time it is passed
  *    Brain break up to 10 XP each
- *    Taming Rex  50 XP (lib/rex.ts), up to 3 times a day */
+ *    Taming Rex  50 XP (lib/rex.ts), up to 8 times a day */
 export const LESSON_XP = 40;
 export const QUIZ_PASS_XP = 60;
 export const BRAIN_BREAK_XP_CAP = 10;

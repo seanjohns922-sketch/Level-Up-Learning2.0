@@ -37,7 +37,11 @@ assert.equal(readRexAnswer(""), null);
 
 // The server sets the same rules the screens show.
 const migration = readFileSync(new URL("../supabase/migrations/20261125150000_rex_visits.sql", import.meta.url), "utf8");
-assert.ok(migration.includes(`rex_xp constant integer := ${REX_XP};`) && migration.includes(`rex_questions constant integer := ${REX_QUESTIONS};`) && migration.includes(`rex_paid_per_day constant integer := ${REX_XP_VISITS_PER_DAY};`), "XP, questions and daily limit match");
+const latest = readFileSync(new URL("../supabase/migrations/20261125170000_rex_chosen_students.sql", import.meta.url), "utf8");
+assert.ok(latest.includes(`rex_xp constant integer := ${REX_XP};`) && latest.includes(`rex_questions constant integer := ${REX_QUESTIONS};`) && latest.includes(`rex_paid_per_day constant integer := ${REX_XP_VISITS_PER_DAY};`), "the latest tame_rex_secure pays what the screens say");
+assert.equal(REX_XP_VISITS_PER_DAY, 8, "paid up to 8 times a day");
+assert.ok(latest.includes("create or replace function public.send_rex_to_students_secure(p_student_ids uuid[])") && latest.includes("not public.can_manage_class(s.class_id)") && /grant execute on function public\.send_rex_to_students_secure\(uuid\[\]\) to authenticated;/.test(latest), "teachers send Rex to chosen students in classes they manage");
+assert.ok(!/delete\s+from|drop\s+table/i.test(latest.replace(/^--.*$/gm, "")), "nothing deleted");
 assert.ok(migration.includes(`interval '${REX_WAKE_MINUTES} minutes'`), "the wake gap matches");
 for (const fn of ["send_rex_secure", "get_rex_visit_secure", "wake_rex_secure", "tame_rex_secure"]) assert.ok(migration.includes(`create or replace function public.${fn}(`), fn);
 assert.ok(/grant execute on function public\.send_rex_secure\(uuid, uuid\) to authenticated;/.test(migration), "only signed-in teachers and parents send Rex");
@@ -50,7 +54,8 @@ assert.ok(!/delete\s+from|drop\s+table/i.test(migration.replace(/^--.*$/gm, ""))
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const hub = read("components/world3d/CentralWorld.tsx");
 assert.ok(hub.includes("useRexVisit(") && hub.includes("<RexHud ") && hub.includes("<RexDinosaur "), "the hub runs Rex");
-assert.ok(read("app/teacher/dashboard/page.tsx").includes('title="Send Rex"'), "teachers send Rex from Manage class");
+assert.ok(read("app/teacher/dashboard/page.tsx").includes('title="Send Rex"') && read("app/teacher/dashboard/page.tsx").includes("<SendRexDialog "), "teachers send Rex from Manage class");
+assert.ok(read("components/teacher/SendRexDialog.tsx").includes("studentIds: [...picked]"), "the dialog sends to the picked students, or the whole class");
 assert.ok(read("components/parent/ParentPortal.tsx").includes("<ParentSendRex "), "parents send Rex from the child's page");
 assert.ok(read("app/credits/page.tsx").includes("quander") && read("app/credits/page.tsx").includes("CC BY 4.0"), "the model is credited");
 assert.ok(statSync(new URL("../public/models/creatures/trex.glb", import.meta.url)).size < 3_000_000, "the model stays small");

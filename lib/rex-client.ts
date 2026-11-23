@@ -110,9 +110,13 @@ export function useRexVisit({ studentId, demo, active, wakeNow = false }: { stud
 }
 export type RexState = ReturnType<typeof useRexVisit>;
 
-/** A teacher sends Rex to their class, or a parent to their child. Returns how many he went to. */
-export async function sendRex(target: { classId: string } | { studentId: string }): Promise<number> {
-  const { data, error } = await supabase.rpc("send_rex_secure", "classId" in target ? { p_class_id: target.classId, p_student_id: null } : { p_class_id: null, p_student_id: target.studentId });
+/** A teacher sends Rex to their class or chosen students, or a parent to their child. Returns how many he went to. */
+export async function sendRex(target: { classId: string } | { studentIds: string[] } | { studentId: string }): Promise<number> {
+  const { data, error } = "classId" in target
+    ? await supabase.rpc("send_rex_secure", { p_class_id: target.classId, p_student_id: null })
+    : "studentIds" in target
+      ? await supabase.rpc("send_rex_to_students_secure", { p_student_ids: target.studentIds })
+      : await supabase.rpc("send_rex_secure", { p_class_id: null, p_student_id: target.studentId });
   if (error) throw error;
   return Number(data ?? 0);
 }
