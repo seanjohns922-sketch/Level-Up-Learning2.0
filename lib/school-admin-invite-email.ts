@@ -119,11 +119,11 @@ export function renderEmailHtml(content: EmailContent, origin: string) {
             <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0 8px;">
               <tr>
                 <td style="border-radius:999px;background:${LIME};">
-                  <a href="${content.cta.url}" style="display:inline-block;padding:14px 28px;font:700 15px ${FONT};color:${CARBON};text-decoration:none;border-radius:999px;">${escapeHtml(content.cta.label)} &rarr;</a>
+                  <a href="${escapeHtml(content.cta.url)}" style="display:inline-block;padding:14px 28px;font:700 15px ${FONT};color:${CARBON};text-decoration:none;border-radius:999px;">${escapeHtml(content.cta.label)} &rarr;</a>
                 </td>
               </tr>
             </table>
-            <p style="margin:8px 0 0;font:400 13px/20px ${FONT};color:${MUTED};">Or open <a href="${content.cta.url}" style="color:${INK};">${escapeHtml(content.cta.url)}</a></p>
+            <p style="margin:8px 0 0;font:400 13px/20px ${FONT};color:${MUTED};">Or open <a href="${escapeHtml(content.cta.url)}" style="color:${INK};">${escapeHtml(content.cta.url)}</a></p>
             ${content.note ? `<p style="margin:24px 0 0;padding:14px 16px;background:${PAPER};border-radius:12px;font:400 14px/21px ${FONT};color:${INK};">${content.note}</p>` : ""}
           </td>
         </tr>
@@ -180,7 +180,7 @@ const ACTIVATE_STEPS = (email: string) => [
 export function schoolAdminInviteEmail({ to, schoolName, schoolCode, baseUrl }: InviteEmailInput) {
   const email = to.trim().toLowerCase();
   const origin = appBaseUrl(baseUrl);
-  const loginUrl = `${origin}/login`;
+  const loginUrl = `${origin}/login?as=educator&invite=1`;
   const subject = `Your RELIQ school administrator access for ${schoolName}`;
   const html = renderEmailHtml({
     preheader: `Set up your RELIQ account for ${schoolName}. Your school code is ${schoolCode}.`,
@@ -218,7 +218,7 @@ export function schoolAdminInviteEmail({ to, schoolName, schoolCode, baseUrl }: 
 export function schoolStaffInviteEmail({ to, schoolName, schoolCode, role, baseUrl }: StaffInviteEmailInput) {
   const email = to.trim().toLowerCase();
   const origin = appBaseUrl(baseUrl);
-  const loginUrl = `${origin}/login`;
+  const loginUrl = `${origin}/login?as=educator&invite=1`;
   const roleLabel = SCHOOL_ROLE_LABELS[role] ?? "staff member";
   const subject = `You're invited to join ${schoolName} on RELIQ`;
   const html = renderEmailHtml({
@@ -258,7 +258,7 @@ export function schoolStaffInviteEmail({ to, schoolName, schoolCode, role, baseU
 export function schoolAdminAccessEmail({ to, schoolName, baseUrl }: Omit<InviteEmailInput, "schoolCode">) {
   const email = to.trim().toLowerCase();
   const origin = appBaseUrl(baseUrl);
-  const loginUrl = `${origin}/login`;
+  const loginUrl = `${origin}/login?as=educator`;
   const subject = `You now manage ${schoolName} on RELIQ`;
   const html = renderEmailHtml({
     preheader: `Your existing RELIQ account now has school administrator access for ${schoolName}.`,

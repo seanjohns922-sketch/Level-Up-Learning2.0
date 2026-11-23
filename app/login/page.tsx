@@ -156,6 +156,19 @@ export default function LoginPage() {
     console.log("[DemoAccess] demo enabled:", demoAccessEnabled);
   }, [demoAccessEnabled]);
 
+  // Links from the RELIQ website open the right tab: ?as=student|educator|parent.
+  // Invite emails add &invite=1 to open Activate Invite.
+  useEffect(() => {
+    const search = new URLSearchParams(window.location.search);
+    const audience = search.get("as");
+    const nextTab = audience === "educator" || audience === "teacher" ? "teacher" : audience === "parent" ? "parent" : audience === "student" ? "student" : null;
+    if (!nextTab) return;
+    queueMicrotask(() => {
+      setTab(nextTab);
+      if (nextTab === "teacher" && search.get("invite") === "1") setTeacherMode("activate");
+    });
+  }, []);
+
   useEffect(() => {
     if (!demoAccessEnabled || demoQueryHandledRef.current || typeof window === "undefined") return;
     demoQueryHandledRef.current = true;
