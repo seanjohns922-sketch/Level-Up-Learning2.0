@@ -17,8 +17,8 @@ export function SendRexDialog({ classId, className, students, onClose, onSent }:
     try {
       const sent = await sendRex(everyone ? { classId } : { studentIds: [...picked] });
       onSent(sent ? `Rex is on his way to ${sent} explorer${sent === 1 ? "" : "s"}.` : "Rex is already visiting everyone you picked.");
-    } catch {
-      onSent("Rex couldn't be sent just now. Try again in a moment.");
+    } catch (error) {
+      onSent(`Rex couldn't be sent: ${error instanceof Error ? error.message : (error as { message?: string })?.message ?? "please try again"}`);
     }
     setBusy(false);
     onClose();

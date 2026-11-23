@@ -50,12 +50,17 @@ export function useRexVisit({ studentId, demo, active, wakeNow = false }: { stud
     if (!studentId) return;
     const load = async () => {
       const { data, error } = await supabase.rpc("get_rex_visit_secure", { p_student_id: studentId });
-      if (!cancelled && !error) setVisit(toVisit((data as RexVisit[] | null)?.[0]));
+      if (cancelled) return;
+      if (error) console.warn("[Rex] couldn't check for a visit:", error.message);
+      else setVisit(toVisit((data as RexVisit[] | null)?.[0]));
     };
     void load();
-    // A teacher can send him while the explorer is already in the hub.
-    const poll = setInterval(load, 60_000);
-    return () => { cancelled = true; clearInterval(poll); };
+    // A teacher or parent can send him while the explorer is already in the hub: check every 20 seconds,
+    // and straight away when the explorer comes back to the tab.
+    const poll = setInterval(load, 20_000);
+    const onVisible = () => { if (document.visibilityState === "visible") void load(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => { cancelled = true; clearInterval(poll); document.removeEventListener("visibilitychange", onVisible); };
   }, [studentId, demo, wakeNow]);
 
   const wake = useCallback(async () => {

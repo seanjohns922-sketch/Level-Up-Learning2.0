@@ -413,8 +413,8 @@ function ParentSendRex({ child, preview }: { child: ParentChild; preview: boolea
     try {
       const sent = await sendRex({ studentId: child.studentId });
       setMessage(sent ? `Rex is on his way to ${child.firstName}'s hub.` : `Rex is already visiting ${child.firstName}.`);
-    } catch {
-      setMessage("Rex couldn't be sent just now. Try again in a moment.");
+    } catch (error) {
+      setMessage(`Rex couldn't be sent: ${(error as { message?: string })?.message ?? "please try again"}`);
     }
     setBusy(false);
   };
