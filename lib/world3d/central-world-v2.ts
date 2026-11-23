@@ -297,6 +297,8 @@ export const HUB_V2_TREEHOUSE_ANCHORS = {
   entrance: [TREEHOUSE.x + 6.5, 0.75, TREEHOUSE.z] as [number, number, number],
   exit: [TREEHOUSE.x + 10, 0.75, TREEHOUSE.z] as [number, number, number],
 };
+/** The home's own carport, on the treehouse pad beside the front door: the car parks facing out (+x). */
+export const HUB_V2_HOME_CARPORT = { x: TREEHOUSE.x + 9, z: TREEHOUSE.z - 9 } as const;
 
 // ---------- building in the bigger hub ----------
 /** Ground counts as flat (items sit at y=0) within 2 cm. */

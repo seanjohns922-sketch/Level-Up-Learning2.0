@@ -44,7 +44,7 @@ import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
 import { CentralWorldV2Scenery } from "@/components/world3d/CentralWorldV2Scenery";
 import { KEEP_LIVE, MergeStatic } from "@/components/world3d/MergeStatic";
 import { ExplorerTreehouse } from "@/components/world3d/ExplorerTreehouse";
-import { HUB_V2_TREEHOUSE_ANCHORS } from "@/lib/world3d/central-world-v2";
+import { HUB_V2_HOME_CARPORT, HUB_V2_TREEHOUSE_ANCHORS } from "@/lib/world3d/central-world-v2";
 import { CentralValleyPanorama } from "./CentralValleyPanorama";
 import { CentralMeadowRim } from "./CentralMeadowRim";
 import {
@@ -1350,6 +1350,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       <PaintedGround tiles={groundTiles} night={night} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
+      {hubV2 ? <group position={[HUB_V2_HOME_CARPORT.x, 0, HUB_V2_HOME_CARPORT.z]}><PlacedCarport /></group> : null}
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} cells={buildGridCells} ring={!buildPreview} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>

@@ -44,7 +44,7 @@ import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { HubWadingRipples } from "@/components/world3d/CentralWorldV2Scenery";
 import { HubNightGlow, HubSkyLights, readHubNight, writeHubNight } from "@/components/world3d/HubNight";
-import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WalkBuildBar, type WalkBuildMode, type WalkBuildSlot } from "@/components/world3d/WalkBuildBar";
@@ -936,7 +936,7 @@ export default function CentralWorld() {
     const [x, , z] = placementCentre(placement, item);
     // The car parks facing the carport's +x; driving headings face +z.
     return [{ id: `${CARPORT_TARGET_PREFIX}${placement.placementId ?? `${placement.gridX}:${placement.gridZ}`}`, pose: { x, z, heading: Math.PI / 2 - (placement.rotation * Math.PI) / 180 } }];
-  }), [placedCustomisations, itemsById]);
+  }).concat(hubV2 ? [{ id: `${CARPORT_TARGET_PREFIX}home`, pose: { x: HUB_V2_HOME_CARPORT.x, z: HUB_V2_HOME_CARPORT.z, heading: Math.PI / 2 } }] : []), [placedCustomisations, itemsById, hubV2]);
   const nearCarport = carports.find((carport) => carport.id === activeTargetId) ?? null;
   const [carChoice, setCarChoice] = useState(() => readCarChoice(placementScope));
   const carStyle = carToDrive(carChoice, ownedItemKeys);
