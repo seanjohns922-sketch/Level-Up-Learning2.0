@@ -4,6 +4,7 @@
 import { useMemo, useRef, useState } from "react";
 import { readRexAnswer, rexQuestion, rexRandom, REX_QUESTIONS } from "@/lib/rex";
 import type { RexState } from "@/lib/rex-client";
+import { rexSounds } from "@/lib/audio/rex-sfx";
 
 const VIOLET = "#C94DF2", INK = "rgba(20,14,40,.94)";
 const card: React.CSSProperties = { background: INK, color: "#fff", borderRadius: 22, border: `2px solid ${VIOLET}99`, boxShadow: "0 18px 50px rgba(0,0,0,.4)", fontFamily: "Inter, system-ui, sans-serif" };
@@ -30,8 +31,8 @@ function RexQuestions({ level, seed, onTamed, onClose }: { level: number; seed: 
     if (value === question.answer) {
       const done = right + 1;
       setRight(done);
-      if (done >= REX_QUESTIONS) onTamed(done); else next();
-    } else setWrong(typed.trim());
+      if (done >= REX_QUESTIONS) { rexSounds.rumble(); onTamed(done); } else next();
+    } else { setWrong(typed.trim()); rexSounds.snap(); }
   };
   return (
     <div role="dialog" aria-label="Tame Rex" style={{ ...card, position: "absolute", right: "max(16px, 4vw)", top: "50%", transform: "translateY(-50%)", width: "min(400px, calc(100vw - 32px))", padding: 24, display: "flex", flexDirection: "column", gap: 14, zIndex: 60, borderColor: wrong ? "#ff8a5a" : `${VIOLET}99` }}

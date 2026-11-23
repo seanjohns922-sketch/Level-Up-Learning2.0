@@ -2,12 +2,14 @@
 // Rex in the hub: a real T-rex model ("Randaling T-Rex, animated!" by quander, CC BY 4.0; see /credits)
 // with run, roar, bite and idle. Chasing, he runs at the explorer and stops a few metres short to roar;
 // he never catches anyone. While they answer he roars on the spot; tamed, he walks along beside them.
+// He roars, stomps and rumbles (lib/audio/rex-sfx.ts) when the learner has sounds on.
 import { useAnimations, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { clone as cloneSkinned } from "three/examples/jsm/utils/SkeletonUtils.js";
 import type { RexPhase } from "@/lib/rex-client";
+import { rexSounds } from "@/lib/audio/rex-sfx";
 
 export const REX_MODEL_URL = "/models/creatures/trex.glb";
 /** Chasing, he stops this far short of the explorer to roar. Tamed, he keeps this far to their side. */
@@ -33,6 +35,7 @@ export function RexDinosaur({ phase, avatarPosRef, aimRef, groundAt }: { phase: 
   useEffect(() => { actionsRef.current = actions; return () => { Object.values(actions).forEach((action) => action?.stop()); }; }, [actions]);
   const playing = useRef<Clip | null>(null);
   const placed = useRef(false);
+  const nextStep = useRef(0);
 
   const play = (clip: Clip, speed = 1) => {
     const next = actionsRef.current[clip];
@@ -54,6 +57,8 @@ export function RexDinosaur({ phase, avatarPosRef, aimRef, groundAt }: { phase: 
       const heading = aimRef.current + 0.35;
       rex.position.set(me.x + Math.sin(heading) * SPAWN_DISTANCE, 0, me.z + Math.cos(heading) * SPAWN_DISTANCE);
       placed.current = true;
+      if (phase === "chasing") rexSounds.roar(0.6); // he announces himself
+
     }
     // Chasing he runs at the explorer; tamed he walks to a spot beside them, in view of the camera.
     const side = aimRef.current + Math.PI / 2;
@@ -69,6 +74,15 @@ export function RexDinosaur({ phase, avatarPosRef, aimRef, groundAt }: { phase: 
       const target = Math.atan2(lookX, lookZ);
       const turn = Math.atan2(Math.sin(target - rex.rotation.y), Math.cos(target - rex.rotation.y));
       rex.rotation.y += turn * Math.min(1, delta * 4);
+    }
+    // Sounds: louder the closer he is (they only play if the learner has sounds on).
+    const near = 1 / (1 + Math.hypot(me.x - rex.position.x, me.z - rex.position.z) / 12);
+    const now = performance.now() / 1000;
+    if (moving && now >= nextStep.current) {
+      rexSounds.stomp(phase === "tamed" ? near * 0.5 : near);
+      nextStep.current = now + (phase === "tamed" ? 0.75 : 0.42);
+    } else if (!moving) {
+      if (phase === "tamed") rexSounds.rumble(near); else rexSounds.roar(near);
     }
     if (moving) {
       const step = Math.min(distance - stopAt, speed * delta);
