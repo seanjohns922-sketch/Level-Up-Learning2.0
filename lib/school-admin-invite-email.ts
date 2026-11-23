@@ -21,7 +21,9 @@ type StaffInviteEmailInput = InviteEmailInput & {
 
 export type InviteEmailDelivery = "sent" | "unconfigured" | "failed";
 
-const DEFAULT_SENDER_ADDRESS = "schools@level-uplearning.com.au";
+const DEFAULT_SENDER_ADDRESS = "schools@reliq.au";
+// Replies reach a monitored inbox, not the sending address.
+const DEFAULT_REPLY_TO_ADDRESS = "support@reliq.au";
 const CARBON = "#121314";
 const LIME = "#83E300";
 const INK = "#121314";
@@ -43,6 +45,12 @@ export function senderAddress(configured = process.env.EMAIL_FROM) {
   const value = configured?.trim() ?? "";
   const address = value.match(/<([^>]+)>/)?.[1]?.trim() || (value.includes("@") ? value : DEFAULT_SENDER_ADDRESS);
   return `RELIQ <${address}>`;
+}
+
+/** Where replies go: EMAIL_REPLY_TO, else support@reliq.au. */
+export function replyToAddress(configured = process.env.EMAIL_REPLY_TO) {
+  const value = configured?.trim() ?? "";
+  return value.includes("@") ? value : DEFAULT_REPLY_TO_ADDRESS;
 }
 
 function appBaseUrl(baseUrl: string) {
@@ -140,7 +148,7 @@ async function sendEmail({ to, subject, html, text, tag }: { to: string; subject
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: senderAddress(), to: [to], subject, html, text }),
+      body: JSON.stringify({ from: senderAddress(), reply_to: replyToAddress(), to: [to], subject, html, text }),
     });
     if (!response.ok) {
       const details = await response.text().catch(() => "");

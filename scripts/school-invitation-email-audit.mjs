@@ -16,6 +16,10 @@ assert.match(email, /choose <strong>Activate Invite<\/strong>/i);
 assert.match(email, /School code: \$\{schoolCode\}/i);
 // Every email sends as "RELIQ", whatever display name EMAIL_FROM carries.
 assert.match(email, /return `RELIQ <\$\{address\}>`/);
+// No address on the retired level-uplearning domain; replies reach a monitored inbox.
+assert.doesNotMatch(email, /level-uplearning/);
+assert.match(email, /DEFAULT_SENDER_ADDRESS = "schools@reliq\.au"/);
+assert.match(email, /reply_to: replyToAddress\(\)/);
 assert.match(server, /school_invitations[\s\S]*status=eq\.pending[\s\S]*select=email,role/);
 assert.match(schoolHome, /Staff invitation created and emailed/);
 assert.match(schoolHome, /Invitation email resent/);
