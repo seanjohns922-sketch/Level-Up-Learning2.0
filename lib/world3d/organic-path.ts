@@ -49,11 +49,12 @@ export function pathCentreLines(tiles: CentralWorldGroundTile[]): Point[][] {
   return lines;
 }
 
-/** Union the curved strokes into one surface: junctions never overlap/flicker,
- * ends are rounded, and world-space UVs keep gravel at a consistent scale. */
-export function buildOrganicPath(tiles: CentralWorldGroundTile[], radius = RADIUS) {
+/** How far inside the painted strokes each point of a half-metre lattice is (negative outside): the
+ * shape both the surface mesh and anything that needs "how deep into the water" read. */
+export type OrganicField = { originX: number; originZ: number; columns: number; rows: number; values: Float32Array };
+export function buildOrganicField(tiles: CentralWorldGroundTile[], radius = RADIUS): OrganicField | null {
   const lines = pathCentreLines(tiles);
-  if (!lines.length) return { surface: new THREE.BufferGeometry(), edge: new THREE.BufferGeometry() };
+  if (!lines.length) return null;
   const points = lines.flat();
   const originX = Math.floor((Math.min(...points.map(p => p[0])) - radius - 1) / STEP) * STEP;
   const originZ = Math.floor((Math.min(...points.map(p => p[1])) - radius - 1) / STEP) * STEP;
@@ -97,6 +98,24 @@ export function buildOrganicPath(tiles: CentralWorldGroundTile[], radius = RADIU
       field[index] = Math.min(field[index], boundaryDistance);
     }
   }
+  return { originX, originZ, columns, rows, values: field };
+}
+
+/** The field's value at any point, blended between lattice points; -3 (well outside) off the lattice. */
+export function sampleOrganicField(field: OrganicField, x: number, z: number) {
+  const fx = (x - field.originX) / STEP, fz = (z - field.originZ) / STEP;
+  const col = Math.floor(fx), row = Math.floor(fz);
+  if (col < 0 || row < 0 || col >= field.columns - 1 || row >= field.rows - 1) return -3;
+  const tx = fx - col, tz = fz - row, at = (c: number, r: number) => field.values[r * field.columns + c];
+  return (at(col, row) * (1 - tx) + at(col + 1, row) * tx) * (1 - tz) + (at(col, row + 1) * (1 - tx) + at(col + 1, row + 1) * tx) * tz;
+}
+
+/** Union the curved strokes into one surface: junctions never overlap/flicker,
+ * ends are rounded, and world-space UVs keep gravel at a consistent scale. */
+export function buildOrganicPath(tiles: CentralWorldGroundTile[], radius = RADIUS) {
+  const built = buildOrganicField(tiles, radius);
+  if (!built) return { surface: new THREE.BufferGeometry(), edge: new THREE.BufferGeometry() };
+  const { originX, originZ, columns, rows, values: field } = built;
   const geometry = (threshold: number, y: number) => {
     const vertices: number[] = [], uv: number[] = [];
     type Vertex = { x: number; z: number; value: number };

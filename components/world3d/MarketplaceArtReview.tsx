@@ -40,7 +40,8 @@ function Product({item,onReady}:{item:EconomyItem;onReady:(row:Exported)=>void})
   <color attach="background" args={["#e9e6dc"]}/><ambientLight intensity={.9}/><hemisphereLight args={["#e7f1ff","#908772",1.4]}/>
   <directionalLight position={[-extent,extent*2,extent*1.5]} intensity={2.3} castShadow shadow-mapSize={[2048,2048]} shadow-camera-left={-extent} shadow-camera-right={extent} shadow-camera-top={extent} shadow-camera-bottom={-extent} shadow-camera-far={extent*6} shadow-normalBias={.035}/>
   <directionalLight position={[extent,extent*.7,-extent]} intensity={.7} color="#d5eaff"/>
-  <mesh rotation={[-Math.PI/2,0,0]} position={[0,-.015,0]} receiveShadow><planeGeometry args={[1000,1000]}/><meshStandardMaterial color="#e9e6dc" roughness={1}/></mesh>
+  {/* Dug-out water (the Swimming Lake) sits below the ground, so its picture has no floor to hide it. */}
+  {item.metadata.marketplaceCategory==="water"?null:<mesh rotation={[-Math.PI/2,0,0]} position={[0,-.015,0]} receiveShadow><planeGeometry args={[1000,1000]}/><meshStandardMaterial color="#e9e6dc" roughness={1}/></mesh>}
   <SizedWorldModel item={item} onMeasured={measure} presentation={REALM_DESIGN_PRESENTATIONS[String(item.metadata.worldAssetKey)]}><SceneryFinish assetKey={String(item.metadata.worldAssetKey)}>{REALM_BUILDING_KEYS.has(String(item.metadata.worldAssetKey))?<RealmBuildingModel assetKey={String(item.metadata.worldAssetKey)}/>:VILLAGE_INFRASTRUCTURE_KEYS.has(String(item.metadata.worldAssetKey))?<VillageInfrastructure assetKey={String(item.metadata.worldAssetKey)}/>:<RewardPlotObject item={item} tier={Number(item.metadata.tier??1)} accent={item.accent}/>}</SceneryFinish></SizedWorldModel>
  </>;
 }

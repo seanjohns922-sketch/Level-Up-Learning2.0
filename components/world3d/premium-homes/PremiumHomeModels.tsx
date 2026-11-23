@@ -2,7 +2,7 @@
 // The sixteen premium home models: four styles, four levels each.
 import { Sparkles } from "@react-three/drei";
 import type { ReactElement } from "react";
-import { CITY_LIFE_STYLES, DEFENCE_STYLES, MAIN_STREET_STYLES, SPORTS_STYLES, EVERYDAY_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { CITY_LIFE_STYLES, DEFENCE_STYLES, MAIN_STREET_STYLES, SPORTS_STYLES, WATER_STYLES, EVERYDAY_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { FAIR_RIDE_MODELS } from "@/components/world3d/premium-items/FairRide";
 import { TRAMPOLINE_MODELS } from "@/components/world3d/premium-items/TrampolineModels";
 import { DEFENCE_MODELS, type TechLevel } from "@/components/world3d/premium-items/TowerDefenceModels";
@@ -11,6 +11,7 @@ import { EVERYDAY_MODELS } from "@/components/world3d/premium-items/EverydayItem
 import { CITY_LIFE_MODELS } from "@/components/world3d/premium-items/CityLifeItems";
 import { MAIN_STREET_MODELS } from "@/components/world3d/premium-items/MainStreetItems";
 import { SPORTS_MODELS } from "@/components/world3d/premium-items/SportsItems";
+import { WATER_MODELS } from "@/components/world3d/premium-items/WaterItems";
 import { C, M, Apartment, Ball, BigTrunk, Block, Bush, Chimney, Deck, Door, FairyLights, FlatRoof, GableRoof, GlassRail, GlassWall, GoldSparkle, Lantern, LeafCloud, LedStrip, Mat, Picket, Planter, Pod, Pool, RopeLadder, Slats, Slide, Solar, Stones, Walls, Window , type V3 } from "./HomeKit";
 
 type Night = { night: boolean };
@@ -313,6 +314,7 @@ const EVERYDAY_LEVEL_MODELS = Object.fromEntries(EVERYDAY_STYLES.map((style) => 
 const CITY_LIFE_LEVEL_MODELS = Object.fromEntries(CITY_LIFE_STYLES.map((style) => [style, byLevelAndNight(CITY_LIFE_MODELS[style])])) as Record<(typeof CITY_LIFE_STYLES)[number], LevelModels>;
 const MAIN_STREET_LEVEL_MODELS = Object.fromEntries(MAIN_STREET_STYLES.map((style) => [style, byLevelAndNight(MAIN_STREET_MODELS[style])])) as Record<(typeof MAIN_STREET_STYLES)[number], LevelModels>;
 const SPORTS_LEVEL_MODELS = Object.fromEntries(SPORTS_STYLES.map((style) => [style, byLevelAndNight(SPORTS_MODELS[style])])) as Record<(typeof SPORTS_STYLES)[number], LevelModels>;
+const WATER_LEVEL_MODELS = Object.fromEntries(WATER_STYLES.map((style) => [style, byLevelAndNight(WATER_MODELS[style])])) as Record<(typeof WATER_STYLES)[number], LevelModels>;
 
 const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   cottage: [HomeL1, HomeL2, HomeL3, HomeL4],
@@ -331,6 +333,7 @@ const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   ...CITY_LIFE_LEVEL_MODELS,
   ...MAIN_STREET_LEVEL_MODELS,
   ...SPORTS_LEVEL_MODELS,
+  ...WATER_LEVEL_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
 const STYLE_DEPTH_OFFSET: Partial<Record<PremiumHomeStyle, number>> = { cottage: -1.63, modern: -0.94, treehouse: -1.44, apartment: -0.75 };

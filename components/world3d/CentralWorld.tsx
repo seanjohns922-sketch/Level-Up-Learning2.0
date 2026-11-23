@@ -45,7 +45,8 @@ import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { HubWadingRipples } from "@/components/world3d/CentralWorldV2Scenery";
 import { HubNightGlow, HubSkyLights, readHubNight, writeHubNight } from "@/components/world3d/HubNight";
-import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { buildWaterAreas, placedLakes, swimSurfaceAt, SWIM_SPEED, waterReach, withSwimming } from "@/lib/world3d/swimming";
+import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { WalkBuildBar, type WalkBuildMode, type WalkBuildSlot } from "@/components/world3d/WalkBuildBar";
@@ -382,11 +383,15 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     return [{ x, z, rotation: placement.rotation, piece }];
   }), [placedCustomisations, itemsById]);
   const rideHeightAt = useMemo(() => skatePieces.length ? (x: number, z: number) => skateHeightAt(x, z, skatePieces) : undefined, [skatePieces]);
+  // All water is swimmable: painted water and placed Swimming Lakes are dug out, and the river runs deep.
+  const waterAreas = useMemo(() => buildWaterAreas(groundTiles, placedLakes(placedCustomisations, itemsById)), [groundTiles, placedCustomisations, itemsById]);
+  const groundAt = useMemo(() => hubV2 ? withSwimming(waterAreas, hubGroundHeight) : undefined, [hubV2, waterAreas]);
+  const swimmingAt = useMemo(() => hubV2 ? (x: number, z: number) => swimSurfaceAt(waterAreas, x, z) ?? hubSwimSurfaceAt(x, z) : undefined, [hubV2, waterAreas]);
   const speedAt = useMemo(() => {
-    const terrain = hubV2 ? hubSpeedFactor : undefined;
+    const terrain = hubV2 ? (x: number, z: number) => swimSurfaceAt(waterAreas, x, z) !== null ? SWIM_SPEED : hubSpeedFactor(x, z) : undefined;
     if (!rideHeightAt) return terrain;
     return (x: number, z: number) => (terrain ? terrain(x, z) : 1) * (rideHeightAt(x, z) === null ? 1 : SKATE_SPEED_BOOST);
-  }, [hubV2, rideHeightAt]);
+  }, [hubV2, rideHeightAt, waterAreas]);
   // The laser fence stops the explorer (and karts) with a zap.
   const fenceBeams = useMemo(() => laserFenceBeams(placedCustomisations.filter((placement) => itemsById.get(placement.itemId)?.metadata.worldAssetKey === "defence_laser_fence")), [placedCustomisations, itemsById]);
   const zap = useRef<{ x: number; z: number; at: number } | null>(null);
@@ -409,11 +414,13 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     const bounds = hubV2 ? HUB_V2_BOUNDS : CENTRAL_WORLD_CONFIG.playableBounds, roam = hubV2 ? HUB_V2_ROAM : CENTRAL_WORLD_CONFIG.roamEllipse;
     return {
       groundHeightAt: hubV2 ? hubGroundHeight : undefined,
+      // Karts and cars stay out of ponds and lakes (the river's banks already stop them).
       canDriveAt: (x, z) => x >= bounds.minX && x <= bounds.maxX && z >= bounds.minZ && z <= bounds.maxZ
         && (x / roam.radiusX) ** 2 + ((z - roam.centerZ) / roam.radiusZ) ** 2 <= 1
-        && (canStandAt ? canStandAt(x, z) : true),
+        && (canStandAt ? canStandAt(x, z) : true)
+        && waterReach(waterAreas, x, z) === 0,
     };
-  }, [hubV2, canStandAt]);
+  }, [hubV2, canStandAt, waterAreas]);
   // Driving your own car: roads are fast, grass is this car's off-road speed, and placed things block.
   const driveCourse = useMemo(() => drive ? buildDriveCourse(groundTiles) : null, [drive, groundTiles]);
   const carBlocked = useMemo(() => drive ? carBlockedCells(placedCustomisations, itemsById) : null, [drive, placedCustomisations, itemsById]);
@@ -500,7 +507,8 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         lookInput={lookInput}
         bounds={hubV2 ? HUB_V2_BOUNDS : CENTRAL_WORLD_CONFIG.playableBounds}
         roamEllipse={hubV2 ? HUB_V2_ROAM : CENTRAL_WORLD_CONFIG.roamEllipse}
-        groundHeightAt={hubV2 ? hubGroundHeight : undefined}
+        groundHeightAt={groundAt}
+        swimSurfaceAt={swimmingAt}
         canStandAt={canStandAt}
         speedFactorAt={speedAt}
         bounceAt={bounceAt}
@@ -1048,7 +1056,7 @@ export default function CentralWorld() {
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
     // The Tower Shield is never placed; it stands round the Tower.
-    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street", "sports"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
+    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street", "sports", "water"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
 
   // The walk-build hotbar: free scenery the learner's kits allow, their owned items, and ground brushes.

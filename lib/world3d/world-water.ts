@@ -1,12 +1,19 @@
 import type { CentralWorldGroundTile } from "./central-world-layout";
-import { buildOrganicPath } from "./organic-path";
+import { buildOrganicField, buildOrganicPath } from "./organic-path";
+
+const WATER_RADIUS = 1.5;
+/** Water strokes are meshed like paths; every other painted surface is a cut-out (islands, paths). */
+const asStrokes = (tiles: CentralWorldGroundTile[]) => tiles.map(tile => ({ ...tile, tileType: tile.tileType === "water" ? "path" as const : "stone" as const }));
 
 /** Reuse the curved union mesher with a wider radius, filling dense lake interiors.
  * Other painted surfaces remain cut-outs, including islands and paths. */
 export function buildWorldWater(tiles: CentralWorldGroundTile[]) {
-  return buildOrganicPath(tiles.map(tile => ({
-    ...tile, tileType: tile.tileType === "water" ? "path" : "stone",
-  })), 1.5);
+  return buildOrganicPath(asStrokes(tiles), WATER_RADIUS);
+}
+
+/** The same shape as the water's surface, as distances in from its bank (for swimming depth). */
+export function buildWaterField(tiles: CentralWorldGroundTile[]) {
+  return buildOrganicField(asStrokes(tiles), WATER_RADIUS);
 }
 
 export function waterBrushCells(gridX:number, gridZ:number, width:number) {

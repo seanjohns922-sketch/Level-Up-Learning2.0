@@ -1,9 +1,9 @@
 import type { EconomyItem } from "./economy";
 export type MarketplaceDepartment = "world" | "avatar";
-export type WorldShopCategory = "buildings" | "animals" | "pools_play" | "special" | "trains" | "kits" | "defence" | "city_life" | "main_street" | "sports" | "cars";
+export type WorldShopCategory = "buildings" | "animals" | "pools_play" | "special" | "trains" | "kits" | "defence" | "city_life" | "main_street" | "sports" | "water" | "cars";
 export function centralWorldCategory(item: EconomyItem): WorldShopCategory | null {
  const value=item.metadata.marketplaceCategory;
- return value==="buildings"||value==="animals"||value==="pools_play"||value==="special"||value==="trains"||value==="kits"||value==="defence"||value==="city_life"||value==="main_street"||value==="sports"||value==="cars"?value:null;
+ return value==="buildings"||value==="animals"||value==="pools_play"||value==="special"||value==="trains"||value==="kits"||value==="defence"||value==="city_life"||value==="main_street"||value==="sports"||value==="water"||value==="cars"?value:null;
 }
 export function marketplaceDepartment(item: EconomyItem): MarketplaceDepartment {
  if(centralWorldCategory(item))return "world";
@@ -19,7 +19,7 @@ export function marketplaceCategory(item: EconomyItem): string {
  return "decorations";
 }
 export const MARKETPLACE_CATEGORIES = {
- world: [{id:"all",label:"All world items"},{id:"trains",label:"Trains"},{id:"buildings",label:"Buildings"},{id:"animals",label:"Animals"},{id:"pools_play",label:"Pools & play"},{id:"kits",label:"Build kits"},{id:"main_street",label:"Main Street"},{id:"city_life",label:"City Life"},{id:"sports",label:"Sports"},{id:"cars",label:"Cars"},{id:"defence",label:"Protect the Tower"},{id:"special",label:"Landmarks"},{id:"home",label:"My home"},{id:"decorations",label:"Decorations"}],
+ world: [{id:"all",label:"All world items"},{id:"trains",label:"Trains"},{id:"buildings",label:"Buildings"},{id:"animals",label:"Animals"},{id:"pools_play",label:"Pools & play"},{id:"kits",label:"Build kits"},{id:"main_street",label:"Main Street"},{id:"city_life",label:"City Life"},{id:"sports",label:"Sports"},{id:"water",label:"Swimming"},{id:"cars",label:"Cars"},{id:"defence",label:"Protect the Tower"},{id:"special",label:"Landmarks"},{id:"home",label:"My home"},{id:"decorations",label:"Decorations"}],
  avatar: [{id:"all",label:"All avatar items"},{id:"outfits",label:"Outfits & accessories"},{id:"companions",label:"Companions"},{id:"effects",label:"Effects & emotes"},{id:"identity",label:"Titles & nameplates"}],
 } as const;
 /** The world shop tab's name for an item (e.g. "City Life"), or null for avatar items. */

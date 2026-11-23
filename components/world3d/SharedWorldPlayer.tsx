@@ -168,6 +168,7 @@ export function SharedThirdPersonPlayer({
   speedFactorAt,
   bounceAt,
   rideHeightAt,
+  swimSurfaceAt,
 }: {
   initialPosition: [number, number, number];
   spawnTarget?: [number, number, number] | null;
@@ -205,6 +206,8 @@ export function SharedThirdPersonPlayer({
   bounceAt?: (x: number, z: number) => number;
   /** Optional ride-on pieces (skate ramps): surface height at a spot, or null off them. The avatar rides on a board there. */
   rideHeightAt?: (x: number, z: number) => number | null;
+  /** Optional water: the surface height where the explorer is swimming, or null. A ripple rings them there. */
+  swimSurfaceAt?: (x: number, z: number) => number | null;
 }) {
   const keys = useRef(new Set<string>());
   const baseY = useRef(initialPosition[1]);
@@ -219,6 +222,7 @@ export function SharedThirdPersonPlayer({
   const raycaster = useRef(new THREE.Raycaster());
   const standable = useRef<{ meshes: THREE.Mesh[]; refreshedAt: number }>({ meshes: [], refreshedAt: -Infinity });
   const surfaceY = useRef(0);
+  const ripple = useRef<THREE.Mesh | null>(null);
 
   useEffect(() => {
     const down = (event: KeyboardEvent) => keys.current.add(event.key.toLowerCase());
@@ -364,6 +368,16 @@ export function SharedThirdPersonPlayer({
       player.position.y = baseY.current + surfaceY.current;
     }
 
+    const swimSurface = swimSurfaceAt?.(player.position.x, player.position.z) ?? null;
+    if (ripple.current) {
+      ripple.current.visible = swimSurface !== null && !hidden;
+      if (swimSurface !== null) {
+        const pulse = 1 + Math.sin(performance.now() / 260) * 0.08 + (movingRef.current ? 0.15 : 0);
+        ripple.current.position.set(player.position.x, baseY.current + swimSurface + 0.02, player.position.z);
+        ripple.current.scale.set(pulse, pulse, pulse);
+      }
+    }
+
     if (positionRef) {
       positionRef.current.x = player.position.x;
       positionRef.current.z = player.position.z;
@@ -375,7 +389,9 @@ export function SharedThirdPersonPlayer({
       const lookDirection = new THREE.Vector3(-sinYaw * cosPitch, Math.sin(pitch.current), -cosYaw * cosPitch);
       const head = new THREE.Vector3(player.position.x, player.position.y + 1.55 * WORLD_AVATAR_SCALE + WORLD_AVATAR_SCALE_OFFSET, player.position.z);
       const desiredCamera = head.clone().addScaledVector(lookDirection, -cameraDistance);
-      desiredCamera.y = Math.max(desiredCamera.y, cameraMinY + (groundHeightAt ? groundHeightAt(desiredCamera.x, desiredCamera.z) : 0));
+      // Over water the camera keeps above the surface, never down in a pond with the swimmer.
+      const cameraGround = groundHeightAt ? Math.max(groundHeightAt(desiredCamera.x, desiredCamera.z), swimSurfaceAt?.(desiredCamera.x, desiredCamera.z) ?? -Infinity) : 0;
+      desiredCamera.y = Math.max(desiredCamera.y, cameraMinY + cameraGround);
       camera.position.lerp(desiredCamera, 1 - Math.pow(0.0001, delta));
       camera.lookAt(
         player.position.x + forward.x * cameraLookAhead,
@@ -399,7 +415,12 @@ export function SharedThirdPersonPlayer({
     }
   });
 
-  return <group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group><group ref={board} visible={false}><SkateboardUnderfoot /></group></WorldAvatarJump></group>;
+  return <>{swimSurfaceAt ? <SwimRipple meshRef={ripple} /> : null}<group ref={playerRef} position={initialPosition} rotation={[0, Math.PI, 0]} visible={!hidden}><WorldAvatarJump request={moveInput.jumpRequest} enabled={movementEnabled && !hidden} resetKey={spawnNonce} bounce={bounceAt ? () => bounceAt(playerRef.current?.position.x ?? 0, playerRef.current?.position.z ?? 0) : undefined}><group scale={WORLD_AVATAR_SCALE} position={[0, WORLD_AVATAR_SCALE_OFFSET, 0]}><TrialStudentAvatar movingRef={movingRef} sprintingRef={sprintingRef} /></group><group ref={board} visible={false}><SkateboardUnderfoot /></group></WorldAvatarJump></group></>;
+}
+
+/** The ring of white water round a swimmer's shoulders. */
+function SwimRipple({ meshRef }: { meshRef: React.RefObject<THREE.Mesh | null> }) {
+  return <mesh ref={meshRef} rotation={[-Math.PI / 2, 0, 0]} visible={false} renderOrder={3}><ringGeometry args={[0.42, 0.62, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.65} depthWrite={false} /></mesh>;
 }
 
 function WorldJumpButton({ onJump }: { onJump: () => void }) {

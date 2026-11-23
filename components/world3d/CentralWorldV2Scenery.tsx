@@ -14,6 +14,7 @@ import {
   distanceFromBuildGrid, hubBridgeDeckY, hubModelUrl, hubPathDistance, hubRiverDistance, hubRiverX, hubTerrainHeight, hubWaterDepth, smoothstep,
   type HubBridge, type HubScenery,
 } from "@/lib/world3d/central-world-v2";
+import { WATER_HOLE_FRAGMENT, WATER_HOLE_VERTEX, waterHoleUniforms } from "./waterHoles";
 
 // ---------- terrain ----------
 // The meadow uses the same textured grass shader as today's hub; paths, sand,
@@ -60,8 +61,11 @@ function HubTerrain({ quality }: { quality: CentralWorldQuality }) {
   return (
     <mesh geometry={geometry} receiveShadow>
       <meshStandardMaterial map={texture} vertexColors color="#edfacb" roughness={1} metalness={0} onBeforeCompile={(shader) => {
-        shader.vertexShader = "attribute float feature;\nvarying float vFeature;\n" + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvFeature = feature;");
-        shader.fragmentShader = "varying float vFeature;\n" + shader.fragmentShader
+        // Dug-out water (painted ponds, Swimming Lakes) cuts holes in the grass so swimmers show through.
+        Object.assign(shader.uniforms, waterHoleUniforms);
+        shader.vertexShader = "attribute float feature;\nvarying float vFeature;\n" + WATER_HOLE_VERTEX.head + shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvFeature = feature;\n" + WATER_HOLE_VERTEX.body);
+        shader.fragmentShader = "varying float vFeature;\n" + WATER_HOLE_FRAGMENT.head + shader.fragmentShader
+          .replace("void main() {", "void main() {\n" + WATER_HOLE_FRAGMENT.body)
           .replace("#include <common>", "#include <common>\n" + CENTRAL_MEADOW_SHADER_COMMON)
           .replace("#include <map_fragment>", CENTRAL_MEADOW_MAP_FRAGMENT)
           .replace("#include <color_fragment>", "#if defined( USE_COLOR )\n  diffuseColor.rgb = mix(diffuseColor.rgb, vColor.rgb * (0.85 + 0.15 * meadowLight), vFeature);\n#endif");

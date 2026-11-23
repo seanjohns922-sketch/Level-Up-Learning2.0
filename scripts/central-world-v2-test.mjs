@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import {
-  HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_WADE_DEPTH, HUB_V2_WATER_Y, HUB_V2_RIVER_START_Z,
+  HUB_V2_BRIDGES, HUB_V2_BUILD_AREA, HUB_V2_DECOR, HUB_V2_GUMS, HUB_V2_PADS, HUB_V2_PATHS, HUB_V2_PLAY_RADIUS, HUB_V2_ROCKS, HUB_V2_SWIM_DEPTH, HUB_V2_WATER_Y, HUB_V2_RIVER_START_Z,
   HUB_V2_BUILD_RULES, HUB_V2_FLAT_TOLERANCE, HUB_V2_GRID, HUB_V2_TREEHOUSE_ANCHORS, distanceFromBuildArea, hubIsReservedCell, hubBridgeDeckY, hubCanStand, hubGroundHeight, hubRiverX, hubSpeedFactor, hubTerrainHeight, hubV2Spot, hubWaterDepth, isCentralWorldV2Enabled,
 } from "../lib/world3d/central-world-v2.ts";
 import { pageFromTreehouseHref, parseTreehouseRoom, treehouseExitHref, treehouseHref, treehouseWindowView, DEFAULT_WINDOW_VIEW } from "../lib/world3d/treehouse-navigation.ts";
@@ -50,7 +50,7 @@ check(() => HUB_V2_DECOR.every((d) => !d.model.startsWith("plant") || distanceFr
 for (const bridge of HUB_V2_BRIDGES) {
   const mid = hubRiverX(bridge.z);
   check(() => hubCanStand(mid, bridge.z + 6), `the river next to the bridge at z=${bridge.z} must be wadeable`);
-  check(() => hubGroundHeight(mid, bridge.z + 6) >= HUB_V2_WATER_Y - HUB_V2_WADE_DEPTH - 1e-9, "wading never goes deeper than the wade depth");
+  check(() => hubGroundHeight(mid, bridge.z + 6) >= HUB_V2_WATER_Y - HUB_V2_SWIM_DEPTH - 1e-9, "in the river you float, never sink to the bed below swimming depth");
   check(() => hubWaterDepth(mid, bridge.z + 6) > 0 && hubSpeedFactor(mid, bridge.z + 6) < 1, "wading is slower than walking");
   check(() => hubWaterDepth(mid, bridge.z) === 0 && hubSpeedFactor(mid, bridge.z) === 1, "on the bridge you are dry");
   check(() => hubTerrainHeight(mid, bridge.z) < HUB_V2_WATER_Y, "riverbed must sit under the water");

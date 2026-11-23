@@ -22,6 +22,7 @@ import { CollectionScenery, COLLECTION_SCENERY_KEYS } from "./CollectionScenery"
 import { VillageBuilding } from "./VillageBuildings";
 import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buildings";
 import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { lakeOval, placedLakes, type WaterOval } from "@/lib/world3d/swimming";
 import { PlacedPremiumHome, TowerShieldAtTower } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
 import { PlacedCarport, RoadNetwork } from "@/components/world3d/premium-items/RoadsAndCars";
@@ -1005,9 +1006,9 @@ function GroundTileBatch({ tiles, tileType }: { tiles: CentralWorldGroundTile[];
   return <instancedMesh ref={ref} args={[undefined, undefined, tiles.length]} receiveShadow><boxGeometry args={[CENTRAL_WORLD_GRID.cellSize, 0.08, CENTRAL_WORLD_GRID.cellSize]} /><meshStandardMaterial color={GROUND_TILE_COLORS[tileType]} roughness={water ? 0.18 : 0.95} metalness={water ? 0.25 : 0} /></instancedMesh>;
 }
 
-function PaintedGround({ tiles, night }: { tiles: CentralWorldGroundTile[]; night: boolean }) {
+function PaintedGround({ tiles, night, dug, lakes }: { tiles: CentralWorldGroundTile[]; night: boolean; dug: boolean; lakes: readonly WaterOval[] }) {
   const batches = useMemo(() => (["stone"] as const).map(tileType => ({ tileType, tiles: tiles.filter(tile => tile.tileType === tileType) })), [tiles]);
-  return <group><OrganicPaths tiles={tiles} /><RoadNetwork tiles={tiles} night={night} /><WorldWater tiles={tiles} /><RaceTrackTiles tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
+  return <group><OrganicPaths tiles={tiles} /><RoadNetwork tiles={tiles} night={night} /><WorldWater tiles={tiles} dug={dug} lakes={lakes} /><RaceTrackTiles tiles={tiles} />{batches.filter(batch => batch.tiles.length).map(batch => <GroundTileBatch key={batch.tileType} {...batch} />)}</group>;
 }
 
 function MeadowGround() {
@@ -1335,6 +1336,8 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
 
 export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, buildGridCells = 16, justPlacedId = null, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; /** How many squares across the build grid shows round the cursor. */ buildGridCells?: number; /** The item just put down, which lands with a bounce. */ justPlacedId?: string | null; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   const reducedMotion = usePrefersReducedMotion();
+  // Placed Swimming Lakes need their holes in the grass, like painted water.
+  const lakes = useMemo(() => placedLakes(placedCustomisations, itemsById).map(lakeOval), [placedCustomisations, itemsById]);
   return (
     <group>
       <Suspense fallback={null}>
@@ -1347,7 +1350,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
         </Suspense>
         <GrassTufts quality={quality} groundTiles={groundTiles} />
       </>}
-      <PaintedGround tiles={groundTiles} night={night} />
+      <PaintedGround tiles={groundTiles} night={night} dug={hubV2} lakes={lakes} />
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <group position={[HUB_V2_HOME_CARPORT.x, 0, HUB_V2_HOME_CARPORT.z]}><PlacedCarport /></group> : null}

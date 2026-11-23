@@ -336,7 +336,8 @@
     "qa:cars": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/cars-test.mjs",
     "qa:retired-items": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/retired-items-test.mjs",
     "qa:main-street": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/main-street-audit.mjs",
-    "qa:sports": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/sports-test.mjs"
+    "qa:sports": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/sports-test.mjs",
+    "qa:swimming": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/swimming-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -4,6 +4,7 @@
 // outside the old build area. The old build area stays perfectly flat at y=0.
 import { CENTRAL_WORLD_CONFIG } from "./central-world-config";
 import { isCentralWorldProtectedCell, type CentralWorldBuildRules, type CentralWorldGrid } from "./central-world-layout";
+import { SWIM_FLOAT_DEPTH, SWIM_FROM_DEPTH, SWIM_SPEED } from "./swimming";
 
 /**
  * The bigger hub is the hub for everyone. `?hub=classic` opens the previous hub
@@ -26,9 +27,9 @@ export const HUB_V2_GRID: CentralWorldGrid = { cellSize: 2, minX: -66, maxX: 66,
 export const HUB_V2_PLAY_RADIUS = 192;
 export const HUB_V2_TERRAIN_SIZE = 640;
 export const HUB_V2_WATER_Y = -0.9;
-/** Explorers wade: their feet never go further than this under the water, so the river is a paddle, never a swim. */
-export const HUB_V2_WADE_DEPTH = 0.7;
-/** Wading is slower than walking. */
+/** In the river's deep middle explorers swim: their feet hang this far under the surface, water at their shoulders. */
+export const HUB_V2_SWIM_DEPTH = SWIM_FLOAT_DEPTH;
+/** Wading in the shallows is slower than walking (swimming slower again). */
 export const HUB_V2_WADE_SPEED = 0.6;
 export const HUB_V2_RIVER_START_Z = -150;
 const RIVER_BED_Y = -2.4;
@@ -140,11 +141,11 @@ function bridgeAt(x: number, z: number) {
   return HUB_V2_BRIDGES.find((b) => Math.abs(z - b.z) < b.width / 2 - 0.3 && x > b.x0 - 1.2 && x < b.x1 + 1.2);
 }
 
-/** Ground height for walking: bridge decks, then terrain, and in the river a wading depth under the surface. The old build area is always 0. */
+/** Ground height for walking: bridge decks, then terrain, and in the river no deeper than a swimmer floats. The old build area is always 0. */
 export function hubGroundHeight(x: number, z: number) {
   const bridge = bridgeAt(x, z);
   if (bridge) return Math.max(hubBridgeDeckY(bridge, x), hubTerrainHeight(x, z));
-  return Math.max(hubTerrainHeight(x, z), HUB_V2_WATER_Y - HUB_V2_WADE_DEPTH);
+  return Math.max(hubTerrainHeight(x, z), HUB_V2_WATER_Y - HUB_V2_SWIM_DEPTH);
 }
 
 /** How deep the water is where an explorer stands: 0 on land and on bridges. */
@@ -153,9 +154,15 @@ export function hubWaterDepth(x: number, z: number) {
   return Math.max(0, HUB_V2_WATER_Y - hubTerrainHeight(x, z));
 }
 
-/** Walking speed where an explorer stands: slower in the water. */
+/** The river's surface where an explorer is swimming in it (deep enough), else null. */
+export function hubSwimSurfaceAt(x: number, z: number) {
+  return Math.min(hubWaterDepth(x, z), HUB_V2_SWIM_DEPTH) > SWIM_FROM_DEPTH ? HUB_V2_WATER_Y : null;
+}
+
+/** Walking speed where an explorer stands: slower wading, slower again swimming. */
 export function hubSpeedFactor(x: number, z: number) {
-  return hubWaterDepth(x, z) > 0.15 ? HUB_V2_WADE_SPEED : 1;
+  const depth = Math.min(hubWaterDepth(x, z), HUB_V2_SWIM_DEPTH);
+  return depth > SWIM_FROM_DEPTH ? SWIM_SPEED : depth > 0.15 ? HUB_V2_WADE_SPEED : 1;
 }
 
 // ---------- fixed scenery: seeded so rendering and collisions always agree ----------
@@ -221,7 +228,7 @@ export const HUB_V2_COLLIDERS: HubCollider[] = [
   ...HUB_V2_ROCKS.filter((r) => r.s > 1.8).map((r) => ({ x: r.x, z: r.z, r: r.s * 0.32 })),
 ];
 
-/** Where the player may stand: inside the world, anywhere along the river (wading) but not up the waterfall, not inside a gum or boulder. */
+/** Where the player may stand: inside the world, anywhere along the river (wading or swimming) but not up the waterfall, not inside a gum or boulder. */
 export function hubCanStand(x: number, z: number) {
   if (Math.hypot(x, z) > HUB_V2_PLAY_RADIUS) return false;
   // The plunge pool's back edge stops anyone wading up into the falls.

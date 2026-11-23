@@ -14,7 +14,9 @@ export const CITY_LIFE_STYLES = ["playground", "cricket_nets", "park_bbq", "cubb
 export const MAIN_STREET_STYLES = ["corner_shop", "cafe", "library", "town_hall", "school", "fire_station"] as const;
 /** Sports: playable courts and goals, unlocked with XP (the basketball court lives in the same tab). */
 export const SPORTS_STYLES = ["tennis", "soccer", "footy", "netball"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES, ...SPORTS_STYLES] as const;
+/** Water: a lake explorers swim in, unlocked with XP. */
+export const WATER_STYLES = ["swimming_lake"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES, ...SPORTS_STYLES, ...WATER_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -30,7 +32,7 @@ type StyleSpec = {
   icon: string;
   /** World model key; the shop row is central_world_plot_1_<assetKey>. */
   assetKey: string;
-  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life" | "main_street" | "sports";
+  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life" | "main_street" | "sports" | "water";
   upgradePrefix: string;
   /** Level 1 is free in the editor's Defence tab (it replaced a free castle piece); only upgrades cost XP. */
   free?: boolean;
@@ -56,6 +58,7 @@ const MAIN_SHOP_PRICES = [400, 400, 800, 1600] as const;
 const MAIN_CIVIC_PRICES = [500, 500, 1000, 2000] as const;
 const SPORT = { marketplaceCategory: "sports", upgradePrefix: "central_world_sports_upgrade_", metres: true } as const;
 const SPORT_PRICES = [400, 400, 800, 1600] as const;
+const WATER = { marketplaceCategory: "water", upgradePrefix: "central_world_water_upgrade_", metres: true } as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -541,6 +544,19 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     assetKey: "sport_netball",
     height: 9,
     ...SPORT,
+  },
+  // The lake model lives in components/world3d/premium-items/WaterItems.tsx; swimming in lib/world3d/swimming.ts.
+  swimming_lake: {
+    name: "Swimming Lake",
+    description: "Dive in and swim! A swimming hole that grows into a lagoon with a waterslide.",
+    levels: ["Swimming Hole", "Beach Lake", "Patrolled Lake", "Lagoon"],
+    prices: [600, 600, 1200, 2400],
+    gridSize: "10x7",
+    accent: "#2fa8d6",
+    icon: "waves",
+    assetKey: "water_swimming_lake",
+    height: 6,
+    ...WATER,
   },
 };
 

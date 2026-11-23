@@ -219,5 +219,6 @@
   {"key":"sport_tennis","name":"Tennis Court","native":[8.00001,3.24001,9],"size":[8.00001,3.24001,9],"footprint":[24,12]},
   {"key":"sport_soccer","name":"Soccer Pitch","native":[14.00001,1.239949,18],"size":[14.00001,1.239949,18],"footprint":[28,18]},
   {"key":"sport_footy","name":"Footy Goals","native":[12.00001,3.850005,10],"size":[12.00001,3.850005,10],"footprint":[20,16]},
-  {"key":"sport_netball","name":"Netball Court","native":[7.00001,3.075005,7],"size":[7.00001,3.075005,7],"footprint":[24,14]}
+  {"key":"sport_netball","name":"Netball Court","native":[7.00001,3.075005,7],"size":[7.00001,3.075005,7],"footprint":[24,14]},
+  {"key":"water_swimming_lake","name":"Swimming Lake","native":[16.825,8.5,10.700001],"size":[16.825,8.5,10.700001],"footprint":[20,14]}
 ]
