@@ -1657,3 +1657,42 @@ Aggregate consistency/coverage checks and whitespace checks passed. This is loca
 diagnostic documentation only; no app build required. Aggregate:
 `official-pool-summary-2026-11-23.json`. Private scripts and samples:
 `/Users/seanjohns/reliq-audits/2026-11-23/official-pool/`.
+
+### Local recovery after interrupted pool test — 23 November 2026
+
+The original API passed preflight. A sequential check of all four synthetic
+classes passed 100 student logins, runtime class checks, daily-activity reads and
+live-activity reads (400 HTTP requests, zero failures). No learning activity or
+event writes were requested; login creates/refreshes local sessions. Historical
+heartbeat freshness was intentionally not asserted. An initial probe expected a
+student_id field that this daily-activity RPC does not return; its documented SQL
+contract returns class_id. The corrected probe checks that class and nonnegative
+numeric activity. The initial failed probe is preserved with private evidence.
+
+Read-only inspection of the latest capacity_run in the failed round's time window
+found 62 events for 31 students, two per student, with no duplicate sequences,
+sequence gaps or records outside the four-class fixture. These agree with the
+31 completed journeys. This does not establish exact daily-activity increments
+for the 69 incomplete student journeys: the earlier harness did not persist their
+before-values and request acknowledgement ledger. No rows were deleted or reset.
+Current readability has recovered; historical write integrity remains unproven
+for those incomplete journeys.
+
+Direct cgroup v2 readings show both DB and API can use CPUs 0–7, with no per-container
+CPU quota and no recorded quota throttling. Over a roughly ten-second idle interval,
+each consumed about 0.0034 CPU cores on average (0.042% of eight CPUs), measured
+from usage_usec deltas divided by host monotonic elapsed time. Individual sampling
+calls took 81–100 ms; that overhead and timing uncertainty are recorded. This is a
+plausible independent measurement at idle, not a calibration under pressure or an
+explanation of the prior >2,500% Docker stream readings. Retain direct counters
+alongside streamed stats in a future controlled run before drawing CPU conclusions.
+
+Next: persist per-synthetic-student activity baselines and acknowledgement counts
+in the load harness so a timed-out run can be reconciled, then evaluate the shared
+attempt-scope prototype. Do not increase the pool or claim the 100-student latency
+gate (or 10,000-user capacity) has passed.
+
+Aggregate assertions and whitespace checks passed. Diagnostic documentation only;
+no application changes, migration, production setting change or app build.
+Aggregate: `local-recovery-summary-2026-11-23.json`. Private probe scripts and raw
+results: `/Users/seanjohns/reliq-audits/2026-11-23/recovery/`.

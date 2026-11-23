@@ -1,0 +1,84 @@
+{
+  "accounts": {
+    "at": "2026-11-23T05:13:52.148Z",
+    "environment": "isolated local synthetic recovery",
+    "groups": 4,
+    "studentsChecked": 100,
+    "requests": 400,
+    "failures": [],
+    "activityWrites": 0,
+    "concurrency": 1,
+    "limitations": [
+      "Login creates/refreshes local sessions; no activity or event writes requested.",
+      "Readability does not prove exact writes in previously aborted journeys.",
+      "No freshness requirement on historical heartbeat."
+    ]
+  },
+  "events": {
+    "firstEventAt": "2026-11-23T05:03:41.920081+00:00",
+    "lastEventAt": "2026-11-23T05:04:31.994044+00:00",
+    "events": 62,
+    "studentsWithEvents": 31,
+    "duplicateSequences": 0,
+    "studentsWithSequenceGaps": 0,
+    "outsideFixtureEvents": 0,
+    "studentsWithOneEvent": 0,
+    "studentsWithTwoEvents": 31,
+    "limitation": "Latest capacity_run in failed-round time window; event presence is not proof of acknowledged daily-activity writes."
+  },
+  "cpu": {
+    "method": "cgroup v2 CPU usage delta / host monotonic elapsed time, read-only, no deliberate load",
+    "samples": [
+      {
+        "container": "supabase_db_reliq-scale-local",
+        "first": {
+          "atMonotonicNs": 108780729,
+          "sampleDurationMs": 99.214708,
+          "quota": "max 100000",
+          "cpuset": "0-7",
+          "usageUsec": 366256398,
+          "throttledUsec": 0
+        },
+        "last": {
+          "atMonotonicNs": 10302017270,
+          "sampleDurationMs": 81.156625,
+          "quota": "max 100000",
+          "cpuset": "0-7",
+          "usageUsec": 366290637,
+          "throttledUsec": 0
+        },
+        "elapsedSeconds": 10.193236541,
+        "averageCoresConsumed": 0.0033589920004584734,
+        "percentOfEightCpus": 0.04198740000573092
+      },
+      {
+        "container": "supabase_rest_reliq-scale-local",
+        "first": {
+          "atMonotonicNs": 208479687,
+          "sampleDurationMs": 100.041042,
+          "quota": "max 100000",
+          "cpuset": "0-7",
+          "usageUsec": 4230210,
+          "throttledUsec": 0
+        },
+        "last": {
+          "atMonotonicNs": 10390840249,
+          "sampleDurationMs": 96.077833,
+          "quota": "max 100000",
+          "cpuset": "0-7",
+          "usageUsec": 4264648,
+          "throttledUsec": 0
+        },
+        "elapsedSeconds": 10.182360562,
+        "averageCoresConsumed": 0.003382123407466113,
+        "percentOfEightCpus": 0.04227654259332641
+      }
+    ],
+    "limitations": [
+      "Short recovery/idle interval; not calibration under load",
+      "docker exec sampling adds overhead; midpoint timestamps include recorded uncertainty",
+      "Cannot repair or explain previous streamed Docker counters retrospectively"
+    ]
+  },
+  "probeCorrection": "Initial recovery probe incorrectly expected student_id in daily activity response. Verified SQL return contract exposes class_id instead; corrected assertion checks fixture class. Initial failed probe retained privately."
+}
