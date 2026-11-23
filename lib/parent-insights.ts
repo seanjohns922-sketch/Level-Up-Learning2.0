@@ -213,24 +213,6 @@ function isoDate(date: Date) {
  * Consecutive active days ending today (or yesterday, so an evening learner
  * doesn't watch the streak vanish at midnight before they've played).
  */
-export function activityStreak(days: ParentActivityDay[], today = new Date()) {
-  const active = new Set(days.filter(activeDay).map((day) => day.date));
-  if (active.size === 0) return 0;
-
-  const cursor = new Date(today);
-  if (!active.has(isoDate(cursor))) {
-    cursor.setDate(cursor.getDate() - 1);
-    if (!active.has(isoDate(cursor))) return 0;
-  }
-
-  let streak = 0;
-  while (active.has(isoDate(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
-}
-
 /** The last 7 calendar days, oldest first, with zero-filled gaps. */
 export function lastSevenDays(days: ParentActivityDay[], today = new Date()) {
   const byDate = new Map(days.map((day) => [day.date, day]));

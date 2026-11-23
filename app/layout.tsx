@@ -11,6 +11,7 @@ import { FullscreenToggle } from "@/components/FullscreenToggle";
 import DemoPreviewBanner from "@/components/demo/DemoPreviewBanner";
 import GemRevealHost from "@/components/gems/GemRevealHost";
 import ChronoCrystalReveal from "@/components/chronorok/ChronoCrystalReveal";
+import StreakRewardReveal from "@/components/streak/StreakRewardReveal";
 import VercelClientInsights from "@/components/VercelClientInsights";
 
 export const metadata: Metadata = {
@@ -47,6 +48,7 @@ export default function RootLayout({
           {children}
           <GemRevealHost />
           <ChronoCrystalReveal />
+          <StreakRewardReveal />
           {process.env.NODE_ENV === "production" ? <VercelClientInsights /> : null}
         </ErrorBoundary>
       </body>

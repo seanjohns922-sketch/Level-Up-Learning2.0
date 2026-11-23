@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { StreakCard } from "@/components/streak/StreakParts";
 import EconomyHeader from "@/components/economy/EconomyHeader";
 import CanonicalStudentAvatar from "@/components/avatar/CanonicalStudentAvatar";
 import HallOfLegendsWidget from "@/components/home/HallOfLegendsWidget";
@@ -266,6 +267,8 @@ export default function HomeBasePage() {
                 <Pencil className="h-3.5 w-3.5" aria-hidden="true" /> Change room
               </button>
             </div>
+
+            <StreakCard />
 
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-md border border-white/15 bg-black/35 p-3 backdrop-blur-sm">

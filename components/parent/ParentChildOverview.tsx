@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Gem } from "lucide-react";
+import { Gem, ShieldCheck } from "lucide-react";
+import { StreakFlame } from "@/components/streak/StreakParts";
+import { DEMO_STREAK, fetchLearningStreak, STREAK_SHIELD_LIMIT, type LearningStreak } from "@/lib/learning-streak";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import ParentReportButton from "@/components/parent/ParentReportButton";
 import SkipWeekDialog, { type SkipWeekRequest } from "@/components/parent/SkipWeekDialog";
@@ -11,7 +13,6 @@ import { stoneForGem } from "@/lib/gem-stones";
 import type { GemRarity } from "@/lib/gems";
 import { parentCurriculumLessonCount, parentCurriculumWeek, parentLevelLabel } from "@/lib/parent-curriculum";
 import {
-  activityStreak,
   currentWeekDays,
   fetchParentChildActivity,
   fetchParentProgressReport,
@@ -150,6 +151,15 @@ export default function ParentChildOverview({
 
   const realms = useMemo(() => buildRealmViews(child, activity, report, skips), [activity, child, report, skips]);
   const isPreview = Boolean(preview);
+  const [streak, setStreak] = useState<LearningStreak | null>(preview ? DEMO_STREAK : null);
+  useEffect(() => {
+    if (preview) return;
+    let active = true;
+    fetchLearningStreak(child.studentId)
+      .then((value) => { if (active) setStreak(value); })
+      .catch(() => { if (active) setStreak(null); });
+    return () => { active = false; };
+  }, [child.studentId, preview]);
 
   async function afterSkip() {
     setSkipRequest(null);
@@ -173,7 +183,8 @@ export default function ParentChildOverview({
   return (
     <div className="space-y-6">
       {!child.homeAccess ? <HomeAccessBanner child={child} onActivated={onChanged} preview={isPreview} /> : null}
-      <ChildHero child={child} activity={activity} />
+      <ChildHero child={child} activity={activity} streak={streak} />
+      {streak ? <ParentStreakCard firstName={child.firstName} streak={streak} /> : null}
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="flex flex-wrap items-end justify-between gap-3 px-5 pb-4 pt-5 sm:px-7">
@@ -207,11 +218,10 @@ export default function ParentChildOverview({
   );
 }
 
-function ChildHero({ child, activity }: { child: ParentChild; activity: ParentActivity | null }) {
+function ChildHero({ child, activity, streak }: { child: ParentChild; activity: ParentActivity | null; streak: LearningStreak | null }) {
   const week = summariseWeek(activity?.feed ?? []);
   const days = currentWeekDays(activity?.days ?? []);
   const minutes = days.reduce((total, day) => total + day.minutes, 0);
-  const streak = activityStreak(activity?.days ?? []);
   const since = startOfWeek().getTime();
   const gemsThisWeek = (child.gems ?? child.recentAchievements).filter((gem) => Date.parse(gem.earnedAt) >= since).length;
   const heroRealm = activity?.feed[0]?.realmId ?? child.realms[0]?.realmId ?? "number";
@@ -232,7 +242,7 @@ function ChildHero({ child, activity }: { child: ParentChild; activity: ParentAc
         <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:w-[560px]">
           <HeroStat label="Minutes" value={String(minutes)} />
           <HeroStat label="Avg score" value={week.average === null ? "—" : `${week.average}%`} />
-          <HeroStat label="In a row" value={plural(streak, "day")} />
+          <HeroStat label="Streak" value={streak ? plural(streak.streak, "day") : "—"} />
           <HeroStat label="Gems" value={String(gemsThisWeek)} />
         </dl>
       </div>
@@ -277,6 +287,33 @@ function HeroStat({ label, value }: { label: string; value: string }) {
       <dt className="text-[11px] font-bold uppercase tracking-[0.1em] text-white/60">{label}</dt>
       <dd className="mt-1 truncate font-display text-xl font-black sm:text-2xl">{value}</dd>
     </div>
+  );
+}
+
+/** The child's learning streak, from the same server rules that pay their rewards. */
+function ParentStreakCard({ firstName, streak }: { firstName: string; streak: LearningStreak }) {
+  const nextIsToday = streak.nextDay !== null && streak.nextDay - streak.streak === 1 && !streak.todayDone;
+  const line = streak.streak === 0
+    ? `A lesson or quiz today starts ${firstName}'s streak. Day 3 earns +100 XP and day 5 earns +500 XP.`
+    : nextIsToday
+      ? `One more lesson today unlocks ${firstName}'s ${streak.nextDay}-day reward (+${streak.nextXp.toLocaleString()} XP).`
+      : streak.todayDone
+        ? `${firstName} has learned today.${streak.nextDay ? ` Next reward on day ${streak.nextDay} (+${streak.nextXp.toLocaleString()} XP).` : ""}`
+        : `A lesson or quiz today keeps ${firstName}'s streak going.`;
+  return (
+    <section aria-label="Learning streak" className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:p-6">
+      <span className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#121314] text-[var(--reliq-lime)]">
+        <StreakFlame className="h-8 w-8" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <h3 className="font-display text-xl font-black">{plural(streak.streak, "day")} learning streak</h3>
+        <p className="mt-1 text-slate-700">{line}</p>
+        <p className="mt-2 flex items-center gap-2 text-sm text-slate-600">
+          <ShieldCheck className="h-4 w-4 shrink-0" aria-hidden="true" />
+          Weekends never break a streak. {firstName} has {streak.shields} of {STREAK_SHIELD_LIMIT} streak shields saved for a missed day.
+        </p>
+      </div>
+    </section>
   );
 }
 

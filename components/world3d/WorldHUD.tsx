@@ -25,6 +25,8 @@ import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import { resolveWorldJourney, type WorldJourney } from "@/lib/world3d/world-journey";
 import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoiceButton";
 import DemoModeNavigationControls from "@/components/demo/DemoModeNavigationControls";
+import { StreakFlame } from "@/components/streak/StreakParts";
+import { streakPrompt, useLearningStreak } from "@/lib/learning-streak";
 
 export type WorldHUDContext = "central" | "tower" | "realm";
 
@@ -94,6 +96,8 @@ export function WorldHUD({
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [xp, setXp] = useState<number | null>(null);
+  const streak = useLearningStreak();
+  const [streakReminderClosed, setStreakReminderClosed] = useState(false);
   const [crystals, setCrystals] = useState<{ crystals: number; open: boolean; learningDays: number } | null>(null);
 
   const refreshJourney = useCallback(() => {
@@ -240,6 +244,12 @@ export function WorldHUD({
           ) : null}
           <div className="worldHudStats">
           <div className="worldHudXp" title="Experience points"><Zap size={15} aria-hidden="true" />{compactXp(xp)}</div>
+          {streak ? (
+            <button type="button" className={`worldHudStreak${streak.todayDone ? "" : " isPending"}`} onClick={() => router.push("/earn-xp")}
+              title="Ways to earn XP" aria-label={`${streak.streak}-day learning streak${streak.todayDone ? "" : ", not done today"}. See ways to earn XP.`}>
+              <StreakFlame className="h-[15px] w-[15px]" />{streak.streak}
+            </button>
+          ) : null}
           {crystals ? (
             <button type="button" className="worldHudCrystals" onClick={() => router.push(preview ? "/world/chronorok?teacher_preview=1" : "/world/chronorok")}
               title={crystals.open ? `Chrono Crystals: ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}` : `Learn on ${Math.max(0, CHRONOROK_OPEN_DAYS - crystals.learningDays)} more days to open Chronorok`}
@@ -251,9 +261,21 @@ export function WorldHUD({
           ) : null}
           <FullscreenToggle icon className="h-9 w-9 rounded-full text-white transition hover:bg-white/10" />
           <button type="button" className="worldHudIcon worldHudAvatar" onClick={() => router.push("/profile")} aria-label="Open profile" title="Profile"><UserRound size={19} /></button>
-          <WorldVoiceButton text={joinSpeechParts([`Experience points. ${compactXp(xp)}.`, crystals ? `Chrono Crystals. ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}.` : null, "Profile button."])} compact label="Read my points" />
+          <WorldVoiceButton text={joinSpeechParts([`Experience points. ${compactXp(xp)}.`, streak ? `Learning streak. ${streak.streak} days.` : null, crystals ? `Chrono Crystals. ${crystals.crystals} of ${CRYSTALS_TO_AWAKEN}.` : null, "Profile button."])} compact label="Read my points" />
           </div>
         </div>
+
+        {context === "central" && streak && streak.streak > 0 && !streak.todayDone && !streakReminderClosed ? (
+          <div className="worldHudStreakReminder" role="status">
+            <span className="worldHudStreakBadge"><StreakFlame className="h-7 w-7" /></span>
+            <span className="worldHudStreakText">
+              <strong>{streak.nextDay && streak.nextDay - streak.streak === 1 ? `One lesson today = +${streak.nextXp.toLocaleString()} XP` : `Keep your ${streak.streak}-day streak`}</strong>
+              <span>{streak.nextDay && streak.nextDay - streak.streak === 1 ? `It turns your ${streak.streak}-day streak into ${streak.nextDay}.` : streakPrompt(streak) ?? "Do a lesson or quiz today."}</span>
+            </span>
+            <button type="button" className="worldHudStreakGo" disabled={quickStartBusy} onClick={() => void quickStart()}>Start lesson</button>
+            <button type="button" className="worldHudStreakClose" onClick={() => setStreakReminderClosed(true)} aria-label="Close streak reminder"><X size={16} /></button>
+          </div>
+        ) : null}
 
         <nav className={`worldHudActions${contextAction ? " worldHudActionsWithContext" : ""}`} aria-label="World actions">
           <WorldVoiceButton text={worldActionsSpeech} className="worldHudActionRead" label="Read world actions" />
@@ -367,6 +389,19 @@ export function WorldHUD({
         .worldHud .worldHudStats{display:flex;align-items:center;gap:2px;height:46px;padding:0 4px 0 6px;border-radius:999px;background:rgba(16,14,24,.62);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 26px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
         .worldHud .worldHudStats .worldHudXp{height:38px!important;background:transparent!important;box-shadow:none!important;border:0!important;color:#fff4d6!important;padding:0 10px!important;gap:6px;font:900 14px var(--font-display)}
         .worldHud .worldHudStats .worldHudXp svg{color:#FFD25A}
+        .worldHud .worldHudStats .worldHudStreak{height:38px;display:flex;align-items:center;gap:6px;background:transparent;border:0;border-left:1px solid rgba(255,255,255,.16);padding:0 12px;color:#fff4d6;font-weight:900;font-size:14px;cursor:pointer}
+        .worldHud .worldHudStats .worldHudStreak svg{color:#ff9a3c}
+        .worldHud .worldHudStats .worldHudStreak.isPending svg{animation:streakPulse 1.6s ease-in-out infinite}
+        @keyframes streakPulse{50%{transform:scale(1.18)}}
+        @media (prefers-reduced-motion:reduce){.worldHud .worldHudStats .worldHudStreak.isPending svg{animation:none}}
+        .worldHudStreakReminder{position:fixed;left:50%;top:max(84px,calc(env(safe-area-inset-top) + 72px));transform:translateX(-50%);z-index:40;display:flex;align-items:center;gap:14px;width:min(560px,calc(100vw - 32px));box-sizing:border-box;padding:12px 12px 12px 14px;border-radius:20px;background:rgba(28,20,12,.92);border:1px solid rgba(255,154,60,.6);box-shadow:0 18px 40px rgba(0,0,0,.35);color:#fff;pointer-events:auto}
+        .worldHudStreakBadge{display:grid;place-items:center;width:48px;height:48px;flex-shrink:0;border-radius:14px;background:linear-gradient(160deg,#ff9a3c,#e8460c);color:#fff4e0}
+        .worldHudStreakText{display:flex;flex-direction:column;min-width:0;flex:1}
+        .worldHudStreakText strong{font-weight:900;font-size:17px}
+        .worldHudStreakText span{font-weight:600;font-size:14px;color:#e6d6bf}
+        .worldHudStreakGo{min-height:44px;padding:0 16px;border-radius:14px;border:0;background:#f5b83d;color:#2a1800;font-weight:900;font-size:15px;white-space:nowrap;cursor:pointer}
+        .worldHudStreakClose{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border-radius:10px;border:0;background:rgba(255,255,255,.08);color:#fff;cursor:pointer}
+        @media(max-width:560px){.worldHudStreakText span{display:none}.worldHudStreakText strong{font-size:14px}.worldHudStreakGo{padding:0 12px;font-size:13px}}
         .worldHud .worldHudStats .worldHudCrystals{height:38px;background:transparent;border:0;box-shadow:none;border-left:1px solid rgba(255,255,255,.16);border-radius:0;padding:0 12px}
         .worldHud .worldHudStats .worldHudCrystals i{left:12px;right:12px;bottom:3px}
         .worldHud .worldHudStats .worldHudAvatar{width:36px;height:36px;border-radius:50%;border:0;margin-left:4px;background:linear-gradient(135deg,#D86BF7,#8C2EAC);color:#fff;box-shadow:none}
