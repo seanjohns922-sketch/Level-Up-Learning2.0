@@ -215,5 +215,9 @@
   {"key":"main_library","name":"Library","native":[4.60001,2.960005,3.71],"size":[4.60001,2.960005,3.71],"footprint":[10,8]},
   {"key":"main_town_hall","name":"Town Hall","native":[8.00001,4.340005,8],"size":[8.00001,4.340005,8],"footprint":[20,16]},
   {"key":"main_school","name":"School","native":[9.00001,5.210005,7.340301],"size":[9.00001,5.210005,7.340301],"footprint":[24,16]},
-  {"key":"main_fire_station","name":"Fire Station","native":[8.00001,4.259049,6.027961],"size":[8.00001,4.259049,6.027961],"footprint":[12,10]}
+  {"key":"main_fire_station","name":"Fire Station","native":[8.00001,4.259049,6.027961],"size":[8.00001,4.259049,6.027961],"footprint":[12,10]},
+  {"key":"sport_tennis","name":"Tennis Court","native":[8.00001,3.24001,9],"size":[8.00001,3.24001,9],"footprint":[24,12]},
+  {"key":"sport_soccer","name":"Soccer Pitch","native":[14.00001,1.239949,18],"size":[14.00001,1.239949,18],"footprint":[28,18]},
+  {"key":"sport_footy","name":"Footy Goals","native":[12.00001,3.850005,10],"size":[12.00001,3.850005,10],"footprint":[20,16]},
+  {"key":"sport_netball","name":"Netball Court","native":[7.00001,3.075005,7],"size":[7.00001,3.075005,7],"footprint":[24,14]}
 ]

@@ -8,7 +8,7 @@ const homes = await import(new URL("../lib/world3d/premium-homes.ts", import.met
 const { PREMIUM_HOME_STYLES: ALL_STYLES, DEFENCE_STYLES, PREMIUM_HOME_SPECS, premiumHomeLevel, premiumHomeUpgradeKey, premiumHomeItemKey, nextPremiumHomeUpgrade, trampolineBounceAt, TRAMPOLINE_BOUNCE } = homes;
 
 // The Protect the Tower, everyday, City Life and Main Street styles share this system and have their own audits (qa:tower-defence, qa:everyday-items, qa:city-life, qa:main-street).
-const PREMIUM_HOME_STYLES = ALL_STYLES.filter((style) => !DEFENCE_STYLES.includes(style) && !homes.EVERYDAY_STYLES.includes(style) && !homes.CITY_LIFE_STYLES.includes(style) && !homes.MAIN_STREET_STYLES.includes(style));
+const PREMIUM_HOME_STYLES = ALL_STYLES.filter((style) => !DEFENCE_STYLES.includes(style) && !homes.EVERYDAY_STYLES.includes(style) && !homes.CITY_LIFE_STYLES.includes(style) && !homes.MAIN_STREET_STYLES.includes(style) && !homes.SPORTS_STYLES.includes(style));
 const isHomeRow = (row) => PREMIUM_HOME_STYLES.includes(row.metadata.premiumHome);
 const PREMIUM_HOME_SHOP_ITEMS = homes.PREMIUM_HOME_SHOP_ITEMS.filter(isHomeRow), PREMIUM_HOME_UPGRADE_ITEMS = homes.PREMIUM_HOME_UPGRADE_ITEMS.filter(isHomeRow);
 assert.deepEqual([...PREMIUM_HOME_STYLES], ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball"]);
@@ -98,5 +98,5 @@ for (const style of ALL_STYLES.filter((s) => !PREMIUM_HOME_SPECS[s].fixed)) {
   }
 }
 const hub = read("components/world3d/CentralWorld.tsx");
-assert.ok(hub.includes('nearCourt ? { label: "SHOOT", icon: "ball"') && hub.includes("<ShotBall key={shot.id}") && hub.includes("<BasketballScoreContext.Provider value={hoopScore}>"), "courts offer Shoot, fly the ball and score");
+assert.ok(hub.includes('nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT"') && hub.includes("<ShotBall key={shot.id}") && hub.includes("<BasketballScoreContext.Provider value={hoopScore}>"), "courts offer Shoot, fly the ball and score");
 console.log(`PASS premium items: ${PREMIUM_HOME_STYLES.length} styles x 4 levels (homes, Fair Ride, trampoline, basketball), ${rows.length} shop rows match the migrations, trampoline bounce, hoop shooting, every level inside its plot and world wiring in place`);

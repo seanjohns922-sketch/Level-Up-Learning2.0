@@ -134,5 +134,21 @@
   {"style":"fire_station","level":1,"min":[-4,0,-3.028],"max":[4,4.259,3]},
   {"style":"fire_station","level":2,"min":[-5.5,-0.025,-4.5],"max":[5.5,5.2,4.5]},
   {"style":"fire_station","level":3,"min":[-5.8,0,-4.8],"max":[5.9,9.5,4.8]},
-  {"style":"fire_station","level":4,"min":[-5.95,0,-4.99],"max":[5.95,8.7,4.95]}
+  {"style":"fire_station","level":4,"min":[-5.95,0,-4.99],"max":[5.95,8.7,4.95]},
+  {"style":"tennis","level":1,"min":[-4,-0.24,-4.5],"max":[4,3,4.5]},
+  {"style":"tennis","level":2,"min":[-11,0,-5.9],"max":[11,1.1,5.9]},
+  {"style":"tennis","level":3,"min":[-11.85,0,-5.9],"max":[11.85,3.06,5.9]},
+  {"style":"tennis","level":4,"min":[-11.9,0,-5.9],"max":[11.9,8.441,5.9]},
+  {"style":"soccer","level":1,"min":[-7,0,-9],"max":[7,1.24,9]},
+  {"style":"soccer","level":2,"min":[-13.9,0,-8.9],"max":[13.9,2.067,8.9]},
+  {"style":"soccer","level":3,"min":[-13.9,0,-8.9],"max":[13.9,2.067,8.9]},
+  {"style":"soccer","level":4,"min":[-14.011,0,-8.9],"max":[14.011,10.441,9]},
+  {"style":"footy","level":1,"min":[-6,0,-5],"max":[6,3.85,5]},
+  {"style":"footy","level":2,"min":[-9.9,0,-7.9],"max":[9.9,7,7.9]},
+  {"style":"footy","level":3,"min":[-9.9,0,-7.9],"max":[9.9,7,7.9]},
+  {"style":"footy","level":4,"min":[-10.03,0,-7.9],"max":[10.03,11.441,7.9]},
+  {"style":"netball","level":1,"min":[-3.5,0,-3.5],"max":[3.5,3.075,3.5]},
+  {"style":"netball","level":2,"min":[-11.9,0,-6.9],"max":[11.9,3.075,6.9]},
+  {"style":"netball","level":3,"min":[-11.9,0,-6.9],"max":[11.9,3.075,6.9]},
+  {"style":"netball","level":4,"min":[-11.98,0,-6.9],"max":[11.98,8.441,6.9]}
 ]

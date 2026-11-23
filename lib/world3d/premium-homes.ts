@@ -12,7 +12,9 @@ export const EVERYDAY_STYLES = ["lamp_post", "bench", "fence", "mailbox", "campf
 export const CITY_LIFE_STYLES = ["playground", "cricket_nets", "park_bbq", "cubby_house", "outdoor_setting", "bus_stop", "food_truck", "vending_kiosk"] as const;
 /** Main Street: the town's buildings, unlocked with XP. */
 export const MAIN_STREET_STYLES = ["corner_shop", "cafe", "library", "town_hall", "school", "fire_station"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES] as const;
+/** Sports: playable courts and goals, unlocked with XP (the basketball court lives in the same tab). */
+export const SPORTS_STYLES = ["tennis", "soccer", "footy", "netball"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES, ...SPORTS_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -28,7 +30,7 @@ type StyleSpec = {
   icon: string;
   /** World model key; the shop row is central_world_plot_1_<assetKey>. */
   assetKey: string;
-  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life" | "main_street";
+  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life" | "main_street" | "sports";
   upgradePrefix: string;
   /** Level 1 is free in the editor's Defence tab (it replaced a free castle piece); only upgrades cost XP. */
   free?: boolean;
@@ -52,6 +54,8 @@ const CITY_BIG_PRICES = [350, 350, 700, 1400] as const;
 const MAIN = { marketplaceCategory: "main_street", upgradePrefix: "central_world_main_upgrade_", metres: true } as const;
 const MAIN_SHOP_PRICES = [400, 400, 800, 1600] as const;
 const MAIN_CIVIC_PRICES = [500, 500, 1000, 2000] as const;
+const SPORT = { marketplaceCategory: "sports", upgradePrefix: "central_world_sports_upgrade_", metres: true } as const;
+const SPORT_PRICES = [400, 400, 800, 1600] as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -130,6 +134,8 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     icon: "dribbble",
     assetKey: "play_basketball",
     ...SET_PIECE,
+    // Sold in the Sports tab; its upgrades keep their original keys.
+    marketplaceCategory: "sports",
     height: 9,
     metres: true,
     scale: 1.2,
@@ -486,6 +492,55 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     assetKey: "main_fire_station",
     height: 9.6,
     ...MAIN,
+  },
+  // Sports models live in components/world3d/premium-items/SportsItems.tsx; the games in lib/world3d/sports.ts.
+  tennis: {
+    name: "Tennis Court",
+    description: "Serve and score! A hit-up wall that grows into a floodlit stadium court.",
+    levels: ["Hit-up Wall", "Grass Court", "Club Court", "Stadium Court"],
+    prices: SPORT_PRICES,
+    gridSize: "12x6",
+    accent: "#d7f04a",
+    icon: "trophy",
+    assetKey: "sport_tennis",
+    height: 9,
+    ...SPORT,
+  },
+  soccer: {
+    name: "Soccer Pitch",
+    description: "Kick for goal! Backyard goals that grow into a floodlit stadium with a crowd.",
+    levels: ["Backyard Goals", "Small Pitch", "Club Pitch", "Floodlit Stadium"],
+    prices: SPORT_PRICES,
+    gridSize: "14x9",
+    accent: "#3f8f3a",
+    icon: "goal",
+    assetKey: "sport_soccer",
+    height: 11,
+    ...SPORT,
+  },
+  footy: {
+    name: "Footy Goals",
+    description: "Kick a goal for six or a behind for one! Backyard posts that grow into a floodlit oval end.",
+    levels: ["Backyard Posts", "Goal Square", "Club Ground", "Floodlit Oval End"],
+    prices: SPORT_PRICES,
+    gridSize: "10x8",
+    accent: "#c0392b",
+    icon: "goal",
+    assetKey: "sport_footy",
+    height: 11.5,
+    ...SPORT,
+  },
+  netball: {
+    name: "Netball Court",
+    description: "Shoot goals! A driveway ring that grows into a floodlit stadium court.",
+    levels: ["Driveway Ring", "Half Court", "Full Court", "Stadium Court"],
+    prices: SPORT_PRICES,
+    gridSize: "12x7",
+    accent: "#ffcc33",
+    icon: "trophy",
+    assetKey: "sport_netball",
+    height: 9,
+    ...SPORT,
   },
 };
 

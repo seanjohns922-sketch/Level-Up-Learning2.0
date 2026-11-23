@@ -24,7 +24,8 @@ import { CarDriver, CarHudPanel, type CarHud, type CarPose } from "@/components/
 import { CarWorldContext } from "@/components/world3d/premium-items/RoadsAndCars";
 import { buildDriveCourse, CAR_COLOURS, CAR_SPECS, CARPORT_ASSET_KEY, carBlockedCells, carToDrive, cellAt, nextOf, ownedCars, readCarChoice, writeCarChoice, type CarStyle } from "@/lib/world3d/cars";
 import { BasketballScoreContext } from "@/components/world3d/premium-items/BasketballCourt";
-import { ballAt, courtInWorld, nearestHoop, planShot, type Shot } from "@/lib/world3d/basketball";
+import { ballAt, COURT_SCALE, courtInWorld, nearestHoop, planShot, RIM_HEIGHT, type Shot } from "@/lib/world3d/basketball";
+import { chooseTarget, planSportShot, SPORT_ACTION, SPORT_KINDS, sportBallAt, sportInWorld, type SportKind, type SportShot } from "@/lib/world3d/sports";
 import { KartGarage, type KartGarageActions } from "@/components/world3d/premium-items/KartGarage";
 import { kartSetup, type KartParts, type KartStyle } from "@/lib/world3d/kart-garage";
 import { fetchFinishedRealms } from "@/lib/world3d/kart-garage-client";
@@ -354,7 +355,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose }: { carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose }: { carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -574,7 +575,13 @@ function WalkTapSurface({ cellSize, onTap }: { cellSize: number; onTap: (gridX: 
 }
 
 /** The ball in flight: up in an arc to the rim, then through the net or off the rim to the ground. */
-function ShotBall({ shot, onDone }: { shot: Shot; onDone: (shot: Shot) => void }) {
+/** What each game's ball looks like: radius, colour, and a squash for the oval footy. */
+const BALLS: Record<"basketball" | SportKind, { r: number; color: string; stretch?: number }> = {
+  basketball: { r: 0.13, color: "#ff7a1a" }, netball: { r: 0.12, color: "#ffcc33" }, soccer: { r: 0.22, color: "#f4f4f4" }, footy: { r: 0.18, color: "#c0392b", stretch: 1.6 }, tennis: { r: 0.11, color: "#d7f04a" },
+};
+function ShotBall({ shot, onDone }: { shot: Shot | SportShot; onDone: (shot: Shot | SportShot) => void }) {
+  const kind = "sport" in shot ? shot.sport : "basketball";
+  const look = BALLS[kind];
   const ref = useRef<THREE.Group>(null);
   const started = useRef<number | null>(null), done = useRef(false);
   useFrame(({ clock }) => {
@@ -582,7 +589,7 @@ function ShotBall({ shot, onDone }: { shot: Shot; onDone: (shot: Shot) => void }
     if (!ball) return;
     started.current ??= clock.elapsedTime;
     const t = (clock.elapsedTime - started.current) / shot.duration;
-    if (t <= 1) ball.position.set(...ballAt(shot, t));
+    if (t <= 1) ball.position.set(...("sport" in shot ? sportBallAt(shot, t) : ballAt(shot, t)));
     else {
       // After the rim: drop through the net, or bounce off to one side.
       const k = Math.min(1, (t - 1) * shot.duration / 0.5);
@@ -592,7 +599,12 @@ function ShotBall({ shot, onDone }: { shot: Shot; onDone: (shot: Shot) => void }
     }
     ball.rotation.x += 0.25;
   });
-  return <group ref={ref} position={[...shot.from]}><mesh castShadow><sphereGeometry args={[0.13, 20, 14]} /><meshStandardMaterial color="#ff7a1a" roughness={0.6} /></mesh>{[0, Math.PI / 2].map((r) => <mesh key={r} rotation={[0, r, 0]}><torusGeometry args={[0.131, 0.007, 6, 24]} /><meshStandardMaterial color="#2a1a10" /></mesh>)}</group>;
+  return (
+    <group ref={ref} position={[...shot.from]}>
+      <mesh castShadow scale={[1, 1, look.stretch ?? 1]}><sphereGeometry args={[look.r, 20, 14]} /><meshStandardMaterial color={look.color} roughness={0.6} /></mesh>
+      {kind === "basketball" ? [0, Math.PI / 2].map((r) => <mesh key={r} rotation={[0, r, 0]}><torusGeometry args={[0.131, 0.007, 6, 24]} /><meshStandardMaterial color="#2a1a10" /></mesh>) : null}
+    </group>
+  );
 }
 
 /** A quick crackle of light where the explorer bumped the laser fence. */
@@ -622,12 +634,12 @@ const HUB_V2_ROAM = { centerZ: 0, radiusX: HUB_V2_PLAY_RADIUS, radiusZ: HUB_V2_P
 
 /** A start line the explorer can walk up to and race from. */
 type RaceStartTarget = { id: string; item: PlacedRaceItem };
-/** A basketball court the explorer can shoot from, and a shot in flight. */
-type CourtTarget = { id: string; court: ReturnType<typeof courtInWorld> };
+/** A court or pitch the explorer can play on: basketball or one of the Sports set, its targets in world space. */
+type CourtTarget = { id: string; kind: "basketball" | SportKind; court: { x: number; z: number; reach: number; targets: Array<readonly [number, number, number]> } };
 const CARPORT_TARGET_PREFIX = "carport:";
 type CarportTarget = { id: string; pose: CarPose };
 type DriveSession = { start: CarPose; style: CarStyle; colour: string; lights: boolean; nonce: number };
-type ShotInFlight = { id: number; plan: Shot };
+type ShotInFlight = { id: number; plan: Shot | SportShot };
 const COURT_TARGET_PREFIX = "court:";
 /** A race in progress; the nonce restarts it. */
 type RaceSession = { start: PlacedRaceItem; nonce: number };
@@ -922,12 +934,22 @@ export default function CentralWorld() {
       return preview ? { ...state, inventory: Array.from(ownedItemKeys, (item_key) => ({ item_key, acquired_at: "", acquisition_type: "demo" })) } : state;
     }, "Done."),
   };
-  // Basketball: stand on a court and tap Shoot; points add up on its scoreboard for this visit.
-  const basketballLevel = homeWorld.levels.basketball;
-  const courts = useMemo(() => placedCustomisations.flatMap((placement): CourtTarget[] =>
-    premiumHomeStyle(itemsById.get(placement.itemId)?.metadata.worldAssetKey) === "basketball"
-      ? [{ id: `${COURT_TARGET_PREFIX}${placement.placementId ?? `${placement.gridX}:${placement.gridZ}`}`, court: courtInWorld(placement, basketballLevel, buildGrid.cellSize) }]
-      : []), [placedCustomisations, itemsById, basketballLevel, buildGrid.cellSize]);
+  // Basketball and the Sports set: stand on a court and tap Shoot, Kick or Serve; points add up for this visit.
+  const courts = useMemo(() => placedCustomisations.flatMap((placement): CourtTarget[] => {
+    const item = itemsById.get(placement.itemId);
+    const style = premiumHomeStyle(item?.metadata.worldAssetKey);
+    if (!item || !style) return [];
+    const id = `${COURT_TARGET_PREFIX}${placement.placementId ?? `${placement.gridX}:${placement.gridZ}`}`;
+    if (style === "basketball") {
+      const court = courtInWorld(placement, homeWorld.levels.basketball, buildGrid.cellSize);
+      return [{ id, kind: "basketball", court: { x: court.x, z: court.z, reach: court.reach, targets: court.hoops.map(([hx, hz]) => [hx, RIM_HEIGHT * COURT_SCALE, hz] as const) } }];
+    }
+    if (!(SPORT_KINDS as readonly string[]).includes(style)) return [];
+    const kind = style as SportKind;
+    const [x, , z] = placementCentre(placement, item);
+    const plot = PREMIUM_HOME_SPECS[style].gridSize.split("x").map((n) => Number(n) * buildGrid.cellSize) as [number, number];
+    return [{ id, kind, court: sportInWorld(kind, homeWorld.levels[style], [x, z], placement.rotation, plot) }];
+  }), [placedCustomisations, itemsById, homeWorld.levels, buildGrid.cellSize]);
   const nearCourt = courts.find((court) => court.id === activeTargetId) ?? null;
   // Roads & Cars: every carport is somewhere to get in; the car parked there is the one you drive.
   const carports = useMemo(() => placedCustomisations.flatMap((placement): CarportTarget[] => {
@@ -974,12 +996,19 @@ export default function CentralWorld() {
   function shoot(court: CourtTarget) {
     if (shot) return;
     const { x, z } = avatarPosRef.current;
-    const hoop = nearestHoop(x, z, court.court.hoops);
-    if (hoop) setShot((current) => ({ id: (current?.id ?? 0) + 1, plan: planShot([x, 1.9, z], hoop, Math.random()) }));
+    const from = [x, court.kind === "soccer" || court.kind === "footy" ? 0.3 : 1.9, z] as const;
+    if (court.kind === "basketball") {
+      const hoop = nearestHoop(x, z, court.court.targets.map(([hx, , hz]) => [hx, hz] as const));
+      if (hoop) setShot((current) => ({ id: (current?.id ?? 0) + 1, plan: planShot(from, hoop, Math.random()) }));
+      return;
+    }
+    const target = chooseTarget(court.kind, x, z, court.court.targets);
+    if (target) setShot((current) => ({ id: (current?.id ?? 0) + 1, plan: planSportShot(court.kind as SportKind, from, target, Math.random(), Math.random()) }));
   }
-  const finishShot = useCallback((done: Shot) => {
+  const finishShot = useCallback((done: Shot | SportShot) => {
     setShot(null);
     if (done.makes) setHoopScore((score) => score + done.points);
+    if ("sport" in done) { setShotMessage({ text: done.label, good: done.points > 0 }); return; }
     setShotMessage(done.makes ? { text: done.points === 3 ? "THREE! +3" : "SWISH! +2", good: true } : { text: "So close!", good: false });
   }, []);
   useEffect(() => {
@@ -1019,7 +1048,7 @@ export default function CentralWorld() {
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
     // The Tower Shield is never placed; it stands round the Tower.
-    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
+    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street", "sports"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
 
   // The walk-build hotbar: free scenery the learner's kits allow, their owned items, and ground brushes.
@@ -1886,7 +1915,7 @@ export default function CentralWorld() {
       </Canvas>
       </div>
 
-      {!editorOpen && !race && !drive ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: "SHOOT", icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !race && !drive ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
