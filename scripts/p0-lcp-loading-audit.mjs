@@ -20,13 +20,13 @@ assert.match(initialSchoolLoader, /Promise\.all\([\s\S]*recordSchoolPreviewAcces
 assert.match(schoolClient, /tab === "students" && directoryState === "idle"/);
 assert.match(schoolClient, /directoryLoading=\{directoryState !== "ready"\}/);
 
-assert.match(studentHome, /dashboard-bg-lcp\.webp/);
+assert.match(studentHome, /student-welcome-bg-lcp\.webp/);
 assert.match(studentHome, /priority/);
 assert.match(studentHome, /fetchPriority="high"/);
 assert.doesNotMatch(studentHome, /dashboard-bg\.jpg/);
 
-const originalBytes = fs.statSync("public/images/dashboard-bg.jpg").size;
-const lcpBytes = fs.statSync("public/images/dashboard-bg-lcp.webp").size;
+const originalBytes = fs.statSync("public/intro/art/tower.jpg").size;
+const lcpBytes = fs.statSync("public/images/student-welcome-bg-lcp.webp").size;
 assert.ok(lcpBytes < originalBytes * 0.2, "Student Home LCP asset should be at least 80% smaller");
 
 console.log("P0 LCP loading audit passed.");

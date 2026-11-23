@@ -34,9 +34,24 @@ async function fetchExplorerCode(studentId: string) {
   }
 }
 
+/** The student's explorer code. `loaded` turns true once the lookup finishes, even if it found nothing. */
+export function useExplorerCode(studentId: string | null | undefined) {
+  const [result, setResult] = useState<{ studentId: string; code: string | null } | null>(null);
+  useEffect(() => {
+    if (!studentId) return;
+    let cancelled = false;
+    void fetchExplorerCode(studentId).then((code) => {
+      if (!cancelled) setResult({ studentId, code });
+    });
+    return () => { cancelled = true; };
+  }, [studentId]);
+  const loaded = !!studentId && result?.studentId === studentId;
+  return { loaded, code: loaded ? result.code : null };
+}
+
 type IntroFilmFrameProps = {
-  studentId: string;
   name?: string | null;
+  code?: string | null;
   year?: string | null;
   /** The student pressed the film's own "Start my adventure" button. */
   onFinish: () => void;
@@ -45,19 +60,12 @@ type IntroFilmFrameProps = {
   className?: string;
 };
 
-/** The intro film with the student's own name, explorer code and year on the explorer pass. */
-export default function IntroFilmFrame({ studentId, name, year, onFinish, onEnded, className }: IntroFilmFrameProps) {
+/**
+ * The intro film with the student's own name, explorer code and year on the explorer pass.
+ * Render it once the code lookup has finished (useExplorerCode), so the film loads only once.
+ */
+export default function IntroFilmFrame({ name, code, year, onFinish, onEnded, className }: IntroFilmFrameProps) {
   const filmRef = useRef<HTMLIFrameElement>(null);
-  const [code, setCode] = useState<{ studentId: string; value: string | null } | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-    void fetchExplorerCode(studentId).then((value) => {
-      if (!cancelled) setCode({ studentId, value });
-    });
-    return () => { cancelled = true; };
-  }, [studentId]);
-
   const handlers = useRef({ onFinish, onEnded });
   useEffect(() => {
     handlers.current = { onFinish, onEnded };
@@ -74,13 +82,10 @@ export default function IntroFilmFrame({ studentId, name, year, onFinish, onEnde
     return () => window.removeEventListener("message", onMessage);
   }, []);
 
-  // Wait for the explorer code so the film loads once, with the pass already filled in.
-  if (code?.studentId !== studentId) return <div className={className} aria-busy="true" />;
-
   return (
     <iframe
       ref={filmRef}
-      src={filmSrc({ name, code: code.value, year })}
+      src={filmSrc({ name, code, year })}
       title="Welcome to RELIQ"
       allow="autoplay; fullscreen"
       className={className}

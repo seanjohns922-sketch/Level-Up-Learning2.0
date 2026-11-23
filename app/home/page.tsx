@@ -10,24 +10,31 @@ import { markStudentIntroSeen, restoreStudentStateFromServer, StudentRestoreSupe
 import { supabase } from "@/lib/supabase";
 import { resolveStudentDestination } from "@/lib/student-destination";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
-import IntroFilmFrame from "@/components/onboarding/IntroFilmFrame";
+import IntroFilmFrame, { useExplorerCode } from "@/components/onboarding/IntroFilmFrame";
+import styles from "./student-welcome.module.css";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 import { isDiagnosticHandoffPaused } from "@/lib/diagnostic-handoff";
 
-function StudentHomeBackdrop() {
+const ARROW_PATH = "M5 11h11.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H5z";
+
+function WelcomeShell({ onLogout, children }: { onLogout: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-0">
+    <div className={styles.scene}>
       <Image
-        src="/images/dashboard-bg-lcp.webp"
+        src="/images/student-welcome-bg-lcp.webp"
         alt=""
         fill
         priority
         fetchPriority="high"
         sizes="100vw"
-        className="object-cover"
-        style={{ objectPosition: "center 40%" }}
+        className={styles.backdrop}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/10 to-black/40" />
+      <header className={styles.bar}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- small static brand mark, already sized */}
+        <img className={styles.logo} src="/brand/reliq-logo-on-dark.png" alt="RELIQ" />
+        <button type="button" className={styles.ghost} onClick={onLogout}>Log out</button>
+      </header>
+      <main className={styles.main}>{children}</main>
     </div>
   );
 }
@@ -40,10 +47,13 @@ export default function StudentHomePage() {
   const [restoreError, setRestoreError] = useState("");
   const placementYear = progress?.year ?? getPlacementEntryYear();
   const isGroundLevel = placementYear === "Prep";
-  const studentNamePrefix = studentProfile?.displayName ? `${studentProfile.displayName}, ` : "";
+  const [filmEnded, setFilmEnded] = useState(false);
+  const [starting, setStarting] = useState(false);
+  const explorer = useExplorerCode(studentProfile?.studentId);
+  const firstName = studentProfile?.displayName?.trim().split(/\s+/)[0] || "Explorer";
   const welcomeMessage = isGroundLevel
-    ? `${studentNamePrefix}watch the welcome video, then choose a realm to begin your Ground adventure.`
-    : `${studentNamePrefix}your journey starts with a short skill check. We'll use your pre-test to place you at the right level, unlock the correct learning path, and guide you into the Tower.`;
+    ? "Watch the welcome film, then choose a realm to begin your Ground adventure."
+    : "Watch how RELIQ works. Then a short skill check places you at the right level and unlocks your learning path.";
 
   useEffect(() => {
     if (isDemoPreviewMode()) {
@@ -101,7 +111,8 @@ export default function StudentHomePage() {
 
   async function beginJourney() {
     const studentId = studentProfile?.studentId;
-    if (!studentId || !progress || restoreState !== "ready") return;
+    if (!studentId || !progress || restoreState !== "ready" || starting) return;
+    setStarting(true);
     try {
       await markStudentIntroSeen(studentId);
       markActiveStudentIntroSeen(studentId);
@@ -114,90 +125,81 @@ export default function StudentHomePage() {
       console.warn("[Home] Could not persist intro state", error);
       setRestoreError("We could not save that you watched the intro. Please try again.");
       setRestoreState("error");
+      setStarting(false);
     }
   }
 
   if (restoreState !== "ready") {
     return (
-      <main className="relative flex min-h-screen items-end justify-center p-6 pb-10">
-        <StudentHomeBackdrop />
-        <div className="relative z-10 w-full max-w-3xl rounded-3xl border border-white/45 bg-white/90 p-8 text-center shadow-[0_20px_40px_rgba(0,0,0,0.18)] backdrop-blur-sm">
-          {restoreState === "loading" ? (
-            <div aria-busy="true" aria-label="Loading your journey">
-              <div className="mx-auto h-4 w-28 animate-pulse rounded bg-amber-800/15" />
-              <div className="mx-auto mt-4 h-12 w-full max-w-lg animate-pulse rounded-lg bg-slate-200" />
-              <div className="mx-auto mt-5 h-4 w-full max-w-xl animate-pulse rounded bg-slate-100" />
-              <div className="mx-auto mt-3 h-4 w-4/5 max-w-lg animate-pulse rounded bg-slate-100" />
-              <div className="mt-8 aspect-video w-full animate-pulse rounded-[22px] bg-slate-900/80" />
-              <div className="mx-auto mt-8 h-14 w-full max-w-md animate-pulse rounded-2xl bg-emerald-700/30" />
-              <span className="sr-only">Loading your journey</span>
-            </div>
-          ) : (
-            <p className="font-bold text-slate-800">{restoreError}</p>
-          )}
-          {restoreState === "error" ? (
-            <button type="button" onClick={() => window.location.reload()} className="mt-4 rounded-xl bg-teal-700 px-5 py-3 font-bold text-white">Retry</button>
-          ) : null}
-        </div>
-      </main>
+      <WelcomeShell onLogout={handleLogout}>
+        {restoreState === "loading" ? (
+          <div className="flex w-full flex-col items-center gap-5" aria-busy="true" aria-label="Loading your journey">
+            <div className={`${styles.skeleton} h-4 w-40`} />
+            <div className={`${styles.skeleton} h-12 w-full max-w-md`} />
+            <div className={`${styles.skeleton} aspect-video w-full max-w-[860px] rounded-[22px]`} />
+            <span className="sr-only">Loading your journey</span>
+          </div>
+        ) : (
+          <div className={styles.notice} role="alert">
+            <p>{restoreError}</p>
+            <button type="button" className={styles.go} onClick={() => window.location.reload()}>Try again</button>
+          </div>
+        )}
+      </WelcomeShell>
     );
   }
 
+  const yearLevel = studentProfile?.yearLevel?.trim();
   return (
-    <main className="min-h-screen relative flex items-end justify-center p-6 pb-10">
-      <StudentHomeBackdrop />
-
-      <div className="absolute top-6 right-6 z-20">
-        <button
-          onClick={handleLogout}
-          className="rounded-2xl border border-white/20 bg-black/30 px-4 py-2 text-sm font-bold text-white backdrop-blur-md hover:bg-black/40 transition"
-          type="button"
-        >
-          Log out
-        </button>
-      </div>
-
-      <div
-        className="relative z-10 rounded-3xl p-8 w-full max-w-3xl text-center"
-        style={{ background: "rgba(255,255,255,0.88)", border: "1px solid rgba(255,255,255,0.45)", boxShadow: "0 20px 40px rgba(0,0,0,0.18), 0 6px 12px rgba(0,0,0,0.06)" }}
-      >
-        <p className="text-sm font-semibold text-amber-800 uppercase tracking-widest mb-2">Welcome to the</p>
-        <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-3 uppercase tracking-wide">
-          Tower of Knowledge
-        </h1>
-        <div className="mb-8 flex items-start justify-center gap-2">
-          <p className="max-w-2xl text-gray-700">{welcomeMessage}</p>
+    <WelcomeShell onLogout={handleLogout}>
+      <section className={styles.hello}>
+        {explorer.code || yearLevel ? (
+          <div className={styles.eyebrow}>
+            {explorer.code ? <>Explorer <b>{explorer.code}</b></> : null}
+            {explorer.code && yearLevel ? " · " : null}
+            {yearLevel}
+          </div>
+        ) : null}
+        <h1 className={styles.title}>Welcome, <span className={styles.highlight}>{firstName}</span></h1>
+        <div className={styles.subRow}>
+          <p className={styles.sub}>{welcomeMessage}</p>
           <ReadAloudBtn
-            text={`Welcome to the Tower of Knowledge. ${welcomeMessage}`}
+            text={`Welcome, ${firstName}. ${welcomeMessage}`}
             speechKey="student-welcome"
             label="Read"
-            className="shrink-0 border-slate-300 bg-white text-slate-600"
+            className={styles.read}
           />
         </div>
+      </section>
 
-        <div className="rounded-[28px] border border-dashed border-teal-300/90 bg-teal-50/70 p-5 md:p-6 mb-8">
-          <div className="aspect-video w-full overflow-hidden rounded-[22px] border border-slate-700/60 bg-slate-950 shadow-[0_12px_28px_rgba(2,23,22,0.18)]">
-            {studentProfile?.studentId ? (
-              <IntroFilmFrame
-                studentId={studentProfile.studentId}
-                name={studentProfile.displayName}
-                year={studentProfile.yearLevel}
-                onFinish={beginJourney}
-                className="h-full w-full border-0"
-              />
-            ) : null}
-          </div>
-        </div>
+      <section className={styles.stage} aria-label="Intro film">
+        {explorer.loaded ? (
+          <IntroFilmFrame
+            name={studentProfile?.displayName}
+            code={explorer.code}
+            year={yearLevel}
+            onFinish={() => void beginJourney()}
+            onEnded={() => setFilmEnded(true)}
+            className={styles.film}
+          />
+        ) : null}
+      </section>
 
+      <div className={styles.tagline} aria-label="Explore, learn, collect">
+        <span><i />Explore</span><span><i />Learn</span><span><i />Collect</span>
+      </div>
+
+      <div className={styles.foot}>
         <button
-          onClick={beginJourney}
-          className="w-full max-w-md mx-auto py-4 rounded-2xl bg-gradient-to-r from-primary to-primary text-primary-foreground font-extrabold text-lg hover:brightness-110 transition"
-          style={{ boxShadow: "0 6px 14px rgba(30,160,90,0.35)" }}
           type="button"
+          onClick={() => void beginJourney()}
+          disabled={starting}
+          className={`${styles.go} ${filmEnded ? styles.ready : styles.quiet}`}
         >
-          {isGroundLevel ? "Start Adventure" : "Begin Your Journey"}
+          {starting ? "Starting..." : filmEnded ? "Start my adventure" : "Skip and start exploring"}
+          {filmEnded && !starting ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d={ARROW_PATH} /></svg> : null}
         </button>
       </div>
-    </main>
+    </WelcomeShell>
   );
 }

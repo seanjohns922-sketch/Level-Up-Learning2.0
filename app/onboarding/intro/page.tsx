@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getActiveStudentProfile, markActiveStudentIntroSeen } from "@/lib/studentIdentity";
 import { markStudentIntroSeen, restoreStudentStateFromServer } from "@/lib/student-progress-sync";
-import IntroFilmFrame from "@/components/onboarding/IntroFilmFrame";
+import IntroFilmFrame, { useExplorerCode } from "@/components/onboarding/IntroFilmFrame";
 
 export default function IntroPage() {
   const router = useRouter();
@@ -14,6 +14,7 @@ export default function IntroPage() {
   const [error, setError] = useState("");
   const [studentProfile] = useState(getActiveStudentProfile);
   const studentId = studentProfile?.studentId;
+  const explorer = useExplorerCode(studentId);
 
   useEffect(() => {
     if (!studentId) {
@@ -55,15 +56,15 @@ export default function IntroPage() {
     }
   }, [router, studentId]);
 
-  if (verifying || !studentId) {
+  if (verifying || !studentId || !explorer.loaded) {
     return <main className="fixed inset-0 z-50 grid place-items-center bg-black font-bold text-white">Loading your journey...</main>;
   }
 
   return (
     <main className="fixed inset-0 z-50 bg-black">
       <IntroFilmFrame
-        studentId={studentId}
         name={studentProfile?.displayName}
+        code={explorer.code}
         year={studentProfile?.yearLevel}
         onFinish={() => void finish()}
         onEnded={() => setEnded(true)}
