@@ -909,6 +909,7 @@ export default function TeacherClassesPage() {
   return (
     <main className="reliq-adult min-h-screen bg-[#f5f5f2] px-4 py-8 text-[#111] sm:px-8">
       <div className="mx-auto flex max-w-6xl flex-col gap-5">
+        <button type="button" onClick={() => router.push("/teacher/dashboard")} className="self-start text-sm font-semibold text-[#5b5b57] hover:text-[#111]">← Back to dashboard</button>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 flex-wrap items-center gap-5">
             <h1 className="font-[Montserrat,sans-serif] text-3xl font-extrabold">My Classes</h1>

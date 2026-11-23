@@ -303,6 +303,13 @@ export default function NewClassPage() {
   return (
     <main className="reliq-adult min-h-screen bg-[#f4f5f1] px-6 py-10">
       <div className="max-w-lg mx-auto">
+        <button
+          type="button"
+          onClick={() => router.push("/teacher/classes")}
+          className="mb-4 text-sm text-gray-400 hover:text-gray-600"
+        >
+          ← Back to Classes
+        </button>
         <h1 className="text-3xl font-black text-gray-900 mb-6">Create a Class</h1>
 
         {!createdCode ? (
