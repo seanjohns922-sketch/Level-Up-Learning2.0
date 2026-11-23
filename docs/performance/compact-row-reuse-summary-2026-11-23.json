@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-23",
+  "change": "Reuse the scoped table composite instead of looking up every selected event again by primary key.",
+  "sqlEquivalenceCases": 409,
+  "roleMatrix": "teacher/support/principal/admin/legacy/revocation/anonymous",
+  "allPaginatedRowsIdentical": true,
+  "alternatingCompleteReads": [
+    {
+      "variant": "original",
+      "executionMs": 156.319,
+      "sharedHitBlocks": 61668
+    },
+    {
+      "variant": "candidate",
+      "executionMs": 105.785,
+      "sharedHitBlocks": 11028
+    },
+    {
+      "variant": "candidate",
+      "executionMs": 116.616,
+      "sharedHitBlocks": 11028
+    },
+    {
+      "variant": "original",
+      "executionMs": 157.584,
+      "sharedHitBlocks": 61668
+    },
+    {
+      "variant": "original",
+      "executionMs": 193.084,
+      "sharedHitBlocks": 61668
+    },
+    {
+      "variant": "candidate",
+      "executionMs": 132.59,
+      "sharedHitBlocks": 11028
+    }
+  ],
+  "limitations": [
+    "One synthetic class for SQL timing; warm cache; EXPLAIN instrumentation.",
+    "No production settings or data changed.",
+    "No evidence of 10,000 concurrent user capacity."
+  ],
+  "mixedRuns": [
+    {
+      "variant": "original",
+      "students": 100,
+      "teachers": 4,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "gatePassed": false,
+      "latencyP95Ms": {
+        "student_login_lookup": 581,
+        "dashboard_events_initial": 1274,
+        "dashboard_refresh": 1275
+      }
+    },
+    {
+      "variant": "candidate",
+      "students": 100,
+      "teachers": 4,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "gatePassed": false,
+      "latencyP95Ms": {
+        "student_login_lookup": 590,
+        "dashboard_events_initial": 1404,
+        "dashboard_refresh": 1406
+      }
+    }
+  ],
+  "restoration": {
+    "originalDefinitionVerified": true,
+    "preflightPassed": true,
+    "smokeRequests": 175,
+    "smokeFailures": 0,
+    "cleanupIssue": "Missing SQL separator on first restoration attempt; corrected and exact original definition verified."
+  },
+  "decision": "Retain as manual experiment only; no release migration. Mixed load did not improve and both runs failed the latency gate."
+}

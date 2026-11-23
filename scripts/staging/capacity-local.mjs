@@ -9,6 +9,7 @@ import { createLiveClassEventReader, fetchLiveClassEvents } from '../../lib/live
 import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
 import { attemptPageClient } from './attempt-page-client.mjs';
+import { runReads } from './read-concurrency.mjs';
 const config = localConfig();
 const traceDatabase = process.env.SCALE_TRACE_DATABASE === '1';
 const seconds = Number(process.env.SCALE_DURATION_SECONDS ?? 120);
@@ -19,6 +20,9 @@ const studentCount = groupCount * 25;
 const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
 assert.ok(['mixed', 'students-only', 'teachers-only', 'dashboard-mixed'].includes(scenario), 'Unknown local capacity scenario');
 const dashboard = scenario === 'dashboard-mixed';
+const dashboardConcurrency = Number(process.env.SCALE_DASHBOARD_CONCURRENCY ?? 6);
+assert.ok([3, 6].includes(dashboardConcurrency), 'Dashboard read concurrency must be 3 or 6');
+assert.ok(dashboard || dashboardConcurrency === 6, 'Read concurrency experiment requires dashboard-mixed');
 const attemptPageSize = Number(process.env.SCALE_ATTEMPT_PAGE_SIZE ?? (dashboard ? 1000 : 500));
 assert.ok([500, 1000].includes(attemptPageSize), 'Attempt page size must be 500 or 1000');
 assert.ok(attemptPageSize === 500 || dashboard, 'Experimental page size requires dashboard-mixed');
@@ -217,14 +221,14 @@ async function dashboardJourney({ group, client, profile }) {
     const start = performance.now();
     let status = 0;
     try {
-      latestRows = await Promise.all([
-        measured('dashboard_live_activity', client.from('live_student_activity').select('*').eq('class_id', group.classId).order('last_active_at',{ascending:false})),
-        measured(refreshes ? 'dashboard_events_incremental' : 'dashboard_events_initial', reader.read()),
-        measured('dashboard_lesson_attempts', fetchLiveClassAttempts(attemptsClient, 'student_lesson_attempts', ids)),
-        measured('dashboard_quiz_attempts', fetchLiveClassAttempts(attemptsClient, 'student_weekly_quiz_attempts', ids)),
-        measured('dashboard_assessments', fetchLiveClassAttempts(attemptsClient, 'student_realm_assessments', ids)),
-        measured('dashboard_daily_activity', client.rpc('get_live_class_activity_today',{p_class_id:group.classId})),
-      ]);
+      latestRows = await runReads([
+        () => measured('dashboard_live_activity', client.from('live_student_activity').select('*').eq('class_id', group.classId).order('last_active_at',{ascending:false})),
+        () => measured(refreshes ? 'dashboard_events_incremental' : 'dashboard_events_initial', reader.read()),
+        () => measured('dashboard_lesson_attempts', fetchLiveClassAttempts(attemptsClient, 'student_lesson_attempts', ids)),
+        () => measured('dashboard_quiz_attempts', fetchLiveClassAttempts(attemptsClient, 'student_weekly_quiz_attempts', ids)),
+        () => measured('dashboard_assessments', fetchLiveClassAttempts(attemptsClient, 'student_realm_assessments', ids)),
+        () => measured('dashboard_daily_activity', client.rpc('get_live_class_activity_today',{p_class_id:group.classId})),
+      ], dashboardConcurrency);
       if (eventMode === 'full') assert.ok(latestRows[1].length >= 5000, 'Complete historical event snapshot');
       assert.equal(new Set(latestRows[1].map(row => row.id)).size, latestRows[1].length, 'No duplicate events');
       refreshes++;
@@ -306,6 +310,7 @@ const report = { at: new Date().toISOString(), environment: 'local protocol rehe
   eventMode, compactPageRequests, attemptPageSize,
   workloadStartedAt: new Date(started).toISOString(),
   databaseTracing: traceDatabase, dashboardHttpProfiling: profileDashboard,
+  dashboardConcurrency, readTimingScope: 'Source timings exclude queue wait; whole dashboard refresh includes queue wait.',
   ...(dashboard ? { dashboardChecks, dashboardMode: `six-source periodic refresh with production ${eventMode} incremental event reader; no realtime subscription`, expectedNewEvents: [...expectedEvents.values()].reduce((a,b)=>a+b,0) } : {}),
   clientProfile, scenario, restRoute, loginRampSeconds: rampSeconds, students: runStudents ? studentCount : 0, teachers: runTeachers ? groupCount : 0, provisionedStudents: studentCount, historyEvents: groupCount * 5000, durationSeconds: Math.round((Date.now()-started)/1000),
   requests: samples.length, requestUnits: dashboard ? 'student/auth HTTP requests plus overlapping logical dashboard source and refresh timings; not an HTTP total' : 'student/teacher-login HTTP requests plus logical teacher snapshots', snapshotHttpRequests, failedRequests, verifiedPresenceStudents:completedStudentJourneys, verifiedActivityWrites: verifiedWrites, failures, endpoints,

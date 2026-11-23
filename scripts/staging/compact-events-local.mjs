@@ -27,7 +27,11 @@ function sql(text) {
  }
 }
 
-const migration = fs.readFileSync('supabase/migrations/20261118120000_compact_live_class_event_reads.sql','utf8').replace(/^begin;$/m,'').replace(/^commit;$/m,'');
+const rowReuse = process.argv.includes('--row-reuse');
+assert.ok(process.argv.slice(2).every(arg => arg === '--row-reuse'), 'Unknown local test option');
+const migrationSource = fs.readFileSync('supabase/migrations/20261118120000_compact_live_class_event_reads.sql','utf8')
+  + (rowReuse ? fs.readFileSync('supabase/manual/compact-row-reuse/candidate.sql','utf8') : '');
+const migration = migrationSource.replace(/^begin;$/gm,'').replace(/^commit;$/gm,'');
 const quote = value => "'" + value.replaceAll("'", "''") + "'";
 const mapStudent = id => id === 'student' ? vars.student_id : vars.other_student_id;
 const mapped = fixtures.map(fixture => ({...fixture,
@@ -80,6 +84,9 @@ roles=roles.replaceAll('get_live_class_event_page_secure','get_live_class_compac
 // Remove existing history inside the rollback transaction for a deterministic matrix.
 sql('begin;\n'+migration+`\ndelete from public.live_activity_events where class_id=:'class_id';\n`+roles+'\nrollback;');
 console.log(JSON.stringify({passed:true,cases:results.length,fullRows,compactRows,roleMatrix:'teacher/support/principal/admin/legacy/revocation/anonymous',restoration:'all functions and fixture changes rolled back'},null,2));
+
+// Existing installed functions are preserved; the candidate mode is rollback-only.
+if (rowReuse) process.exit(0);
 
 // Verify the real PostgREST transport and client pagination. Install only in the
 // isolated local database, then remove both functions and this run's events.

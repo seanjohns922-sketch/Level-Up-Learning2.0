@@ -1,0 +1,902 @@
+{
+  "date": "2026-11-23",
+  "environment": "official local API; synthetic 100 students and four teachers per run",
+  "configuration": {
+    "durationSeconds": 60,
+    "eventMode": "compact",
+    "attemptPageSize": 1000,
+    "loginRampSeconds": 0,
+    "readOrder": [
+      6,
+      3,
+      3,
+      6
+    ]
+  },
+  "runs": [
+    {
+      "round": 1,
+      "concurrency": 6,
+      "gatePassed": false,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "dashboardChecks": [
+        {
+          "historyCounts": [
+            1609,
+            516,
+            1032
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2259,
+            1609,
+            516,
+            1032,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1614,
+            518,
+            1036
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2258,
+            1614,
+            518,
+            1036,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1631,
+            523,
+            1046
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2260,
+            1631,
+            523,
+            1046,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1622,
+            520,
+            1040
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2261,
+            1622,
+            520,
+            1040,
+            25
+          ]
+        }
+      ],
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 121,
+          "p99Ms": 121,
+          "maximumMs": 121
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 577,
+          "p99Ms": 803,
+          "maximumMs": 893
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 497,
+          "p99Ms": 836,
+          "maximumMs": 907
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1002,
+          "p99Ms": 1002,
+          "maximumMs": 1002
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 493,
+          "p99Ms": 617,
+          "maximumMs": 675
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 387,
+          "p99Ms": 652,
+          "maximumMs": 711
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 385,
+          "p99Ms": 551,
+          "maximumMs": 651
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 536,
+          "p99Ms": 536,
+          "maximumMs": 536
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 286,
+          "p99Ms": 472,
+          "maximumMs": 830
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 935,
+          "p99Ms": 935,
+          "maximumMs": 935
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1189,
+          "p99Ms": 1189,
+          "maximumMs": 1189
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 296,
+          "p99Ms": 385,
+          "maximumMs": 437
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1247,
+          "p99Ms": 1247,
+          "maximumMs": 1247
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 1515,
+          "p99Ms": 1515,
+          "maximumMs": 1515
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1515,
+          "p99Ms": 1515,
+          "maximumMs": 1515
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 8,
+          "failedRequests": 0,
+          "p95Ms": 111,
+          "p99Ms": 111,
+          "maximumMs": 111
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 155,
+          "p99Ms": 172,
+          "maximumMs": 173
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "concurrency": 3,
+      "gatePassed": false,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "dashboardChecks": [
+        {
+          "historyCounts": [
+            1631,
+            523,
+            1046
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2310,
+            1631,
+            523,
+            1046,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1622,
+            520,
+            1040
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2311,
+            1622,
+            520,
+            1040,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1614,
+            518,
+            1036
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2308,
+            1614,
+            518,
+            1036,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1609,
+            516,
+            1032
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2309,
+            1609,
+            516,
+            1032,
+            25
+          ]
+        }
+      ],
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 117,
+          "p99Ms": 117,
+          "maximumMs": 117
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 362,
+          "p99Ms": 549,
+          "maximumMs": 756
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 420,
+          "p99Ms": 552,
+          "maximumMs": 788
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 350,
+          "p99Ms": 350,
+          "maximumMs": 350
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 488,
+          "p99Ms": 568,
+          "maximumMs": 837
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 304,
+          "p99Ms": 475,
+          "maximumMs": 509
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 298,
+          "p99Ms": 431,
+          "maximumMs": 689
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 264,
+          "p99Ms": 264,
+          "maximumMs": 264
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 305,
+          "p99Ms": 390,
+          "maximumMs": 437
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1003,
+          "p99Ms": 1003,
+          "maximumMs": 1003
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 306,
+          "p99Ms": 412,
+          "maximumMs": 522
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 645,
+          "p99Ms": 645,
+          "maximumMs": 645
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 386,
+          "p99Ms": 386,
+          "maximumMs": 386
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 1232,
+          "p99Ms": 1232,
+          "maximumMs": 1232
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1233,
+          "p99Ms": 1233,
+          "maximumMs": 1233
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 8,
+          "failedRequests": 0,
+          "p95Ms": 235,
+          "p99Ms": 235,
+          "maximumMs": 235
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 142,
+          "p99Ms": 167,
+          "maximumMs": 167
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "concurrency": 3,
+      "gatePassed": false,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 204,
+      "expectedNewEvents": 204,
+      "dashboardChecks": [
+        {
+          "historyCounts": [
+            1631,
+            523,
+            1046
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 51,
+          "finalRowCounts": [
+            25,
+            2361,
+            1631,
+            523,
+            1046,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1622,
+            520,
+            1040
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 51,
+          "finalRowCounts": [
+            25,
+            2362,
+            1622,
+            520,
+            1040,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1614,
+            518,
+            1036
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2358,
+            1614,
+            518,
+            1036,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1609,
+            516,
+            1032
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 52,
+          "finalRowCounts": [
+            25,
+            2361,
+            1609,
+            516,
+            1032,
+            25
+          ]
+        }
+      ],
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 120,
+          "p99Ms": 120,
+          "maximumMs": 120
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 450,
+          "p99Ms": 728,
+          "maximumMs": 801
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 549,
+          "p99Ms": 660,
+          "maximumMs": 1007
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 566,
+          "p99Ms": 703,
+          "maximumMs": 713
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 877,
+          "p99Ms": 877,
+          "maximumMs": 877
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 453,
+          "p99Ms": 777,
+          "maximumMs": 880
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 204,
+          "failedRequests": 0,
+          "p95Ms": 664,
+          "p99Ms": 774,
+          "maximumMs": 790
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1383,
+          "p99Ms": 1383,
+          "maximumMs": 1383
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 876,
+          "p99Ms": 876,
+          "maximumMs": 876
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 204,
+          "failedRequests": 0,
+          "p95Ms": 531,
+          "p99Ms": 736,
+          "maximumMs": 829
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 204,
+          "failedRequests": 0,
+          "p95Ms": 499,
+          "p99Ms": 751,
+          "maximumMs": 843
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 957,
+          "p99Ms": 957,
+          "maximumMs": 957
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 265,
+          "p99Ms": 265,
+          "maximumMs": 265
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 1360,
+          "p99Ms": 1360,
+          "maximumMs": 1360
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1389,
+          "p99Ms": 1389,
+          "maximumMs": 1389
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 8,
+          "failedRequests": 0,
+          "p95Ms": 859,
+          "p99Ms": 859,
+          "maximumMs": 859
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 239,
+          "p99Ms": 263,
+          "maximumMs": 272
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "concurrency": 6,
+      "gatePassed": false,
+      "failedRequests": 0,
+      "verifiedPresenceStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedNewEvents": 200,
+      "dashboardChecks": [
+        {
+          "historyCounts": [
+            1622,
+            520,
+            1040
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2412,
+            1622,
+            520,
+            1040,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1631,
+            523,
+            1046
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2411,
+            1631,
+            523,
+            1046,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1614,
+            518,
+            1036
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2408,
+            1614,
+            518,
+            1036,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1609,
+            516,
+            1032
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2411,
+            1609,
+            516,
+            1032,
+            25
+          ]
+        }
+      ],
+      "endpoints": [
+        {
+          "name": "teacher_login",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 127,
+          "p99Ms": 127,
+          "maximumMs": 127
+        },
+        {
+          "name": "student_login_lookup",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 518,
+          "p99Ms": 635,
+          "maximumMs": 917
+        },
+        {
+          "name": "dashboard_live_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 228,
+          "p99Ms": 228,
+          "maximumMs": 228
+        },
+        {
+          "name": "get_student_runtime_context_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 501,
+          "p99Ms": 837,
+          "maximumMs": 961
+        },
+        {
+          "name": "dashboard_daily_activity",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 473,
+          "p99Ms": 473,
+          "maximumMs": 473
+        },
+        {
+          "name": "upsert_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 589,
+          "p99Ms": 1001,
+          "maximumMs": 1112
+        },
+        {
+          "name": "get_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 450,
+          "p99Ms": 520,
+          "maximumMs": 651
+        },
+        {
+          "name": "dashboard_quiz_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 587,
+          "p99Ms": 587,
+          "maximumMs": 587
+        },
+        {
+          "name": "touch_live_student_presence_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 324,
+          "p99Ms": 492,
+          "maximumMs": 784
+        },
+        {
+          "name": "upsert_student_activity_daily_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 287,
+          "p99Ms": 487,
+          "maximumMs": 607
+        },
+        {
+          "name": "dashboard_lesson_attempts",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1208,
+          "p99Ms": 1208,
+          "maximumMs": 1208
+        },
+        {
+          "name": "insert_live_activity_event_secure",
+          "requests": 200,
+          "failedRequests": 0,
+          "p95Ms": 253,
+          "p99Ms": 343,
+          "maximumMs": 523
+        },
+        {
+          "name": "dashboard_assessments",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1031,
+          "p99Ms": 1031,
+          "maximumMs": 1031
+        },
+        {
+          "name": "dashboard_events_initial",
+          "requests": 4,
+          "failedRequests": 0,
+          "p95Ms": 1249,
+          "p99Ms": 1249,
+          "maximumMs": 1249
+        },
+        {
+          "name": "dashboard_refresh",
+          "requests": 12,
+          "failedRequests": 0,
+          "p95Ms": 1249,
+          "p99Ms": 1249,
+          "maximumMs": 1249
+        },
+        {
+          "name": "dashboard_events_incremental",
+          "requests": 8,
+          "failedRequests": 0,
+          "p95Ms": 216,
+          "p99Ms": 216,
+          "maximumMs": 216
+        },
+        {
+          "name": "get_live_student_activity_secure",
+          "requests": 100,
+          "failedRequests": 0,
+          "p95Ms": 148,
+          "p99Ms": 188,
+          "maximumMs": 191
+        }
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "scripts/staging/capacity-local.mjs": "9446f45577470c3ed0d43aab7f5a21825d2b189fa6861acf180076a25dc7779d",
+    "scripts/staging/read-concurrency.mjs": "ac7412657936a507ec49fdca90a5b38f53995ad1f18272dda7b5e66f76b62a5e",
+    "scripts/staging/read-concurrency.test.mjs": "311d6f5f77e59c941e50f275210d661ab069f6e199c5929c6b0b8686ec8d9bfc"
+  },
+  "checks": {
+    "schedulerTestsPassed": 3,
+    "postRunPreflightPassed": true
+  },
+  "decision": "Do not change application concurrency: dashboard improvement was not consistent and all runs failed the latency gate.",
+  "limitations": [
+    "Closed-loop workload; activity-write counts differ slightly with scheduling.",
+    "Source timings exclude scheduler wait; whole-dashboard timings include it.",
+    "Caches and synthetic event history evolve between rounds.",
+    "No realtime or browser rendering; not hosted or 10,000-user capacity certification."
+  ]
+}

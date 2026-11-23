@@ -1488,3 +1488,118 @@ Retain run configuration, application/schema versions, generator measurements,
 latency distributions, errors, integrity results, realtime lag, database/resource
 graphs and metered usage. Report the maximum tested passing load, not an estimate
 extrapolated from a small rehearsal. Security readiness remains a separate gate.
+
+### Mixed acquisition probe — 23 November 2026
+
+Docker recovered after the local engine stall. Its restart regenerated the gateway
+configuration; the existing local tuning script restored 4,096 worker connections.
+Readiness and a 25-student/175-request smoke passed before testing.
+
+Extended the existing custom PostgREST 14.8 probe with fixed teacher endpoint
+labels, preserving completion labels. A pool-10 run used 100 synthetic students,
+four teachers, compact events and 1,000-row attempt pages for 61 seconds. All 100
+students, 200 activity increments, 200 new events and complete attempt histories
+passed; zero failed requests. The latency gate still failed: dashboard refresh
+p95 1,345 ms, initial events 1,344 ms and student login 832 ms.
+
+Measured acquisition versus connection-use p95, respectively:
+
+| Endpoint group | Count | Acquisition | Connection use |
+| --- | ---: | ---: | ---: |
+| Student login | 100 | 718 ms | 32 ms |
+| Teacher event head | 12 | 628 ms | 34 ms |
+| Teacher compact event page | 28 | 230 ms | 144 ms |
+| Teacher lesson history | 40 | 521 ms | 145 ms |
+
+This directly observes substantial acquisition delay in this instrumented local
+run. It does not justify changing production pool sizes. Acquisition includes
+connection establishment and scheduling; connection use includes transaction and
+release. Groups cover the workload window including final verification reads,
+not only initial dashboard requests. They have fixed labels, not unique request
+IDs: do not subtract independent percentiles or claim exact HTTP correlation.
+The custom runtime and logging overhead prevent comparison as an official-runtime
+speed improvement. Compact paging also has measurable connection-use cost.
+
+The original API was restored automatically; readiness and a further 25-student,
+175-request smoke passed. No app, schema, content, visual or production changes;
+no migration. Keep the 250-student gate closed. Next: profile compact-page query
+execution under its actual teacher role and review avoidable dashboard request
+concurrency while preserving complete history and existing access checks.
+
+Aggregate: `mixed-acquisition-summary-2026-11-23.json`. Private orchestration,
+binary and raw numeric traces: `/Users/seanjohns/reliq-audits/2026-11-23/mixed-acquisition/`.
+
+### Compact event row reuse experiment — 23 November 2026
+
+The query-body plan showed 2,110 primary-key row lookups after selecting events
+already present in the materialized scope. A candidate retains the table composite
+and returns it directly. It changes no stored data, filters, ordering, cursors,
+access checks or grants. All 409 SQL/JS equivalence cases and the existing
+teacher/support/principal/admin/legacy/revocation/anonymous matrix passed inside
+rollback transactions. Complete ordered paginated results had identical digests.
+
+Alternating complete-read SQL timings were original 156/158/193 ms versus candidate
+106/117/133 ms. Buffer hits fell from 61,668 to 11,028. These are warm single-class
+query measurements, not dashboard or production speed claims.
+
+The subsequent official-runtime mixed pair (100 students/four teachers, compact
+pages, page size 1,000, simultaneous starts) did not establish an overall benefit:
+original dashboard p95 1,275 ms, candidate 1,406 ms; login p95 581/590 ms. Both
+runs had zero failures and verified all 100 students, 200 activity increments and
+200 events, but failed the latency gate. One ordered pair cannot establish a
+regression either; cache/history and host scheduling vary.
+
+**Decision: do not ship this as a migration.** Preserve the experiment at
+`supabase/manual/compact-row-reuse/candidate.sql`; it is outside the migration
+runner. Reproduce rollback-only parity using the existing local fixture cwd:
+`node --experimental-strip-types --experimental-loader <repo>/scripts/typescript-alias-loader.mjs <repo>/scripts/staging/compact-events-local.mjs --row-reuse`.
+No browser/app code changed, so an app build does not validate this SQL experiment.
+
+The diagnostic's first restore command missed a SQL separator. Its transaction
+failed; a corrected restore then succeeded and the original function definition
+matched exactly. Readiness and the 25-student/175-request smoke passed afterward.
+No production changes, no migration to apply. Next controlled experiment should
+bound overlapping teacher reads without dropping any source or delaying student
+logins; keep the 250-student gate closed.
+
+Aggregate: `compact-row-reuse-summary-2026-11-23.json`. Private raw plans and
+workload reports: `/Users/seanjohns/reliq-audits/2026-11-23/compact-plan/`.
+
+### Bounded teacher-read experiment — 23 November 2026
+
+Added a local-harness-only `SCALE_DASHBOARD_CONCURRENCY=3|6` option (default 6).
+Every teacher still reads all six sources, including complete paginated attempt
+history and compact events; result order and integrity checks are unchanged.
+Student logins have no artificial delay. Whole-dashboard latency includes queue
+wait; per-source timings begin when each source is dispatched and exclude it.
+
+Four 60-second official-runtime runs used 100 students/four teachers, compact
+events and 1,000-row attempt pages in reversed-pair order:
+
+| Round | Reads per teacher | Login p95 | Dashboard p95 | Verified writes | Gate |
+| --- | ---: | ---: | ---: | ---: | --- |
+| 1 | 6 | 577 ms | 1,515 ms | 200 | Fail |
+| 2 | 3 | 362 ms | 1,233 ms | 200 | Fail |
+| 3 | 3 | 450 ms | 1,389 ms | 204 | Fail |
+| 4 | 6 | 518 ms | 1,249 ms | 200 | Fail |
+
+All runs verified all 100 students, expected events, complete histories and exact
+activity totals, with no failed requests or correctness assertions. Differences
+in write totals reflect the closed-loop scheduling/deadline; these are not fixed
+arrival-rate workloads. Caches and synthetic event history evolve between runs.
+
+Decision: keep application concurrency unchanged. Lower concurrency helped login
+in these runs, but dashboard performance was inconsistent and no run passed the
+latency gate. Keep the experimental scheduler in staging tools only. Next: compare
+local connection capacity on the official API runtime, measuring database resource
+pressure as well as end-to-end latency; no production pool change is justified.
+
+Three scheduler tests passed (bounded dispatch and ordered results, failure
+propagation/stopping queued work, empty/invalid input). Run them with
+`node --test scripts/staging/read-concurrency.test.mjs`. Syntax, aggregate integrity
+assertions and whitespace checks passed. Post-run local preflight passed. No app,
+visual, content, schema or production changes; no migration or app build required
+for this test-tool-only change. The 250-student gate remains closed.
+
+Aggregate: `read-concurrency-summary-2026-11-23.json`. Private profiles, reports and
+source snapshots: `/Users/seanjohns/reliq-audits/2026-11-23/read-concurrency/`.
