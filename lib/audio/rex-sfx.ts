@@ -2,8 +2,8 @@
 
 /**
  * Rex's sounds, made on the fly (no audio files): a deep growling roar, heavy footsteps, a jaw snap and
- * a low contented rumble. Like the other synthesised sounds they stay silent unless the learner has
- * turned sounds on. `near` (0 far .. 1 right beside you) sets how loud he is.
+ * a low contented rumble. The roar is the best part, so unlike the other game sounds they're on unless
+ * Rex is muted on this device (the speaker on his panel). `near` (0 far .. 1 beside you) sets the volume.
  */
 import { playSynth } from "./synth";
 
@@ -116,12 +116,28 @@ function rumbleVoice(audio: AudioContext, at: number, loud: number) {
 
 const loudness = (near: number) => Math.max(0.08, Math.min(1, near));
 
+const MUTE_KEY = "reliq:rex:muted";
+const MUTE_EVENT = "reliq:rex-mute-change";
+/** Rex is heard unless he's been muted on this device. */
+export function rexSoundsOn() {
+  try { return window.localStorage.getItem(MUTE_KEY) !== "1"; } catch { return true; }
+}
+export function setRexMuted(muted: boolean) {
+  try { window.localStorage.setItem(MUTE_KEY, muted ? "1" : "0"); } catch { /* the choice just isn't remembered */ }
+  window.dispatchEvent(new Event(MUTE_EVENT));
+}
+export function subscribeRexMute(onChange: () => void) {
+  window.addEventListener(MUTE_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => { window.removeEventListener(MUTE_EVENT, onChange); window.removeEventListener("storage", onChange); };
+}
+
 /** The raw voices, for previewing them into any audio context (the game plays them through `rexSounds`). */
 export const REX_VOICES = { roar: roarVoice, stomp: stompVoice, snap: snapVoice, rumble: rumbleVoice } as const;
 
 export const rexSounds = {
-  roar: (near = 1) => playSynth("rex-roar", 3, (a, t) => roarVoice(a, t, loudness(near))),
-  stomp: (near = 1) => playSynth("rex-stomp", 0.3, (a, t) => stompVoice(a, t, loudness(near))),
-  snap: () => playSynth("rex-snap", 0.6, snapVoice),
-  rumble: (near = 1) => playSynth("rex-rumble", 5, (a, t) => rumbleVoice(a, t, loudness(near))),
+  roar: (near = 1) => playSynth("rex-roar", 3, (a, t) => roarVoice(a, t, loudness(near)), rexSoundsOn),
+  stomp: (near = 1) => playSynth("rex-stomp", 0.3, (a, t) => stompVoice(a, t, loudness(near)), rexSoundsOn),
+  snap: () => playSynth("rex-snap", 0.6, snapVoice, rexSoundsOn),
+  rumble: (near = 1) => playSynth("rex-rumble", 5, (a, t) => rumbleVoice(a, t, loudness(near)), rexSoundsOn),
 };

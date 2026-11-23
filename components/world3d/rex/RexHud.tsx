@@ -1,10 +1,11 @@
 "use client";
 // Rex's panels over the hub: the warning while he chases, five easy questions to tame him (typed,
 // marked here, a worked hint when wrong), the reward, and the reminder that a lesson sends him home.
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { Volume2, VolumeX } from "lucide-react";
 import { readRexAnswer, rexQuestion, rexRandom, REX_QUESTIONS } from "@/lib/rex";
 import type { RexState } from "@/lib/rex-client";
-import { rexSounds } from "@/lib/audio/rex-sfx";
+import { rexSounds, rexSoundsOn, setRexMuted, subscribeRexMute } from "@/lib/audio/rex-sfx";
 import { getLiveRealmDefinitions, type CanonicalRealmId } from "@/lib/realms/realm-registry";
 import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 
@@ -60,6 +61,17 @@ function RexQuestions({ level, seed, onTamed, onClose }: { level: number; seed: 
 
 const SENT_BY: Record<string, string> = { teacher: "Your teacher sent Rex!", parent: "Rex has come to visit!", timer: "You've been building for a while…" };
 
+/** Rex's sounds on or off for this device; turning them on gives a roar so you know. */
+function RexMuteButton() {
+  const on = useSyncExternalStore(subscribeRexMute, rexSoundsOn, () => true);
+  return (
+    <button type="button" onClick={() => { setRexMuted(on); if (!on) window.setTimeout(() => rexSounds.roar(1), 50); }} aria-pressed={!on} aria-label={on ? "Mute Rex" : "Hear Rex roar"} title={on ? "Mute Rex" : "Hear Rex roar"}
+      style={{ flex: "none", width: 44, height: 44, borderRadius: 12, border: "1px solid rgba(255,255,255,.2)", background: on ? "rgba(255,255,255,.08)" : "rgba(229,72,77,.25)", color: "#fff", display: "grid", placeItems: "center", cursor: "pointer" }}>
+      {on ? <Volume2 size={20} aria-hidden="true" /> : <VolumeX size={20} aria-hidden="true" />}
+    </button>
+  );
+}
+
 /** The realms to pick from when it's time for a lesson, each in its own colour. */
 const REALMS = getLiveRealmDefinitions().slice().sort((a, b) => a.displayOrder - b.displayOrder);
 
@@ -97,6 +109,7 @@ export function RexHud({ rex, level, onChooseRealm }: { rex: RexState; level: nu
   if (rex.phase === "chasing") return <>
     {banner("REX IS AWAKE! RUN!", "#e5302a")}
     <div style={{ ...card, position: "absolute", top: "max(226px, calc(env(safe-area-inset-top) + 218px))", left: "50%", transform: "translateX(-50%)", zIndex: 55, padding: "14px 18px", width: "min(420px, calc(100vw - 32px))", display: "flex", gap: 14, alignItems: "center" }}>
+      <RexMuteButton />
       <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 900, fontSize: 16 }}>{SENT_BY[rex.visit.source]}</div><div style={{ opacity: .8, fontSize: 14 }}>Answer {REX_QUESTIONS} easy questions to tame him.</div></div>
       <button type="button" onClick={rex.startAnswering} style={{ ...bigButton(VIOLET), padding: "0 20px" }}>ANSWER</button>
     </div>
@@ -105,6 +118,7 @@ export function RexHud({ rex, level, onChooseRealm }: { rex: RexState; level: nu
   return <>
     {banner(rex.paidXp ? `REX IS TAMED · +${rex.paidXp} XP` : "REX IS TAMED", "#6d3fd6")}
     <div style={{ ...card, position: "absolute", top: "max(226px, calc(env(safe-area-inset-top) + 218px))", left: "50%", transform: "translateX(-50%)", zIndex: 55, padding: "14px 18px", width: "min(440px, calc(100vw - 32px))", display: "flex", gap: 14, alignItems: "center" }}>
+      <RexMuteButton />
       <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 900, fontSize: 16 }}>Rex is following you</div><div style={{ opacity: .8, fontSize: 14 }}>{rex.paidXp === 0 ? `You've had today's Rex XP. ` : ""}Finish a lesson to send him home.</div></div>
       <RealmPicker onChoose={onChooseRealm} />
     </div>
