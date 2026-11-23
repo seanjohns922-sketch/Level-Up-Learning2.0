@@ -1,7 +1,7 @@
 "use client";
 // The Friends panel in the hub: your friends (VISIT, and the switch that lets each one help build in your
 // world), requests to accept, and adding a friend with their friend code. No chat anywhere.
-import { Check, RefreshCw, UserMinus, X } from "lucide-react";
+import { Check, RefreshCw, Swords, UserMinus, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
   FRIEND_CODE_PATTERN, fetchFriends, newFriendCode, normaliseFriendCode, removeFriend, respondToFriend, sendFriendRequest, setFriendCanBuild,
@@ -23,8 +23,11 @@ const SEND_MESSAGES: Record<SendResult, string> = {
   off: "Friends are switched off for you right now.",
 };
 
+/** A friend's initial: from their own name (so "Demo Mia" shows M). */
+export const initialOf = (name: string) => (name.trim().split(/\s+/).pop() ?? "?").slice(0, 1).toUpperCase();
+
 function Avatar({ name }: { name: string }) {
-  return <span aria-hidden="true" style={{ width: 38, height: 38, borderRadius: 99, display: "grid", placeItems: "center", fontWeight: 900, color: "#1f1236", background: colourFor(name), flex: "none" }}>{name.slice(0, 1).toUpperCase()}</span>;
+  return <span aria-hidden="true" style={{ width: 38, height: 38, borderRadius: 99, display: "grid", placeItems: "center", fontWeight: 900, color: "#1f1236", background: colourFor(name), flex: "none" }}>{initialOf(name)}</span>;
 }
 
 function Switch({ on, label, onChange, disabled }: { on: boolean; label: string; onChange: (on: boolean) => void; disabled?: boolean }) {
@@ -84,7 +87,7 @@ export function FriendsPanel({ studentId, demo, onVisit, onChallenge, onClose }:
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Avatar name={friend.name} />
             <span style={{ flex: 1, minWidth: 0, fontWeight: 800, fontSize: 16 }}>{friend.name}<small style={{ display: "block", fontWeight: 600, fontSize: 12, opacity: .7 }}>{friend.iCanBuild ? "You can help build in their world" : "You can visit their world"}</small></span>
-            {onChallenge ? <button type="button" onClick={() => onChallenge(friend)} aria-label={`Battle ${friend.name}`} title="Battle" style={pill("#ffcf4a", "#3a2a00")}>⚔</button> : null}
+            {onChallenge ? <button type="button" onClick={() => onChallenge(friend)} aria-label={`Battle ${friend.name}`} style={{ ...pill("#ffcf4a", "#3a2a00"), display: "inline-flex", alignItems: "center", gap: 6 }}><Swords size={16} aria-hidden="true" />BATTLE</button> : null}
             <button type="button" onClick={() => onVisit(friend)} style={pill(VIOLET)}>VISIT</button>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingLeft: 50 }}>

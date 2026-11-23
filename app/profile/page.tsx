@@ -4,6 +4,7 @@ import { Fragment, useEffect, useMemo, useState, useSyncExternalStore } from "re
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { fetchFriends, type Friend } from "@/lib/friends";
+import { initialOf } from "@/components/world3d/friends/FriendsPanel";
 import { BATTLE_PLAY_XP, BATTLE_WIN_XP, fetchBattles, type Battle } from "@/lib/battles";
 import { BATTLE_QUESTIONS } from "@/lib/battle-questions";
 
@@ -668,7 +669,7 @@ function FriendsAndBattles({ initial, studentId, demo }: { initial: string; stud
           <div className="flex flex-wrap gap-3">
             {friends.slice(0, 6).map((friend) => (
               <div key={friend.friendshipId} className="flex w-16 flex-col items-center gap-1">
-                <span className="grid h-[52px] w-[52px] place-items-center rounded-full font-display text-xl font-black text-[#1a1026]" style={{ background: friendColour(friend.name) }}>{friend.name.slice(0, 1).toUpperCase()}</span>
+                <span className="grid h-[52px] w-[52px] place-items-center rounded-full font-display text-xl font-black text-[#1a1026]" style={{ background: friendColour(friend.name) }}>{initialOf(friend.name)}</span>
                 <span className="max-w-full truncate text-[13px] font-extrabold">{friend.name}</span>
               </div>
             ))}
@@ -684,7 +685,7 @@ function FriendsAndBattles({ initial, studentId, demo }: { initial: string; stud
           <div className="flex items-center justify-center gap-4">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] font-display text-2xl font-black">{initial}</span>
             <span className="font-display text-xl font-black text-[#ffd76a]">VS</span>
-            <span className="grid h-16 w-16 place-items-center rounded-full font-display text-2xl font-black text-[#1a1026]" style={{ background: rival ? friendColour(rival.name) : "rgba(255,255,255,.15)" }}>{rival ? rival.name.slice(0, 1).toUpperCase() : "?"}</span>
+            <span className="grid h-16 w-16 place-items-center rounded-full font-display text-2xl font-black text-[#1a1026]" style={{ background: rival ? friendColour(rival.name) : "rgba(255,255,255,.15)" }}>{rival ? initialOf(rival.name) : "?"}</span>
           </div>
           <Link href={hub("battles")} className="mt-3.5 block rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] py-3 text-center font-display text-[13px] font-black tracking-[0.05em]">⚔️ CHALLENGE A FRIEND</Link>
           <p className="mt-2 text-center text-[13px] font-semibold text-[#bdb3cc]">{BATTLE_QUESTIONS} questions each · at your own level · in the Battle Arena</p>

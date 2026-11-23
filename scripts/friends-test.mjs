@@ -18,7 +18,7 @@ const friend = "11111111-2222-3333-4444-555555555555";
 assert.equal(visitScope(friend), `visit:${friend}`);
 assert.equal(visitedFriendId(visitScope(friend)), friend);
 assert.equal(visitedFriendId(friend), null);
-assert.ok(isSyncedWorldScope(visitScope(friend)) && isSyncedWorldScope(friend) && !isSyncedWorldScope("visit:demo-charlotte") && !isSyncedWorldScope("demo-preview"));
+assert.ok(isSyncedWorldScope(visitScope(friend)) && isSyncedWorldScope(friend) && !isSyncedWorldScope("visit:demo-mia") && !isSyncedWorldScope("demo-preview"));
 
 // A friend's changes: summarised, then undone without losing what the owner built since.
 const p = (id, gridX, gridZ, rotation = 0, itemId = "tree") => ({ placementId: id, itemId, gridX, gridZ, rotation });

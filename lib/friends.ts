@@ -38,14 +38,15 @@ export const VISIT_SCOPE_PREFIX = "visit:";
 export const visitScope = (friendId: string) => `${VISIT_SCOPE_PREFIX}${friendId}`;
 export const visitedFriendId = (scope: string) => (scope.startsWith(VISIT_SCOPE_PREFIX) ? scope.slice(VISIT_SCOPE_PREFIX.length) : null);
 
+/** Demo mode has no real students, so it gets pretend friends (clearly named) to show visiting and battles. */
 const DEMO_STATE: FriendsState = {
   code: "PAL-D3MQ",
   enabled: true,
   buildingEnabled: true,
   friends: [
-    { friendshipId: "demo-1", studentId: "demo-charlotte", name: "Charlotte", status: "friend", theyCanBuild: true, iCanBuild: true },
-    { friendshipId: "demo-2", studentId: "demo-liam", name: "Liam", status: "friend", theyCanBuild: false, iCanBuild: false },
-    { friendshipId: "demo-3", studentId: "demo-ava", name: "Ava", status: "incoming", theyCanBuild: false, iCanBuild: false },
+    { friendshipId: "demo-1", studentId: "demo-mia", name: "Demo Mia", status: "friend", theyCanBuild: true, iCanBuild: true },
+    { friendshipId: "demo-2", studentId: "demo-leo", name: "Demo Leo", status: "friend", theyCanBuild: false, iCanBuild: false },
+    { friendshipId: "demo-3", studentId: "demo-zara", name: "Demo Zara", status: "incoming", theyCanBuild: false, iCanBuild: false },
   ],
 };
 let demoState = DEMO_STATE;
