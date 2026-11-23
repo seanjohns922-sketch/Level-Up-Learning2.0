@@ -4,8 +4,8 @@ export const WORLD_AVATAR_REFERENCE_HEIGHT = 2.2 * WORLD_AVATAR_SCALE;
 // Both avatar renderers use the same foot pivot, below the movement origin.
 export const WORLD_AVATAR_FOOT_Y = -0.73;
 export const WORLD_AVATAR_SCALE_OFFSET = WORLD_AVATAR_FOOT_Y * (1 - WORLD_AVATAR_SCALE);
-export const TRAIN_WORLD_SCALE = 1.8;
-export const TRAIN_CARRIAGE_SPACING = 5.2;
+export const TRAIN_WORLD_SCALE = 2.9;
+export const TRAIN_CARRIAGE_SPACING = 8.4;
 export const TRAIN_RAIL_HALF_GAUGE = 0.28 * TRAIN_WORLD_SCALE;
 export const TRAIN_RAIL_Y = 0.13;
 // Building only: a wider, taller station with a shallow platform-side plan.

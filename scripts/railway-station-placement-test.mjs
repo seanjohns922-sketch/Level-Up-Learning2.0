@@ -97,7 +97,7 @@ for(const entry of trainCatalogue.TRAIN_CATALOGUE){
  for(let car=0;car<=design.cars;car++){
   const root=new THREE.Group();attach(TrainUnit({asset:entry.item_key,car}),root);root.updateMatrixWorld(true);
   const box=new THREE.Box3().setFromObject(root),size=box.getSize(new THREE.Vector3());
-  assert.ok(size.x<1.9&&size.z<3.3&&size.y<2.8,'Enlarged units remain inside the railway envelope');
+  assert.ok(size.x<3.05&&size.z<5.2&&size.y<4.6,`${entry.name} unit ${car} stays inside the railway envelope (${size.x.toFixed(2)} x ${size.y.toFixed(2)} x ${size.z.toFixed(2)} m)`);
   if(car===0)assert.ok(size.y>worldScale.WORLD_AVATAR_REFERENCE_HEIGHT,'Engine is taller than the reference avatar');
   const geometry=[];root.traverse(o=>{if(o.isMesh)geometry.push([o.geometry.type,o.geometry.attributes.position.count,...o.matrixWorld.elements]);});
   if(car===0)geometrySignatures.add(JSON.stringify(geometry));

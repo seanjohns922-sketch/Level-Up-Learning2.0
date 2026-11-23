@@ -208,7 +208,7 @@ for(const item of [...catalogue,...rewards]){
  const actual=[x*scale[0],y*scale[1],z*scale[2]];
  actual.forEach((value,index)=>assert.ok(Math.abs(value-row.size[index])<1e-5,'Measured geometry matches sizing: '+key));
  assert.ok(p.sizing==='fixed'||Math.abs((p.width?actual[0]:actual[1])-(p.width??p.height))<1e-4,'No silent shrinking below the individual size anchor: '+key);
- if(isTrainAsset(key))assert.ok(actual[0]<=2.03&&actual[2]<=3.3,'Vehicles fit the tested railway envelope: '+key);
+ if(isTrainAsset(key))assert.ok(actual[0]<=3.05&&actual[2]<=5.2,'Vehicles fit the tested railway envelope: '+key);
  else assert.ok(actual[0]<=footprint[0]+.03&&actual[2]<=footprint[1]+.03,'Actual model fits reserved land: '+key);
  assert.deepEqual(rotatedGridSize(item,90),parseGridSize(item).toReversed(),'Rotation reserves the correct land: '+key);
  assert.deepEqual(parseGridSize({...item,metadata:{...item.metadata,gridSize:'1x1'}}),parseGridSize(item),'Old live metadata cannot miniaturise this item: '+key);
