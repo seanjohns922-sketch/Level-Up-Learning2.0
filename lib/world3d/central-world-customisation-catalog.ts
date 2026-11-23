@@ -70,8 +70,20 @@ const ENTRIES: CatalogueEntry[] = [
   ...WORLD_REWARD_ADDITIONS.map(item => ({plot:item.plot, area:item.area, name:item.name, description:item.description, assetKey:item.key, rarity:(item.tier===3?"legendary":item.tier===2?"rare":"common") as EconomyItem["rarity"],tier:item.tier,price:item.price,accent:"#8b9972",icon:item.icon,gridSize:item.grid})),
 ];
 
-/** No longer sold (owners keep theirs): the old village homes, and the Trampoline Park the premium Trampoline replaced. */
-const RETIRED_FROM_SALE = new Set<string>([...RETIRED_VILLAGE_HOME_KEYS, "trampoline_park"]);
+/** No longer sold (owners keep theirs and can still place them): the old-look buildings, landmarks and
+ * pools that the premium sets replace, by world key. The animals stay on sale. */
+export const RETIRED_FROM_SALE = new Set<string>([
+  ...RETIRED_VILLAGE_HOME_KEYS, "trampoline_park",
+  // Town and seaside buildings (Main Street rebuilds the town ones as premium items).
+  "village_store", "village_cafe", "village_library", "village_town_hall", "clubhouse", "games_room", "treehouse",
+  "training_centre", "workshop", "observatory", "lighthouse", "beach_huts", "country_bakery",
+  // The six realm houses.
+  "nexus_tower", "measure_lodge", "pattern_loom", "stats_station", "chance_games", "star_habitat",
+  // Landmarks.
+  "sports_stadium", "cinema", "arcade", "party_house", "opera_house", "harbour_bridge", "windmill_garden", "bush_camp",
+  // Pools and the old playground (City Life's Playground replaces it).
+  "backyard_pool", "splash_pool", "water_park", "adventure_playground",
+]);
 
 export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.map<EconomyItem>((entry) => ({
   item_key: `central_world_plot_${entry.plot}_${entry.assetKey}`,
@@ -103,7 +115,7 @@ export const CENTRAL_WORLD_CUSTOMISATION_CATALOG: EconomyItem[] = [...ENTRIES.ma
       previewMode: "background",
     },
   },
-})), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS, ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed !== true)];
+})), ...TRAIN_CATALOGUE, ...REALM_BUILDING_SHOP_ITEMS.map((item) => (RETIRED_FROM_SALE.has(String(item.metadata.worldAssetKey)) ? { ...item, purchasable: false } : item)), ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed !== true)];
 
 /** Everything the hub sells: placeable items, upgrades, kits, karts, and the Tower Shield (never placed). */
 export const CENTRAL_WORLD_SHOP_ROWS: EconomyItem[] = [...CENTRAL_WORLD_CUSTOMISATION_CATALOG, ...PREMIUM_HOME_SHOP_ITEMS.filter((item) => item.metadata.premiumFixed === true), ...PREMIUM_HOME_UPGRADE_ITEMS, ...SKATE_KIT_SHOP_ITEMS, ...RACE_KIT_SHOP_ITEMS, ...KART_GARAGE_SHOP_ITEMS, ...CAR_SHOP_ITEMS];

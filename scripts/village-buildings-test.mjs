@@ -6,7 +6,7 @@ import Module, { createRequire } from 'node:module';
 import ts from 'typescript';
 import * as THREE from 'three';
 import * as village from '../lib/world3d/village-buildings.ts';
-import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as catalogue } from '../lib/world3d/central-world-customisation-catalog.ts';
+import { CENTRAL_WORLD_CUSTOMISATION_CATALOG as catalogue, RETIRED_FROM_SALE } from '../lib/world3d/central-world-customisation-catalog.ts';
 import { BUILDING_SCALE, WORLD_ITEM_PRESENTATION, fitWorldItemScale } from '../lib/world3d/world-item-presentation.ts';
 import { selectCentralWorldInventoryPlacement, parseGridSize, writeCentralWorldPlacements, readCentralWorldPlacements, validateCentralWorldPlacement } from '../lib/world3d/central-world-layout.ts';
 // Evaluate the actual stateless JSX models in a Three scene without a GPU.
@@ -46,7 +46,8 @@ const storage=new Map();globalThis.window={localStorage:{getItem:key=>storage.ge
 for(const spec of village.VILLAGE_BUILDINGS){
  const item=catalogue.find(item=>item.metadata.worldAssetKey===spec.key);
  assert(item && item.price>0,'XP reward registered');
- assert.equal(item.purchasable,!village.RETIRED_VILLAGE_HOME_KEYS.has(spec.key),'Retired homes stop selling; the rest stay for sale: '+spec.key);
+ // The old homes and town buildings are retired from sale (owners keep them); Main Street replaces the town ones.
+ assert.equal(item.purchasable,!RETIRED_FROM_SALE.has(spec.key),'Retired buildings stop selling; anything not retired stays for sale: '+spec.key);
  const styles=spec.kind==='apartments'?['castle']:Object.keys(village.VILLAGE_STYLES);
  for(const style of styles){
   const root=new THREE.Group();attach(VillageBuilding({assetKey:spec.key,style,tint:'#a855f7'}),root);root.updateMatrixWorld(true);
