@@ -3,11 +3,10 @@
 import type { CSSProperties } from "react";
 import { Castle, House } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { world3DTowerHref } from "@/lib/world3d/return-context";
 
 const DESTINATIONS = [
-  { key: "home", label: "MY HOME", accessibleLabel: "Open My Home", route: "/home-base", Icon: House },
-  { key: "tower", label: "TOWER", accessibleLabel: "Return to the Tower of Knowledge", route: "/realms", Icon: Castle },
+  { key: "home", label: "MY HOME", accessibleLabel: "Open My Home", route: "/world/treehouse", Icon: House },
+  { key: "tower", label: "TOWER", accessibleLabel: "Return to the Tower of Knowledge", route: "/world/tower", Icon: Castle },
 ] as const;
 
 type RealmDashboardNavProps = {
@@ -35,7 +34,7 @@ export default function RealmDashboardNav({
     <button
       key={key}
       type="button"
-      onClick={() => router.push(route === "/realms" ? world3DTowerHref() ?? route : route)}
+      onClick={() => router.push(route)}
       aria-label={accessibleLabel}
       title={accessibleLabel}
       style={buttonStyle}

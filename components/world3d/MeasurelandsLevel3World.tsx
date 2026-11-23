@@ -193,7 +193,6 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
   const [lookInput, setLookInput] = useState<WorldLookInput>(EMPTY_WORLD_LOOK_INPUT);
   const theme = getMeasurelandsLevelTheme(level);
   const returnPath = `/world/measurelands?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`;
-  const twoDPath = `/measurelands?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`;
   const towerPath = `/world/tower?spawn=measurement-return${preview ? "&teacher_preview=1" : ""}`;
   const selectedDistrict = worldState.districts.find((district) => district.id === selectedDistrictId);
 
@@ -303,7 +302,7 @@ export default function MeasurelandsLevel3World({ level = "Year 3" }: { level?: 
         realmId="measurement"
         preview={preview}
         accent={theme.accent}
-        fallbackHref={twoDPath}
+       
         mission={{ eyebrow: "CURRENT MISSION", title: `Measurelands · ${level === "Prep" ? "Ground" : level.replace("Year", "Level")}`, detail: worldState.nextActivity.label }}
         primaryAction={selectedDistrict ? { label: "DISTRICTS", icon: "map", onClick: () => { setSelectedDistrictId(null); setActiveId(null); } } : { label: "RETURN TO TOWER", icon: "door", onClick: () => router.push(towerPath) }}
         onQuickStart={quickStart}

@@ -22,7 +22,6 @@ export default function StarpathLevel3World({ level = "Year 3" }: { level?: Real
   const initialYaw = Number(searchParams.get("camYaw")) || 0;
   const theme = getStarpathLevelTheme(level);
   const guidedAdventure = level === "Prep" || level === "Year 1" || level === "Year 2";
-  const fallbackLevel = level === "Prep" ? "ground" : `level-${level.replace(/\D/g, "")}`;
   const config = useMemo<SharedRealmWorld3DConfig>(() => ({
     realmId: "space",
     realmName: "Starpath",
@@ -33,7 +32,6 @@ export default function StarpathLevel3World({ level = "Year 3" }: { level?: Real
     worldState: getStarpathWorldState({ preview, level }),
     refreshWorldState: () => getStarpathWorldState({ preview, level }),
     worldHref: `/world/starpath?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
-    fallbackHref: `/starpath?realm_id=space&level=${fallbackLevel}${preview ? "&teacher_preview=1" : ""}`,
     towerHref: `/world/tower?spawn=space-return${preview ? "&teacher_preview=1" : ""}`,
     guidedAdventure,
     initialYaw,
@@ -52,7 +50,7 @@ export default function StarpathLevel3World({ level = "Year 3" }: { level?: Real
     WeekGate: StarpathWeekGate,
     AdventurePortal: StarpathAdventurePortal,
     ReturnBeam: StarpathReturnBeam,
-  }), [fallbackLevel, guidedAdventure, initialYaw, level, preview, theme]);
+  }), [guidedAdventure, initialYaw, level, preview, theme]);
 
   return <SharedRealmWorld3D config={config} />;
 }

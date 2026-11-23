@@ -9,6 +9,8 @@ import { setLastRealm } from "@/lib/last-realm";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import World3DUnavailable from "@/components/world3d/World3DUnavailable";
+import { realmOutside3DHref } from "@/lib/world3d/return-context";
 import { resolveRealm3DAccess, type Realm3DAccessDecision } from "@/lib/world3d/access";
 import { announceCanonicalWorldStateRestored } from "@/lib/world3d/canonical-bootstrap";
 
@@ -39,7 +41,7 @@ export default function ChanceHollow3DEntry({ teacherPreview = false }: { teache
   const [resolvedLevel, setResolvedLevel] = useState<RealmLevelId>(() => resolvePreviewLevel(requestedLevel));
   const [entry] = useState<{ decision: Realm3DAccessDecision; status: "loading" | "ready" | "disabled" }>(() => {
     const profile = getActiveStudentProfile();
-    const decision = resolveRealm3DAccess({ realmId: "chance", classId: profile?.classId, studentId: profile?.studentId, respectReducedMotion: true });
+    const decision = resolveRealm3DAccess({ realmId: "chance", classId: profile?.classId, studentId: profile?.studentId });
     return { decision, status: decision.canExplore3D ? "loading" : "disabled" };
   });
   const [status, setStatus] = useState(entry.status);
@@ -51,8 +53,8 @@ export default function ChanceHollow3DEntry({ teacherPreview = false }: { teache
 
   useEffect(() => {
     if (!previewMode || isAvailable3DLevel(requestedLevel)) return;
-    router.replace(`/chance-hollow?level=${encodeURIComponent(requestedLevel ?? "Year 3")}${teacherPreview ? "&teacher_preview=1" : ""}`);
-  }, [previewMode, requestedLevel, router, teacherPreview]);
+    router.replace(realmOutside3DHref("chance", requestedLevel, true));
+  }, [previewMode, requestedLevel, router]);
 
   useEffect(() => {
     if (!entry.decision.canExplore3D || previewMode) return;
@@ -70,7 +72,7 @@ export default function ChanceHollow3DEntry({ teacherPreview = false }: { teache
           return;
         }
         if (!CHANCE_HOLLOW_3D_LEVELS.includes(restored.progress.year as RealmLevelId)) {
-          router.replace(`/chance-hollow?level=${encodeURIComponent(restored.progress.year)}`);
+          router.replace(realmOutside3DHref("chance", restored.progress.year));
           return;
         }
         setResolvedLevel(restored.progress.year as RealmLevelId);
@@ -91,6 +93,6 @@ export default function ChanceHollow3DEntry({ teacherPreview = false }: { teache
 
   if (!isAvailable3DLevel(requestedLevel)) return <div className="grid min-h-screen place-items-center bg-[#211728] font-semibold text-rose-100/80">Opening Chance Hollow...</div>;
   if (displayStatus === "loading") return <div className="grid min-h-screen place-items-center bg-[#211728] font-semibold text-rose-100/80">Loading saved progress...</div>;
-  if (displayStatus === "disabled") return <main className="grid min-h-screen place-items-center bg-[#211728] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Chance Hollow 3D is not available</h1><p className="mt-2 text-rose-100/70">The standard Chance Hollow world is ready to use.</p><button type="button" onClick={() => router.push("/chance-hollow?level=Year%203")} className="mt-5 rounded-md bg-rose-300 px-5 py-3 font-bold text-stone-950">Open 2D World</button></div></main>;
+  if (displayStatus === "disabled") return <World3DUnavailable place="Chance Hollow" reason={entry.decision.reason} background="#211728" />;
   return <ChanceHollowLevel3World level={displayLevel} />;
 }

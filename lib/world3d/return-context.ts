@@ -1,6 +1,6 @@
 "use client";
 
-import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
+import { getRealmDefinition, type CanonicalRealmId } from "@/lib/realms/realm-registry";
 
 const RETURN_CONTEXT_KEY = "lul:world3d:return-context:v2";
 const RETURN_CONTEXT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -91,17 +91,26 @@ function rememberedRealmHome(realmId: CanonicalRealmId, level: string) {
   return home.href;
 }
 
-/** Where "back" goes for this realm when it isn't the exact activity left from 3D:
- * the same realm's 3D world (from this visit, or remembered on this device). */
-function realmFallback(context: World3DReturnContext | null, input: { realmId: CanonicalRealmId; level: string }) {
-  if (context && context.realmId === input.realmId && context.level === input.level) return realmWorldHref(context.returnHref);
-  return rememberedRealmHome(input.realmId, input.level);
+/** A realm's 3D world for a level. Levels 7 and 8 live in the 3D Expedition. */
+export function realm3DWorldHref(realmId: CanonicalRealmId, level: string | null | undefined, preview = false) {
+  const params = new URLSearchParams();
+  let pathname = `/world/${getRealmDefinition(realmId).slug}`;
+  if (level === "Year 7" || level === "Year 8") {
+    pathname = "/world/expedition";
+    params.set("realm", realmId);
+  } else if (level) {
+    params.set("level", level);
+  }
+  if (preview) params.set("teacher_preview", "1");
+  const query = params.toString();
+  return `${pathname}${query ? `?${query}` : ""}`;
 }
 
-/** The 3D Tower when this student has played any realm in 3D on this device recently. */
-export function world3DTowerHref() {
-  const recent = Object.values(readRealmHomes()).some((home) => home && Date.now() - home.savedAt <= REALM_HOME_MAX_AGE_MS);
-  return recent ? "/world/tower" : null;
+/** Where "back" goes for this realm when it isn't the exact activity left from 3D:
+ * the same realm's 3D world (from this visit, remembered on this device, or fresh). */
+function realmFallback(context: World3DReturnContext | null, input: { realmId: CanonicalRealmId; level: string }) {
+  if (context && context.realmId === input.realmId && context.level === input.level) return realmWorldHref(context.returnHref);
+  return rememberedRealmHome(input.realmId, input.level) ?? realm3DWorldHref(input.realmId, input.level);
 }
 
 export function rememberWorld3DWeekEntry(context: World3DWeekEntry) {
@@ -238,4 +247,11 @@ export function getWorld3DReturnPathForPosttest(input: {
   if (!context || context.realmId !== input.realmId || context.level !== input.level) return realmFallback(context, input);
   if (context.activity?.activityType !== "posttest") return realmFallback(context, input);
   return context.returnHref;
+}
+
+/** Where a student goes when their level is not one this realm's 3D world builds:
+ * Levels 7 and 8 continue in the Expedition, anything else returns to the Tower. */
+export function realmOutside3DHref(realmId: CanonicalRealmId, level: string | null | undefined, preview = false) {
+  if (level === "Year 7" || level === "Year 8") return realm3DWorldHref(realmId, level, preview);
+  return preview ? "/world/tower?teacher_preview=1" : "/world/tower";
 }

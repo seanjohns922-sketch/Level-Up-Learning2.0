@@ -56,6 +56,8 @@ for (const realmId of CANONICAL_REALM_IDS) {
 const firstLevelMigration = latestMigrationContaining(
   "create or replace function public.realm_first_level(",
 );
+const nextConfig = fs.readFileSync(path.join(root, "next.config.ts"), "utf8");
+
 for (const realm of liveRealms) {
   assert(
     firstLevelMigration.body.includes(`when '${realm.realmId}' then '${getRealmFirstLevel(realm.realmId)}'`),
@@ -73,7 +75,8 @@ for (const realm of liveRealms) {
     buildRealmProgramHref({ realmId: realm.realmId, year: realm.levelLabels[0], week: 1 }).startsWith("/program?"),
     `${realm.name} does not build a shared weekly-program route.`,
   );
-  assert(fs.existsSync(path.join(root, "app", realm.slug, "page.tsx")), `${realm.name} is live but app/${realm.slug}/page.tsx is missing.`);
+  assert(fs.existsSync(path.join(root, "app", "world", realm.slug, "page.tsx")), `${realm.name} is live but its 3D world app/world/${realm.slug}/page.tsx is missing.`);
+  assert(nextConfig.includes(`"/${realm.slug}": "/world/${realm.slug}"`), `${realm.name}'s retired 2D address must redirect to its 3D world.`);
 
   for (const yearLabel of realm.levelLabels) {
     const genreId = genreIdForRealm(realm.realmId);

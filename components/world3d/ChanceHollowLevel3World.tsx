@@ -31,7 +31,6 @@ export default function ChanceHollowLevel3World({ level = "Year 3" }: { level?: 
     worldState: getChanceHollowWorldState({ preview, level }),
     refreshWorldState: () => getChanceHollowWorldState({ preview, level }),
     worldHref: `/world/chance-hollow?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
-    fallbackHref: `/chance-hollow?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
     towerHref: `/world/tower?spawn=chance-return${preview ? "&teacher_preview=1" : ""}`,
     guidedAdventure: false,
     initialYaw,

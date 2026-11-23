@@ -1,5 +1,6 @@
 "use client";
 
+import World3DUnavailable from "@/components/world3d/World3DUnavailable";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -23,7 +24,7 @@ export default function TowerRealmChamber3DEntry({ teacherPreview = false }: { t
   const preview = storedPreview || (teacherPreview && (!activeStudentId || activeStudentId==="demo-preview"));
   const [access] = useState(() => {
     const profile = getActiveStudentProfile();
-    return resolveRealm3DAccess({ realmId: "number", classId: profile?.classId, studentId: profile?.studentId, respectReducedMotion: false });
+    return resolveRealm3DAccess({ realmId: "number", classId: profile?.classId, studentId: profile?.studentId });
   });
   const [status, setStatus] = useState<"loading" | "ready" | "error">(preview || !access.canExplore3D ? "ready" : "loading");
 
@@ -56,9 +57,9 @@ export default function TowerRealmChamber3DEntry({ teacherPreview = false }: { t
   }, [access.canExplore3D, preview, router]);
 
   if (!access.canExplore3D && !preview) {
-    return <main className="grid min-h-screen place-items-center bg-[#211815] p-6 text-center text-white"><div><h1 className="text-2xl font-black">The 3D Tower is not available</h1><p className="mt-2 text-white/70">The standard Realm selector is still ready.</p><button type="button" onClick={() => router.push("/realms")} className="mt-5 rounded-md bg-amber-300 px-5 py-3 font-black text-stone-900">Open Realms</button></div></main>;
+    return <World3DUnavailable place="The Tower" reason={access.reason} background="#211815" />;
   }
   if (status === "loading") return <div className="grid min-h-screen place-items-center bg-[#211815] font-bold text-amber-100">Restoring realm progress...</div>;
-  if (status === "error") return <main className="grid min-h-screen place-items-center bg-[#211815] p-6 text-center text-white"><div><h1 className="text-2xl font-black">The Tower could not load</h1><button type="button" onClick={() => router.push("/realms")} className="mt-5 rounded-md bg-amber-300 px-5 py-3 font-black text-stone-900">Open Realms</button></div></main>;
+  if (status === "error") return <World3DUnavailable place="The Tower" reason={access.reason} background="#211815" />;
   return <TowerRealmChamber />;
 }

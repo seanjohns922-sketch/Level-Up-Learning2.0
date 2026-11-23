@@ -7,7 +7,7 @@ const numberEngine = fs.readFileSync(path.join(root, "components/lesson/Year2Les
 const lesson = fs.readFileSync(path.join(root, "app/lesson/page.tsx"), "utf8");
 const session = fs.readFileSync(path.join(root, "app/session/page.tsx"), "utf8");
 const program = fs.readFileSync(path.join(root, "app/program/page.tsx"), "utf8");
-const numberNexus = fs.readFileSync(path.join(root, "app/number-nexus/page.tsx"), "utf8");
+const numberNexus = fs.readFileSync(path.join(root, "components/world3d/NumberNexus3DEntry.tsx"), "utf8");
 const teacher = fs.readFileSync(path.join(root, "components/teacher/StrandStudentsPanel.tsx"), "utf8");
 const sync = fs.readFileSync(path.join(root, "lib/student-progress-sync.ts"), "utf8");
 const architecture = fs.readFileSync(path.join(root, "docs/CANONICAL_PROGRESSION_ARCHITECTURE.md"), "utf8");
@@ -25,7 +25,7 @@ const checks = [
   ["lesson entry restores canonical state", lesson.includes("restoreStudentStateFromServer(studentId, lessonRealmId)")],
   ["program entry restores canonical state", program.includes("restoreStudentStateFromServer(studentId, canonicalRealmId)")],
   ["Number Nexus entry restores canonical state", /restoreStudentStateFromServer\(studentId!?,\s*["']number["']\)/.test(numberNexus)],
-  ["real Number Nexus level selection cannot overwrite placement", /preview &&[\s\S]*validLevel[\s\S]*updateProgress/.test(numberNexus)],
+  ["Number Nexus entry never overwrites placement", !/updateProgress|writeProgress/.test(numberNexus)],
   ["real lesson completion refreshes server cache", /previewMode[\s\S]*markLessonComplete[\s\S]*else[\s\S]*restoreStudentStateFromServer/.test(lesson)],
   ["real quiz completion refreshes server cache", /persistProgramQuizComplete\(year, Number\(week\), percent[\s\S]*else[\s\S]*restoreStudentStateFromServer/.test(session)],
   ["legacy Number cache keys are removed during hydration", sync.includes("legacyNumberKey.test(key)")],

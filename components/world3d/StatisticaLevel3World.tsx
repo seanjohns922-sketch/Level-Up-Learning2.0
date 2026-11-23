@@ -31,7 +31,6 @@ export default function StatisticaLevel3World({ level = "Year 1" }: { level?: Re
     worldState: getStatisticaWorldState({ preview, level }),
     refreshWorldState: () => getStatisticaWorldState({ preview, level }),
     worldHref: `/world/statistica?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
-    fallbackHref: `/statistica?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
     towerHref: `/world/tower?spawn=statistics-return${preview ? "&teacher_preview=1" : ""}`,
     guidedAdventure,
     initialYaw,

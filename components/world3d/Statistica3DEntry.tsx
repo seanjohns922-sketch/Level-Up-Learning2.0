@@ -9,6 +9,8 @@ import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { setLastRealm } from "@/lib/last-realm";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import World3DUnavailable from "@/components/world3d/World3DUnavailable";
+import { realmOutside3DHref } from "@/lib/world3d/return-context";
 import { resolveRealm3DAccess, type Realm3DAccessDecision } from "@/lib/world3d/access";
 import { announceCanonicalWorldStateRestored } from "@/lib/world3d/canonical-bootstrap";
 
@@ -37,7 +39,7 @@ export default function Statistica3DEntry({ teacherPreview = false }: { teacherP
   const requestedLevel = resolvePreviewLevel(searchParams.get("level"));
   const [entry] = useState<{ decision: Realm3DAccessDecision; status: "loading" | "ready" | "disabled" }>(() => {
     const profile = getActiveStudentProfile();
-    const decision = resolveRealm3DAccess({ realmId: "statistics", classId: profile?.classId, studentId: profile?.studentId, respectReducedMotion: true });
+    const decision = resolveRealm3DAccess({ realmId: "statistics", classId: profile?.classId, studentId: profile?.studentId });
     return { decision, status: decision.canExplore3D ? "loading" : "disabled" };
   });
   const [status, setStatus] = useState(entry.status);
@@ -47,8 +49,8 @@ export default function Statistica3DEntry({ teacherPreview = false }: { teacherP
 
   useEffect(() => {
     if (!previewMode || has3DLevel) return;
-    router.replace(`/statistica?level=${encodeURIComponent(resolvedLevel)}${teacherPreview ? "&teacher_preview=1" : ""}`);
-  }, [has3DLevel, previewMode, resolvedLevel, router, teacherPreview]);
+    router.replace(realmOutside3DHref("statistics", resolvedLevel, true));
+  }, [has3DLevel, previewMode, resolvedLevel, router]);
 
   useEffect(() => {
     if (!entry.decision.canExplore3D || previewMode) return;
@@ -66,7 +68,7 @@ export default function Statistica3DEntry({ teacherPreview = false }: { teacherP
           return;
         }
         if (!STATISTICA_3D_LEVELS.includes(restored.progress.year as RealmLevelId)) {
-          router.replace(`/statistica?level=${encodeURIComponent(restored.progress.year)}`);
+          router.replace(realmOutside3DHref("statistics", restored.progress.year));
           return;
         }
         setResolvedLevel(restored.progress.year as RealmLevelId);
@@ -87,6 +89,6 @@ export default function Statistica3DEntry({ teacherPreview = false }: { teacherP
 
   if (displayStatus === "loading") return <div className="grid min-h-screen place-items-center bg-[#12312a] font-semibold text-amber-100/80">Loading saved progress...</div>;
   if (!has3DLevel) return <div className="grid min-h-screen place-items-center bg-[#12312a] font-semibold text-amber-100/80">Opening Statistica...</div>;
-  if (displayStatus === "disabled") return <main className="grid min-h-screen place-items-center bg-[#12312a] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Statistica 3D is not available</h1><p className="mt-2 text-amber-100/70">The standard Statistica world is ready to use.</p><button type="button" onClick={() => router.push("/statistica")} className="mt-5 rounded-md bg-amber-300 px-5 py-3 font-bold text-stone-950">Open 2D World</button></div></main>;
+  if (displayStatus === "disabled") return <World3DUnavailable place="Statistica" reason={entry.decision.reason} background="#12312a" />;
   return <StatisticaLevel3World level={resolvedLevel} />;
 }

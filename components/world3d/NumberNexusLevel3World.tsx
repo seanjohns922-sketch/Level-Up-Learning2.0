@@ -759,7 +759,6 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
   const initialPitch = searchParams.get("camPitch") !== null ? Number(searchParams.get("camPitch")) : -0.08;
   const levelParam = encodeURIComponent(level);
   const returnPath = `/world/number-nexus?level=${levelParam}${preview ? "&teacher_preview=1" : ""}`;
-  const twoDWorldPath = `/number-nexus?level=${levelParam}${preview ? "&teacher_preview=1" : ""}`;
   const towerHubPath = `/world/tower?spawn=number-return${preview ? "&teacher_preview=1" : ""}`;
   const [worldState, setWorldState] = useState(() => getNumberNexusWorldState({ preview, level }));
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(() => guidedAdventure ? null : searchParams.get("district"));
@@ -899,7 +898,7 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
         realmId="number"
         preview={preview}
         accent={theme.energyAccent}
-        fallbackHref={twoDWorldPath}
+       
         mission={{
           eyebrow: "CURRENT MISSION",
           title: `Number Nexus · ${level === "Prep" ? "Ground" : level.replace("Year", "Level")}`,
@@ -927,13 +926,10 @@ export default function NumberNexusLevel3World({ level }: { level: RealmLevelId 
         <div style={overlayStyle}>
           <div style={modalStyle}>
             <div style={modalTitleStyle}>Tower Door</div>
-            <div style={{ marginTop: 8, color: "#cbd5e1", fontWeight: 700 }}>Jump out to the wider realm hub or stay in this Number Nexus slice.</div>
+            <div style={{ marginTop: 8, color: "#cbd5e1", fontWeight: 700 }}>Head back to the Tower or stay in Number Nexus.</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 14 }}>
               <button type="button" onClick={() => router.push(towerHubPath)} style={{ border: 0, borderRadius: 7, padding: "10px 12px", background: "#f8fafc", color: "#0f172a", fontWeight: 900, cursor: "pointer" }}>
                 Tower Hub
-              </button>
-              <button type="button" onClick={() => router.push(twoDWorldPath)} style={secondaryButtonStyle}>
-                2D World
               </button>
               <button type="button" onClick={() => setTowerOpen(false)} style={secondaryButtonStyle}>
                 Stay Here

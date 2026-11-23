@@ -345,7 +345,6 @@ export default function NumberNexusMap() {
       realmId: "number",
       classId: profile?.classId,
       studentId: profile?.studentId,
-      respectReducedMotion: true,
     });
   });
   const eraIdx     = getEra(year);

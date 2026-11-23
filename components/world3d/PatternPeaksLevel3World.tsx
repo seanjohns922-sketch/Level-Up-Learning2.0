@@ -30,7 +30,6 @@ export default function PatternPeaksLevel3World({ level = "Year 3" }: { level?: 
     worldState: getPatternPeaksWorldState({ preview, level }),
     refreshWorldState: () => getPatternPeaksWorldState({ preview, level }),
     worldHref: `/world/pattern-peaks?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
-    fallbackHref: `/pattern-peaks?level=${encodeURIComponent(level)}${preview ? "&teacher_preview=1" : ""}`,
     towerHref: `/world/tower?spawn=pattern-return${preview ? "&teacher_preview=1" : ""}`,
     guidedAdventure: false,
     initialYaw,

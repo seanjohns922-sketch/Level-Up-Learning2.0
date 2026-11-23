@@ -9,6 +9,8 @@ import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { setLastRealm } from "@/lib/last-realm";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import World3DUnavailable from "@/components/world3d/World3DUnavailable";
+import { realmOutside3DHref } from "@/lib/world3d/return-context";
 import { resolveRealm3DAccess, type Realm3DAccessDecision } from "@/lib/world3d/access";
 import { announceCanonicalWorldStateRestored } from "@/lib/world3d/canonical-bootstrap";
 
@@ -35,7 +37,7 @@ export default function PatternPeaks3DEntry({ teacherPreview = false }: { teache
   const requestedLevel = resolvePreviewLevel(searchParams.get("level"));
   const [entry] = useState<{ decision: Realm3DAccessDecision; status: "loading" | "ready" | "disabled" }>(() => {
     const profile = getActiveStudentProfile();
-    const decision = resolveRealm3DAccess({ realmId: "pattern", classId: profile?.classId, studentId: profile?.studentId, respectReducedMotion: true });
+    const decision = resolveRealm3DAccess({ realmId: "pattern", classId: profile?.classId, studentId: profile?.studentId });
     return { decision, status: decision.canExplore3D ? "loading" : "disabled" };
   });
   const [status, setStatus] = useState(entry.status);
@@ -45,8 +47,8 @@ export default function PatternPeaks3DEntry({ teacherPreview = false }: { teache
 
   useEffect(() => {
     if (!previewMode || has3DLevel) return;
-    router.replace(`/pattern-peaks?level=${encodeURIComponent(resolvedLevel)}${teacherPreview ? "&teacher_preview=1" : ""}`);
-  }, [has3DLevel, previewMode, resolvedLevel, router, teacherPreview]);
+    router.replace(realmOutside3DHref("pattern", resolvedLevel, true));
+  }, [has3DLevel, previewMode, resolvedLevel, router]);
 
   useEffect(() => {
     if (!entry.decision.canExplore3D || previewMode) return;
@@ -64,7 +66,7 @@ export default function PatternPeaks3DEntry({ teacherPreview = false }: { teache
           return;
         }
         if (!PATTERN_PEAKS_3D_LEVELS.includes(restored.progress.year as RealmLevelId)) {
-          router.replace(`/pattern-peaks?level=${encodeURIComponent(restored.progress.year)}`);
+          router.replace(realmOutside3DHref("pattern", restored.progress.year));
           return;
         }
         setResolvedLevel("Year 3");
@@ -85,6 +87,6 @@ export default function PatternPeaks3DEntry({ teacherPreview = false }: { teache
 
   if (displayStatus === "loading") return <div className="grid min-h-screen place-items-center bg-[#17242d] font-semibold text-emerald-100/80">Loading saved progress...</div>;
   if (!has3DLevel) return <div className="grid min-h-screen place-items-center bg-[#17242d] font-semibold text-emerald-100/80">Opening Pattern Peaks...</div>;
-  if (displayStatus === "disabled") return <main className="grid min-h-screen place-items-center bg-[#17242d] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Pattern Peaks 3D is not available</h1><p className="mt-2 text-emerald-100/70">The standard Pattern Peaks world is ready to use.</p><button type="button" onClick={() => router.push("/pattern-peaks")} className="mt-5 rounded-md bg-emerald-300 px-5 py-3 font-bold text-stone-950">Open 2D World</button></div></main>;
+  if (displayStatus === "disabled") return <World3DUnavailable place="Pattern Peaks" reason={entry.decision.reason} background="#17242d" />;
   return <PatternPeaksLevel3World level={resolvedLevel} />;
 }

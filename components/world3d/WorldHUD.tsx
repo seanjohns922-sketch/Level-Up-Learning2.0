@@ -53,7 +53,7 @@ function realmProgressLabel(realmId: CanonicalRealmId): string | null {
 }
 
 const fallbackJourney: WorldJourney = {
-  route: "/realms",
+  route: "/world/tower",
   realmName: "Your learning journey",
   activityLabel: "Your next activity is ready",
 };
@@ -71,7 +71,6 @@ export function WorldHUD({
   mission,
   primaryAction,
   navActions,
-  fallbackHref,
   onQuickStart,
   contextAction,
   realmId,
@@ -82,7 +81,6 @@ export function WorldHUD({
   mission?: { eyebrow?: string; title: string; detail: string };
   primaryAction?: WorldHUDAction;
   navActions?: Array<{ key: string; label: string; icon?: React.ReactNode; onClick: () => void }>;
-  fallbackHref: string;
   onQuickStart?: () => void | Promise<void>;
   /** Central hub: what the main dock button does near an object ("Enter my home"). */
   contextAction?: WorldHUDAction;
@@ -145,7 +143,7 @@ export function WorldHUD({
       setJourney(resolved);
       router.push(resolved.route);
     } catch {
-      router.push(fallbackHref);
+      router.push(preview ? "/world/tower?teacher_preview=1" : "/world/tower");
     }
   }
 
@@ -193,7 +191,6 @@ export function WorldHUD({
     hubLayout ? (contextAction ? `${contextAction.label}. Button.` : null) : quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
     "Realms. Opens fast travel to the learning realms.",
     hubLayout ? primaryActionSpeech : null,
-    hubLayout ? null : "2D View. Opens the normal map view.",
   ]);
 
   return (

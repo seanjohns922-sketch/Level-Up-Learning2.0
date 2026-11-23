@@ -288,7 +288,7 @@ export default function TowerRealmChamber() {
         context="tower"
         preview={preview}
         accent="#e0ad55"
-        fallbackHref={preview ? "/realms?teacher_preview=1" : "/realms"}
+       
         primaryAction={{
           label: "EXIT TOWER",
           icon: "door",

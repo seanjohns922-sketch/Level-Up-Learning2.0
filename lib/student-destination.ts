@@ -32,15 +32,14 @@ export function resolveStudentDestination(args: {
 
   if (isGroundLevel) {
     // Each Ground realm now resolves its own baseline or existing program.
-    return "/realms";
+    return "/world";
   }
 
   if (!isPlacementComplete(args.progress)) {
     return `/pretest?year=${encodeURIComponent(resolvedYear)}`;
   }
 
-  // Realm-first: after placement, students land on the Tower of Knowledge (the
-  // realm selector) — not a level-choice screen. Each realm resolves its own
-  // level and resumes/pre-tests from there.
-  return "/realms";
+  // After placement, students land in their 3D world. Each realm resolves its
+  // own level and resumes or pre-tests from there.
+  return "/world";
 }

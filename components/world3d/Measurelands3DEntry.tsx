@@ -7,6 +7,8 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete } from "@/data/progress";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import World3DUnavailable from "@/components/world3d/World3DUnavailable";
+import { realmOutside3DHref } from "@/lib/world3d/return-context";
 import { resolveRealm3DAccess, type Realm3DAccessDecision } from "@/lib/world3d/access";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { setLastRealm } from "@/lib/last-realm";
@@ -32,7 +34,7 @@ export default function Measurelands3DEntry({ teacherPreview = false }: { teache
   const requestedLevel = resolvePreviewLevel(searchParams.get("level"));
   const [entry] = useState<{ decision: Realm3DAccessDecision; status: "loading" | "ready" | "disabled" }>(() => {
     const profile = getActiveStudentProfile();
-    const decision = resolveRealm3DAccess({ realmId: "measurement", classId: profile?.classId, studentId: profile?.studentId, respectReducedMotion: true });
+    const decision = resolveRealm3DAccess({ realmId: "measurement", classId: profile?.classId, studentId: profile?.studentId });
     return { decision, status: decision.canExplore3D ? "loading" : "disabled" };
   });
   const [status, setStatus] = useState(entry.status);
@@ -55,7 +57,7 @@ export default function Measurelands3DEntry({ teacherPreview = false }: { teache
           return;
         }
         if (!MEASURELANDS_3D_LEVELS.includes(restored.progress.year as RealmLevelId)) {
-          router.replace("/measurelands");
+          router.replace(realmOutside3DHref("measurement", restored.progress.year));
           return;
         }
         setResolvedLevel(restored.progress.year as RealmLevelId);
@@ -76,7 +78,7 @@ export default function Measurelands3DEntry({ teacherPreview = false }: { teache
 
   if (displayStatus === "loading") return <div className="grid min-h-screen place-items-center bg-[#211812] font-semibold text-amber-200/80">Loading saved progress...</div>;
   if (displayStatus === "disabled") {
-    return <main className="grid min-h-screen place-items-center bg-[#211812] p-6 text-center text-white"><div><h1 className="text-2xl font-black">Measurelands 3D is not available</h1><p className="mt-2 text-amber-100/70">The standard Measurelands world is ready to use.</p><button type="button" onClick={() => router.push("/measurelands")} className="mt-5 rounded-md bg-amber-400 px-5 py-3 font-bold text-stone-950">Open 2D World</button></div></main>;
+    return <World3DUnavailable place="Measurelands" reason={entry.decision.reason} background="#211812" />;
   }
   return <MeasurelandsLevel3World level={resolvedLevel} />;
 }

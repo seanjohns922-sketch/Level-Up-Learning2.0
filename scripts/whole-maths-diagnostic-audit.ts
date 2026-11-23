@@ -224,7 +224,6 @@ const diagnosticHandoff = read("lib/diagnostic-handoff.ts");
 const centralWorldEntry = read("components/world3d/CentralWorld3DEntry.tsx");
 const towerWorldEntry = read("components/world3d/TowerRealmChamber3DEntry.tsx");
 const studentLogin = read("app/login/page.tsx");
-const realmsPage = read("app/realms/page.tsx");
 assert(!studentInstrument.includes("isDemoPreviewMode"), "The diagnostic must not have a demo-only persistence shortcut.");
 assert(studentInstrument.includes("saveDiagnosticProgress"), "Student answers and position must persist during a sitting.");
 assert(studentInstrument.includes('label="Read page"'), "The student diagnostic journey must offer a complete page read-aloud.");
@@ -275,7 +274,6 @@ assert(
 assert(
   diagnosticHandoff.includes("sessionStorage") &&
     centralWorldEntry.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&
-    realmsPage.includes("isDiagnosticHandoffPaused(pendingDiagnostic.sitting_id)") &&
     studentLogin.includes("clearDiagnosticHandoffPause()"),
   "A deliberate diagnostic pause must survive the world handoff without weakening the next-login assignment check.",
 );
@@ -296,7 +294,6 @@ const supervisedMigration = read("supabase/migrations/20260911153000_supervised_
 const answerCountFix = read("supabase/migrations/20260914110000_fix_whole_maths_diagnostic_answer_counts.sql");
 const studentJourneyAccessFix = read("supabase/migrations/20260914123000_restore_student_diagnostic_journey_access.sql");
 assert(studentLogin.includes("fetchPendingStudentDiagnostic(student.student_id)"), "Student login must prioritise an open assigned diagnostic.");
-assert(realmsPage.includes("fetchPendingStudentDiagnostic(studentId)"), "The 2D realm entry must not bypass an open assigned diagnostic.");
 assert(
   studentJourneyAccessFix.includes("to anon,authenticated") && answerCountFix.includes("to anon,authenticated"),
   "Custom student sessions must retain execute access to their diagnostic journey.",

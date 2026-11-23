@@ -16,7 +16,6 @@ import { normalizeSchoolYearLabel, normalizeWorkingLevelLabel } from "@/lib/stud
 import { deactivateDemoPreviewMode, isDemoAccessFeatureEnabled } from "@/lib/demo-mode";
 import { bootstrapDemoPreview } from "@/lib/demo-preview-bootstrap";
 import { resolveStudentDestination } from "@/lib/student-destination";
-import { resolvePostLoginExperience } from "@/lib/world3d/access";
 import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-client";
 import { clearDiagnosticHandoffPause } from "@/lib/diagnostic-handoff";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
@@ -791,14 +790,11 @@ export default function LoginPage() {
 
     const placementComplete = isPlacementComplete(progress);
 
-    const twoDDestination = resolveStudentDestination({
+    const dest = resolveStudentDestination({
       progress,
       introSeen,
       fallbackYear: studentWorkingYear ?? studentSchoolYear ?? "Year 1",
     });
-    const dest = twoDDestination === "/realms"
-      ? resolvePostLoginExperience({ realmId: "number", classId: student.class_id, studentId: student.student_id, respectReducedMotion: true, fallbackHref: twoDDestination })
-      : twoDDestination;
     console.log("[LoginRouteDebug]", {
       student_id: student.student_id,
       student_table: {

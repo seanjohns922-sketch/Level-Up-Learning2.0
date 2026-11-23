@@ -1934,11 +1934,7 @@ export default function CentralWorld() {
   function enterMyHome() {
     if (transitioning) return;
     rememberCentralWorldHomeEntry(preview);
-    if (hubV2) {
-      window.location.assign(treehouseHref("main", preview));
-      return;
-    }
-    window.location.assign("/home-base");
+    window.location.assign(treehouseHref("main", preview));
   }
 
   function enterTower() {
@@ -1998,7 +1994,7 @@ export default function CentralWorld() {
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
         // Edit World: plan the whole world from above.
         ...(walkBuild ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
-      ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
+      ]} /> : null}
 
       {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive || boat)} />{race || drive || boat ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
       {drive ? <CarHudPanel hud={carHud} name={CAR_SPECS[drive.style].name} lights={drive.lights} canSwap={ownedCars(ownedItemKeys).length > 1}

@@ -87,7 +87,7 @@ export async function resolveTowerRealmEntry(args: {
   }
   return {
     status: "ready",
-    route: resolveRealm3DAccess({ realmId: args.realmId, classId: profile?.classId, studentId: identity.studentId, respectReducedMotion: true }).canExplore3D
+    route: resolveRealm3DAccess({ realmId: args.realmId, classId: profile?.classId, studentId: identity.studentId }).canExplore3D
       ? adaptCanonicalRouteToAvailable3DWorld(canonicalRoute, args.realmId, restored.progress?.year)
       : canonicalRoute,
   };

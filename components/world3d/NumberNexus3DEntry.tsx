@@ -7,6 +7,8 @@ import { ACTIVE_STUDENT_KEY, isPlacementComplete } from "@/data/progress";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, StudentRestoreSupersededError } from "@/lib/student-progress-sync";
+import World3DUnavailable from "@/components/world3d/World3DUnavailable";
+import { realmOutside3DHref } from "@/lib/world3d/return-context";
 import { resolveRealm3DAccess, type Realm3DAccessDecision } from "@/lib/world3d/access";
 import type { RealmLevelId } from "@/lib/realms/realm-dashboard-config";
 import { isNumberNexusLevel } from "@/lib/number-nexus-visuals";
@@ -38,7 +40,6 @@ export default function NumberNexus3DEntry({ teacherPreview = false, requestedLe
       realmId: "number",
       classId: profile?.classId,
       studentId: profile?.studentId,
-      respectReducedMotion: true,
     });
     return {
       accessDecision,
@@ -72,7 +73,7 @@ export default function NumberNexus3DEntry({ teacherPreview = false, requestedLe
           return;
         }
         if (!isNumberNexusLevel(restored.progress.year)) {
-          setStatus("error");
+          router.replace(realmOutside3DHref("number", restored.progress.year));
           return;
         }
         setResolvedLevel(restored.progress.year);
@@ -98,38 +99,8 @@ export default function NumberNexus3DEntry({ teacherPreview = false, requestedLe
     return <div className="grid min-h-screen place-items-center bg-slate-950 font-semibold text-teal-200/70">Loading saved progress...</div>;
   }
 
-  if (displayStatus === "disabled") {
-    return (
-      <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white">
-        <div>
-          <h1 className="text-2xl font-black">3D world is not available</h1>
-          <p className="mt-2 text-slate-300">
-            {accessDecision?.reason === "webgl-unavailable"
-              ? "This device or browser cannot run the 3D world right now."
-              : accessDecision?.reason === "reduced-motion"
-                ? "Reduced motion is enabled, so the standard world is used."
-                : "Use the standard Number Nexus world to continue learning."}
-          </p>
-          <button type="button" onClick={() => router.push("/number-nexus")} className="mt-5 rounded-md bg-teal-500 px-5 py-3 font-bold text-slate-950">
-            Open 2D World
-          </button>
-        </div>
-      </main>
-    );
-  }
-
-  if (displayStatus === "error") {
-    return (
-      <main className="grid min-h-screen place-items-center bg-slate-950 p-6 text-center text-white">
-        <div>
-          <h1 className="text-2xl font-black">3D world could not load</h1>
-          <p className="mt-2 text-slate-300">Use the 2D world to continue learning.</p>
-          <button type="button" onClick={() => router.push("/number-nexus")} className="mt-5 rounded-md bg-teal-500 px-5 py-3 font-bold text-slate-950">
-            Open 2D World
-          </button>
-        </div>
-      </main>
-    );
+  if (displayStatus === "disabled" || displayStatus === "error") {
+    return <World3DUnavailable place="Number Nexus" reason={accessDecision.reason} background="#020617" />;
   }
 
   return <NumberNexusLevel3World key={resolvedLevel} level={resolvedLevel} />;
