@@ -59,4 +59,11 @@ assert.ok(read("components/teacher/SendRexDialog.tsx").includes("studentIds: [..
 assert.ok(read("components/parent/ParentPortal.tsx").includes("<ParentSendRex "), "parents send Rex from the child's page");
 assert.ok(read("app/credits/page.tsx").includes("quander") && read("app/credits/page.tsx").includes("CC BY 4.0"), "the model is credited");
 assert.ok(statSync(new URL("../public/models/creatures/trex.glb", import.meta.url)).size < 3_000_000, "the model stays small");
+const sfx = read("lib/audio/rex-sfx.ts");
+for (const clip of ["roar", "growl-1", "growl-2", "tamed", "huff", "snarl"]) {
+  assert.ok(sfx.includes(`"${clip}"`), `${clip} is one of his sounds`);
+  assert.ok(statSync(new URL(`../public/audio/rex/${clip}.m4a`, import.meta.url)).size < 80_000, `${clip} is a small recording`);
+}
+assert.ok(!sfx.includes("roarVoice"), "his voice is the recordings, not the old made-up roar");
+assert.ok(read("app/credits/page.tsx").includes("T-rex calls"), "his voice is credited");
 console.log("rex: questions at every level, typed answers, server rules, hub, teacher and parent wiring all check out");

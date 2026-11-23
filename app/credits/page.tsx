@@ -5,6 +5,7 @@ export const metadata: Metadata = { title: "Credits · RELIQ" };
 
 const CREDITS = [
   { what: "Rex the maths T-rex", title: "Randaling T-Rex, animated!", author: "quander", source: "https://sketchfab.com/3d-models/randaling-t-rex-animated-09a3632365344a99bb88e3dd0b684c89", licence: "CC BY 4.0", licenceUrl: "https://creativecommons.org/licenses/by/4.0/", note: "Textures resized and the file compressed for the web." },
+  { what: "Rex's roars and growls", title: "T-rex calls", author: "OpenGameArt.org", source: "https://opengameart.org/content/t-rex-calls", licence: "CC0 1.0", licenceUrl: "https://creativecommons.org/publicdomain/zero/1.0/", note: "Cut into separate calls and levelled." },
   { what: "Trees, rocks and plants in the hub", title: "Nature Kit", author: "Kenney", source: "https://www.kenney.nl", licence: "CC0 1.0", licenceUrl: "https://creativecommons.org/publicdomain/zero/1.0/", note: null },
 ] as const;
 

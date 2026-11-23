@@ -34,7 +34,7 @@ function RexQuestions({ level, seed, onTamed, onClose }: { level: number; seed: 
     if (value === question.answer) {
       const done = right + 1;
       setRight(done);
-      if (done >= REX_QUESTIONS) { rexSounds.rumble(); onTamed(done); } else next();
+      if (done >= REX_QUESTIONS) { rexSounds.tamed(); onTamed(done); } else next();
     } else { setWrong(typed.trim()); rexSounds.snap(); }
   };
   return (
@@ -61,11 +61,11 @@ function RexQuestions({ level, seed, onTamed, onClose }: { level: number; seed: 
 
 const SENT_BY: Record<string, string> = { teacher: "Your teacher sent Rex!", parent: "Rex has come to visit!", timer: "You've been building for a while…" };
 
-/** Rex's sounds on or off for this device; turning them on gives a roar so you know. */
+/** Rex's sounds on or off for this device; turning them on gives a growl so you know. */
 function RexMuteButton() {
   const on = useSyncExternalStore(subscribeRexMute, rexSoundsOn, () => true);
   return (
-    <button type="button" onClick={() => { setRexMuted(on); if (!on) window.setTimeout(() => rexSounds.roar(1), 50); }} aria-pressed={!on} aria-label={on ? "Mute Rex" : "Hear Rex roar"} title={on ? "Mute Rex" : "Hear Rex roar"}
+    <button type="button" onClick={() => { setRexMuted(on); if (!on) window.setTimeout(() => rexSounds.hello(), 50); }} aria-pressed={!on} aria-label={on ? "Mute Rex" : "Hear Rex roar"} title={on ? "Mute Rex" : "Hear Rex roar"}
       style={{ flex: "none", width: 44, height: 44, borderRadius: 12, border: "1px solid rgba(255,255,255,.2)", background: on ? "rgba(255,255,255,.08)" : "rgba(229,72,77,.25)", color: "#fff", display: "grid", placeItems: "center", cursor: "pointer" }}>
       {on ? <Volume2 size={20} aria-hidden="true" /> : <VolumeX size={20} aria-hidden="true" />}
     </button>

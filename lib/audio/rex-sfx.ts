@@ -1,11 +1,50 @@
 "use client";
 
 /**
- * Rex's sounds, made on the fly (no audio files): a deep growling roar, heavy footsteps, a jaw snap and
- * a low contented rumble. The roar is the best part, so unlike the other game sounds they're on unless
- * Rex is muted on this device (the speaker on his panel). `near` (0 far .. 1 beside you) sets the volume.
+ * Rex's sounds. His voice is real recordings ("T-rex calls", CC0, OpenGameArt; see /credits), cut into
+ * public/audio/rex: a big arrival roar, two growls, a tamed roar, a huff and a snarl. His footsteps and
+ * jaw clacks are made on the fly. Unlike the other game sounds they're on unless Rex is muted on this
+ * device (the speaker on his panel). `near` (0 far .. 1 beside you) sets the volume.
  */
 import { playSynth } from "./synth";
+
+const CLIPS = ["roar", "growl-1", "growl-2", "tamed", "huff", "snarl"] as const;
+type RexClip = (typeof CLIPS)[number];
+const buffers = new Map<RexClip, AudioBuffer>();
+let loading = false;
+
+/** Fetches and decodes his recordings once (about 180 KB). A clip that fails to load just stays silent. */
+export function loadRexSounds() {
+  if (loading || typeof window === "undefined" || typeof OfflineAudioContext === "undefined") return;
+  loading = true;
+  // Decoded off to the side: an AudioBuffer plays in any audio context, so this needs no tap first.
+  const decoder = new OfflineAudioContext(1, 1, 48000);
+  for (const clip of CLIPS) {
+    void fetch(`/audio/rex/${clip}.m4a`)
+      .then((response) => (response.ok ? response.arrayBuffer() : Promise.reject(new Error(response.statusText))))
+      .then((data) => decoder.decodeAudioData(data))
+      .then((buffer) => { buffers.set(clip, buffer); })
+      .catch(() => { /* that sound stays silent */ });
+  }
+}
+
+function clipVoice(audio: AudioContext, at: number, buffer: AudioBuffer, loud: number) {
+  const source = audio.createBufferSource(), level = audio.createGain();
+  source.buffer = buffer;
+  level.gain.value = loud;
+  source.connect(level).connect(audio.destination);
+  source.start(at);
+}
+
+/**
+ * His voice is one channel, so he never talks over himself: each call waits `gap` seconds after the last
+ * thing he said. True once it has actually played (false while the clip loads or the browser holds audio).
+ */
+function speak(gap: number, clip: RexClip, loud: number) {
+  const buffer = buffers.get(clip);
+  if (!buffer) { loadRexSounds(); return false; }
+  return playSynth("rex-voice", gap, (audio, at) => clipVoice(audio, at, buffer, loud), rexSoundsOn);
+}
 
 let noise: AudioBuffer | null = null;
 /** Two seconds of white noise, made once and shared. */
@@ -16,60 +55,12 @@ function noiseBuffer(audio: AudioContext) {
   for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
   return noise;
 }
-/** A soft-clipping curve: grit for the roar. */
-function grit(amount: number) {
-  const curve = new Float32Array(1024);
-  for (let i = 0; i < curve.length; i++) { const x = (i / (curve.length - 1)) * 2 - 1; curve[i] = Math.tanh(x * amount); }
-  return curve;
-}
-/** An envelope: up over `attack`, held, then down to silence by `length`. */
-function envelope(gain: GainNode, at: number, peak: number, attack: number, length: number) {
-  gain.gain.setValueAtTime(0.0001, at);
-  gain.gain.exponentialRampToValueAtTime(peak, at + attack);
-  gain.gain.setValueAtTime(peak, at + length * 0.6);
-  gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
-}
 function noiseSource(audio: AudioContext, at: number, length: number) {
   const source = audio.createBufferSource();
   source.buffer = noiseBuffer(audio);
   source.start(at, Math.random());
   source.stop(at + length + 0.05);
   return source;
-}
-
-function roarVoice(audio: AudioContext, at: number, loud: number) {
-  const length = 1.7 + Math.random() * 0.4, out = audio.createGain();
-  envelope(out, at, 0.5 * loud, 0.18, length);
-  const shaper = audio.createWaveShaper();
-  shaper.curve = grit(3.2);
-  shaper.connect(out).connect(audio.destination);
-  // The breath: noise through a sweeping band, from a bright snarl down to a deep rumble.
-  const band = audio.createBiquadFilter();
-  band.type = "bandpass"; band.Q.value = 1.4;
-  band.frequency.setValueAtTime(900, at);
-  band.frequency.exponentialRampToValueAtTime(380, at + length * 0.4);
-  band.frequency.exponentialRampToValueAtTime(160, at + length);
-  const breath = audio.createGain(); breath.gain.value = 0.9;
-  noiseSource(audio, at, length).connect(band).connect(breath).connect(shaper);
-  // The throat: a growling saw that drops in pitch, wobbled fast for the rattle.
-  const throat = audio.createOscillator(), wobble = audio.createOscillator(), depth = audio.createGain(), low = audio.createBiquadFilter(), throatGain = audio.createGain();
-  throat.type = "sawtooth";
-  throat.frequency.setValueAtTime(150, at);
-  throat.frequency.exponentialRampToValueAtTime(95, at + length * 0.3);
-  throat.frequency.exponentialRampToValueAtTime(52, at + length);
-  wobble.frequency.value = 26; depth.gain.value = 18;
-  wobble.connect(depth).connect(throat.frequency);
-  low.type = "lowpass"; low.frequency.value = 1100;
-  throatGain.gain.value = 0.35;
-  throat.connect(low).connect(throatGain).connect(shaper);
-  // The chest: a sub-bass you feel more than hear.
-  const chest = audio.createOscillator(), chestGain = audio.createGain();
-  chest.type = "sine";
-  chest.frequency.setValueAtTime(60, at);
-  chest.frequency.exponentialRampToValueAtTime(34, at + length);
-  chestGain.gain.value = 0.5;
-  chest.connect(chestGain).connect(out);
-  for (const osc of [throat, wobble, chest]) { osc.start(at); osc.stop(at + length + 0.05); }
 }
 
 function stompVoice(audio: AudioContext, at: number, loud: number) {
@@ -101,17 +92,8 @@ function snapVoice(audio: AudioContext, at: number) {
     clack.gain.exponentialRampToValueAtTime(0.0001, at + offset + 0.06);
     noiseSource(audio, at + offset, 0.07).connect(high).connect(clack).connect(audio.destination);
   }
-  roarVoice(audio, at + 0.12, 0.35);
-}
-
-function rumbleVoice(audio: AudioContext, at: number, loud: number) {
-  // A slow, contented purr: low noise swelling in and out.
-  const low = audio.createBiquadFilter(), gain = audio.createGain();
-  low.type = "lowpass"; low.frequency.value = 320;
-  gain.gain.setValueAtTime(0.0001, at);
-  gain.gain.exponentialRampToValueAtTime(0.28 * loud, at + 0.7);
-  gain.gain.exponentialRampToValueAtTime(0.0001, at + 1.6);
-  noiseSource(audio, at, 1.6).connect(low).connect(gain).connect(audio.destination);
+  const snarl = buffers.get("snarl");
+  if (snarl) clipVoice(audio, at + 0.12, snarl, 0.6);
 }
 
 const loudness = (near: number) => Math.max(0.08, Math.min(1, near));
@@ -132,12 +114,18 @@ export function subscribeRexMute(onChange: () => void) {
   return () => { window.removeEventListener(MUTE_EVENT, onChange); window.removeEventListener("storage", onChange); };
 }
 
-/** The raw voices, for previewing them into any audio context (the game plays them through `rexSounds`). */
-export const REX_VOICES = { roar: roarVoice, stomp: stompVoice, snap: snapVoice, rumble: rumbleVoice } as const;
+/** Seconds between his growls while he's near (chasing or being answered), and his huffs once tamed. */
+export const REX_GROWL_GAP = 20, REX_HUFF_GAP = 30;
 
 export const rexSounds = {
-  roar: (near = 1) => playSynth("rex-roar", 3, (a, t) => roarVoice(a, t, loudness(near)), rexSoundsOn),
+  /** His big entrance. False until it has played, so the caller tries again next frame. */
+  arrive: () => speak(0, "roar", 1),
+  growl: (near = 1) => speak(REX_GROWL_GAP, Math.random() < 0.5 ? "growl-1" : "growl-2", loudness(near) * 0.8),
+  huff: (near = 1) => speak(REX_HUFF_GAP, "huff", loudness(near) * 0.5),
+  /** Five right: he roars, won over. */
+  tamed: () => speak(0, "tamed", 0.9),
+  /** Turning him back on: a growl so you know he's heard. */
+  hello: () => speak(0, "growl-1", 1),
   stomp: (near = 1) => playSynth("rex-stomp", 0.3, (a, t) => stompVoice(a, t, loudness(near)), rexSoundsOn),
   snap: () => playSynth("rex-snap", 0.6, snapVoice, rexSoundsOn),
-  rumble: (near = 1) => playSynth("rex-rumble", 5, (a, t) => rumbleVoice(a, t, loudness(near)), rexSoundsOn),
 };
