@@ -798,10 +798,11 @@ export default function CentralWorld() {
   }, [visitId, placementScope, preview, student?.studentId]);
   const visiting = Boolean(visitId);
   const canBuildHere = !visiting || Boolean(friendWorld?.canBuild);
-  const [friendsOpen, setFriendsOpen] = useState(false);
+  // ?friends=1 or ?battles=1 (from the profile page) opens that panel straight away.
+  const [friendsOpen, setFriendsOpen] = useState(() => searchParams.get("friends") === "1" && !visitId);
   // Friend battles: the Battles panel (from the arena or a friend's CHALLENGE), a battle in play, and its tug of war.
   const [friendsList, setFriendsList] = useState<Friend[]>([]);
-  const [battlesOpen, setBattlesOpen] = useState<{ preselect: Friend | null } | null>(null);
+  const [battlesOpen, setBattlesOpen] = useState<{ preselect: Friend | null } | null>(() => (searchParams.get("battles") === "1" && !visitId ? { preselect: null } : null));
   const [battle, setBattle] = useState<{ play: BattleToPlay; level: number } | null>(null);
   const [battleClash, setBattleClash] = useState<number | null>(null);
   const [battleInvite, setBattleInvite] = useState<Battle | null>(null);

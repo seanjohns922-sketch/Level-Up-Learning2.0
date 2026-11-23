@@ -1,7 +1,11 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { fetchFriends, type Friend } from "@/lib/friends";
+import { BATTLE_PLAY_XP, BATTLE_WIN_XP, fetchBattles, type Battle } from "@/lib/battles";
+import { BATTLE_QUESTIONS } from "@/lib/battle-questions";
 
 import { profileRealmSummary } from "@/lib/profile-realm-summary";
 import { getLiveRealmDefinitions, tryCanonicalRealmId } from "@/lib/realms/realm-registry";
@@ -263,6 +267,7 @@ export default function ProfilePage() {
   const demoPreviewMode = useDemoPreviewMode();
   const crystals = useMemo(() => (demoPreviewMode ? { crystals: 63, open: true, learningDays: 63 } : chronorokProgress(activityRows)), [activityRows, demoPreviewMode]);
   const [yearLevel] = useState(() => getActiveStudentProfile()?.yearLevel ?? null);
+  const [profileStudentId] = useState(() => getActiveStudentProfile()?.studentId ?? null);
   const xpToNextRank = Math.max(0, explorerRank.nextLevelXp - explorerRank.currentXp);
 
   const demoPreview = useDemoPreviewMode();
@@ -524,7 +529,7 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <FriendsAndBattlesPreview initial={initials} />
+        <FriendsAndBattles initial={initials} studentId={profileStudentId} demo={demoPreview} />
 
         <section className="mt-8 grid gap-4 lg:grid-cols-[1.25fr_1fr]">
           <div className={`${GLASS} rounded-3xl p-6`} aria-label="My wins">
@@ -634,60 +639,64 @@ function StreakFlame() {
   );
 }
 
-// A preview of what is coming, so learners know it is on the way. Nothing here
-// is live: the names and results are examples and the button does nothing yet.
-const PREVIEW_FRIENDS = [
-  { initial: "L", name: "Lily", color: "#f472b6", streak: 6 },
-  { initial: "M", name: "Mason", color: "#38bdf8", streak: 3 },
-  { initial: "A", name: "Ava", color: "#a3e635", streak: 9 },
-  { initial: "J", name: "Jack", color: "#fbbf24", streak: 2 },
-];
+// Friends & Battles: your friends, a CHALLENGE button and your recent battles. Adding friends and battling
+// happen in the hub (these links open its Friends and Battles panels).
+const FRIEND_COLOURS = ["#f472b6", "#38bdf8", "#a3e635", "#fbbf24", "#c084fc", "#2dd4bf"];
+const friendColour = (name: string) => FRIEND_COLOURS[[...name].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % FRIEND_COLOURS.length];
 
-function FriendsAndBattlesPreview({ initial }: { initial: string }) {
+function FriendsAndBattles({ initial, studentId, demo }: { initial: string; studentId: string | null; demo: boolean }) {
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [battles, setBattles] = useState<Battle[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      void fetchFriends(studentId, demo).then((state) => { if (!cancelled) setFriends(state.friends.filter((f) => f.status === "friend")); }).catch(() => undefined);
+      void fetchBattles(studentId, demo).then((list) => { if (!cancelled) setBattles(list.filter((b) => b.status === "finished").slice(0, 3)); }).catch(() => undefined);
+    }, 0);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [studentId, demo]);
+  const hub = (panel: "friends" | "battles") => `/world?${panel}=1${demo ? "&teacher_preview=1" : ""}`;
+  const rival = friends[0];
   return (
-    <section className="relative mt-8 overflow-hidden rounded-3xl border border-[#D86BF7]/35 bg-gradient-to-br from-[#8C2EAC]/45 via-[#161222]/85 to-[#161222]/85 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.28)]" aria-label="Friends and Battles, coming soon">
-      <span className="absolute right-6 top-5 rounded-full bg-[#ffd76a] px-3.5 py-1.5 font-display text-xs font-black tracking-[0.1em] text-[#2a1a00]">COMING SOON</span>
+    <section className="relative mt-8 overflow-hidden rounded-3xl border border-[#D86BF7]/35 bg-gradient-to-br from-[#8C2EAC]/45 via-[#161222]/85 to-[#161222]/85 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.28)]" aria-label="Friends and Battles">
       <p className="font-display text-xs font-black uppercase tracking-[0.14em] text-[#ffd76a]">Friends &amp; Battles</p>
       <h2 className="mt-2 font-display text-[26px] font-black">Challenge your friends!</h2>
-      <p className="mt-1 max-w-[640px] font-semibold text-[#e3dbef]">Add friends from your school, cheer each other on, and battle with maths questions at your own level to win bonus XP.</p>
-      <div className="mt-5 grid gap-3.5 md:grid-cols-[1.2fr_1fr_1fr]" aria-hidden="true">
+      <p className="mt-1 max-w-[640px] font-semibold text-[#e3dbef]">Add friends with their friend code, visit each other&apos;s worlds, and battle with {BATTLE_QUESTIONS} quick questions at your own level. +{BATTLE_WIN_XP} XP for a win, +{BATTLE_PLAY_XP} for playing.</p>
+      <div className="mt-5 grid gap-3.5 md:grid-cols-[1.2fr_1fr_1fr]">
         <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
           <p className="mb-3 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">MY FRIENDS</p>
           <div className="flex flex-wrap gap-3">
-            {PREVIEW_FRIENDS.map((friend) => (
-              <div key={friend.name} className="flex w-16 flex-col items-center gap-1">
-                <span className="relative grid h-[52px] w-[52px] place-items-center rounded-full font-display text-xl font-black text-[#1a1026]" style={{ background: friend.color }}>
-                  {friend.initial}<span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-[#1a1426] bg-[#4ade80]" />
-                </span>
-                <span className="text-[13px] font-extrabold">{friend.name}</span>
-                <span className="text-xs font-bold text-[#ffcf8a]">🔥 {friend.streak}</span>
+            {friends.slice(0, 6).map((friend) => (
+              <div key={friend.friendshipId} className="flex w-16 flex-col items-center gap-1">
+                <span className="grid h-[52px] w-[52px] place-items-center rounded-full font-display text-xl font-black text-[#1a1026]" style={{ background: friendColour(friend.name) }}>{friend.name.slice(0, 1).toUpperCase()}</span>
+                <span className="max-w-full truncate text-[13px] font-extrabold">{friend.name}</span>
               </div>
             ))}
-            <div className="flex w-16 flex-col items-center gap-1">
+            <Link href={hub("friends")} className="flex w-16 flex-col items-center gap-1">
               <span className="grid h-[52px] w-[52px] place-items-center rounded-full border-2 border-dashed border-white/35 bg-white/10 text-xl font-black">+</span>
               <span className="text-[13px] font-extrabold">Add friend</span>
-            </div>
+            </Link>
           </div>
+          {!friends.length ? <p className="mt-3 text-[13px] font-semibold text-[#bdb3cc]">Tap Add friend and type a friend&apos;s friend code, or share yours.</p> : null}
         </div>
         <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
           <p className="mb-3 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">BATTLE</p>
           <div className="flex items-center justify-center gap-4">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] font-display text-2xl font-black">{initial}</span>
             <span className="font-display text-xl font-black text-[#ffd76a]">VS</span>
-            <span className="grid h-16 w-16 place-items-center rounded-full bg-[#f472b6] font-display text-2xl font-black">L</span>
+            <span className="grid h-16 w-16 place-items-center rounded-full font-display text-2xl font-black text-[#1a1026]" style={{ background: rival ? friendColour(rival.name) : "rgba(255,255,255,.15)" }}>{rival ? rival.name.slice(0, 1).toUpperCase() : "?"}</span>
           </div>
-          <div className="mt-3.5 rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] py-3 text-center font-display text-[13px] font-black tracking-[0.05em] opacity-70">⚔️ CHALLENGE A FRIEND</div>
-          <p className="mt-2 text-center text-[13px] font-semibold text-[#bdb3cc]">Same number of questions · each at your own level</p>
+          <Link href={hub("battles")} className="mt-3.5 block rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] py-3 text-center font-display text-[13px] font-black tracking-[0.05em]">⚔️ CHALLENGE A FRIEND</Link>
+          <p className="mt-2 text-center text-[13px] font-semibold text-[#bdb3cc]">{BATTLE_QUESTIONS} questions each · at your own level · in the Battle Arena</p>
         </div>
         <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
           <p className="mb-2 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">RECENT BATTLES</p>
-          {[["You beat Lily", "8 – 6", "+20 XP"], ["Ava beat you", "7 – 9", "+5 XP"], ["You beat Mason", "10 – 4", "+20 XP"]].map(([who, score, xp], index) => (
-            <div key={who} className={`flex items-center gap-2.5 py-2 ${index ? "border-t border-white/[0.07]" : ""}`}>
-              <span className="flex-1 text-sm font-extrabold">{who}</span>
-              <span className="font-display text-[13px] font-black text-[#d8d2e4]">{score}</span>
-              <span className="w-14 text-right font-display text-xs font-black text-[#ffd76a]">{xp}</span>
+          {battles.length ? battles.map((battle, index) => (
+            <div key={battle.id} className={`flex items-center gap-2.5 py-2 ${index ? "border-t border-white/[0.07]" : ""}`}>
+              <span className="flex-1 text-sm font-extrabold">{battle.won ? `🏆 You beat ${battle.friendName}` : battle.draw ? `🤝 Draw with ${battle.friendName}` : `${battle.friendName} won`}</span>
+              <span className="font-display text-[13px] font-black text-[#d8d2e4]">{battle.myScore} – {battle.friendScore}</span>
             </div>
-          ))}
+          )) : <p className="text-[13px] font-semibold text-[#bdb3cc]">No battles yet. Challenge a friend!</p>}
         </div>
       </div>
     </section>

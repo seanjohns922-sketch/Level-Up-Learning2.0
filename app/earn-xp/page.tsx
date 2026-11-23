@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { BATTLE_PLAY_XP, BATTLE_WIN_XP } from "@/lib/battles";
 import { ArrowLeft, BookOpen, CheckCircle2, Swords, Zap } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { StreakFlame } from "@/components/streak/StreakParts";
@@ -11,13 +12,13 @@ const WAYS = [
   { icon: BookOpen, title: "Finish a lesson", detail: "The first time you finish it", xp: `+${LESSON_XP}` },
   { icon: CheckCircle2, title: "Pass a weekly quiz", detail: "Score 80% or more", xp: `+${QUIZ_PASS_XP}` },
   { icon: Zap, title: "Win a brain break", detail: "During your lessons", xp: `up to +${BRAIN_BREAK_XP_CAP}` },
+  { icon: Swords, title: "Win a friend battle", detail: `+${BATTLE_PLAY_XP} just for playing, in the Battle Arena`, xp: `+${BATTLE_WIN_XP}` },
 ];
 
 const SPOKEN = [
   "Ways to earn X P. You spend X P on homes, rides, pets and more in your world.",
   `Keep a streak: do a lesson or quiz each day. Weekends never break it. ${STREAK_REWARDS.map((r) => `Day ${r.day}, ${r.xp} X P.`).join(" ")} After that, ${STREAK_REPEAT_XP} X P every fifth day.`,
   ...WAYS.map((way) => `${way.title}. ${way.detail}. ${way.xp.replace("+", "")} X P.`),
-  "Friend battles are coming soon.",
 ].join(" ");
 
 export default function EarnXpPage() {
@@ -68,13 +69,6 @@ export default function EarnXpPage() {
               <span className="shrink-0 font-black text-amber-300">{way.xp}</span>
             </li>
           ))}
-          <li className="flex items-center gap-3.5 rounded-2xl border border-dashed border-violet-400/50 bg-[#1d1a24] px-4 py-3.5">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#2c2640] text-violet-300"><Swords className="h-5 w-5" aria-hidden="true" /></span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-black">Friend battles</span>
-              <span className="block text-sm font-semibold text-violet-200/80">Coming soon</span>
-            </span>
-          </li>
         </ul>
       </div>
     </main>
