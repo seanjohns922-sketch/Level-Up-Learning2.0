@@ -8,9 +8,9 @@ const groups = Array.from({ length: 20 }, (_, i) => JSON.parse(fs.readFileSync(`
 const uuid = value => { assert.match(value, /^[0-9a-f-]{36}$/i); return `'${value}'::uuid`; };
 const tables = ['student_lesson_attempts', 'student_weekly_quiz_attempts', 'student_realm_assessments'];
 const columns = [
-  'student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at',
-  'student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at',
-  'student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at',
+  'id,student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at',
+  'id,student_id,realm_id,working_level,week,quiz_id,attempt_no,correct_count,total_questions,accuracy_percent,completed_at',
+  'id,student_id,realm_id,working_level,assessment_type,correct_count,total_questions,score_percent,completed_at',
 ];
 const query = (index, scope) => `select ${columns[index]} from public.${tables[index]} where student_id=any(${scope})${index === 0 ? ' and completed=true' : ''}`;
 const aggregate = q => `(select coalesce(jsonb_agg(to_jsonb(t) order by to_jsonb(t)::text),'[]'::jsonb) from (${q}) t)`;
@@ -102,7 +102,52 @@ reset role;
 do $$ begin assert not has_function_privilege('anon','pg_temp.scoped_attempts(uuid[])','execute'), 'No anonymous execute'; end $$;
 rollback;`;
 cases.push(...sql(roles).split('\n').filter(line => line.startsWith('{')).map(line => JSON.parse(line)));
-assert.equal(cases.length, 147);
+// Independently exercise legacy ownership and individual assignment access.
+// All fixture mutations roll back, including when any assertion fails.
+const firstStudent = uuid(g.students[0].studentId);
+const secondStudent = uuid(g.students[1].studentId);
+const compatibility = setup + `
+update public.class_staff_memberships set status='inactive' where user_id=${uuid(g.teacherId)};
+select set_config('request.jwt.claim.sub',${uuid(g.teacherId)}::text,true);
+set local role authenticated;
+select pg_temp.check_scope(array[${firstStudent}],'legacy-owner-only');
+reset role;
+update public.classes set teacher_id=${uuid(groups[1].teacherId)} where id=${uuid(g.classId)};
+set local role authenticated;
+select pg_temp.check_scope(array[${firstStudent}],'no-canonical-or-legacy-access');
+reset role;
+insert into public.student_staff_assignments(student_id,school_id,user_id,role,status)
+values(${firstStudent},${uuid(g.schoolId)},${uuid(g.teacherId)},'support_staff','active');
+set local role authenticated;
+select pg_temp.check_scope(array[${firstStudent}],'individual-assignment');
+select pg_temp.check_scope(array[${firstStudent},${secondStudent}],'partial-individual-assignment');
+reset role;
+update public.student_staff_assignments set status='inactive' where student_id=${firstStudent} and user_id=${uuid(g.teacherId)};
+set local role authenticated;
+select pg_temp.check_scope(array[${firstStudent}],'individual-assignment-revoked');
+reset role;
+update public.student_staff_assignments set status='active' where student_id=${firstStudent} and user_id=${uuid(g.teacherId)};
+set local role authenticated;
+select pg_temp.check_scope(array[${firstStudent}],'individual-assignment-restored');
+rollback;`;
+const compatibilityCases = sql(compatibility).split('\n').filter(line => line.startsWith('{')).map(line => JSON.parse(line));
+fs.writeFileSync(`${localDir}/scoped-attempts-compatibility-result.json`, JSON.stringify(compatibilityCases, null, 2) + '\n');
+const byLabel = Object.fromEntries(compatibilityCases.map(row => [row.label, row]));
+for (const label of ['partial-individual-assignment']) {
+  assert.equal(byLabel[label].supported, false);
+  assert.ok(byLabel[label].rows.every(n => n > 0), 'Fallback must preserve nonempty partial RLS results');
+}
+// Legacy attempt policy joins students, whose RLS still requires student access.
+for (const label of ['legacy-owner-only','no-canonical-or-legacy-access','individual-assignment-revoked']) {
+  assert.equal(byLabel[label].supported, false);
+  assert.ok(byLabel[label].rows.every(n => n === 0), 'Revoked access must not retain old results');
+}
+for (const label of ['individual-assignment','individual-assignment-restored']) {
+  assert.equal(byLabel[label].supported, true);
+  assert.ok(byLabel[label].rows.every(n => n > 0));
+}
+cases.push(...compatibilityCases);
+assert.equal(cases.length, 153);
 assert(cases.filter(c => c.label.startsWith('teacher-')).every(c => c.supported));
 assert(cases.filter(c => c.label.startsWith('mixed-school-') || c.label === 'revoked').every(c => !c.supported));
 assert(cases.filter(c => ['support_staff','principal','school_admin','platform-admin-cross-school'].includes(c.label)).every(c => c.supported));

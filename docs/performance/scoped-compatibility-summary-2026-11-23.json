@@ -1,0 +1,76 @@
+{
+  "at": "2026-11-23T07:54:25.609Z",
+  "casesPassed": 153,
+  "compatibilityCases": [
+    {
+      "rows": [
+        0,
+        0,
+        0
+      ],
+      "label": "legacy-owner-only",
+      "supported": false,
+      "baselineMs": 97.088,
+      "candidateMs": 0.927
+    },
+    {
+      "rows": [
+        0,
+        0,
+        0
+      ],
+      "label": "no-canonical-or-legacy-access",
+      "supported": false,
+      "baselineMs": 76.21,
+      "candidateMs": 0.527
+    },
+    {
+      "rows": [
+        78,
+        21,
+        42
+      ],
+      "label": "individual-assignment",
+      "supported": true,
+      "baselineMs": 80.176,
+      "candidateMs": 2.325
+    },
+    {
+      "rows": [
+        78,
+        21,
+        42
+      ],
+      "label": "partial-individual-assignment",
+      "supported": false,
+      "baselineMs": 147.9,
+      "candidateMs": 0.978
+    },
+    {
+      "rows": [
+        0,
+        0,
+        0
+      ],
+      "label": "individual-assignment-revoked",
+      "supported": false,
+      "baselineMs": 80.012,
+      "candidateMs": 0.536
+    },
+    {
+      "rows": [
+        78,
+        21,
+        42
+      ],
+      "label": "individual-assignment-restored",
+      "supported": true,
+      "baselineMs": 84.745,
+      "candidateMs": 2.742
+    }
+  ],
+  "baselineMeanMs": 49.69693750000003,
+  "candidateMeanMs": 37.367987500000005,
+  "scope": "SQL authenticated role; complete three-table projected rows including UUID IDs; rollback-only; no HTTP or app integration",
+  "initialFailure": "Incorrect expectation that legacy class ownership alone yielded rows. Nested students RLS requires canonical student access; verified both SQL definitions and direct zero-row results before correcting the assertion."
+}

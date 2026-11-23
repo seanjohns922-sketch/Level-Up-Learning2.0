@@ -1763,3 +1763,42 @@ Raw private evidence and orchestration/reconciliation scripts:
 `/Users/seanjohns/reliq-audits/2026-11-23/journal-baseline/`. Redacted aggregate:
 `journal-baseline-summary-2026-11-23.json`. Aggregate reconciliation and whitespace
 checks passed; documentation-only commit, no app build required.
+
+### Attempt-scope permission compatibility — 23 November 2026
+
+Extended the rollback-only SQL prototype to compare row IDs as well as every
+existing summary column, and added six cases isolating legacy class ownership,
+individual assignment, partial assignment, revocation and restoration. All 153
+cases passed under the authenticated database role. Existing application history
+reader QA also passed API-cap pagination, fixed upper bounds, cancellation,
+malformed/failed pages and concurrent-write recovery. No application edit.
+
+The first new assertion incorrectly expected legacy ownership alone to expose
+attempts after class-staff access was disabled. Inspection of the live local RLS
+showed that the legacy attempt policy joins students, whose own SELECT policy
+still checks student access. Direct reads returned zero rows across all three
+tables. The assertion was corrected to require denial, not removed; the initial
+failed result is retained privately. No policy was changed to satisfy a test.
+
+An individual assignment exposed 78 lesson, 21 quiz and 42 assessment rows,
+identical in the candidate and existing reads. Revocation removed access; restoring
+the assignment restored those results. A scope containing that student plus an
+unassigned student yielded the same permitted rows under existing RLS, whereas the
+candidate explicitly returned unsupported with no data. A future client must use
+whole-scope original reads in that case, not render an empty or partial candidate
+result. This test verifies SQL response semantics; it does not implement client
+fallback or test revocation between HTTP pages.
+
+All temporary ownership, class/school membership and individual-assignment edits
+were confirmed rolled back. Temporary functions exist only within their database
+sessions. This run's combined SQL mean was 49.697 ms direct versus 37.368 ms
+candidate, substantially less separation than the earlier probe; do not extrapolate
+old speedups or equate these SQL timings to full-dashboard improvements.
+
+The existing HTTP prototype still lacks the production reader's fixed upper UUID
+bounds and needs the new assignment/revocation cases and explicit fallback handling.
+Keep it out of the app until these pass, then measure the complete mixed workload.
+No migration or production changes. Node syntax, affected reader QA, SQL parity,
+rollback verification and whitespace checks passed; no app build for test-only
+changes. Aggregate: `scoped-compatibility-summary-2026-11-23.json`. Full private
+results: `/Users/seanjohns/reliq-audits/2026-11-23/scoped-compatibility/`.
