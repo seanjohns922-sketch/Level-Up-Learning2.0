@@ -62,7 +62,9 @@ function getRealmHomeRoute(realmId?: string | null): string {
   if (realmId === "statistics") return "/statistica";
   if (realmId === "pattern") return "/pattern-peaks";
   if (realmId === "chance") return "/chance-hollow";
-  return "/levels";
+  // Number Nexus is the first realm students meet, straight from the welcome page: send them
+  // into the hub to explore, not into the Tower.
+  return "/world";
 }
 
 function getLegendIdsUpToYear(year: string, realmId: LegendRealmId) {

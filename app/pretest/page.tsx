@@ -528,7 +528,7 @@ function PretestPage() {
         setCanonicalProgress(progress);
         setRestoreState("ready");
         if (isPlacementComplete(progress)) {
-          router.replace(progressRealmId === "measurement" ? "/measurelands" : "/levels");
+          router.replace(progressRealmId === "measurement" ? "/measurelands" : "/world");
         } else if (progress.year !== year) {
           router.replace(`/pretest?year=${encodeURIComponent(progress.year)}&realm_id=${encodeURIComponent(progressRealmId)}`);
         }
@@ -705,7 +705,7 @@ function PretestPage() {
   }
   function exitToLevels() {
     persistSnapshot();
-    router.push(isDemoPreviewMode() ? `/demo-review?realm=${progressRealmId}&year=${encodeURIComponent(year)}` : "/levels");
+    router.push(isDemoPreviewMode() ? `/demo-review?realm=${progressRealmId}&year=${encodeURIComponent(year)}` : "/world");
   }
   async function exitLogout() {
     persistSnapshot();

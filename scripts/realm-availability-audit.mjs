@@ -95,7 +95,7 @@ check(
 );
 check(
   "Completed Measurelands placement leaves the pre-test for the Measurelands map",
-  pretest.includes('progressRealmId === "measurement" ? "/measurelands" : "/levels"'),
+  pretest.includes('progressRealmId === "measurement" ? "/measurelands" : "/world"'),
 );
 
 const failures = results.filter((result) => !result.ok);
