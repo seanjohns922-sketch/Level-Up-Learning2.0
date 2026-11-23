@@ -25,7 +25,6 @@ type Props = {
   archiving: boolean;
   onArchive: () => void;
   onRestore: () => void;
-  onDelete: () => void;
   onPrintLoginCard: () => void;
   onPrintHomeCard: () => void;
 };
@@ -43,10 +42,7 @@ export function StudentPanel(p: Props) {
       subtitle={`${p.editForm.school_year_level || "Year not set"} · ${p.className}${s.username ? ` · @${s.username}` : ""}${archived ? " · Archived" : ""}`}
       onClose={p.onClose}
       footer={archived ? (
-        <>
-          <button type="button" onClick={p.onDelete} className={btnDanger}>Delete permanently</button>
-          <button type="button" onClick={p.onRestore} className={btnDark}>Restore student</button>
-        </>
+        <button type="button" onClick={p.onRestore} className={btnDark}>Restore student</button>
       ) : (
         <>
           <button type="button" onClick={p.onArchive} disabled={p.archiving} className={btnDanger}>{p.archiving ? "Archiving…" : "Archive student"}</button>

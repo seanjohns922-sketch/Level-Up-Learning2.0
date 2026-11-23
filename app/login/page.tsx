@@ -41,6 +41,9 @@ function normalizeClassCode(code: string) {
 }
 
 const PENDING_PARENT_EXPLORER_CODE_KEY = "lul_pending_parent_explorer_code_v1";
+// Set by the student login guards after too many wrong access codes
+// (migration 20261126110000_student_login_attempt_limits).
+const STUDENT_LOGIN_LOCKED_HINT = "student_login_locked";
 
 function normalizeExplorerCode(code: string) {
   return code.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 13);
@@ -663,9 +666,13 @@ export default function LoginPage() {
     if (!isCurrentAttempt()) return;
     if (studentErr) {
       failCurrentAttempt(
-        isServiceUnavailableError(studentErr)
-          ? "The login service is temporarily unavailable. Please try again shortly."
-          : "Your login details could not be checked. Please try again.",
+        studentErr.hint === STUDENT_LOGIN_LOCKED_HINT
+          ? studentLoginMode === "home"
+            ? "Too many tries. Wait 15 minutes, or ask your parent to check your login details."
+            : "Too many tries. Wait 15 minutes, or ask your teacher to check your login details."
+          : isServiceUnavailableError(studentErr)
+            ? "The login service is temporarily unavailable. Please try again shortly."
+            : "Your login details could not be checked. Please try again.",
       );
       return;
     }

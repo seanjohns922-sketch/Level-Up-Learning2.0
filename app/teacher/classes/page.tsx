@@ -386,8 +386,7 @@ export default function TeacherClassesPage() {
       })
       .eq("id", created.student_id);
     if (updateError) {
-      await supabase.from("students").delete().eq("id", created.student_id);
-      throw new Error(updateError.message);
+      throw new Error(`${name} was added, but their details did not save (${updateError.message}). Refresh, then open the student to finish their details.`);
     }
 
     const createdPin = String(created?.pin ?? pin);
@@ -554,14 +553,6 @@ export default function TeacherClassesPage() {
     const ids = new Set(list.map((s) => s.id));
     setStudents((prev) => prev.map((s) => (ids.has(s.id) ? { ...s, archived_at: now } : s)));
     setSelectedStudentIds(new Set());
-  }
-
-  async function deleteStudent(student: StudentRow) {
-    if (!confirm(`Permanently delete ${student.display_name}? This cannot be undone and all their progress will be lost.`)) return;
-    const { error } = await supabase.from("students").delete().eq("id", student.id);
-    if (error) { alert(error.message); return; }
-    setStudents((prev) => prev.filter((s) => s.id !== student.id));
-    setEditingStudentId(null);
   }
 
   async function unarchiveStudent(student: StudentRow) {
@@ -1104,7 +1095,6 @@ export default function TeacherClassesPage() {
           archiving={archivingStudentId === panelStudent.id}
           onArchive={() => void archiveStudent(panelStudent)}
           onRestore={() => void unarchiveStudent(panelStudent)}
-          onDelete={() => void deleteStudent(panelStudent)}
           onPrintLoginCard={() => void printOneLoginCard(selectedClass, panelStudent)}
           onPrintHomeCard={() => printFamilyCards(selectedClass, [panelStudent])}
         />
