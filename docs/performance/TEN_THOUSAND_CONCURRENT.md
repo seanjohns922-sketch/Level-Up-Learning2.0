@@ -1696,3 +1696,32 @@ Aggregate assertions and whitespace checks passed. Diagnostic documentation only
 no application changes, migration, production setting change or app build.
 Aggregate: `local-recovery-summary-2026-11-23.json`. Private probe scripts and raw
 results: `/Users/seanjohns/reliq-audits/2026-11-23/recovery/`.
+
+### Interrupted-run activity journal — 23 November 2026
+
+The local capacity harness now creates an exclusive, per-run JSONL journal before
+starting journeys. It records synthetic student ordinals in fixture order, initial
+activity totals, write intent before dispatch, acknowledgement after success,
+final readback totals and verified completion. Activity and event writes are
+separate operations; event sequence and run ID match the existing event payload.
+The final report names the journal and run ID. Credentials, real identifiers and
+request bodies are not written to the journal.
+
+An intent without acknowledgement is **unknown**, not proof of failure: a timeout
+or failed acknowledgement append can occur after the server commits. There are no
+automatic retries. If intent persistence fails, the request is not dispatched.
+Each append is synchronous to preserve ordering on process interruption, but is
+not fsynced and does not promise survival of power loss; retain complete JSONL
+lines and treat a damaged/truncated tail as incomplete evidence. Disk writes add
+observer overhead, so future timings need a fresh baseline with the same journal.
+Reconciliation still requires a quiescent fixture and a later database read; this
+journal does not retroactively repair older runs or track presence writes.
+
+Focused tests cover timeout-after-possible-commit, intent visibility before
+request dispatch, independent event/activity acknowledgements, existing-file
+protection, and disk failures before and after dispatch. All five journal and
+read-concurrency tests passed, plus harness syntax and whitespace checks. No full
+capacity run was repeated for this instrumentation change, and no new performance
+claim is made. No application or schema change; no app build required.
+The default ESLint configuration ignores these staging scripts; its invocation
+reported three ignored-file warnings and is not counted as a lint pass.

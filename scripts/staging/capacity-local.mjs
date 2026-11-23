@@ -10,6 +10,7 @@ import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
 import { attemptPageClient } from './attempt-page-client.mjs';
 import { runReads } from './read-concurrency.mjs';
+import { createActivityJournal, journalActivityWrite } from './activity-journal.mjs';
 const config = localConfig();
 const traceDatabase = process.env.SCALE_TRACE_DATABASE === '1';
 const seconds = Number(process.env.SCALE_DURATION_SECONDS ?? 120);
@@ -145,6 +146,8 @@ for (let i = 0; i < teachers.length; i++) {
   await assert.rejects(request('/rest/v1/rpc/get_live_class_events_secure', { p_class_id: groups[(i+1)%groupCount].classId }, teacher.token), /HTTP 403, code 42501/);
 }
 const students = groups.flatMap(group => group.students.map(student => ({ group, student })));
+const activityJournalFile = `capacity-${eventRun}-activity.jsonl`;
+const recordActivity = createActivityJournal(`${localDir}/${activityJournalFile}`, eventRun);
 const eventLoop = monitorEventLoopDelay({ resolution: 10 });
 const initialUtilization = nodePerformance.eventLoopUtilization();
 eventLoop.enable();
@@ -174,26 +177,31 @@ async function studentJourney({ group, student }, index) {
   await rpc('upsert_live_student_activity_secure', {p_student_id:student.studentId,p_class_id:group.classId,p_data:{current_level:'Year 4',current_strand:'number',current_lesson:'Synthetic capacity session',last_active_at:'2000-01-01T00:00:00Z'}}, session);
   initializedStudents++;
   const before = sum(await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session));
+  const studentOrdinal = index + 1;
+  recordActivity({ kind: 'baseline', studentOrdinal, secondsActive: before });
   let writes = 0;
   do {
     assert.equal(await rpc('touch_live_student_presence_secure', { p_student_id: student.studentId, p_class_id: group.classId }, session), true, 'Heartbeat must update a live activity row');
-    await rpc('upsert_student_activity_daily_secure', { p_student_id: student.studentId, p_class_id: group.classId, p_seconds_active: 30 }, session);
+    await journalActivityWrite(recordActivity, studentOrdinal, writes + 1, 'activity', () =>
+      rpc('upsert_student_activity_daily_secure', { p_student_id: student.studentId, p_class_id: group.classId, p_seconds_active: 30 }, session));
     writes++;
     if (dashboard) {
-      await rpc('insert_live_activity_event_secure', { p_student_id: student.studentId, p_class_id: group.classId,
+      await journalActivityWrite(recordActivity, studentOrdinal, writes, 'event', () => rpc('insert_live_activity_event_secure', { p_student_id: student.studentId, p_class_id: group.classId,
         p_session_id: null, p_event_type: 'answer_correct', p_payload: { capacity_run: eventRun, sequence: writes,
-          ...(eventMode === 'compact' ? { lessonId: `capacity-${eventRun}`, week: 1 } : {}) } }, session);
+          ...(eventMode === 'compact' ? { lessonId: `capacity-${eventRun}`, week: 1 } : {}) } }, session));
       expectedEvents.set(student.studentId, writes);
     }
     await sleep(Math.min(30000, Math.max(0, deadline - Date.now())));
   } while (Date.now() < deadline);
   const after = sum(await rpc('get_student_activity_daily_secure', { p_student_id: student.studentId }, session));
+  recordActivity({ kind: 'readback', studentOrdinal, secondsActive: after });
   assert.equal(after, before + writes * 30, 'Individual activity write integrity');
   const live = await rpc('get_live_student_activity_secure',{p_student_id:student.studentId,p_class_id:group.classId},session);
   assert.equal(live.student_id,student.studentId);
   assert.ok(Date.now()-Date.parse(live.last_active_at)<90000,'Persisted heartbeat must be recent');
   verifiedWrites += writes;
   completedStudentJourneys++;
+  recordActivity({ kind: 'verified', studentOrdinal, activityWrites: writes });
 }
 async function dashboardJourney({ group, client, profile }) {
   const attemptsClient = attemptPageClient(client, attemptPageSize);
@@ -307,7 +315,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 if (eventMode === 'compact' && compactPageRequests === 0) failures.push('Compact event RPC was never exercised');
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
-  eventMode, compactPageRequests, attemptPageSize,
+  eventMode, compactPageRequests, attemptPageSize, eventRun, activityJournalFile,
   workloadStartedAt: new Date(started).toISOString(),
   databaseTracing: traceDatabase, dashboardHttpProfiling: profileDashboard,
   dashboardConcurrency, readTimingScope: 'Source timings exclude queue wait; whole dashboard refresh includes queue wait.',
