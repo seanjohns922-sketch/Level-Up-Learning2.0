@@ -669,12 +669,22 @@ function FireStation({ level, night }: Props) {
   );
 }
 
+/** How much bigger each level stands than it's modelled: the supermarket, town hall and school grow
+ * well past the houses at their top levels, as they would in a real town. */
+type Growth = readonly [number, number, number, number];
+const CIVIC_GROWTH: Growth = [1, 1, 1.3, 1.6];
+function grown(Model: (props: Props) => ReactNode, growth: Growth) {
+  const Grown = ({ level, night }: Props) => <group scale={growth[level - 1]}><Model level={level} night={night} /></group>;
+  Grown.displayName = `Grown${Model.name}`;
+  return Grown;
+}
+
 /** Each Main Street building's model by level, in world metres. Names, prices and plots live in lib/world3d/premium-homes.ts. */
 export const MAIN_STREET_MODELS = {
-  corner_shop: CornerShop,
+  corner_shop: grown(CornerShop, CIVIC_GROWTH),
   cafe: Cafe,
   library: Library,
-  town_hall: TownHall,
-  school: School,
+  town_hall: grown(TownHall, CIVIC_GROWTH),
+  school: grown(School, CIVIC_GROWTH),
   fire_station: FireStation,
 } as const satisfies Record<(typeof MAIN_STREET_STYLES)[number], (props: Props) => ReactNode>;

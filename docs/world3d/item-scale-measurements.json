@@ -210,10 +210,10 @@
   {"key":"city_food_truck","name":"Food Truck","native":[2.66,2.77,2],"size":[2.66,2.77,2],"footprint":[8,6]},
   {"key":"city_vending_kiosk","name":"Vending & ATM","native":[1.80001,2.36001,1.4],"size":[1.80001,2.36001,1.4],"footprint":[4,4]},
   {"key":"carport","name":"Carport","native":[5.96,2.81,3.96],"size":[5.96,2.81,3.96],"footprint":[6,4]},
-  {"key":"main_corner_shop","name":"Corner Shop","native":[5.00001,2.78467,3.4],"size":[5.00001,2.78467,3.4],"footprint":[10,8]},
+  {"key":"main_corner_shop","name":"Corner Shop","native":[5.00001,2.78467,3.4],"size":[5.00001,2.78467,3.4],"footprint":[16,14]},
   {"key":"main_cafe","name":"Café","native":[4.60001,3.17001,4],"size":[4.60001,3.17001,4],"footprint":[8,8]},
   {"key":"main_library","name":"Library","native":[4.60001,2.960005,3.71],"size":[4.60001,2.960005,3.71],"footprint":[10,8]},
-  {"key":"main_town_hall","name":"Town Hall","native":[8.00001,4.340005,8],"size":[8.00001,4.340005,8],"footprint":[12,10]},
-  {"key":"main_school","name":"School","native":[9.00001,5.210005,7.339915],"size":[9.00001,5.210005,7.339915],"footprint":[14,10]},
+  {"key":"main_town_hall","name":"Town Hall","native":[8.00001,4.340005,8],"size":[8.00001,4.340005,8],"footprint":[20,16]},
+  {"key":"main_school","name":"School","native":[9.00001,5.210005,7.340301],"size":[9.00001,5.210005,7.340301],"footprint":[24,16]},
   {"key":"main_fire_station","name":"Fire Station","native":[8.00001,4.259049,6.027961],"size":[8.00001,4.259049,6.027961],"footprint":[12,10]}
 ]
