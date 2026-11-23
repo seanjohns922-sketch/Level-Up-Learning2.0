@@ -56,6 +56,8 @@ import { RexHud } from "@/components/world3d/rex/RexHud";
 import { useRexVisit, type RexPhase } from "@/lib/rex-client";
 import { rexLevelFrom } from "@/lib/rex";
 import { resolveWorldJourney } from "@/lib/world3d/world-journey";
+import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
+import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
 import { WalkBuildBar, type WalkBuildMode, type WalkBuildSlot } from "@/components/world3d/WalkBuildBar";
 import { footCell, frontCell, HOTBAR_STARTERS, hotbarSlots, hotbarTool, hotbarToolOf, itemSize, readHotbar, readPlaceViews, rememberHotbarEntry, standBehind, togglePin, writeHotbar, writePlaceViews, type HotbarEntry, type PlaceView } from "@/lib/world3d/walk-build";
 import {
@@ -990,6 +992,17 @@ export default function CentralWorld() {
     void resolveWorldJourney().then((journey) => { if (!cancelled) setLessonRoute(journey.route); }).catch(() => undefined);
     return () => { cancelled = true; };
   }, [rex.phase, lessonRoute]);
+  // Tamed Rex goes home after a lesson: the explorer picks a realm and enters it like the Realms button.
+  async function enterRealmForRex(realmId: CanonicalRealmId) {
+    try {
+      const result = await resolveTowerRealmEntry({ realmId, teacherPreview: preview });
+      if (result.status === "unavailable") { setEconomyMessage(result.message); return; }
+      rex.leaveForLesson();
+      router.push(result.route);
+    } catch {
+      setEconomyMessage("That realm could not be opened. Please try again.");
+    }
+  }
   const carHud = useRef<CarHud>({ speed: 0, offRoad: false });
   const carPose = useRef<CarPose>({ x: 0, z: 0, heading: 0 });
   const carWorld = useMemo(() => ({ style: carStyle, colour: carChoice.colour, night, driving: Boolean(drive) }), [carStyle, carChoice.colour, night, drive]);
@@ -1978,7 +1991,7 @@ export default function CentralWorld() {
       </Canvas>
       </div>
 
-      {!editorOpen && !race && !drive && !boat && hubV2 ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onStartLesson={() => router.push(lessonRoute ?? "/realms")} /> : null}
+      {!editorOpen && !race && !drive && !boat && hubV2 ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onChooseRealm={enterRealmForRex} /> : null}
       {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },

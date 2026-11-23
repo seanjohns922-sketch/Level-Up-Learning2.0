@@ -5,6 +5,8 @@ import { useMemo, useRef, useState } from "react";
 import { readRexAnswer, rexQuestion, rexRandom, REX_QUESTIONS } from "@/lib/rex";
 import type { RexState } from "@/lib/rex-client";
 import { rexSounds } from "@/lib/audio/rex-sfx";
+import { getLiveRealmDefinitions, type CanonicalRealmId } from "@/lib/realms/realm-registry";
+import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 
 const VIOLET = "#C94DF2", INK = "rgba(20,14,40,.94)";
 const card: React.CSSProperties = { background: INK, color: "#fff", borderRadius: 22, border: `2px solid ${VIOLET}99`, boxShadow: "0 18px 50px rgba(0,0,0,.4)", fontFamily: "Inter, system-ui, sans-serif" };
@@ -58,7 +60,33 @@ function RexQuestions({ level, seed, onTamed, onClose }: { level: number; seed: 
 
 const SENT_BY: Record<string, string> = { teacher: "Your teacher sent Rex!", parent: "Rex has come to visit!", timer: "You've been building for a while…" };
 
-export function RexHud({ rex, level, onStartLesson }: { rex: RexState; level: number; onStartLesson: () => void }) {
+/** The realms to pick from when it's time for a lesson, each in its own colour. */
+const REALMS = getLiveRealmDefinitions().slice().sort((a, b) => a.displayOrder - b.displayOrder);
+
+function RealmPicker({ onChoose }: { onChoose: (realmId: CanonicalRealmId) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ position: "relative" }}>
+      <button type="button" aria-expanded={open} aria-haspopup="menu" onClick={() => setOpen((value) => !value)} style={{ ...bigButton("#7dff8a", "#103a17"), padding: "0 18px", display: "inline-flex", alignItems: "center", gap: 8 }}>
+        START A LESSON <span aria-hidden="true" style={{ display: "inline-block", transform: open ? "rotate(180deg)" : "none", transition: "transform .15s" }}>▾</span>
+      </button>
+      {open ? (
+        <div role="menu" aria-label="Choose a realm" style={{ ...card, position: "absolute", right: 0, top: "calc(100% + 8px)", width: "min(280px, calc(100vw - 32px))", padding: 8, display: "grid", gap: 4, zIndex: 61 }}>
+          <div style={{ padding: "6px 10px 4px", fontSize: 12, fontWeight: 800, letterSpacing: ".12em", color: "#e9b8fa" }}>CHOOSE A REALM</div>
+          {REALMS.map((realm) => (
+            <button key={realm.portalId} type="button" role="menuitem" onClick={() => { setOpen(false); onChoose(realm.realmId); }}
+              style={{ display: "flex", alignItems: "center", gap: 12, minHeight: 46, padding: "0 12px", border: 0, borderRadius: 12, background: "rgba(255,255,255,.06)", color: "#fff", fontWeight: 800, fontSize: 16, cursor: "pointer", textAlign: "left" }}>
+              <span aria-hidden="true" style={{ width: 14, height: 14, borderRadius: 99, background: reliqRealmColor(realm.realmId), boxShadow: `0 0 10px ${reliqRealmColor(realm.realmId)}` }} />
+              {realm.name}
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export function RexHud({ rex, level, onChooseRealm }: { rex: RexState; level: number; onChooseRealm: (realmId: CanonicalRealmId) => void }) {
   if (rex.phase === "away" || !rex.visit) return null;
   const banner = (text: string, background: string) => (
     <div style={{ position: "absolute", top: "max(168px, calc(env(safe-area-inset-top) + 160px))", left: "50%", transform: "translateX(-50%)", zIndex: 55, display: "flex", flexDirection: "column", alignItems: "center", gap: 10, pointerEvents: "none", width: "min(560px, calc(100vw - 32px))" }}>
@@ -78,7 +106,7 @@ export function RexHud({ rex, level, onStartLesson }: { rex: RexState; level: nu
     {banner(rex.paidXp ? `REX IS TAMED · +${rex.paidXp} XP` : "REX IS TAMED", "#6d3fd6")}
     <div style={{ ...card, position: "absolute", top: "max(226px, calc(env(safe-area-inset-top) + 218px))", left: "50%", transform: "translateX(-50%)", zIndex: 55, padding: "14px 18px", width: "min(440px, calc(100vw - 32px))", display: "flex", gap: 14, alignItems: "center" }}>
       <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontWeight: 900, fontSize: 16 }}>Rex is following you</div><div style={{ opacity: .8, fontSize: 14 }}>{rex.paidXp === 0 ? `You've had today's Rex XP. ` : ""}Finish a lesson to send him home.</div></div>
-      <button type="button" onClick={() => { rex.leaveForLesson(); onStartLesson(); }} style={{ ...bigButton("#7dff8a", "#103a17"), padding: "0 18px" }}>START A LESSON</button>
+      <RealmPicker onChoose={onChooseRealm} />
     </div>
   </>;
 }
