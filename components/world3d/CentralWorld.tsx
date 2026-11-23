@@ -1019,7 +1019,7 @@ export default function CentralWorld() {
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
     // The Tower Shield is never placed; it stands round the Tower.
-    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
+    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
 
   // The walk-build hotbar: free scenery the learner's kits allow, their owned items, and ground brushes.

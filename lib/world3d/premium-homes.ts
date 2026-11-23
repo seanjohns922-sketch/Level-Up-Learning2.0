@@ -10,7 +10,9 @@ export const DEFENCE_STYLES = ["laser_fence", "laser_gate", "scanner", "trip_wir
 export const EVERYDAY_STYLES = ["lamp_post", "bench", "fence", "mailbox", "campfire"] as const;
 /** City Life: everyday places, unlocked with XP. */
 export const CITY_LIFE_STYLES = ["playground", "cricket_nets", "park_bbq", "cubby_house", "outdoor_setting", "bus_stop", "food_truck", "vending_kiosk"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES] as const;
+/** Main Street: the town's buildings, unlocked with XP. */
+export const MAIN_STREET_STYLES = ["corner_shop", "cafe", "library", "town_hall", "school", "fire_station"] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -26,7 +28,7 @@ type StyleSpec = {
   icon: string;
   /** World model key; the shop row is central_world_plot_1_<assetKey>. */
   assetKey: string;
-  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life";
+  marketplaceCategory: "buildings" | "pools_play" | "defence" | "city_life" | "main_street";
   upgradePrefix: string;
   /** Level 1 is free in the editor's Defence tab (it replaced a free castle piece); only upgrades cost XP. */
   free?: boolean;
@@ -47,6 +49,9 @@ const EVERYDAY = { marketplaceCategory: "buildings", upgradePrefix: "central_wor
 const CITY = { marketplaceCategory: "city_life", upgradePrefix: "central_world_city_upgrade_", metres: true } as const;
 const CITY_SMALL_PRICES = [200, 200, 400, 800] as const;
 const CITY_BIG_PRICES = [350, 350, 700, 1400] as const;
+const MAIN = { marketplaceCategory: "main_street", upgradePrefix: "central_world_main_upgrade_", metres: true } as const;
+const MAIN_SHOP_PRICES = [400, 400, 800, 1600] as const;
+const MAIN_CIVIC_PRICES = [500, 500, 1000, 2000] as const;
 
 export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
   cottage: {
@@ -408,6 +413,79 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     assetKey: "city_vending_kiosk",
     height: 3.8,
     ...CITY,
+  },
+  // Main Street models live in components/world3d/premium-items/MainStreetItems.tsx.
+  corner_shop: {
+    name: "Corner Shop",
+    description: "A fruit stall that grows into a supermarket with shelves of goods behind the glass.",
+    levels: ["Fruit Stall", "Corner Store", "Mini-Mart", "Supermarket"],
+    prices: MAIN_SHOP_PRICES,
+    gridSize: "5x4",
+    accent: "#e5484d",
+    icon: "store",
+    assetKey: "main_corner_shop",
+    height: 7.4,
+    ...MAIN,
+  },
+  cafe: {
+    name: "Café",
+    description: "A coffee window that grows into a rooftop café with a neon coffee cup.",
+    levels: ["Coffee Window", "Corner Café", "Café with Terrace", "Rooftop Café"],
+    prices: MAIN_SHOP_PRICES,
+    gridSize: "4x4",
+    accent: "#1f6f5a",
+    icon: "coffee",
+    assetKey: "main_cafe",
+    height: 10.4,
+    ...MAIN,
+  },
+  library: {
+    name: "Library",
+    description: "A little free library that grows into a glass library with a glowing wall of books.",
+    levels: ["Little Free Library", "Village Library", "Sandstone Library", "Glass City Library"],
+    prices: MAIN_SHOP_PRICES,
+    gridSize: "5x4",
+    accent: "#2f6fd6",
+    icon: "book",
+    assetKey: "main_library",
+    height: 8.6,
+    ...MAIN,
+  },
+  town_hall: {
+    name: "Town Hall",
+    description: "A rotunda that grows into a domed civic centre with a clock that really turns.",
+    levels: ["Rotunda", "Town Hall", "Clock Tower Hall", "Grand Civic Centre"],
+    prices: MAIN_CIVIC_PRICES,
+    gridSize: "6x5",
+    accent: "#2f6b4f",
+    icon: "landmark",
+    assetKey: "main_town_hall",
+    height: 13.6,
+    ...MAIN,
+  },
+  school: {
+    name: "School",
+    description: "A portable classroom that grows into a big school with a COLA, a garden and solar panels.",
+    levels: ["Portable Classroom", "School Block", "School with COLA", "Big School"],
+    prices: MAIN_CIVIC_PRICES,
+    gridSize: "7x5",
+    accent: "#2f6fd6",
+    icon: "school",
+    assetKey: "main_school",
+    height: 8,
+    ...MAIN,
+  },
+  fire_station: {
+    name: "Fire Station",
+    description: "A hose shed that grows into a big station with flashing fire trucks and a ladder that lifts.",
+    levels: ["Hose Shed", "Fire Station", "Two-Bay Station", "Big Station"],
+    prices: MAIN_CIVIC_PRICES,
+    gridSize: "6x5",
+    accent: "#d8282b",
+    icon: "siren",
+    assetKey: "main_fire_station",
+    height: 9.6,
+    ...MAIN,
   },
 };
 

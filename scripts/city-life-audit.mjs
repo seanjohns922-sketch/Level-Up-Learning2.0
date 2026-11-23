@@ -48,5 +48,5 @@ assert.ok(migration.includes("on conflict (item_key) do nothing") && !/create\s+
 // Drawn by the premium renderer at the learner's level, and the hub lists them in My items.
 const models = read("components/world3d/premium-homes/PremiumHomeModels.tsx");
 assert.ok(models.includes("...CITY_LIFE_LEVEL_MODELS") && models.includes("CITY_LIFE_MODELS"), "City Life models are registered");
-assert.ok(read("components/world3d/CentralWorld.tsx").includes('"defence", "city_life"].includes('), "owned City Life items appear in My items");
+assert.ok(/"city_life"[^\]]*\]\.includes\(/.test(read("components/world3d/CentralWorld.tsx")), "owned City Life items appear in My items");
 console.log(`PASS City Life: ${CITY_LIFE_STYLES.length} places x 4 levels, ${rows.length} shop rows match the migration, City Life tab, placing view by size and renderer wiring in place`);
