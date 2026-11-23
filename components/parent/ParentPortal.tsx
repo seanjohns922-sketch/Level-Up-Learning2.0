@@ -27,6 +27,7 @@ import {
   X,
 } from "lucide-react";
 import { sendRex } from "@/lib/rex-client";
+import { fetchChildFriends, setChildFriends } from "@/lib/friends";
 import { REX_QUESTIONS, REX_XP } from "@/lib/rex";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import { stoneForGem } from "@/lib/gem-stones";
@@ -397,9 +398,49 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
             />
           ) : null}
           {activeChild ? <ParentSendRex key={`rex-${activeChild.studentId}`} child={activeChild} preview={Boolean(preview)} /> : null}
+          {activeChild ? <ParentFriends key={`friends-${activeChild.studentId}`} child={activeChild} preview={Boolean(preview)} /> : null}
         </>
       )}
     </div>
+  );
+}
+
+/** Friends: whether the child can add friends and visit worlds, and whether friends can help build theirs. */
+function ParentFriends({ child, preview }: { child: ParentChild; preview: boolean }) {
+  const [settings, setSettings] = useState<{ enabled: boolean; building: boolean; schoolManaged: boolean } | null>(preview ? { enabled: true, building: true, schoolManaged: false } : null);
+  const [message, setMessage] = useState<string | null>(null);
+  useEffect(() => {
+    if (preview) return;
+    let cancelled = false;
+    void fetchChildFriends(child.studentId).then((next) => { if (!cancelled) setSettings(next); }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [child.studentId, preview]);
+  const save = async (enabled: boolean, building: boolean) => {
+    if (!settings) return;
+    setSettings({ ...settings, enabled, building });
+    if (preview) return;
+    try { await setChildFriends(child.studentId, enabled, building); setMessage(null); }
+    catch { setMessage("That couldn't be saved just now. Try again in a moment."); }
+  };
+  return (
+    <section aria-labelledby="friends-title" className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+      <div className="flex flex-wrap items-start gap-4">
+        <Users className="h-8 w-8 shrink-0 text-[#121314]" aria-hidden="true" />
+        <div className="min-w-0 flex-1">
+          <h2 id="friends-title" className="font-display text-lg font-black uppercase tracking-wide">Friends</h2>
+          <p className="mt-1 text-sm text-slate-600">{child.firstName} can add friends with a friend code and visit their worlds. There&apos;s no chat. Friends can only build in {child.firstName}&apos;s world if {child.firstName} says so.{settings?.schoolManaged ? ` ${child.firstName}'s school can also switch this off.` : ""}</p>
+          {message ? <p role="status" className="mt-2 text-sm font-bold text-[#121314]">{message}</p> : null}
+        </div>
+      </div>
+      {settings ? <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {([["Friends and visits", settings.enabled, (on: boolean) => void save(on, on && settings.building)], ["Friends can help build", settings.enabled && settings.building, (on: boolean) => void save(settings.enabled || on, on)]] as const).map(([label, on, change]) => (
+          <button key={label} type="button" role="switch" aria-checked={on} onClick={() => change(!on)} className="flex min-h-11 items-center justify-between rounded-lg border border-slate-300 px-4 font-bold">
+            <span>{label}</span>
+            <span className={`rounded-full px-3 py-0.5 text-sm ${on ? "bg-[var(--reliq-lime)] text-[#121314]" : "bg-slate-100 text-slate-600"}`}>{on ? "ON" : "OFF"}</span>
+          </button>
+        ))}
+      </div> : null}
+    </section>
   );
 }
 

@@ -1,6 +1,8 @@
 "use client";
 
 import { supabase } from "@/lib/supabase";
+import { saveFriendWorld, visitedFriendId } from "@/lib/friends";
+import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 
 /** Keeps a learner's built world on their account, not just in this browser.
  * The browser copy stays as an instant cache; edits are sent to the account a
@@ -14,9 +16,10 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const pending = new Map<string, () => { placements: unknown[]; groundTiles: unknown[] }>();
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
-/** Only real learner accounts sync; demo preview and guests stay in the browser. */
+/** Only real learner accounts sync (your own world, or a friend's you're helping build); demo preview and guests stay in the browser. */
 export function isSyncedWorldScope(scope: string) {
-  return UUID.test(scope);
+  const friendId = visitedFriendId(scope);
+  return friendId ? UUID.test(friendId) : UUID.test(scope);
 }
 
 export async function fetchServerWorldLayout(studentId: string): Promise<ServerWorldLayout | null> {
@@ -27,14 +30,21 @@ export async function fetchServerWorldLayout(studentId: string): Promise<ServerW
   return Array.isArray(layout.placements) && Array.isArray(layout.groundTiles) ? layout : null;
 }
 
-async function send(studentId: string) {
-  const read = pending.get(studentId);
-  pending.delete(studentId);
-  timers.delete(studentId);
+async function send(scope: string) {
+  const read = pending.get(scope);
+  pending.delete(scope);
+  timers.delete(scope);
   if (!read) return;
   const { placements, groundTiles } = read();
+  // Helping build a friend's world saves to theirs (the server checks you're allowed), never to yours.
+  const friendId = visitedFriendId(scope), me = getActiveStudentIdentity().studentId;
+  if (friendId) {
+    if (!me) return;
+    await saveFriendWorld(me, friendId, { placements, groundTiles }).catch((error) => console.warn("[central-world] your friend's world could not be saved", error));
+    return;
+  }
   const { error } = await supabase.rpc("save_student_world_layout_secure", {
-    p_student_id: studentId,
+    p_student_id: scope,
     p_placements: placements,
     p_ground_tiles: groundTiles,
   });

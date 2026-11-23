@@ -39,7 +39,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Map as MapIcon, Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Waves, X, type LucideIcon } from "lucide-react";
+import { Map as MapIcon, Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Users, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -51,6 +51,10 @@ import { BoatRider } from "@/components/world3d/premium-items/BoatRider";
 import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, hubWaterDepth, HUB_V2_WATER_Y, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
+import { FriendsPanel } from "@/components/world3d/friends/FriendsPanel";
+import { VisitBanner, VisitorChangesCard } from "@/components/world3d/friends/FriendVisit";
+import { fetchFriendWorld, fetchVisitorChanges, resolveVisitorChange, visitScope, type Friend, type VisitorChange } from "@/lib/friends";
+import { undoFriendChanges } from "@/lib/world3d/friend-changes";
 import { RexDinosaur } from "@/components/world3d/rex/RexDinosaur";
 import { RexHud } from "@/components/world3d/rex/RexHud";
 import { useRexVisit, type RexPhase } from "@/lib/rex-client";
@@ -698,7 +702,9 @@ export default function CentralWorld() {
   const searchParams = useSearchParams();
   const preview = searchParams.get("teacher_preview") === "1" || isDemoPreviewMode();
   const student = useMemo(() => getActiveStudentProfile(), []);
-  const placementScope = preview ? "demo-preview" : student?.studentId ?? "guest";
+  // Visiting a friend (?visit=<their id>) shows their world in a separate copy that never saves over yours.
+  const visitId = searchParams.get("visit");
+  const placementScope = visitId ? visitScope(visitId) : preview ? "demo-preview" : student?.studentId ?? "guest";
   const [placedCustomisations, setPlacedCustomisations] = useState<CentralWorldPlacement[]>(() => readCentralWorldPlacements(placementScope));
   const homePlacement = getCentralWorldHome(placedCustomisations);
   const requestedBuildItemKey = searchParams.get("build");
@@ -745,7 +751,7 @@ export default function CentralWorld() {
   // The learner's world lives on their account: load it here (so it follows them
   // to any device), or move a world built before that up to the account.
   useEffect(() => {
-    if (preview || !isSyncedWorldScope(placementScope)) return;
+    if (preview || visitId || !isSyncedWorldScope(placementScope)) return;
     let cancelled = false;
     void fetchServerWorldLayout(placementScope)
       .then((layout) => {
@@ -762,7 +768,62 @@ export default function CentralWorld() {
       })
       .catch((error) => console.warn("[central-world] account world could not be loaded; using this browser's copy", error));
     return () => { cancelled = true; };
-  }, [placementScope, preview]);
+  }, [placementScope, preview, visitId]);
+  // A friend's world: their layout, the items they own (so their homes show their levels and, if they've
+  // let you help build, your build bar holds their items) and whether you may build.
+  const [friendWorld, setFriendWorld] = useState<{ name: string; canBuild: boolean; owned: string[] } | null>(null);
+  useEffect(() => {
+    if (!visitId) return;
+    let cancelled = false;
+    void fetchFriendWorld(student?.studentId ?? null, preview, visitId)
+      .then((world) => {
+        if (cancelled || !world) return;
+        // The demo has no real friends: it shows its own world as the friend's.
+        const layout = preview ? { placements: readCentralWorldPlacements("demo-preview"), groundTiles: readCentralWorldGroundTiles("demo-preview") } : world;
+        applyAccountCentralWorld(placementScope, layout);
+        setPlacedCustomisations(readCentralWorldPlacements(placementScope));
+        setGroundTiles(readCentralWorldGroundTiles(placementScope));
+        setFriendWorld({ name: world.name, canBuild: world.canBuild, owned: world.owned });
+        if (!preview) setOwnedItemKeys(new Set(world.owned));
+      })
+      .catch(() => { if (!cancelled) setEconomyMessage("You can't visit that world right now."); });
+    return () => { cancelled = true; };
+  }, [visitId, placementScope, preview, student?.studentId]);
+  const visiting = Boolean(visitId);
+  const canBuildHere = !visiting || Boolean(friendWorld?.canBuild);
+  const [friendsOpen, setFriendsOpen] = useState(false);
+  const goHome = () => router.push(preview ? "/world?teacher_preview=1" : "/world");
+  const visitFriend = (friend: Friend) => router.push(`/world?visit=${encodeURIComponent(friend.studentId)}${preview ? "&teacher_preview=1" : ""}`);
+  // Back home: what friends changed while you were away, to keep or undo.
+  const [visitorChanges, setVisitorChanges] = useState<VisitorChange[]>([]);
+  const [resolvingChange, setResolvingChange] = useState(false);
+  useEffect(() => {
+    if (visitId || preview || !student?.studentId) return;
+    let cancelled = false;
+    void fetchVisitorChanges(student.studentId, false).then((changes) => { if (!cancelled) setVisitorChanges(changes); }).catch(() => undefined);
+    return () => { cancelled = true; };
+  }, [visitId, preview, student?.studentId]);
+  async function resolveChange(undo: boolean) {
+    const change = visitorChanges[0];
+    if (!change || !student?.studentId) return;
+    setResolvingChange(true);
+    try {
+      if (undo) {
+        const reverted = undoFriendChanges({ placements: placedCustomisations, groundTiles },
+          { placements: change.beforePlacements, groundTiles: change.beforeGroundTiles },
+          { placements: change.afterPlacements, groundTiles: change.afterGroundTiles });
+        setPlacedCustomisations(reverted.placements);
+        setGroundTiles(reverted.groundTiles);
+        writeCentralWorldPlacements(placementScope, reverted.placements);
+        writeCentralWorldGroundTiles(placementScope, reverted.groundTiles);
+      }
+      await resolveVisitorChange(student.studentId, change.id);
+      setVisitorChanges((current) => current.slice(1));
+    } catch {
+      setEconomyMessage("That didn't work just now. Try again in a moment.");
+    }
+    setResolvingChange(false);
+  }
   const [editorOpen, setEditorOpen] = useState(false);
   // Walk-and-place building: carry an item and it goes on the square in front of
   // the explorer. Planning from above (Edit World) opens on top and returns here.
@@ -984,7 +1045,7 @@ export default function CentralWorld() {
   const [drive, setDrive] = useState<DriveSession | null>(null);
   const [boat, setBoat] = useState<BoatRide | null>(null);
   // Rex the maths T-rex: sent by a teacher or parent, or awake after 15 minutes in the hub.
-  const rex = useRexVisit({ studentId: student?.studentId ?? null, demo: preview, active: hubV2 && !race && !drive && !boat, wakeNow: preview && searchParams.get("rex") === "now" });
+  const rex = useRexVisit({ studentId: visitId ? null : student?.studentId ?? null, demo: preview && !visitId, active: hubV2 && !race && !drive && !boat && !visitId, wakeNow: preview && searchParams.get("rex") === "now" });
   const [lessonRoute, setLessonRoute] = useState<string | null>(null);
   useEffect(() => {
     if (rex.phase === "away" || lessonRoute) return;
@@ -1171,7 +1232,8 @@ export default function CentralWorld() {
         const nextPlacements = readCentralWorldPlacements(placementScope);
         const ownedKeys = new Set(merged.inventory.map((entry) => entry.item_key));
         setItemsById(nextItemsById);
-        setOwnedItemKeys(ownedKeys);
+        // Visiting a friend, their items count (set when their world loads), not yours.
+        if (!visitId || preview) setOwnedItemKeys(ownedKeys);
         setEquipped(merged.equipped);
         setXpBalance(merged.wallet.xp_balance);
 
@@ -1204,7 +1266,7 @@ export default function CentralWorld() {
     return () => {
       cancelled = true;
     };
-  }, [placementScope, preview, requestedBuildItemKey, student?.studentId, buildGrid.cellSize]);
+  }, [placementScope, preview, requestedBuildItemKey, student?.studentId, buildGrid.cellSize, visitId]);
 
   // Pan the build camera/cursor by whole cells. The avatar stays put — panning no
   // longer teleports it to follow the cursor — and the cursor is clamped to the
@@ -1971,7 +2033,7 @@ export default function CentralWorld() {
         <CentralWorldScene night={night} selection={selectedPlacement && selectedItem ? { placement: selectedPlacement, item: selectedItem, menu: (
           <div className="worldEditPicked" onPointerDown={(event) => event.stopPropagation()} onPointerUp={(event) => event.stopPropagation()}>
             <b>{selectedItem.name}</b>
-            <PremiumHomeUpgradeRows assetKey={selectedItem.metadata.worldAssetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={upgradeHome} />
+            {visiting ? null : <PremiumHomeUpgradeRows assetKey={selectedItem.metadata.worldAssetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={upgradeHome} />}
             <button type="button" className="worldEditPickedMove" onClick={() => pickUpPlacement(selectedPlacement)}><Move size={20} aria-hidden="true" />Move</button>
             {selectedPlacement.itemId !== CENTRAL_WORLD_HOME_KEY ? <>
               <button type="button" onClick={() => turnPlaced(selectedPlacement, selectedItem)}><RotateCw size={20} aria-hidden="true" />Turn</button>
@@ -1987,13 +2049,18 @@ export default function CentralWorld() {
       </Canvas>
       </div>
 
-      {!editorOpen && !race && !drive && !boat && hubV2 ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onChooseRealm={enterRealmForRex} /> : null}
-      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
+      {visiting && friendWorld && !editorOpen && !race && !drive && !boat ? <VisitBanner name={friendWorld.name} canBuild={friendWorld.canBuild} onGoHome={goHome} /> : null}
+      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} onVisit={visitFriend} onClose={() => setFriendsOpen(false)} /> : null}
+      {!visiting && visitorChanges[0] && !editorOpen && !race && !drive && !boat ? <VisitorChangesCard change={visitorChanges[0]} busy={resolvingChange} onKeep={() => void resolveChange(false)} onUndo={() => void resolveChange(true)} /> : null}
+      {!editorOpen && !race && !drive && !boat && hubV2 && !visiting ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onChooseRealm={enterRealmForRex} /> : null}
+      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
         // Edit World: plan the whole world from above.
-        ...(walkBuild ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
+        ...(walkBuild || !canBuildHere ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
+        // Friends: visit their worlds and choose who can help build yours (not while visiting).
+        ...(visiting || !hubV2 ? [] : [{ key: "friends", label: "Friends", icon: <Users size={15} />, onClick: () => setFriendsOpen(true) }]),
       ]} /> : null}
 
       {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive || boat)} />{race || drive || boat ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
