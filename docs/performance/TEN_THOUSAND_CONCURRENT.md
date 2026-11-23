@@ -1725,3 +1725,41 @@ capacity run was repeated for this instrumentation change, and no new performanc
 claim is made. No application or schema change; no app build required.
 The default ESLint configuration ignores these staging scripts; its invocation
 reported three ignored-file warnings and is not counted as a lint pass.
+
+### Journal-backed default baseline — 23 November 2026
+
+Ran the unchanged official local API with its default pool and the journal-enabled
+harness at commit 8596a16b: 100 synthetic students, four teachers, six-source
+compact dashboard refreshes, page size 1000, simultaneous login and a 60-second
+closed-loop workload (61 seconds elapsed). Local preflight passed before and after.
+No container settings, application code or schema changed.
+
+All 100 student journeys completed. There were zero failed recorded operations
+and zero journey failures. Independent read-only SQL reconciliation against the
+journal found 100 baselines, 200 acknowledged activity increments, 200 acknowledged
+events and no unacknowledged intents. Every student's stored activity delta was
+exactly 30 seconds per acknowledged write. Every stored event sequence matched its
+acknowledgements. This validates the journal integration on a successful run; the
+previous timeout and disk-failure unit tests remain the evidence for those paths.
+
+The latency gate still failed (expected harness exit code 1): login p95 1,005 ms,
+whole dashboard refresh 1,857 ms, initial events 1,856 ms, lesson attempts 1,683 ms,
+quiz attempts 1,235 ms and assessments 1,729 ms. Incremental events were 408 ms.
+Do not treat a complete, correct workload as a latency pass or increase scale.
+
+Direct cgroup CPU counters sampled roughly every two seconds produced plausible
+interval peaks of 2.45 cores for DB and 2.15 for API, each with CPUs 0–7 available
+and no quota-throttling delta. Thirty samples per container included preparation;
+whole-window means were 0.146 and 0.099 cores respectively. These averages include
+closed-loop sleep periods and cannot rule out brief saturation. Sampling calls
+cost up to 97 ms. No streamed Docker stats or SQL connection sampler was used, so
+this is a fresh instrumented baseline, not an improvement comparison with older
+runs or an explanation of their anomalous counters.
+
+Next: evaluate the existing shared authorised attempt-scope prototype with actual
+API-role access, pagination, unsupported-scope fallback and revocation checks
+before considering any application integration. No production change or migration.
+Raw private evidence and orchestration/reconciliation scripts:
+`/Users/seanjohns/reliq-audits/2026-11-23/journal-baseline/`. Redacted aggregate:
+`journal-baseline-summary-2026-11-23.json`. Aggregate reconciliation and whitespace
+checks passed; documentation-only commit, no app build required.

@@ -1,0 +1,80 @@
+{
+  "at": "2026-11-23T06:47:36.297Z",
+  "workloadCommit": "8596a16b",
+  "students": 100,
+  "teachers": 4,
+  "durationSeconds": 61,
+  "gatePassed": false,
+  "failedRecordedOperations": 0,
+  "journeyFailures": 0,
+  "verifiedStudents": 100,
+  "verifiedActivityWrites": 200,
+  "expectedNewEvents": 200,
+  "p95Ms": {
+    "teacher_login": 216,
+    "student_login_lookup": 1005,
+    "get_student_runtime_context_secure": 524,
+    "upsert_live_student_activity_secure": 658,
+    "get_student_activity_daily_secure": 545,
+    "dashboard_daily_activity": 514,
+    "touch_live_student_presence_secure": 400,
+    "dashboard_live_activity": 440,
+    "upsert_student_activity_daily_secure": 318,
+    "dashboard_quiz_attempts": 1235,
+    "dashboard_assessments": 1729,
+    "insert_live_activity_event_secure": 332,
+    "dashboard_lesson_attempts": 1683,
+    "dashboard_events_initial": 1856,
+    "dashboard_refresh": 1857,
+    "dashboard_events_incremental": 408,
+    "get_live_student_activity_secure": 192
+  },
+  "reconciliation": {
+    "students": 100,
+    "baselines": 100,
+    "acknowledgedActivityWrites": 200,
+    "acknowledgedEvents": 200,
+    "unacknowledgedIntents": 0,
+    "studentsWithExactActivityDelta": 100,
+    "studentsWithExactEvents": 100,
+    "journalVerifiedStudents": 100,
+    "issues": [],
+    "scope": "Quiescent local synthetic fixture after workload; SQL read-only totals include all dates. No real identifiers exported."
+  },
+  "cpu": [
+    {
+      "container": "supabase_db_reliq-scale-local",
+      "samples": 30,
+      "cpus": [
+        "0-7"
+      ],
+      "quota": [
+        "max 100000"
+      ],
+      "maximumIntervalCores": 2.449643916675839,
+      "averageCores": 0.14583113041057663,
+      "maximumSampleDurationMs": 96.704958,
+      "throttledUsecDelta": 0
+    },
+    {
+      "container": "supabase_rest_reliq-scale-local",
+      "samples": 30,
+      "cpus": [
+        "0-7"
+      ],
+      "quota": [
+        "max 100000"
+      ],
+      "maximumIntervalCores": 2.1456397450975655,
+      "averageCores": 0.09872468372199401,
+      "maximumSampleDurationMs": 93.733916,
+      "throttledUsecDelta": 0
+    }
+  ],
+  "limitations": [
+    "One local closed-loop run, not production capacity proof.",
+    "Direct cgroup usage sampled about every two seconds, includes preparation and sampling overhead; not per-request CPU attribution.",
+    "Instrumentation differs from earlier runs; no performance comparison claimed.",
+    "No streamed CPU or SQL connection sampler in this run."
+  ]
+}
