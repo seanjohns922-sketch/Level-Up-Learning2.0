@@ -26,6 +26,7 @@ import { lakeOval, placedLakes, type WaterOval } from "@/lib/world3d/swimming";
 import { PlacedPremiumHome, TowerShieldAtTower } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
 import { PlacedCarport, RoadNetwork } from "@/components/world3d/premium-items/RoadsAndCars";
+import { BattleArena } from "@/components/world3d/battle/BattleArena";
 import { CARPORT_ASSET_KEY } from "@/lib/world3d/cars";
 import { PlacedRacePiece, RaceTrackTiles } from "@/components/world3d/premium-items/RacePieces";
 import { RACE_PIECE_KEYS } from "@/lib/world3d/race-kit";
@@ -45,7 +46,7 @@ import { ExplorerLodge } from "@/components/world3d/ExplorerLodge";
 import { CentralWorldV2Scenery } from "@/components/world3d/CentralWorldV2Scenery";
 import { KEEP_LIVE, MergeStatic } from "@/components/world3d/MergeStatic";
 import { ExplorerTreehouse } from "@/components/world3d/ExplorerTreehouse";
-import { HUB_V2_HOME_CARPORT, HUB_V2_TREEHOUSE_ANCHORS } from "@/lib/world3d/central-world-v2";
+import { HUB_V2_ARENA, HUB_V2_HOME_CARPORT, HUB_V2_TREEHOUSE_ANCHORS } from "@/lib/world3d/central-world-v2";
 import { CentralValleyPanorama } from "./CentralValleyPanorama";
 import { CentralMeadowRim } from "./CentralMeadowRim";
 import {
@@ -1334,7 +1335,7 @@ function PlaceholderMyHome(props: React.ComponentProps<typeof ExplorerLodge>) {
   return <ExplorerLodge {...props} />;
 }
 
-export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, buildGridCells = 16, justPlacedId = null, onEnterTower, onEnterHome, onToggleDrawbridge }: { hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; /** How many squares across the build grid shows round the cursor. */ buildGridCells?: number; /** The item just put down, which lands with a bounce. */ justPlacedId?: string | null; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
+export function CentralWorldEnvironment({ hubV2 = false, night = false, reservedCell, quality, entranceActive, homeActive, homePlacement = DEFAULT_HOME_PLACEMENT, placedCustomisations = [], groundTiles = [], itemsById = new Map(), buildPreview = null, groundPreview = null, editing = false, editCursor = { gridX: 0, gridZ: 0 }, buildGridCells = 16, justPlacedId = null, battleClash = null, onEnterTower, onEnterHome, onToggleDrawbridge }: { /** A battle on: where the clash point of light sits (-1..1). */ battleClash?: number | null; hubV2?: boolean; night?: boolean; reservedCell?: (gridX: number, gridZ: number) => boolean; quality: CentralWorldQuality; entranceActive: boolean; homeActive: boolean; homePlacement?: CentralWorldPlacement; placedCustomisations?: CentralWorldPlacement[]; groundTiles?: CentralWorldGroundTile[]; itemsById?: Map<string, EconomyItem>; buildPreview?: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview?: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing?: boolean; editCursor?: { gridX: number; gridZ: number }; /** How many squares across the build grid shows round the cursor. */ buildGridCells?: number; /** The item just put down, which lands with a bounce. */ justPlacedId?: string | null; onEnterTower?: () => void; onEnterHome?: () => void; onToggleDrawbridge?: (placementId: string) => void }) {
   const reducedMotion = usePrefersReducedMotion();
   // Placed Swimming Lakes need their holes in the grass, like painted water.
   const lakes = useMemo(() => placedLakes(placedCustomisations, itemsById).map(lakeOval), [placedCustomisations, itemsById]);
@@ -1354,6 +1355,7 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <group position={[HUB_V2_HOME_CARPORT.x, 0, HUB_V2_HOME_CARPORT.z]}><PlacedCarport /></group> : null}
+      {hubV2 ? <group position={[HUB_V2_ARENA.x, 0, HUB_V2_ARENA.z]}><BattleArena night={night} clash={battleClash ?? undefined} /></group> : null}
       {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} cells={buildGridCells} ring={!buildPreview} reservedCell={reservedCell} /> : null}
       <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>

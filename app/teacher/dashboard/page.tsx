@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Footprints, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
 import { SendRexDialog } from "@/components/teacher/SendRexDialog";
 import { setClassFriends } from "@/lib/friends";
+import { setClassBattles } from "@/lib/battles";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -46,6 +47,7 @@ type ClassRow = {
   brain_break_frequency?: string | null;
   friends_enabled?: boolean | null;
   friend_building_enabled?: boolean | null;
+  battles_enabled?: boolean | null;
 };
 type StudentRow = { id: string; display_name: string; first_name?: string | null; last_name?: string | null; username?: string | null; class_id: string; user_id: string; pin?: string | null; qr_token?: string | null; school_year_level?: string | null; working_level?: string | null; year_level?: string | null; brain_break_frequency?: string | null; archived_at?: string | null };
 type ProgressRow = {
@@ -651,6 +653,16 @@ export default function TeacherDashboardPage() {
     }
   }
 
+  async function setClassBattlesSetting(enabled: boolean) {
+    if (!selectedClassId) return;
+    try {
+      await setClassBattles(selectedClassId, enabled);
+      setClasses((prev) => prev.map((c) => (c.id === selectedClassId ? { ...c, battles_enabled: enabled } : c)));
+    } catch {
+      rexSent("Battles settings couldn't be saved just now. Try again in a moment.");
+    }
+  }
+
   // Brain-break frequency: class default + per-student override (null = inherit).
   async function setClassBrainBreak(value: BrainBreakFrequency) {
     if (!selectedClassId) return;
@@ -1099,7 +1111,7 @@ export default function TeacherDashboardPage() {
                       <div className="px-3 py-2.5">
                         <p className="flex items-center gap-2 text-sm font-bold"><Users className="h-4 w-4" aria-hidden="true" />Friends</p>
                         <p className="mt-0.5 pl-6 text-xs text-[#5A5E63]">Students add friends with a friend code and visit each other&apos;s worlds. No chat.</p>
-                        {([["Friends and visits", selectedClass.friends_enabled !== false, (on: boolean) => void setClassFriendsSetting(on, on && selectedClass.friend_building_enabled !== false)], ["Friends can help build", selectedClass.friends_enabled !== false && selectedClass.friend_building_enabled !== false, (on: boolean) => void setClassFriendsSetting(selectedClass.friends_enabled !== false || on, on)]] as const).map(([label, on, change]) => (
+                        {([["Friends and visits", selectedClass.friends_enabled !== false, (on: boolean) => void setClassFriendsSetting(on, on && selectedClass.friend_building_enabled !== false)], ["Friends can help build", selectedClass.friends_enabled !== false && selectedClass.friend_building_enabled !== false, (on: boolean) => void setClassFriendsSetting(selectedClass.friends_enabled !== false || on, on)], ["Friend battles", selectedClass.battles_enabled !== false, (on: boolean) => void setClassBattlesSetting(on)]] as const).map(([label, on, change]) => (
                           <button key={label} type="button" role="switch" aria-checked={on} onClick={() => change(!on)} className="ml-6 mt-2 flex w-[calc(100%-1.5rem)] items-center justify-between rounded-xl border border-[#E3E5E0] px-3 py-2 text-xs font-bold">
                             <span>{label}</span>
                             <span className={`rounded-full px-2.5 py-0.5 ${on ? "bg-[#83E300] text-[#121314]" : "bg-[#F1F2EE] text-[#5A5E63]"}`}>{on ? "ON" : "OFF"}</span>

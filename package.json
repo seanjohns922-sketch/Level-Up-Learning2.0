@@ -341,7 +341,9 @@
     "qa:swimming": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/swimming-test.mjs",
     "qa:rex": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/rex-test.mjs",
     "qa:boats": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/boats-test.mjs",
-    "qa:friends": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/friends-test.mjs"
+    "qa:friends": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/friends-test.mjs",
+    "qa:battles": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/battles-test.mjs",
+    "qa:battle-questions": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/battle-questions-test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",

@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { sendRex } from "@/lib/rex-client";
 import { fetchChildFriends, setChildFriends } from "@/lib/friends";
+import { setChildBattles } from "@/lib/battles";
 import { REX_QUESTIONS, REX_XP } from "@/lib/rex";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import { stoneForGem } from "@/lib/gem-stones";
@@ -407,7 +408,7 @@ export function ParentHome({ selectedStudentId, preview }: { selectedStudentId?:
 
 /** Friends: whether the child can add friends and visit worlds, and whether friends can help build theirs. */
 function ParentFriends({ child, preview }: { child: ParentChild; preview: boolean }) {
-  const [settings, setSettings] = useState<{ enabled: boolean; building: boolean; schoolManaged: boolean } | null>(preview ? { enabled: true, building: true, schoolManaged: false } : null);
+  const [settings, setSettings] = useState<{ enabled: boolean; building: boolean; battles?: boolean; schoolManaged: boolean } | null>(preview ? { enabled: true, building: true, battles: true, schoolManaged: false } : null);
   const [message, setMessage] = useState<string | null>(null);
   useEffect(() => {
     if (preview) return;
@@ -422,6 +423,13 @@ function ParentFriends({ child, preview }: { child: ParentChild; preview: boolea
     try { await setChildFriends(child.studentId, enabled, building); setMessage(null); }
     catch { setMessage("That couldn't be saved just now. Try again in a moment."); }
   };
+  const saveBattles = async (on: boolean) => {
+    if (!settings) return;
+    setSettings({ ...settings, battles: on });
+    if (preview) return;
+    try { await setChildBattles(child.studentId, on); setMessage(null); }
+    catch { setMessage("That couldn't be saved just now. Try again in a moment."); }
+  };
   return (
     <section aria-labelledby="friends-title" className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
       <div className="flex flex-wrap items-start gap-4">
@@ -432,8 +440,8 @@ function ParentFriends({ child, preview }: { child: ParentChild; preview: boolea
           {message ? <p role="status" className="mt-2 text-sm font-bold text-[#121314]">{message}</p> : null}
         </div>
       </div>
-      {settings ? <div className="mt-4 grid gap-2 sm:grid-cols-2">
-        {([["Friends and visits", settings.enabled, (on: boolean) => void save(on, on && settings.building)], ["Friends can help build", settings.enabled && settings.building, (on: boolean) => void save(settings.enabled || on, on)]] as const).map(([label, on, change]) => (
+      {settings ? <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        {([["Friends and visits", settings.enabled, (on: boolean) => void save(on, on && settings.building)], ["Friends can help build", settings.enabled && settings.building, (on: boolean) => void save(settings.enabled || on, on)], ["Friend battles", settings.battles !== false, (on: boolean) => void saveBattles(on)]] as const).map(([label, on, change]) => (
           <button key={label} type="button" role="switch" aria-checked={on} onClick={() => change(!on)} className="flex min-h-11 items-center justify-between rounded-lg border border-slate-300 px-4 font-bold">
             <span>{label}</span>
             <span className={`rounded-full px-3 py-0.5 text-sm ${on ? "bg-[var(--reliq-lime)] text-[#121314]" : "bg-slate-100 text-slate-600"}`}>{on ? "ON" : "OFF"}</span>

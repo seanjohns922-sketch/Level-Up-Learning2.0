@@ -109,6 +109,6 @@ export async function setClassFriends(classId: string, enabled: boolean, buildin
 export async function setChildFriends(studentId: string, enabled: boolean, building: boolean) {
   await call("set_child_friends_secure", { p_student_id: studentId, p_enabled: enabled, p_building: building });
 }
-export async function fetchChildFriends(studentId: string): Promise<{ enabled: boolean; building: boolean; schoolManaged: boolean }> {
+export async function fetchChildFriends(studentId: string): Promise<{ enabled: boolean; building: boolean; battles?: boolean; schoolManaged: boolean }> {
   return call("get_child_friends_secure", { p_student_id: studentId });
 }

@@ -219,6 +219,21 @@ export const HUB_V2_ROCKS: HubRock[] = (() => {
   return out;
 })();
 
+/** The Battle Arena: a fixed landmark behind the Tower, outside the build area (components/world3d/battle/BattleArena.tsx).
+ * `bowl` is the bowl and rim, `podium` how far out each launch podium stands (on the x axis). */
+export const HUB_V2_ARENA = { x: 0, z: -112, radius: 21, bowl: 10.6, podium: 11.5 } as const;
+/** What you can't walk through at the arena: the bowl, the two podiums, the four curved stands, the scoreboard and floodlights. */
+const ARENA_COLLIDERS: HubCollider[] = [
+  { x: HUB_V2_ARENA.x, z: HUB_V2_ARENA.z, r: HUB_V2_ARENA.bowl },
+  ...[-1, 1].map((side) => ({ x: HUB_V2_ARENA.x + side * HUB_V2_ARENA.podium, z: HUB_V2_ARENA.z, r: 2 })),
+  ...[1, 3, 5, 7].flatMap((eighth) => [-0.3, 0, 0.3].map((spread) => {
+    const a = (eighth * Math.PI) / 4 + spread;
+    return { x: HUB_V2_ARENA.x + Math.sin(a) * 16.8, z: HUB_V2_ARENA.z + Math.cos(a) * 16.8, r: 2.6 };
+  })),
+  ...[-5, 5].map((dx) => ({ x: HUB_V2_ARENA.x + dx, z: HUB_V2_ARENA.z - 18.5, r: 0.6 })),
+  ...[[1, 1], [-1, 1], [1, -1], [-1, -1]].map(([sx, sz]) => ({ x: HUB_V2_ARENA.x + sx * 17, z: HUB_V2_ARENA.z + sz * 17, r: 0.5 })),
+];
+
 const CAMP = HUB_V2_PADS.find((p) => p.key === "camp")!;
 const TREEHOUSE = HUB_V2_PADS.find((p) => p.key === "treehouse")!;
 export const HUB_V2_COLLIDERS: HubCollider[] = [
@@ -226,6 +241,7 @@ export const HUB_V2_COLLIDERS: HubCollider[] = [
   { x: CAMP.x, z: CAMP.z, r: 1 }, { x: CAMP.x - 5, z: CAMP.z - 4, r: 1.7 }, { x: CAMP.x + 4.5, z: CAMP.z - 4.5, r: 1.7 },
   ...HUB_V2_GUMS.map((g) => ({ x: g.x, z: g.z, r: 0.8 * g.s })),
   ...HUB_V2_ROCKS.filter((r) => r.s > 1.8).map((r) => ({ x: r.x, z: r.z, r: r.s * 0.32 })),
+  ...ARENA_COLLIDERS,
 ];
 
 /** Where the player may stand: inside the world, anywhere along the river (wading or swimming) but not up the waterfall, not inside a gum or boulder. */
@@ -277,7 +293,8 @@ export const HUB_V2_DECOR: HubDecor[] = (() => {
       placed++;
     }
   }
-  return out;
+  // Nothing grows on the Battle Arena (filtered afterwards, so the rest of the meadow stays exactly as it was).
+  return out.filter((d) => Math.hypot(d.x - HUB_V2_ARENA.x, d.z - HUB_V2_ARENA.z) > HUB_V2_ARENA.radius);
 })();
 
 
@@ -320,10 +337,11 @@ function computeReserved(gridX: number, gridZ: number) {
   if (hubPathDistance(x, z) < 3) return true;
   if (HUB_V2_BRIDGES.some((b) => Math.abs(z - b.z) < b.width / 2 + 2 && x > b.x0 - 3 && x < b.x1 + 3)) return true;
   if (HUB_V2_PADS.some((p) => Math.hypot(x - p.x, z - p.z) < p.r + 3)) return true;
+  if (Math.hypot(x - HUB_V2_ARENA.x, z - HUB_V2_ARENA.z) < HUB_V2_ARENA.radius + 2) return true; // the Battle Arena
   return HUB_V2_COLLIDERS.some((c) => Math.hypot(x - c.x, z - c.z) < c.r + 1.2);
 }
 
-/** Squares nobody can build on: the Tower, river, bridges, paths, clearings, gums and boulders. Computed once. */
+/** Squares nobody can build on: the Tower, river, bridges, paths, clearings, the Battle Arena, gums and boulders. Computed once. */
 export function hubIsReservedCell(gridX: number, gridZ: number) {
   if (!reservedCells) {
     reservedCells = new Set();

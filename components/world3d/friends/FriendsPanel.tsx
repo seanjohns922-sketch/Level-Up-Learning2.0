@@ -38,7 +38,7 @@ function Switch({ on, label, onChange, disabled }: { on: boolean; label: string;
   );
 }
 
-export function FriendsPanel({ studentId, demo, onVisit, onClose }: { studentId: string | null; demo: boolean; onVisit: (friend: Friend) => void; onClose: () => void }) {
+export function FriendsPanel({ studentId, demo, onVisit, onChallenge, onClose }: { studentId: string | null; demo: boolean; onVisit: (friend: Friend) => void; onChallenge?: (friend: Friend) => void; onClose: () => void }) {
   const [state, setState] = useState<FriendsState | null>(null);
   const [tab, setTab] = useState<"friends" | "requests" | "add">("friends");
   const [typed, setTyped] = useState("");
@@ -84,6 +84,7 @@ export function FriendsPanel({ studentId, demo, onVisit, onClose }: { studentId:
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Avatar name={friend.name} />
             <span style={{ flex: 1, minWidth: 0, fontWeight: 800, fontSize: 16 }}>{friend.name}<small style={{ display: "block", fontWeight: 600, fontSize: 12, opacity: .7 }}>{friend.iCanBuild ? "You can help build in their world" : "You can visit their world"}</small></span>
+            {onChallenge ? <button type="button" onClick={() => onChallenge(friend)} aria-label={`Battle ${friend.name}`} title="Battle" style={pill("#ffcf4a", "#3a2a00")}>⚔</button> : null}
             <button type="button" onClick={() => onVisit(friend)} style={pill(VIOLET)}>VISIT</button>
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, paddingLeft: 50 }}>
