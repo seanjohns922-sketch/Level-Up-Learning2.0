@@ -45,8 +45,10 @@ import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
 import { HubWadingRipples } from "@/components/world3d/CentralWorldV2Scenery";
 import { HubNightGlow, HubSkyLights, readHubNight, writeHubNight } from "@/components/world3d/HubNight";
-import { buildWaterAreas, placedLakes, swimSurfaceAt, SWIM_SPEED, waterReach, withSwimming } from "@/lib/world3d/swimming";
-import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { buildWaterAreas, placedLakes, swimSurfaceAt, SWIM_SPEED, waterReach, withSwimming, type WaterAreas } from "@/lib/world3d/swimming";
+import { BOAT_SPECS, boatToRide, boatWaterAt, nearestBank, openWaterHeading, ownedBoats, type BoatStyle } from "@/lib/world3d/boats";
+import { BoatRider } from "@/components/world3d/premium-items/BoatRider";
+import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, hubWaterDepth, HUB_V2_WATER_Y, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { RexDinosaur } from "@/components/world3d/rex/RexDinosaur";
@@ -361,7 +363,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase }: { rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt }: { waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -389,7 +391,6 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
   }), [placedCustomisations, itemsById]);
   const rideHeightAt = useMemo(() => skatePieces.length ? (x: number, z: number) => skateHeightAt(x, z, skatePieces) : undefined, [skatePieces]);
   // All water is swimmable: painted water and placed Swimming Lakes are dug out, and the river runs deep.
-  const waterAreas = useMemo(() => buildWaterAreas(groundTiles, placedLakes(placedCustomisations, itemsById)), [groundTiles, placedCustomisations, itemsById]);
   const groundAt = useMemo(() => hubV2 ? withSwimming(waterAreas, hubGroundHeight) : undefined, [hubV2, waterAreas]);
   const swimmingAt = useMemo(() => hubV2 ? (x: number, z: number) => swimSurfaceAt(waterAreas, x, z) ?? hubSwimSurfaceAt(x, z) : undefined, [hubV2, waterAreas]);
   const speedAt = useMemo(() => {
@@ -433,7 +434,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
     groundHeightAt: kartWorld.groundHeightAt,
     canDriveAt: (x, z) => kartWorld.canDriveAt(x, z) && !carBlocked?.has(cellAt(x, z)),
   }), [kartWorld, carBlocked]);
-  const racing = Boolean(raceCourse && raceStart) || Boolean(drive);
+  const racing = Boolean(raceCourse && raceStart) || Boolean(drive) || Boolean(boat);
   // The build camera takes over in the planner; walking builders keep their own view.
   const frozen = editing || (Boolean(buildPreview) && !walking);
   const roaming = !frozen && !racing;
@@ -540,6 +541,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         positionRef={avatarPosRef}
         aimRef={aimRef}
       />
+      {boat ? <BoatRider key={boat.nonce} start={boat.start} style={boat.style} waterAt={boatWaterAt} moveInput={moveInput} hudRef={carHud} poseRef={carPose} night={night} /> : null}
       {drive && driveCourse ? <CarDriver key={drive.nonce} start={drive.start} style={drive.style} colour={drive.colour} course={driveCourse} world={carWorld} moveInput={moveInput} hudRef={carHud} poseRef={carPose} night={night} lights={drive.lights} /> : null}
       {race && raceCourse && raceStart ? <RaceKartDriver key={race.nonce} course={raceCourse} start={raceStart} world={kartWorld} moveInput={moveInput} hud={raceHud} kart={kart} paused={racePaused} night={night} onBestLap={onBestLap} /> : null}
       <BuildModeCamera active={frozen} cursor={cameraFocus} zoom={buildZoom} yaw={cameraYaw} pitch={cameraPitch} />
@@ -653,6 +655,7 @@ type CourtTarget = { id: string; kind: "basketball" | SportKind; court: { x: num
 const CARPORT_TARGET_PREFIX = "carport:";
 type CarportTarget = { id: string; pose: CarPose };
 type DriveSession = { start: CarPose; style: CarStyle; colour: string; lights: boolean; nonce: number };
+type BoatRide = { start: CarPose; style: BoatStyle; nonce: number };
 type ShotInFlight = { id: number; plan: Shot | SportShot };
 const COURT_TARGET_PREFIX = "court:";
 /** A race in progress; the nonce restarts it. */
@@ -977,8 +980,9 @@ export default function CentralWorld() {
   const [carChoice, setCarChoice] = useState(() => readCarChoice(placementScope));
   const carStyle = carToDrive(carChoice, ownedItemKeys);
   const [drive, setDrive] = useState<DriveSession | null>(null);
+  const [boat, setBoat] = useState<BoatRide | null>(null);
   // Rex the maths T-rex: sent by a teacher or parent, or awake after 15 minutes in the hub.
-  const rex = useRexVisit({ studentId: student?.studentId ?? null, demo: preview, active: hubV2 && !race && !drive, wakeNow: preview && searchParams.get("rex") === "now" });
+  const rex = useRexVisit({ studentId: student?.studentId ?? null, demo: preview, active: hubV2 && !race && !drive && !boat, wakeNow: preview && searchParams.get("rex") === "now" });
   const [lessonRoute, setLessonRoute] = useState<string | null>(null);
   useEffect(() => {
     if (rex.phase === "away" || lessonRoute) return;
@@ -1013,6 +1017,41 @@ export default function CentralWorld() {
     setDrive(null);
     teleport([x - Math.cos(heading) * 2.4, CENTRAL_WORLD_CONFIG.spawnPoint[1], z + Math.sin(heading) * 2.4], heading + Math.PI);
   }
+  // Boats: wade into any water deep enough to float in and tap BOAT; EXIT BOAT lands on the nearest bank.
+  const waterAreas = useMemo(() => buildWaterAreas(groundTiles, placedLakes(placedCustomisations, itemsById)), [groundTiles, placedCustomisations, itemsById]);
+  const findBoatWater = useMemo(() => {
+    const river = hubV2 ? { surfaceY: HUB_V2_WATER_Y, depthAt: hubWaterDepth } : null;
+    return (x: number, z: number) => boatWaterAt(waterAreas, river, x, z);
+  }, [waterAreas, hubV2]);
+  const [boatChoice, setBoatChoice] = useState<BoatStyle | null>(null);
+  const boatStyle = boatToRide(boatChoice, ownedItemKeys);
+  const [onBoatWater, setOnBoatWater] = useState(false);
+  useEffect(() => {
+    if (!hubV2 || boat || drive || race) return;
+    const check = window.setInterval(() => setOnBoatWater(findBoatWater(avatarPosRef.current.x, avatarPosRef.current.z) !== null), 300);
+    return () => { window.clearInterval(check); setOnBoatWater(false); };
+  }, [hubV2, boat, drive, race, findBoatWater]);
+  function startBoat() {
+    if (!boatStyle) {
+      const text = "Unlock a boat in the Marketplace's Swimming & boats tab, then wade in and ride it.";
+      setEconomyMessage(text);
+      void speak(text, undefined, "manual", { rate: 0.9 });
+      return;
+    }
+    const { x, z } = avatarPosRef.current;
+    const pose = { x, z, heading: openWaterHeading((px, pz) => findBoatWater(px, pz) !== null, x, z, aimRef.current) };
+    carHud.current = { speed: 0, offRoad: false };
+    carPose.current = pose;
+    setBoat((current) => ({ start: pose, style: boatStyle, nonce: (current?.nonce ?? 0) + 1 }));
+    void speak(`${BOAT_SPECS[boatStyle].name}. Push the joystick to go. Boats stay on the water.`, undefined, "manual", { rate: 0.95 });
+  }
+  function exitBoat() {
+    const { x, z, heading } = carPose.current;
+    const dry = (px: number, pz: number) => waterReach(waterAreas, px, pz) === 0 && (!hubV2 || (hubWaterDepth(px, pz) === 0 && hubCanStand(px, pz)));
+    const bank = nearestBank(dry, x, z) ?? { x, z };
+    setBoat(null);
+    teleport([bank.x, CENTRAL_WORLD_CONFIG.spawnPoint[1], bank.z], heading + Math.PI);
+  }
   const [shot, setShot] = useState<ShotInFlight | null>(null);
   const [hoopScore, setHoopScore] = useState(0);
   const [shotMessage, setShotMessage] = useState<{ text: string; good: boolean } | null>(null);
@@ -1039,7 +1078,7 @@ export default function CentralWorld() {
     const timer = window.setTimeout(() => setShotMessage(null), 1400);
     return () => window.clearTimeout(timer);
   }, [shotMessage]);
-  const hasAvailableAction = !race && !drive && (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null || nearCourt !== null || nearCarport !== null);
+  const hasAvailableAction = !race && !drive && !boat && (onBoatWater || activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null || nearCourt !== null || nearCarport !== null);
   const activeBuildItemKey = editorOpen || walkBuild ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
   // Exclude the item currently in hand by its unique placementId (not itemId),
@@ -1070,8 +1109,8 @@ export default function CentralWorld() {
   } : null;
   const ownedWorldItems = useMemo(() => Array.from(ownedItemKeys)
     .map((itemKey) => itemsById.get(itemKey))
-    // The Tower Shield is never placed; it stands round the Tower.
-    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street", "sports", "water"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true))
+    // The Tower Shield is never placed (it stands round the Tower), and boats are ridden, not placed.
+    .filter((item): item is EconomyItem => Boolean(item && ["buildings", "animals", "pools_play", "special", "trains", "defence", "city_life", "main_street", "sports", "water"].includes(String(item.metadata.marketplaceCategory)) && item.metadata.premiumFixed !== true && !item.metadata.boatStyle))
     .sort((a, b) => a.sort_order - b.sort_order), [itemsById, ownedItemKeys]);
 
   // The walk-build hotbar: free scenery the learner's kits allow, their owned items, and ground brushes.
@@ -1896,7 +1935,8 @@ export default function CentralWorld() {
   }
 
   function runActiveAction() {
-    if (!activeTargetId || transitioning) return;
+    if (transitioning) return;
+    if (!activeTargetId) { if (onBoatWater) startBoat(); return; }
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance) enterMyHome();
     if (activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance) enterTower();
     if (nearRaceStart) startRace(nearRaceStart.item);
@@ -1929,7 +1969,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive ? "away" : rex.phase} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} />
         </CarWorldContext.Provider>
         </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
@@ -1938,8 +1978,8 @@ export default function CentralWorld() {
       </Canvas>
       </div>
 
-      {!editorOpen && !race && !drive && hubV2 ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onStartLesson={() => router.push(lessonRoute ?? "/realms")} /> : null}
-      {!editorOpen && !race && !drive ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : { label: "ENTER TOWER", icon: "door", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !race && !drive && !boat && hubV2 ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onStartLesson={() => router.push(lessonRoute ?? "/realms")} /> : null}
+      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
@@ -1947,13 +1987,17 @@ export default function CentralWorld() {
         ...(walkBuild ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
       ]} fallbackHref={preview ? "/home-base?teacher_preview=1" : "/home-base"} /> : null}
 
-      {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive)} />{race || drive ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
+      {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive || boat)} />{race || drive || boat ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
       {drive ? <CarHudPanel hud={carHud} name={CAR_SPECS[drive.style].name} lights={drive.lights} canSwap={ownedCars(ownedItemKeys).length > 1}
         onHorn={carSounds.horn}
         onLights={() => setDrive((current) => current ? { ...current, lights: !current.lights } : current)}
         onColour={() => chooseCar({ colour: nextOf(CAR_COLOURS, carChoice.colour as (typeof CAR_COLOURS)[number]) })}
         onSwap={() => { if (carStyle) chooseCar({ style: nextOf(ownedCars(ownedItemKeys), carStyle) }); }}
         onExit={exitDrive} /> : null}
+      {boat ? <CarHudPanel hud={carHud} name={BOAT_SPECS[boat.style].name} status="on the water" swapLabel="Boat" exitLabel="EXIT BOAT" canSwap={ownedBoats(ownedItemKeys).length > 1}
+        onHorn={carSounds.horn}
+        onSwap={() => { const next = nextOf(ownedBoats(ownedItemKeys), boat.style); setBoatChoice(next); setBoat((current) => current ? { ...current, style: next } : current); }}
+        onExit={exitBoat} /> : null}
       {race && !garageOpen ? <RaceHud hud={raceHud} onRestart={() => startRace(race.start)} onGarage={openGarage} onExit={exitRace} /> : null}
       {garageOpen ? <KartGarage style={kart.style} parts={kart.parts} owned={ownedItemKeys} finishedRealms={finishedRealms} xp={xpBalance} busy={garageBusy} message={garageMessage} actions={garageActions} onClose={closeGarage} /> : null}
       {walking && !race && !garageOpen ? (

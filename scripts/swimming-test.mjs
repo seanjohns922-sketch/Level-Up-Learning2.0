@@ -53,7 +53,7 @@ assert.equal(hubSwimSurfaceAt(0, 0), null, "not swimming at the Tower");
 const rows = [...PREMIUM_HOME_SHOP_ITEMS, ...PREMIUM_HOME_UPGRADE_ITEMS].filter((row) => WATER_STYLES.includes(row.metadata.premiumHome));
 assert.equal(rows.length, 4);
 assert.equal(centralWorldCategory(lakeItem), "water");
-assert.ok(MARKETPLACE_CATEGORIES.world.some((c) => c.id === "water" && c.label === "Swimming"));
+assert.ok(MARKETPLACE_CATEGORIES.world.some((c) => c.id === "water" && c.label === "Swimming & boats"));
 assert.ok(existsSync(new URL(`../public/marketplace/world-renders/${PREMIUM_HOME_SPECS.swimming_lake.assetKey}.webp`, import.meta.url)), "lake shop picture");
 const migration = readFileSync(new URL("../supabase/migrations/20261125120000_swimming_lake.sql", import.meta.url), "utf8");
 for (const row of rows) assert.ok(migration.split("\n").some((line) => line.startsWith(`('${row.item_key}'`) && line.includes(`, ${row.price}, `)), `migration row for ${row.item_key}`);

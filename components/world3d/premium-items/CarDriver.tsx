@@ -93,17 +93,21 @@ export function CarDriver({ start, style, colour, course, world, moveInput, hudR
 const panel: React.CSSProperties = { background: "rgba(18,22,30,.88)", border: "1px solid rgba(255,255,255,.18)", borderRadius: 14, color: "#fff", boxShadow: "0 10px 28px rgba(0,0,0,.32)" };
 const button: React.CSSProperties = { ...panel, display: "inline-flex", alignItems: "center", gap: 7, minHeight: 48, padding: "0 15px", fontWeight: 850, fontSize: 14, cursor: "pointer", pointerEvents: "auto" };
 
-/** Driving controls: speed, Horn, Lights, Colour, swap car, and EXIT CAR. */
-export function CarHudPanel({ hud, name, lights, canSwap, onHorn, onLights, onColour, onSwap, onExit }: {
+/** Driving controls: speed, Horn, Lights, Colour, swap, and EXIT. Boats use it too (no lights or paint). */
+export function CarHudPanel({ hud, name, lights = false, canSwap, onHorn, onLights, onColour, onSwap, onExit, status, swapLabel = "Car", exitLabel = "EXIT CAR" }: {
   hud: React.MutableRefObject<CarHud>;
   name: string;
-  lights: boolean;
+  lights?: boolean;
   canSwap: boolean;
   onHorn: () => void;
-  onLights: () => void;
-  onColour: () => void;
+  onLights?: () => void;
+  onColour?: () => void;
   onSwap: () => void;
   onExit: () => void;
+  /** Replaces "on the road / off-road" (a boat is always "on the water"). */
+  status?: string;
+  swapLabel?: string;
+  exitLabel?: string;
 }) {
   const [view, setView] = useState<CarHud>(() => ({ ...hud.current }));
   useEffect(() => {
@@ -118,9 +122,9 @@ export function CarHudPanel({ hud, name, lights, canSwap, onHorn, onLights, onCo
     return () => cancelAnimationFrame(frame);
   }, [hud]);
   return (
-    <section aria-label={`Driving the ${name}`} className="carHud" style={{ position: "absolute", inset: 0, zIndex: 40, pointerEvents: "none", fontFamily: "var(--font-display, system-ui)" }}>
-      <div className="carHudTitle" style={{ ...panel, position: "absolute", top: "max(74px, calc(env(safe-area-inset-top) + 62px))", left: 0, right: 0, marginInline: "auto", width: "fit-content", padding: "9px 16px", fontWeight: 850, fontSize: 15, border: `2px solid ${view.offRoad ? "#d9b46a" : "#4ade80"}` }}>
-        {name} · {view.offRoad ? "off-road" : "on the road"}
+    <section aria-label={`Riding the ${name}`} className="carHud" style={{ position: "absolute", inset: 0, zIndex: 40, pointerEvents: "none", fontFamily: "var(--font-display, system-ui)" }}>
+      <div className="carHudTitle" style={{ ...panel, position: "absolute", top: "max(74px, calc(env(safe-area-inset-top) + 62px))", left: 0, right: 0, marginInline: "auto", width: "fit-content", padding: "9px 16px", fontWeight: 850, fontSize: 15, border: `2px solid ${status ? "#5fd0ff" : view.offRoad ? "#d9b46a" : "#4ade80"}` }}>
+        {name} · {status ?? (view.offRoad ? "off-road" : "on the road")}
       </div>
       <div className="carHudSpeed" style={{ ...panel, position: "absolute", left: 0, right: 0, bottom: "max(28px, calc(env(safe-area-inset-bottom) + 22px))", marginInline: "auto", width: "fit-content", padding: "8px 18px", fontWeight: 950, fontSize: 28, fontVariantNumeric: "tabular-nums" }}>
         {Math.round(view.speed * 3.6)} <span style={{ fontSize: 13, opacity: 0.7 }}>km/h</span>
@@ -128,11 +132,11 @@ export function CarHudPanel({ hud, name, lights, canSwap, onHorn, onLights, onCo
       <div className="carHudButtons" style={{ position: "absolute", right: "max(24px, calc(env(safe-area-inset-right) + 18px))", bottom: "max(178px, calc(env(safe-area-inset-bottom) + 172px))", display: "grid", gap: 8, justifyItems: "end" }}>
         <div style={{ display: "flex", gap: 8 }}>
           <button type="button" style={button} onClick={onHorn} aria-label="Beep the horn"><Megaphone size={18} aria-hidden="true" />Horn</button>
-          <button type="button" style={{ ...button, background: lights ? "#ffcc33" : panel.background, color: lights ? "#3a2a00" : "#fff" }} onClick={onLights} aria-pressed={lights}><Lightbulb size={18} aria-hidden="true" />Lights</button>
-          <button type="button" style={button} onClick={onColour} aria-label="Change the paint colour"><Palette size={18} aria-hidden="true" />Colour</button>
-          {canSwap ? <button type="button" style={button} onClick={onSwap} aria-label="Swap to another car"><CarIcon size={18} aria-hidden="true" />Car</button> : null}
+          {onLights ? <button type="button" style={{ ...button, background: lights ? "#ffcc33" : panel.background, color: lights ? "#3a2a00" : "#fff" }} onClick={onLights} aria-pressed={lights}><Lightbulb size={18} aria-hidden="true" />Lights</button> : null}
+          {onColour ? <button type="button" style={button} onClick={onColour} aria-label="Change the paint colour"><Palette size={18} aria-hidden="true" />Colour</button> : null}
+          {canSwap ? <button type="button" style={button} onClick={onSwap} aria-label={`Swap to another ${swapLabel.toLowerCase()}`}><CarIcon size={18} aria-hidden="true" />{swapLabel}</button> : null}
         </div>
-        <button type="button" style={{ ...button, minHeight: 56, padding: "0 26px", fontSize: 18, background: "#e5484d", border: 0 }} onClick={onExit}><X size={20} aria-hidden="true" />EXIT CAR</button>
+        <button type="button" style={{ ...button, minHeight: 56, padding: "0 26px", fontSize: 18, background: "#e5484d", border: 0 }} onClick={onExit}><X size={20} aria-hidden="true" />{exitLabel}</button>
       </div>
       <style>{`@media (max-width:700px){.carHudButtons{left:16px;right:16px!important;justify-items:stretch!important;bottom:max(170px,calc(env(safe-area-inset-bottom) + 164px))!important}.carHudButtons>div{justify-content:space-between}.carHudButtons button{padding:0 10px!important;font-size:12px!important}}`}</style>
     </section>
