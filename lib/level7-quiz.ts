@@ -61,3 +61,26 @@ export function pickLevel7LessonQuiz<Q extends { prompt: string; answer: string 
   });
   return picked;
 }
+
+/**
+ * Some lessons word every question the same way ("What is the median?") with new data in the picture.
+ * Within one quiz, a repeated prompt is numbered so no two questions read the same:
+ * "Data set 2: What is the median?". `noun` names what changed, e.g. "spinner".
+ */
+export function distinctQuizPrompts<Q extends { prompt: string }>(questions: Q[], noun: (q: Q) => string): Q[] {
+  const seen = new Map<string, number>();
+  return questions.map((q) => {
+    const count = (seen.get(q.prompt) ?? 0) + 1;
+    seen.set(q.prompt, count);
+    if (count === 1) return q;
+    const name = noun(q);
+    return { ...q, prompt: `${name[0].toUpperCase()}${name.slice(1)} ${count}: ${q.prompt}` };
+  });
+}
+
+/** A short noun from a picture title: "Given formula" → "formula", "Spreadsheet: d = v × t" → "spreadsheet". */
+export function quizNoun(title: string | undefined, fallback: string): string {
+  if (!title || /^(Read|Find|Use|Exactly)\b/.test(title)) return fallback;
+  const noun = title.replace(/^Given\s+/i, '').split(/[:(]/)[0].trim();
+  return noun ? noun[0].toLowerCase() + noun.slice(1) : fallback;
+}

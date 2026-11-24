@@ -4,7 +4,7 @@ import type { Lesson } from '@/data/programs/year1';
 import type { LessonActivity } from '@/data/programs/types';
 import { number7Guide, number7ContentKey, NUMBER7_READABILITY_REVISION } from './curriculum';
 import { number7Challenge, type Number7Role } from './challenges';
-import { pickLevel7LessonQuiz } from '@/lib/level7-quiz';
+import { pickLevel7LessonQuiz, distinctQuizPrompts } from '@/lib/level7-quiz';
 export type Number7Question = MultipleChoiceQuestion & { skill:string; seed:number; lessonId:string; version:2; tier:Number7Role; diagramSpeech?:string; expectedValue?:number };
 export const gcd=(a:number,b:number):number=>b?gcd(b,a%b):Math.abs(a);
 export const fraction=(n:number,d:number)=>{const f=gcd(n,d);return d/f===1?String(n/f):`${n/f}/${d/f}`;};
@@ -85,6 +85,6 @@ export function generateNumber7Question(_level:unknown,lesson:Lesson,activity:Le
 export function number7Quiz(week:number,attempt=0) {
  if(!Number.isInteger(week)||week<1||week>11)throw new Error('Unknown Level 7 quiz');
  const taken=new Set<string>();
- return [1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>number7Question(week,lesson,seed,role),700001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+q.options.slice().sort().join('|'),`Number ${week}/${lesson}`,taken)
-  .map((q,i)=>({...q,lessonTag:lesson as 1|2|3,id:`y7-w${week}-quiz-l${lesson}-${i+1}`})));
+ return distinctQuizPrompts([1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>number7Question(week,lesson,seed,role),700001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+q.options.slice().sort().join('|'),`Number ${week}/${lesson}`,taken)
+  .map((q,i)=>({...q,lessonTag:lesson as 1|2|3,id:`y7-w${week}-quiz-l${lesson}-${i+1}`}))),()=>'example');
 }

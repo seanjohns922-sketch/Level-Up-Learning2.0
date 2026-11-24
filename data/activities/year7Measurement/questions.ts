@@ -6,6 +6,7 @@ import type { MultipleChoiceQuestion } from '@/data/activities/year2/lessonEngin
 import type { Measurement7Visual } from '@/data/assessments/revisions/year7MeasurementFiveForms';
 import { measurement7Guide, MEASUREMENT7_READABILITY_REVISION } from './curriculum';
 import { pickLevel7LessonQuiz } from '@/lib/level7-quiz';
+import { distinctQuizPrompts } from '@/lib/level7-quiz';
 export type Measurement7Role='fast_thinking'|'reasoning'|'apply_create';
 export type Measurement7Question=MultipleChoiceQuestion & {lessonId:string;version:1;tier:Measurement7Role;steps:string[];answerUnit?:string};
 type Relation='corresponding'|'alternate'|'cointerior';
@@ -218,6 +219,6 @@ export function measurement7Quiz(week:number,attempt=0){
  if(!Number.isInteger(week)||week<1||week>11)throw Error('Unknown Measurement Level 7 quiz');
  // Two questions match when both the wording and the diagram match.
  const taken=new Set<string>();
- return [1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>measurement7Question(week,lesson,seed,role),770001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+JSON.stringify(q.measurementVisual??null),`Measurement ${week}/${lesson}`,taken)
-  .map((q,i)=>({...q,id:`y7-measurement-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3})));
+ return distinctQuizPrompts([1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>measurement7Question(week,lesson,seed,role),770001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+JSON.stringify(q.measurementVisual??null),`Measurement ${week}/${lesson}`,taken)
+  .map((q,i)=>({...q,id:`y7-measurement-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3}))),()=>'diagram');
 }

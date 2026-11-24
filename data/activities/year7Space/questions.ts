@@ -6,6 +6,7 @@ import type {Task7,P7,Polygon7,Flow7} from '@/data/assessments/revisions/level7S
 import {HEXOMINOES,VALID_NET_IDS,foldNet,relationBetween} from '@/data/activities/starpath/level5/nets';
 import {space7Guide,space7SourceGuide,SPACE7_SKILL_GROUPS,SPACE7_READABILITY_REVISION} from './curriculum';
 import {pickLevel7LessonQuiz} from '@/lib/level7-quiz';
+import { distinctQuizPrompts } from '@/lib/level7-quiz';
 import {buildViews,fewestCubes,BUILD_MAX_HEIGHT,runSorter,sorterSlots,shapeFacts,SORTER7_TEMPLATES,SORTER7_QUESTIONS,type Level7Build,type Level7Plane,type Level7Sorter,type Sorter7Question,type Sorter7Shape,type Sorter7Node} from '@/lib/level7-answer';
 export type Space7Role='fast_thinking'|'reasoning'|'apply_create';
 export type Space7Question=MultipleChoiceQuestion & {lessonId:string;version:2;skillKey:number;tier:Space7Role;steps:string[];answerLabels?:string[];build?:Level7Build;place?:Level7Plane;sorter?:Level7Sorter};
@@ -382,6 +383,6 @@ export function generateSpace7Question(_level:unknown,lesson:Lesson,activity:Les
 export function space7Quiz(week:number,attempt=0){
  if(!Number.isInteger(week)||week<1||week>9)throw Error('Unknown Space Level 7 quiz');
  const taken=new Set<string>();
- return [1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>space7Question(week,lesson,seed,role),970001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+JSON.stringify(q.spaceVisual)+q.options.slice().sort().join('|'),`Space ${week}/${lesson}`,taken)
-  .map((q,i)=>({...q,id:`y7-space-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3})));
+ return distinctQuizPrompts([1,2,3].flatMap(lesson=>pickLevel7LessonQuiz((role,seed)=>space7Question(week,lesson,seed,role),970001+week*10007+lesson*101+attempt*1000003,q=>q.prompt+JSON.stringify(q.spaceVisual)+q.options.slice().sort().join('|'),`Space ${week}/${lesson}`,taken)
+  .map((q,i)=>({...q,id:`y7-space-w${week}-quiz-l${lesson}-${i+1}`,lessonTag:lesson as 1|2|3}))),()=>'diagram');
 }
