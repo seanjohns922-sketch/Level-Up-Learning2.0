@@ -10,7 +10,7 @@ export const WARM = "#ffd27a";
 
 /** A white-to-clear radial gradient, made once and shared by every light pool. */
 let poolTexture: CanvasTexture | null = null;
-function lightPoolTexture() {
+export function lightPoolTexture() {
   if (poolTexture || typeof document === "undefined") return poolTexture;
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 128;

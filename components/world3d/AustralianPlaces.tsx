@@ -58,7 +58,7 @@ export function AustralianPlace({assetKey}:{assetKey:string}){
   {[-1,1].map(side=><group key={side}>
    {[-6,-2,2,6].map(z=><Pole key={z} a={[side*28,.05,z]} b={[side*28,Math.abs(z)<3?8:5,z]} radius={.1} c="#ddd9be"/>)}
    {[0,1,2,3].map(row=><Box key={row} p={[0,.35+row*.45,side*(18+row*.65)]} s={[24,.22,.6]} c={row%2?"#849087":"#aaad95"}/>)}
-   {[-1,1].map(end=><group key={end}><Pole a={[end*31.5,0,side*18]} b={[end*31.5,11.5,side*18]} radius={.15} c={iron}/><Box p={[end*31.5,11.5,side*18]} s={[1,.8,.35]} c="#d6cda9"/></group>)}
+   {[-1,1].map(end=><group key={end}><Pole a={[end*31.5,0,side*18]} b={[end*31.5,11.5,side*18]} radius={.15} c={iron}/><Box p={[end*31.5,11.5,side*18]} s={[1,.8,.35]} c="#d6cda9" glow="#fff1c2"/></group>)}
   </group>)}
   <Box p={[0,4,-20.5]} s={[7,3,.25]} c={iron}/>
   {[-2.5,2.5].map(x=><Pole key={x} a={[x,0,-20.5]} b={[x,4,-20.5]} radius={.12} c={iron}/>)}

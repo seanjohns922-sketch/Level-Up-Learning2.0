@@ -5,6 +5,7 @@ import { Sparkles } from "@react-three/drei";
 import { useRef, type ReactNode } from "react";
 import type { Group } from "three";
 import { Ball, Block, C, FairyLights, M, Mat, type V3 } from "@/components/world3d/premium-homes/HomeKit";
+import { LightPool } from "@/components/world3d/premium-items/ItemKit";
 
 type Props = { night: boolean };
 const NEON_PINK = "#ff4fd8";
@@ -23,7 +24,7 @@ function Legendary({ scale, pos, color = C.gold }: { scale: V3; pos: V3; color?:
   return <Sparkles count={70} scale={scale} position={pos} size={8} speed={0.35} color={color} />;
 }
 function Floodlight({ pos, h, night, color = "#fff3c4" }: { pos: V3; h: number; night: boolean; color?: string }) {
-  return <group position={pos}><Block size={[0.14, h, 0.14]} pos={[0, h / 2, 0]} color={M.charcoal} r={0.04} /><Block size={[0.6, 0.24, 0.3]} pos={[0, h, 0]} color={M.charcoal} r={0.05} /><Block size={[0.5, 0.16, 0.04]} pos={[0, h - 0.02, 0.15]} color={color} r={0.02} glow={night ? 3 : 0.3} /></group>;
+  return <group position={pos}><Block size={[0.14, h, 0.14]} pos={[0, h / 2, 0]} color={M.charcoal} r={0.04} /><Block size={[0.6, 0.24, 0.3]} pos={[0, h, 0]} color={M.charcoal} r={0.05} /><Block size={[0.5, 0.04, 0.22]} pos={[0, h - 0.13, 0]} color={color} r={0.01} glow={night ? 3 : 0.3} /><Block size={[0.5, 0.16, 0.04]} pos={[0, h - 0.02, 0.15]} color={color} r={0.02} glow={night ? 3 : 0.3} /><LightPool r={3.2} color={color} night={night} /></group>;
 }
 function Horse({ color }: { color: string }) {
   return <group><Ball pos={[0, 0, 0]} r={0.2} color={color} scale={[0.7, 0.75, 1.4]} /><Ball pos={[0, 0.2, 0.26]} r={0.12} color={color} scale={[0.8, 1, 1.2]} />{[-0.08, 0.08].flatMap((x) => [-0.14, 0.14].map((z) => <Block key={`${x}${z}`} size={[0.05, 0.24, 0.05]} pos={[x, -0.2, z]} rot={[z > 0 ? -0.5 : 0.5, 0, 0]} color={color} r={0.02} />))}<Block size={[0.06, 0.06, 0.16]} pos={[0, 0.16, 0.14]} color={C.gold} r={0.02} /></group>;

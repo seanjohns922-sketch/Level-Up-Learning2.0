@@ -22,6 +22,7 @@ import { CollectionScenery, COLLECTION_SCENERY_KEYS } from "./CollectionScenery"
 import { VillageBuilding } from "./VillageBuildings";
 import { isVillageBuilding, type VillageStyle } from "@/lib/world3d/village-buildings";
 import { premiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { HubNightContext, NightLit } from "@/components/world3d/HubNight";
 import { lakeOval, placedLakes, type WaterOval } from "@/lib/world3d/swimming";
 import { PlacedPremiumHome, TowerShieldAtTower } from "@/components/world3d/premium-homes/PremiumHomeContext";
 import { PlacedSkatePiece } from "@/components/world3d/premium-items/SkatePieces";
@@ -224,6 +225,11 @@ function LagoonPool() {
       </group>
     </group>
   );
+}
+
+/** Newer models that switch their own lights on at night (and so skip the NightLit wrapper). */
+function litByItself(assetKey: string) {
+  return premiumHomeStyle(assetKey) !== null || SKATE_PIECE_KEYS.has(assetKey) || RACE_PIECE_KEYS.has(assetKey) || assetKey === CARPORT_ASSET_KEY;
 }
 
 // Landmark models retained alongside the detailed reward collection.
@@ -810,19 +816,19 @@ export function PlacedWorldObject({ item, placement, items, neighbours = [], pre
 
   return (
     <group position={position} rotation={[0, (placement.rotation * Math.PI) / 180, 0]}>
-      {RAIL_KEYS.has(assetKey) ? <group ref={groupRef}>{(!isTrainAsset(assetKey) || (assetKey === "rail_train" && !trainSupport)) && <RailTrack asset={assetKey}/>} {preview && isTrainAsset(assetKey) && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
+      {RAIL_KEYS.has(assetKey) ? <group ref={groupRef}><NightLit>{(!isTrainAsset(assetKey) || (assetKey === "rail_train" && !trainSupport)) && <RailTrack asset={assetKey}/>} {preview && isTrainAsset(assetKey) && <ParkedTrain start={placement} placements={neighbours} items={items}/>}</NightLit></group> : CONNECTED_BOUNDARY_KEYS.has(assetKey) ? <group ref={groupRef}><SceneryFinish assetKey={assetKey}><ConnectedBoundary assetKey={assetKey} placement={placement} neighbours={neighbours}/></SceneryFinish></group> : interactiveBridge ? (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
           <SceneryFinish assetKey="drawbridge"><Drawbridge state={placement.state} tint={placement.tint} onToggle={onToggle && placement.placementId ? () => onToggle(placement.placementId as string) : undefined} /></SceneryFinish>
         </SizedWorldModel></group>
       ) : gait ? (
         <AnimalRoamer gait={gait}>
           <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
-            <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} buildingStyle={placement.buildingStyle} /></SceneryFinish>
+            <NightLit enabled={!litByItself(assetKey)}><SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} buildingStyle={placement.buildingStyle} /></SceneryFinish></NightLit>
           </SizedWorldModel></group>
         </AnimalRoamer>
       ) : (
         <group ref={groupRef}><SizedWorldModel key={placement.buildingStyle ?? "castle"} item={item}>
-          <SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} buildingStyle={placement.buildingStyle} /></SceneryFinish>
+          <NightLit enabled={!litByItself(assetKey)}><SceneryFinish assetKey={assetKey}><RewardPlotObject item={item} accent={item.accent || "#38bdf8"} tier={tier} tint={placement.tint} buildingStyle={placement.buildingStyle} /></SceneryFinish></NightLit>
         </SizedWorldModel></group>
       )}
       {!preview && item.metadata.marketplaceCategory !== "world_basic" ? <Html center position={[0, getItemPresentation(item).height + .5, 0]} distanceFactor={18} zIndexRange={[4, 0]} style={{ pointerEvents: "none" }}><div style={{ padding: "6px 10px", border: "1px solid rgba(255,232,185,.62)", borderRadius: 4, background: "rgba(28,33,30,.84)", color: "#fff8df", fontFamily: "ui-monospace,monospace", fontSize: 10, fontWeight: 900, letterSpacing: ".1em", whiteSpace: "nowrap" }}>{item.name.toUpperCase()}</div></Html> : null}
@@ -1339,11 +1345,12 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
   // Placed Swimming Lakes need their holes in the grass, like painted water.
   const lakes = useMemo(() => placedLakes(placedCustomisations, itemsById).map(lakeOval), [placedCustomisations, itemsById]);
   return (
+    <HubNightContext.Provider value={night}>
     <group>
       <Suspense fallback={null}>
         <CentralValleyPanorama quality={quality} night={night} />
       </Suspense>
-      {hubV2 ? <CentralWorldV2Scenery quality={quality} animate={quality !== "low" && !reducedMotion} placements={placedCustomisations.filter((p) => p.itemId !== CENTRAL_WORLD_HOME_KEY)} groundTiles={groundTiles} itemsById={itemsById} /> : <>
+      {hubV2 ? <NightLit><CentralWorldV2Scenery quality={quality} animate={quality !== "low" && !reducedMotion} placements={placedCustomisations.filter((p) => p.itemId !== CENTRAL_WORLD_HOME_KEY)} groundTiles={groundTiles} itemsById={itemsById} /></NightLit> : <>
         <Suspense fallback={<mesh rotation={[-Math.PI / 2, 0, 0]}><circleGeometry args={[CENTRAL_WORLD_CONFIG.meadow.radius, 64]} /><meshStandardMaterial color="#718f42" roughness={1} /></mesh>}>
           <MeadowGround />
           <CentralMeadowRim />
@@ -1351,12 +1358,12 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
         <GrassTufts quality={quality} groundTiles={groundTiles} />
       </>}
       <PaintedGround tiles={groundTiles} night={night} dug={hubV2} lakes={lakes} />
-      <PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} />
+      <NightLit><PlaceholderKnowledgeTower active={entranceActive} onEnter={editing || buildPreview ? undefined : onEnterTower} quality={quality} /></NightLit>
       <TowerShieldAtTower position={CENTRAL_WORLD_CONFIG.towerPosition} />
       {hubV2 ? <group position={[HUB_V2_HOME_CARPORT.x, 0, HUB_V2_HOME_CARPORT.z]}><PlacedCarport /></group> : null}
-      {hubV2 ? <ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
+      {hubV2 ? <NightLit><ExplorerTreehouse position={HUB_V2_TREEHOUSE_ANCHORS.position} rotationY={0} active={homeActive} animate={!reducedMotion} onEnter={editing || buildPreview ? undefined : onEnterHome} /></NightLit> : <PlaceholderMyHome placement={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY ? buildPreview.placement : homePlacement} preview={buildPreview?.placement.itemId === CENTRAL_WORLD_HOME_KEY} valid={buildPreview?.valid} quality={quality} active={homeActive} onEnter={editing || buildPreview ? undefined : onEnterHome} />}
       {editing || buildPreview ? <BuildModeGrid cursor={editCursor} cells={buildGridCells} ring={!buildPreview} reservedCell={reservedCell} /> : null}
-      <WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/>
+      <NightLit><WorldRailway placements={placedCustomisations} items={itemsById} editing={editing}/></NightLit>
       {placedCustomisations.filter(p => p.itemId !== CENTRAL_WORLD_HOME_KEY).map((placement, index) => {
         const item = itemsById.get(placement.itemId);
         return item ? (
@@ -1374,5 +1381,6 @@ export function CentralWorldEnvironment({ hubV2 = false, night = false, reserved
       </> : null}
       {groundPreview ? groundPreview.cells?.map(cell => <GroundTile key={cell.gridX+":"+cell.gridZ} tile={{...groundPreview.tile,...cell}} preview valid={cell.valid}/>) ?? <GroundTile tile={groundPreview.tile} preview valid={groundPreview.valid} /> : null}
     </group>
+    </HubNightContext.Provider>
   );
 }

@@ -7,21 +7,24 @@ type V = [
     number
 ];
 const wood = "#846044", iron = "#35413c", stone = "#928e7e";
-export function Box({ p, s, c = wood, r = [0, 0, 0], finish }: {
+/** `glow`: a light (lamp glass, screen, bulb): a faint glow by day that the hub turns up after dark. */
+export function Box({ p, s, c = wood, r = [0, 0, 0], finish, glow }: {
     p: V;
     s: V;
     c?: string;
     r?: V;
     finish?: "fabric";
+    glow?: string;
 }) {
-    return <mesh position={p} rotation={r} castShadow receiveShadow><boxGeometry args={s}/><meshStandardMaterial color={c} roughness={.86} userData={{ finish }}/></mesh>;
+    return <mesh position={p} rotation={r} castShadow receiveShadow><boxGeometry args={s}/><meshStandardMaterial color={c} roughness={.86} emissive={glow ?? "#000000"} emissiveIntensity={glow ? .2 : 1} userData={{ finish }}/></mesh>;
 }
-export function Ball({ p, s, c }: {
+export function Ball({ p, s, c, glow }: {
     p: V;
     s: V;
     c: string;
+    glow?: string;
 }) {
-    return <mesh position={p} scale={s} castShadow receiveShadow><sphereGeometry args={[1, 16, 12]}/><meshStandardMaterial color={c} roughness={.86}/></mesh>;
+    return <mesh position={p} scale={s} castShadow receiveShadow><sphereGeometry args={[1, 16, 12]}/><meshStandardMaterial color={c} roughness={.86} emissive={glow ?? "#000000"} emissiveIntensity={glow ? .2 : 1}/></mesh>;
 }
 export function Pole({ a, b, radius = .035, c = wood }: {
     a: V;
@@ -261,7 +264,7 @@ export function DetailedReward({ assetKey }: {
     if (assetKey === "adventure_playground")
         return <group><group position={[-.9, 0, 0]}><Shelter variant="gazebo" tint="#a58651"/><Box p={[0, .95, 0]} s={[1.4, .12, 1.2]}/><Box p={[0, .55, 1.25]} s={[.65, .06, 1.9]} r={[.5, 0, 0]} c="#7d9c98"/>{[-.36, .36].map(x => <Box key={x} p={[x, .62, 1.25]} s={[.055, .15, 1.9]} r={[.5, 0, 0]} c="#516d69"/>)}{Array.from({ length: 5 }, (_, i) => <Pole key={i} a={[-.75, .15 + i * .2, -.2]} b={[-.75, .15 + i * .2, .2]} radius={.04}/>)}</group><group position={[1, 0, 0]} scale={.8}><Shelter variant="swing"/></group></group>;
     if (assetKey === "cinema")
-        return <group><Box p={[0,.04,0]} s={[22,.08,16]} c="#767d69"/><Box p={[0,5.5,-7]} s={[12,6,.3]} c="#3e4b46"/><Box p={[0,5.5,-6.83]} s={[11.4,5.4,.03]} c="#d3d7c9"/>{[-4,4].map(x=><Pole key={x} a={[x,0,-7]} b={[x,6,-7]} radius={.16} c={iron}/>)}
+        return <group><Box p={[0,.04,0]} s={[22,.08,16]} c="#767d69"/><Box p={[0,5.5,-7]} s={[12,6,.3]} c="#3e4b46"/><Box p={[0,5.5,-6.83]} s={[11.4,5.4,.03]} c="#d3d7c9" glow="#cfe0ff"/>{[-4,4].map(x=><Pole key={x} a={[x,0,-7]} b={[x,6,-7]} radius={.16} c={iron}/>)}
         {[-5,0,5].flatMap(x=>[1,6].map(z=><group key={`${x}-${z}`} position={[x,0,z]}><Box p={[0,.6,0]} s={[1.8,.7,3.8]} c={x<0?"#8b5c4c":"#749187"}/><Box p={[0,1.15,0]} s={[1.6,.65,1.8]} c="#adbbad"/>{[-1,1].flatMap(side=>[-1.15,1.15].map(axle=><Ball key={`${side}-${axle}`} p={[side*.86,.35,axle]} s={[.16,.35,.35]} c="#303732"/>))}</group>))}</group>;
     if (assetKey === "party_house")
         return <group><group position={[-.75, 0, -.5]} scale={1.1}><Shelter variant="gazebo"/></group><group position={[-.75, 0, .25]}><Bench picnic/></group><Box p={[1.3, .7, 0]} s={[.8, .18, .55]} c={iron}/>{[-1, 1].flatMap(x => [-1, 1].map(z => <Pole key={`${x}-${z}`} a={[1.3 + x * .3, 0, z * .2]} b={[1.3 + x * .3, .7, z * .2]} radius={.03} c={iron}/>))}{Array.from({ length: 8 }, (_, i) => <Pole key={i} a={[1 + i * .08, .81, -.23]} b={[1 + i * .08, .81, .23]} radius={.012} c="#a2a794"/>)}</group>;

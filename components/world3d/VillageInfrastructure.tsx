@@ -5,7 +5,7 @@ function Paving({ size = 2 }: { size?: number }) {
  return <group><Box p={[0,.025,0]} s={[size,.05,size]} c={edge}/>{Array.from({length:16},(_,i)=><Box key={i} p={[(i%4-1.5)*size/4,.055,(Math.floor(i/4)-1.5)*size/4]} s={[size/4-.014,.05,size/4-.014]} c={i%3===0?"#c5bba6":stone}/>)}</group>;
 }
 function Lantern({x,tint}:{x:number;tint?:string}) {
- return <group position={[x,2.5,0]}><Box p={[0,0,0]} s={[.3,.4,.3]} c={tint??"#efd794"}/>{[-1,1].flatMap(a=>[-1,1].map(b=><Box key={`${a}:${b}`} p={[a*.16,0,b*.16]} s={[.028,.44,.028]} c={iron}/>))}<Box p={[0,-.23,0]} s={[.4,.06,.4]} c={iron}/><mesh position={[0,.28,0]} rotation={[0,Math.PI/4,0]} castShadow><coneGeometry args={[.3,.18,4]}/><meshStandardMaterial color={iron}/></mesh></group>;
+ return <group position={[x,2.5,0]}><Box p={[0,0,0]} s={[.3,.4,.3]} c={tint??"#efd794"} glow="#ffc35a"/>{[-1,1].flatMap(a=>[-1,1].map(b=><Box key={`${a}:${b}`} p={[a*.16,0,b*.16]} s={[.028,.44,.028]} c={iron}/>))}<Box p={[0,-.23,0]} s={[.4,.06,.4]} c={iron}/><mesh position={[0,.28,0]} rotation={[0,Math.PI/4,0]} castShadow><coneGeometry args={[.3,.18,4]}/><meshStandardMaterial color={iron}/></mesh></group>;
 }
 export function VillageInfrastructure({assetKey,tint}:{assetKey:string;tint?:string}) {
  if(assetKey==="village_plaza")return <group><Paving/>{[-1,1].flatMap(side=>[0,1].map(axis=><Box key={`${side}:${axis}`} p={axis?[0,.071,side*.88]:[side*.88,.071,0]} s={axis?[1.8,.018,.035]:[.035,.018,1.8]} c={tint??"#718578"}/>))}</group>;
