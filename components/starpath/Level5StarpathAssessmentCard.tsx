@@ -1,6 +1,7 @@
 "use client";
 import type {CSSProperties} from 'react';
 import {FoldStage} from './StarpathNetCard';
+import {PremiumCubeNet} from './Space7Net';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
 import {buildSolid,type SolidFace,type SolidKind} from '@/data/activities/starpath/level5/solids';
 import {foldTree,type Cell} from '@/data/activities/starpath/level5/nets';
@@ -17,10 +18,8 @@ function FoldPreview({cells}:{cells:Cell[]}){
  const text=detached?'Some faces are not joined by an edge. Unfold and join every face to the net.':'Inspect your folded faces for overlaps and gaps. Unfold to revise your net.';
  return <div>{!detached&&<FoldStage cells={cells} coloured={false} folded compact size={72} height={235}/>}<p>{text}</p><ReadAloudBtn text={text} label="Read fold inspection" className={shared.voice}/></div>;
 }
-export function CubeNet({cells,labels=false,marked}:{cells:Cell[];labels?:boolean;marked?:number}){
- const minR=Math.min(...cells.map(c=>c.r)),minC=Math.min(...cells.map(c=>c.c));
- const w=(Math.max(...cells.map(c=>c.c))-minC+1)*48,h=(Math.max(...cells.map(c=>c.r))-minR+1)*48;
- return <svg viewBox={`-5 -5 ${w+10} ${h+10}`} className={styles.net} aria-hidden="true">{cells.map((c,i)=><g key={cellKey(c)}><rect x={(c.c-minC)*48} y={(c.r-minR)*48} width="48" height="48" fill={i===marked?'#fde68a':'#ddd0f6'} stroke="#5b3592" strokeWidth="2"/>{labels&&<text x={(c.c-minC)*48+24} y={(c.r-minR)*48+30} textAnchor="middle" fill="#30204c" fontSize="20" fontWeight="700">{String.fromCharCode(65+i)}</text>}</g>)}</svg>;
+export function CubeNet({cells,labels=false,marked,choice=false}:{cells:Cell[];labels?:boolean;marked?:number;choice?:boolean}){
+ return <PremiumCubeNet cells={cells} labels={labels} marked={marked} choice={choice}/>;
 }
 // Reuse the lesson's face dimensions and hinge tree to show an exact flat net.
 export function SolidNet({kind,angle=0}:{kind:SolidKind;angle?:number}){
@@ -54,7 +53,7 @@ function CoordinateGrid({t,a,onChange}:{t:PlotTask;a:Level5Response;onChange:(a:
 }
 export default function Level5StarpathAssessmentCard({item,response:a,onChange}:{item:Level5Item;response:Level5Response;onChange:(a:Level5Response)=>void}){
  const t=item.task;
- const choices=(options:Option[])=><div className={options.some(o=>o.cells)?styles.netChoices:styles.choices}>{options.map(o=><div className={shared.optionRow} key={o.id}><button data-option-id={o.id} aria-pressed={a.selected===o.id} onClick={()=>onChange({...a,selected:o.id})}>{o.cells&&<CubeNet cells={o.cells}/>}<span>{o.label}</span></button><ReadAloudBtn text={o.cells?`${o.label}. ${o.cells.map(c=>`Square at row ${c.r+1}, column ${c.c+1}`).join('. ')}`:o.label} kind="option" className={shared.voice}/></div>)}</div>;
+ const choices=(options:Option[])=><div className={options.some(o=>o.cells)?styles.netChoices:styles.choices}>{options.map(o=><div className={shared.optionRow} key={o.id}><button data-option-id={o.id} aria-pressed={a.selected===o.id} onClick={()=>onChange({...a,selected:o.id})}>{o.cells&&<CubeNet cells={o.cells} choice/>}<span>{o.label}</span></button><ReadAloudBtn text={o.cells?`${o.label}. ${o.cells.map(c=>`Square at row ${c.r+1}, column ${c.c+1}`).join('. ')}`:o.label} kind="option" className={shared.voice}/></div>)}</div>;
  let body;
  if(item.kind==='net'){
   const n=item.task;
