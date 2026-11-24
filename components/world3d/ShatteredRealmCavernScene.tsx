@@ -11,6 +11,7 @@ import {cave7WeekCount} from '@/lib/cave7-config';
 import {cavernDarkness,cavernDoor} from '@/lib/world3d/shattered-realms';
 import {EXPEDITION_TRAILS} from '@/lib/world3d/expedition-crossroads';
 import type {ExpeditionRealm} from '@/lib/world3d/expedition-access';
+import StarpathCavernSky from './StarpathCavernSky';
 
 // Level 7 cavern: a crystal-lit cave that grows darker towards the captive Core. Walkable
 // floor and doorway positions come from lib/world3d/shattered-realms.ts.
@@ -26,15 +27,21 @@ function Features({realm,colour,week}:{realm:ExpeditionRealm;colour:string;week:
  return <group position={[0,0,-8-(week-1)*16]}>
  {realm==='number'&&<><WorldPlaque at={[5.8,3,-5]} title={`${week} · ${week*10} · ${week*100}`} subtitle="NUMBER STONES" width={3}/>{[0,1,2].map(i=><Crystal key={i} x={5.5+i*.45} z={-4-i*.65} colour={colour} scale={.5+i*.2}/>)}</>}
  {realm==='measurement'&&<><Box at={[5.9,.35,-5]} size={[1.6,.6,5]} colour="#907b58"/>{Array.from({length:8},(_,i)=><Box key={i} at={[5.9,.68,-7+i*.6]} size={[i%2?.5:1,.04,.08]} colour={colour}/>)}<WorldPlaque at={[-6,3,-5]} title="MEASURELANDS" subtitle="STONE SURVEY MARKERS" width={3}/></>}
- {realm==='space'&&<>{[0,1,2,3,4].map(i=><Crystal key={i} x={Math.sin(i*2)*4} y={9+Math.cos(i)*1.5} z={-3+i} colour={colour} scale={.3}/>)}<mesh position={[5.8,2,-5]}><icosahedronGeometry args={[1.3,0]}/><meshStandardMaterial color={colour} wireframe emissive={colour} emissiveIntensity={.9}/></mesh></>}
- {realm==='statistics'&&<>{[0,1,2].map(i=><group key={i}>{Array.from({length:i+2},(_,j)=><Crystal key={j} x={5.4+i*.6} z={-5+j*.6} colour={colour} scale={.45}/>)}</group>)}<WorldPlaque at={[-6,3,-5]} title="CRYSTAL RECORDS" subtitle="OBSERVE · GROUP · COMPARE" width={3.5}/></>}
+  {realm==='statistics'&&<>{[0,1,2].map(i=><group key={i}>{Array.from({length:i+2},(_,j)=><Crystal key={j} x={5.4+i*.6} z={-5+j*.6} colour={colour} scale={.45}/>)}</group>)}<WorldPlaque at={[-6,3,-5]} title="CRYSTAL RECORDS" subtitle="OBSERVE · GROUP · COMPARE" width={3.5}/></>}
  {realm==='pattern'&&<>{Array.from({length:6},(_,i)=><mesh key={i} position={[-5+i*2,9,-3]} rotation={[0,0,i%2?Math.PI/4:0]}><torusGeometry args={[.5,.12,4,i%2?4:12]}/><meshStandardMaterial color={i%2?colour:'#ddd5ef'} emissive={colour} emissiveIntensity={.5}/></mesh>)}</>}
  {realm==='chance'&&<>{[-1,1].map(side=><group key={side}><Box at={[side*5.8,1,-5]} size={[1.6,1.6,1.6]} colour="#ad9b9f"/>{[-.4,0,.4].map((y,i)=><mesh key={i} position={[side*5.8+(i%2?.3:-.3),1+y,-4.18]}><sphereGeometry args={[.1,8,6]}/><meshBasicMaterial color="#362732"/></mesh>)}<Box at={[side*6,.04,-2]} size={[.4,.04,6]} colour="#60899d"/><Box at={[side*5.5,.04,-3]} size={[1.4,.04,.3]} colour="#60899d"/><Box at={[side*5,.04,-1.6]} size={[.3,.04,3]} colour="#60899d"/></group>)}</>}
  </group>;
 }
 
-/** Cave floor, flagstone path, rock walls, stalactites and crystal clusters. One draw call per kind. */
-function CaveShell({realm,colour}:{realm:ExpeditionRealm;colour:string}){
+/** Rock colours by depth. Starpath's open-sky cavern uses indigo stone so its starlight reads as night. */
+const STONE={
+ cave:{wall:['#4d5160','#434756','#1f2330'],top:['#3d404d','#1a1d28'],rock:['#5a5e6c','#2a2e3a'],spike:['#3b3e4b','#171a24'],floor:'#9aa0b2',sky:'#0b0d15'},
+ sky:{wall:['#3d3a6e','#34305f','#15132c'],top:['#2f2b5c','#110f24'],rock:['#4b4784','#1f1c3d'],spike:['#3b3e4b','#171a24'],floor:'#8d8fc8',sky:'#070820'},
+} as const;
+/** Cave floor, flagstone path, rock walls, stalactites and crystal clusters. One draw call per kind.
+ *  With `openSky` the ceiling, stalactites and hanging crystals are left out so the sky shows through. */
+function CaveShell({realm,colour,openSky=false}:{realm:ExpeditionRealm;colour:string;openSky?:boolean}){
+ const tone=openSky?STONE.sky:STONE.cave;
  const end=caveEnd(realm),length=22-end+8,mid=(22+end-8)/2;
  const {map}=useMemo(()=>basaltTextures([2,Math.round(length/9)]),[length]);
  const rock=useMemo(()=>new THREE.IcosahedronGeometry(1,0),[]),box=useMemo(()=>new THREE.BoxGeometry(1,1,1),[]),cone=useMemo(()=>new THREE.ConeGeometry(1,1,6).rotateX(Math.PI),[]),crystal=useMemo(()=>crystalGeometry(),[]);
@@ -43,30 +50,30 @@ function CaveShell({realm,colour}:{realm:ExpeditionRealm;colour:string}){
  const studs=useMemo(()=>new THREE.MeshBasicMaterial({color:new THREE.Color(colour).multiplyScalar(2),toneMapped:false}),[colour]);
  const walls=useMemo(()=>{const out:InstanceItem[]=[];let i=0;
   for(const side of [-1,1]){
-   for(let z=18;z>end-6;z-=2.6){i++;const h=6+rand(i)*6;out.push({p:[side*(10.6+rand(i+1)*1.2),h*.45,z],s:[2.4+rand(i+2)*1.3,h,2.3+rand(i+3)*1.1],r:[rand(i+4)*.4,rand(i+5)*3,side*(.08+rand(i+6)*.12)],c:depthShade(realm,z,rand(i+7)>.5?'#4d5160':'#434756','#1f2330')});}
-   for(let z=17;z>end-6;z-=3.4){i++;out.push({p:[side*(9+rand(i)*1.4),11+rand(i+1)*2.5,z],s:[2.6+rand(i+2)*1.6,3.4+rand(i+3)*2.4,2.8],r:[rand(i+4),rand(i+5)*3,-side*(.35+rand(i+6)*.3)],c:depthShade(realm,z,'#3d404d','#1a1d28')});}
-   for(let z=16;z>end-6;z-=4.1){i++;out.push({p:[side*(8.6+rand(i)*.6),.45,z],s:[1.2+rand(i+1)*.8,.9+rand(i+2)*.7,1.3],r:[rand(i+3)*3,rand(i+4)*3,0],c:depthShade(realm,z,'#5a5e6c','#2a2e3a')});}
+   for(let z=18;z>end-6;z-=2.6){i++;const h=6+rand(i)*6;out.push({p:[side*(10.6+rand(i+1)*1.2),h*.45,z],s:[2.4+rand(i+2)*1.3,h,2.3+rand(i+3)*1.1],r:[rand(i+4)*.4,rand(i+5)*3,side*(.08+rand(i+6)*.12)],c:depthShade(realm,z,rand(i+7)>.5?tone.wall[0]:tone.wall[1],tone.wall[2])});}
+   if(!openSky)for(let z=17;z>end-6;z-=3.4){i++;out.push({p:[side*(9+rand(i)*1.4),11+rand(i+1)*2.5,z],s:[2.6+rand(i+2)*1.6,3.4+rand(i+3)*2.4,2.8],r:[rand(i+4),rand(i+5)*3,-side*(.35+rand(i+6)*.3)],c:depthShade(realm,z,tone.top[0],tone.top[1])});}
+   for(let z=16;z>end-6;z-=4.1){i++;out.push({p:[side*(8.6+rand(i)*.6),.45,z],s:[1.2+rand(i+1)*.8,.9+rand(i+2)*.7,1.3],r:[rand(i+3)*3,rand(i+4)*3,0],c:depthShade(realm,z,tone.rock[0],tone.rock[1])});}
   }
   for(let x=-10;x<=10;x+=3){i++;out.push({p:[x,6,end-7-rand(i)*1.5],s:[3,12,2.6],r:[rand(i+1)*.3,rand(i+2)*3,0],c:'#1b1e29'});}
-  return out;},[end,realm]);
- const spikes=useMemo(()=>{const out:InstanceItem[]=[];let i=500;for(let z=17;z>end-6;z-=2.2)for(let n=0;n<4;n++){i++;const len=1.2+rand(i)*4,r=.3+rand(i+1)*.7;out.push({p:[(rand(i+2)-.5)*20,14.6-len/2,z+(rand(i+3)-.5)*2],s:[r,len,r],r:[0,rand(i+4)*3,0],c:depthShade(realm,z,'#3b3e4b','#171a24')});}return out;},[end,realm]);
+  return out;},[end,realm,tone,openSky]);
+ const spikes=useMemo(()=>{const out:InstanceItem[]=[];if(openSky)return out;let i=500;for(let z=17;z>end-6;z-=2.2)for(let n=0;n<4;n++){i++;const len=1.2+rand(i)*4,r=.3+rand(i+1)*.7;out.push({p:[(rand(i+2)-.5)*20,14.6-len/2,z+(rand(i+3)-.5)*2],s:[r,len,r],r:[0,rand(i+4)*3,0],c:depthShade(realm,z,tone.spike[0],tone.spike[1])});}return out;},[end,realm,openSky,tone]);
  const flags=useMemo(()=>{const out:InstanceItem[]=[];let i=900;for(let z=14;z>end+2;z-=1.2)for(let lane=-1;lane<=1;lane++){i++;out.push({p:[lane*1.2+(rand(i)-.5)*.14,.04,z+(rand(i+50)-.5)*.2],s:[1.1,.1,1.04],r:[0,(rand(i+9)-.5)*.12,0],c:rand(i+3)>.5?'#5d5f69':'#4f515b'});}return out;},[end]);
  const marks=useMemo(()=>{const out:InstanceItem[]=[];for(let z=12;z>end+2;z-=4)for(const x of [-2.1,2.1])out.push({p:[x,.1,z],s:[.12,.05,.12],c:'#ffffff'});return out;},[end]);
  const crystals=useMemo(()=>{const out:InstanceItem[]=[],palette=['#ffffff','#e6fff9','#d2f3ff'];let s=0;
   for(let z=12;z>end;z-=6.5)for(const side of [-1,1]){s++;addCrystalCluster(out,[side*(8.4+rand(s)*.8),.05,z+rand(s+1)*2],.8+rand(s+2)*.7,s,palette);}
-  for(let z=6;z>end;z-=13){s++;addCrystalCluster(out,[(rand(s)-.5)*12,14.2,z],1,s,palette,true);}
-  return out;},[end]);
+  if(!openSky)for(let z=6;z>end;z-=13){s++;addCrystalCluster(out,[(rand(s)-.5)*12,14.2,z],1,s,palette,true);}
+  return out;},[end,openSky]);
  useEffect(()=>()=>{map.dispose();rock.dispose();box.dispose();cone.dispose();crystal.dispose();stone.dispose();glass.dispose();studs.dispose();},[map,rock,box,cone,crystal,stone,glass,studs]);
  return <>
-  <mesh position={[0,0,mid]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[18,length]}/><meshStandardMaterial map={map} color="#9aa0b2" roughness={.95}/></mesh>
-  <mesh position={[0,15.2,mid]} rotation={[Math.PI/2,0,0]}><planeGeometry args={[26,length]}/><meshStandardMaterial color="#0f111a" roughness={1}/></mesh>
+  <mesh position={[0,0,mid]} rotation={[-Math.PI/2,0,0]}><planeGeometry args={[18,length]}/><meshStandardMaterial map={map} color={tone.floor} roughness={.95}/></mesh>
+  {!openSky&&<mesh position={[0,15.2,mid]} rotation={[Math.PI/2,0,0]}><planeGeometry args={[26,length]}/><meshStandardMaterial color="#0f111a" roughness={1}/></mesh>}
   <Instances geometry={rock} material={stone} items={walls}/>
   <Instances geometry={cone} material={stone} items={spikes}/>
   <Instances geometry={box} material={stone} items={flags}/>
   <Instances geometry={box} material={studs} items={marks}/>
   <Instances geometry={crystal} material={glass} items={crystals}/>
   {[-1,1].map(side=><mesh key={side} visible={false} position={[side*10,7,mid]} userData={{cameraObstacle:true}}><boxGeometry args={[2,16,length]}/></mesh>)}
-  <mesh visible={false} position={[0,15,mid]} userData={{cameraObstacle:true}}><boxGeometry args={[24,.5,length]}/></mesh>
+  {!openSky&&<mesh visible={false} position={[0,15,mid]} userData={{cameraObstacle:true}}><boxGeometry args={[24,.5,length]}/></mesh>}
  </>;
 }
 
@@ -118,6 +125,7 @@ function Doorway({week,state,colour}:{week:number;state:DoorState;colour:string}
 export default function ShatteredRealmCavernScene({realm,position,unlockedWeeks,finishedWeeks,ready,current}:{realm:ExpeditionRealm;position:React.RefObject<THREE.Vector3>;unlockedWeeks:number[];finishedWeeks:number[];ready:boolean;current:number}){
  // The trail colours keep each cavern consistent with its trail gate and summit gateway.
  const colour=EXPEDITION_TRAILS.find(t=>t.id===realm)?.colour??getRealmTheme(realm).accentText;
+ const openSky=realm==='space',skyColour=(openSky?STONE.sky:STONE.cave).sky;
  const ambient=useRef<THREE.AmbientLight>(null),fog=useRef<THREE.Fog>(null),glow=useRef<THREE.PointLight>(null);
  const sections=useRef<(THREE.Group|null)[]>([]);
  const currentDoor=cavernDoor(current);
@@ -128,11 +136,12 @@ export default function ShatteredRealmCavernScene({realm,position,unlockedWeeks,
   if(glow.current)glow.current.position.set(here.x*.5,5,here.z-6);
   sections.current.forEach((g,i)=>{if(g)g.visible=Math.abs(here.z-cavernDoor(i+1)[2])<65;});});
  return <>
-  <color attach="background" args={['#0b0d15']}/><fog ref={fog} attach="fog" args={['#0b0d15',18,70]}/>
+  <color attach="background" args={[skyColour]}/><fog ref={fog} attach="fog" args={[skyColour,18,70]}/>
   <ambientLight ref={ambient} intensity={.55} color="#b4bdd6"/><hemisphereLight args={['#7d8cad','#1d1a22',.7]}/>
   <pointLight ref={glow} color={colour} intensity={45} distance={30} decay={1.6}/>
   <pointLight position={[currentDoor[0]*.6,3.5,currentDoor[2]]} color={colour} intensity={40} distance={16} decay={1.6}/>
-  <CaveShell realm={realm} colour={colour}/>
+  <CaveShell realm={realm} colour={colour} openSky={openSky}/>
+  {openSky&&<StarpathCavernSky colour={colour} start={14} end={caveEnd(realm)}/>}
   {realmWeeks(realm).map((week,i)=><group key={week} ref={g=>{sections.current[i]=g;}}>
    <Doorway week={week} state={!ready?'loading':finishedWeeks.includes(week)?'done':week===current?'current':unlockedWeeks.includes(week)?'open':'locked'} colour={colour}/>
    <Features realm={realm} colour={colour} week={week}/>
