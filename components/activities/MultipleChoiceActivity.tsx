@@ -6,6 +6,8 @@ import Algebra8Visual from '@/components/lesson/level8/AlgebraVisual';
 import Chance8Visual from '@/components/lesson/level8/ChanceVisual';
 import Number7RatioVisual from './Number7RatioVisual';
 import {number7RatioVisual} from '@/lib/number7-ratio-visual';
+import {number7Picture} from '@/data/activities/year7Number/pictures';
+import Number7Picture from '@/components/lesson/level7/Number7Picture';
 import Number7ContextArt, { Number7AreaModel } from './Number7ContextArt';
 import PaintTinsVisual from './PaintTinsVisual';
 import Level7AnswerInput from './Level7AnswerInput';
@@ -191,6 +193,8 @@ export default function MultipleChoiceActivity({
   const optionPrefix = (questionData as { optionPrefix?: string }).optionPrefix ?? "";
   const isSpace = realmId === "space";
   const ratioVisual=number7RatioVisual(questionData as MultipleChoiceQuestion & {lessonId?:string});
+  // Level 7 Number pictures are drawn from the question's own numbers and sit beside the answer.
+  const number7Pic=isNumber7Question&&!ratioVisual&&!questionData.visual&&!questionData.paintContext?number7Picture(questionData.prompt):undefined;
   const answerSpec=level7Answer(questionData as MultipleChoiceQuestion & {lessonId?:string});
   const questionReadAloudText = answerSpec?.prompt ?? (isPattern
     ? getPatternQuestionReadAloudText(questionData, { includeSupport: !assessmentMode })
@@ -344,7 +348,7 @@ export default function MultipleChoiceActivity({
         {isCoreHunt ? "Core challenge" : constructed ? "Your answer" : "Multiple Choice"}
       </div>
       <div data-number7-question-heading={isNumber7Question || undefined} className="flex items-start gap-2.5 mt-2">
-        {isNumber7Question && !ratioVisual && !questionData.visual && !questionData.paintContext && <Number7ContextArt prompt={questionData.prompt}/>}
+        {isNumber7Question && !ratioVisual && !number7Pic && !questionData.visual && !questionData.paintContext && <Number7ContextArt prompt={questionData.prompt}/>}
 
         <h2 className="min-w-0 flex-1 text-[1.65rem] md:text-[1.85rem] font-bold text-slate-900 leading-[1.15] tracking-[-0.02em]">
           <MathFormattedText text={answerSpec?.prompt??questionData.prompt} />
@@ -492,7 +496,8 @@ export default function MultipleChoiceActivity({
         <DecisionPathCardVisual visual={questionData.visual} />
       ) : null}
 
-      <VisualAnswerLayout visual={questionData.chance8Visual?<Chance8Visual visual={questionData.chance8Visual}/>:questionData.algebra8Visual?<Algebra8Visual visual={questionData.algebra8Visual}/>:questionData.number8Visual?<Number8Visual visual={questionData.number8Visual}/>:questionData.space8Visual?<Space8Visual visual={questionData.space8Visual}/>:questionData.measurement8Visual?<Year8MeasurementAssessmentVisual visual={questionData.measurement8Visual}/>:questionData.measurementVisual?<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>:questionData.cave7Visual?<Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>:questionData.spaceVisual?<Space7LessonVisual visual={questionData.spaceVisual}/>:undefined}>
+      {number7Pic&&!constructed&&<div className="mt-4"><Number7Picture picture={number7Pic}/></div>}
+      <VisualAnswerLayout visual={number7Pic&&constructed?<Number7Picture picture={number7Pic}/>:questionData.chance8Visual?<Chance8Visual visual={questionData.chance8Visual}/>:questionData.algebra8Visual?<Algebra8Visual visual={questionData.algebra8Visual}/>:questionData.number8Visual?<Number8Visual visual={questionData.number8Visual}/>:questionData.space8Visual?<Space8Visual visual={questionData.space8Visual}/>:questionData.measurement8Visual?<Year8MeasurementAssessmentVisual visual={questionData.measurement8Visual}/>:questionData.measurementVisual?<Year7MeasurementAssessmentVisual visual={questionData.measurementVisual}/>:questionData.cave7Visual?<Cave7Visual visual={questionData.cave7Visual} realm={realmId??"number"}/>:questionData.spaceVisual?<Space7LessonVisual visual={questionData.spaceVisual}/>:undefined}>
       {constructed?<><Level7AnswerInput key={questionData.prompt+questionData.answer} spec={constructed} initialValue={initialResponse} onEditing={renderMode==='quiz'?()=>{setQuizRecorded(false);onWrong?.('');}:undefined} realm={realmId} disabled={answerLocked||(renderMode==='lesson'&&submitted)} onAnswer={(correct,response)=>{setPicked(response);if(renderMode==='lesson')setSubmitted(true);else setQuizRecorded(true);if(correct)onCorrect?.(response);else onWrong?.(response);}}/>{renderMode==='quiz'&&quizRecorded&&<p role="status" className="mt-3 rounded-lg border-2 border-emerald-300 bg-emerald-50 px-4 py-2 font-bold text-emerald-900">✓ Answer recorded. You can change it before you submit.</p>}</>:<div data-lesson-answer-options className={["mt-6 grid gap-2.5", (questionData.measurementVisual||questionData.cave7Visual||questionData.spaceVisual) && longestOptionLength <= 12 ? "grid-cols-2" : compactOptionColumns].join(" ")}>
         {questionData.options.map((option, index) => {
           const isPicked = isMultiSelect

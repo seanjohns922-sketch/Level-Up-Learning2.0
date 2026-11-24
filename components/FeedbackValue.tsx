@@ -26,5 +26,7 @@ export default function FeedbackValue({ value, unit, labels }: { value: unknown;
     text = `${text} = ${improper[1]}${Math.floor(n / d)}${n % d ? ` ${n % d}/${d}` : ""}`;
   }
   text = text.replace(/(^|[\s(,=])-(?=[\d$])/g, "$1−");
+  // Expression answers read as maths: "48 * 3" → "48 × 3", "n^2" → "n²".
+  if (/[*^]/.test(text)) text = text.replace(/\^2/g, "²").replace(/\^3/g, "³").replace(/\s*\*\s*/g, " × ");
   return <MathFormattedText text={text} compactFractions />;
 }

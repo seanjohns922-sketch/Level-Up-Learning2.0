@@ -87,12 +87,13 @@ export function level7Answer(q:Question):Level7Answer|null{
 }
 // Restricted arithmetic parser: no eval, function calls or arbitrary identifiers.
 function expressionValue(source:string,variables:Record<string,number>):number|null{
- source=clean(source).replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g,s=>'^'+[...s].map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c)).join('')).replace(/\s+/g,'');
- if(source.length>120||!/^[\d.a-zA-Z+*/()^=-]+$/.test(source))return null;
+ source=clean(source).replace(/([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g,s=>'^'+[...s].map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(c)).join('')).replaceAll('√','#').replace(/\s+/g,'');
+ if(source.length>120||!/^[\d.a-zA-Z+*/()^=#-]+$/.test(source))return null;
  if(source.includes('=')){const parts=source.split('=');if(parts.length!==2||! /^[a-zA-Z]$/.test(parts[0]))return null;source=parts[1];}
- source=source.replace(/(\d|\)|[a-zA-Z])(?=[a-zA-Z(])/g,'$1*');
- const tokens=source.match(/\d+(?:\.\d*)?|\.\d+|[a-zA-Z]|[+*/()^-]/g)??[];let i=0;
- function atom():number{const t=tokens[i++];if(t==='('){const n=sum();if(tokens[i++]!==')')throw Error();return n;}if(t in variables)return variables[t];if(!t||!/^\d|^\./.test(t))throw Error();return Number(t);}
+ source=source.replace(/(\d|\)|[a-zA-Z])(?=[a-zA-Z(#])/g,'$1*');
+ const tokens=source.match(/\d+(?:\.\d*)?|\.\d+|[a-zA-Z]|[+*/()^#-]/g)??[];let i=0;
+ // "#" stands for √ and applies to the next number, letter or bracket: √(9 + 16) = 5.
+ function atom():number{const t=tokens[i++];if(t==='#'){const n=atom();if(n<0)throw Error();return Math.sqrt(n);}if(t==='('){const n=sum();if(tokens[i++]!==')')throw Error();return n;}if(t in variables)return variables[t];if(!t||!/^\d|^\./.test(t))throw Error();return Number(t);}
  function power():number{const n=atom();if(tokens[i]==='^'){i++;const exponent=signed();if(!Number.isInteger(exponent)||Math.abs(exponent)>6)throw Error();return n**exponent;}return n;}
  function signed():number{if(tokens[i]==='+'){i++;return signed();}if(tokens[i]==='-'){i++;return -signed();}return power();}
  function product():number{let n=signed();while(tokens[i]==='*'||tokens[i]==='/'){const op=tokens[i++],v=signed();n=op==='*'?n*v:n/v;}return n;}
