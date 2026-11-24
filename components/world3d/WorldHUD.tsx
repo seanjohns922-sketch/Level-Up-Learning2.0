@@ -16,8 +16,7 @@ import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { fetchStudentEconomy } from "@/lib/economy";
-import { fetchStudentActivityDaily } from "@/lib/student-activity";
-import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokProgress } from "@/lib/chronorok";
+import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN } from "@/lib/chronorok";
 import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
 import { TOWER_REALM_PORTALS } from "@/lib/world3d/tower-realm-chamber-config";
@@ -29,6 +28,7 @@ import { StreakFlame } from "@/components/streak/StreakParts";
 import { streakPrompt, useLearningStreak } from "@/lib/learning-streak";
 import { HubQuestCard } from "@/components/quests/QuestParts";
 import { getXpPaidSinceLoad, subscribeXpQuests } from "@/lib/xp-quests";
+import { useChronorok } from "@/lib/chronorok-cards";
 
 export type WorldHUDContext = "central" | "tower" | "realm";
 
@@ -104,7 +104,7 @@ export function WorldHUD({
   const xp = loadedXp ? loadedXp.balance + paidSinceLoad - loadedXp.paidBefore : null;
   const streak = useLearningStreak();
   const [streakReminderClosed, setStreakReminderClosed] = useState(false);
-  const [crystals, setCrystals] = useState<{ crystals: number; open: boolean; learningDays: number } | null>(null);
+  const crystals = useChronorok().state;
 
   const refreshJourney = useCallback(() => {
     void resolveWorldJourney().then(setJourney).catch(() => setJourney(fallbackJourney));
@@ -126,17 +126,6 @@ export function WorldHUD({
     return () => { cancelled = true; };
   }, []);
 
-  // Chrono Crystals: one per learning day this school year (see lib/chronorok).
-  useEffect(() => {
-    const profile = getActiveStudentProfile();
-    if (preview) { queueMicrotask(() => setCrystals({ crystals: 63, open: true, learningDays: 63 })); return; }
-    if (!profile?.studentId) return;
-    let cancelled = false;
-    void fetchStudentActivityDaily(profile.studentId)
-      .then((rows) => { if (!cancelled) setCrystals(chronorokProgress(rows)); })
-      .catch(() => { if (!cancelled) setCrystals(null); });
-    return () => { cancelled = true; };
-  }, [preview]);
 
   async function quickStart() {
     if (quickStartBusy) return;

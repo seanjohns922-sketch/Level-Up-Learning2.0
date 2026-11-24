@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCcw } from "lucide-react";
+import { cheerCompanion, submitGameBest, type ChronorokGame } from "@/lib/chronorok-cards";
 
 /** Shared frame for the Chronorok games: back button, score card, start and
- *  game-over cards, and per-device best scores. No XP: these are just for fun. */
+ *  game-over cards, and best scores (kept on the device and saved to the server for the friends board).
+ *  No XP: these are just for fun. */
 
-export function useBest(game: string) {
+export function useBest(game: ChronorokGame) {
   const key = `lul:chronorok:${game}:best`;
   const [best, setBest] = useState(0);
   useEffect(() => {
@@ -19,6 +21,8 @@ export function useBest(game: string) {
     if (better) {
       setBest(score);
       try { localStorage.setItem(key, String(score)); } catch { /* per device only */ }
+      if (!lowerIsBetter) void submitGameBest(game, score).catch(() => undefined);
+      cheerCompanion();
     }
     return better;
   }

@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Flag, Lock, RotateCcw, Star } from "lucide-react";
 import { GAME_STYLES, GameHeader } from "@/components/chronorok/GameChrome";
-import { RIDER_TRACKS, WHEEL_R, bikeAngle, newBike, stepBike, trackSegments, type Bike, type Controls, type Track } from "@/lib/chronorok/relic-rider";
+import { RIDER_TRACKS, WHEEL_R, bikeAngle, newBike, riderStars, riderTotalStars, stepBike, trackSegments, type Bike, type Controls, type Track } from "@/lib/chronorok/relic-rider";
+import { cheerCompanion, submitGameBest, useCompanionColour } from "@/lib/chronorok-cards";
 
 /** Relic Rider: a side-on stunt bike over castle tracks. Gas, brake, lean.
  *  Flip in the air to take a second off your time; land on your wheels.
@@ -19,9 +20,6 @@ const PROGRESS_KEY = "lul:chronorok:relic-rider:progress";
 type Progress = { unlocked: number; best: Record<number, number> };
 function readProgress(): Progress {
   try { return { unlocked: 1, best: {}, ...JSON.parse(localStorage.getItem(PROGRESS_KEY) ?? "{}") }; } catch { return { unlocked: 1, best: {} }; }
-}
-export function riderStars(time: number, par: number) {
-  return time <= par ? 3 : time <= par * 1.35 ? 2 : 1;
 }
 
 function useTex(src: string, repeat: [number, number]) {
@@ -103,6 +101,7 @@ function Backdrop() {
 }
 
 function BikeModel({ bike }: { bike: React.RefObject<Bike> }) {
+  const frame = useCompanionColour("#c94df2");
   const group = useRef<THREE.Group>(null);
   const rearWheel = useRef<THREE.Group>(null);
   const frontWheel = useRef<THREE.Group>(null);
@@ -127,9 +126,9 @@ function BikeModel({ bike }: { bike: React.RefObject<Bike> }) {
     <group ref={group}>
       {wheel(rearWheel, 0)}
       {wheel(frontWheel, 1.7)}
-      <mesh position={[0.6, 0.35, 0]} rotation={[0, 0, 0.5]}><boxGeometry args={[1.0, 0.14, 0.14]} /><meshStandardMaterial color="#c94df2" metalness={0.4} roughness={0.35} /></mesh>
-      <mesh position={[1.15, 0.38, 0]} rotation={[0, 0, -0.55]}><boxGeometry args={[1.05, 0.14, 0.14]} /><meshStandardMaterial color="#c94df2" metalness={0.4} roughness={0.35} /></mesh>
-      <mesh position={[0.85, 0.66, 0]}><boxGeometry args={[1.0, 0.18, 0.34]} /><meshStandardMaterial color="#8c2eac" /></mesh>
+      <mesh position={[0.6, 0.35, 0]} rotation={[0, 0, 0.5]}><boxGeometry args={[1.0, 0.14, 0.14]} /><meshStandardMaterial color={frame} metalness={0.4} roughness={0.35} /></mesh>
+      <mesh position={[1.15, 0.38, 0]} rotation={[0, 0, -0.55]}><boxGeometry args={[1.05, 0.14, 0.14]} /><meshStandardMaterial color={frame} metalness={0.4} roughness={0.35} /></mesh>
+      <mesh position={[0.85, 0.66, 0]}><boxGeometry args={[1.0, 0.18, 0.34]} /><meshStandardMaterial color={frame} emissive={frame} emissiveIntensity={0.25} /></mesh>
       <mesh position={[1.55, 0.95, 0]} rotation={[0, 0, 1.2]}><boxGeometry args={[0.7, 0.08, 0.08]} /><meshStandardMaterial color="#ffd76a" metalness={0.7} /></mesh>
       <mesh position={[1.62, 1.25, 0]}><boxGeometry args={[0.08, 0.08, 0.6]} /><meshStandardMaterial color="#1f1612" /></mesh>
       {/* rider: the time sprite */}
@@ -200,6 +199,7 @@ export default function RelicRider({ backHref }: { backHref: string }) {
       const next: Progress = { unlocked: Math.max(progress.unlocked, index + 2), best: better ? { ...progress.best, [index]: t } : progress.best };
       setProgress(next);
       try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(next)); } catch { /* per device only */ }
+      if (better) { void submitGameBest("relic-rider", riderTotalStars(next.best)).catch(() => undefined); cheerCompanion(); }
       setResult({ kind, time: t, newBest: better });
     } else setResult({ kind, time: t, newBest: false });
   }
@@ -271,7 +271,7 @@ export default function RelicRider({ backHref }: { backHref: string }) {
         </>
       ) : (
         <div className="absolute inset-0 overflow-y-auto p-5" style={{ background: "linear-gradient(180deg,#3a2450,#c0567a 60%,#f59a5a)" }}>
-          <GameHeader backHref={backHref} title="RELIC RIDER · THE ARENA GATE" accent="#ffc94a" value={`${Object.values(progress.best).reduce((s, t, i) => s + riderStars(t, RIDER_TRACKS[Number(Object.keys(progress.best)[i])]?.par ?? 99), 0)} ★`} sub={`of ${RIDER_TRACKS.length * 3} stars`} />
+          <GameHeader backHref={backHref} title="RELIC RIDER · THE ARENA GATE" accent="#ffc94a" value={`${riderTotalStars(progress.best)} ★`} sub={`of ${RIDER_TRACKS.length * 3} stars`} />
           <div className="mx-auto mt-36 max-w-[760px]">
             <div className="chronoGlass mb-4 rounded-3xl p-5 text-center">
               <h1 className="chronoTitle text-3xl">Relic Rider</h1>

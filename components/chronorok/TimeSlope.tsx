@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import * as THREE from "three";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { GAME_STYLES, GameCard, GameHeader, useBest } from "@/components/chronorok/GameChrome";
+import { useCompanionColour } from "@/lib/chronorok-cards";
 
 /** Time Slope: steer a glowing time orb down an endless neon track that bends
  *  and drops away. Fall off an edge or hit a red block and the run ends. It
@@ -115,6 +116,7 @@ function Track({ game, row }: { game: React.RefObject<Game>; row: (i: number) =>
 }
 
 function Orb({ game }: { game: React.RefObject<Game> }) {
+  const colour = useCompanionColour("#ffa830");
   const group = useRef<THREE.Group>(null);
   const ball = useRef<THREE.Mesh>(null);
   useFrame((_, delta) => {
@@ -128,7 +130,7 @@ function Orb({ game }: { game: React.RefObject<Game> }) {
     <group ref={group}>
       <mesh ref={ball}>
         <sphereGeometry args={[ORB, 32, 32]} />
-        <meshStandardMaterial color="#ffa830" emissive="#ff8a00" emissiveIntensity={0.6} roughness={0.25} metalness={0.2} />
+        <meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={0.35} roughness={0.25} metalness={0.2} />
       </mesh>
       <mesh rotation={[Math.PI / 2.3, 0, 0]}><torusGeometry args={[ORB * 1.25, 0.06, 8, 48]} /><meshBasicMaterial color="#7ff0ff" toneMapped={false} /></mesh>
       <mesh scale={1.7}><sphereGeometry args={[ORB, 16, 16]} /><meshBasicMaterial color="#ffb347" transparent opacity={0.15} toneMapped={false} /></mesh>

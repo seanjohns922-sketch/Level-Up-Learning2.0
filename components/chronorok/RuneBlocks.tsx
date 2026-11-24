@@ -7,6 +7,7 @@ import * as THREE from "three";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Lock, RotateCcw, Star } from "lucide-react";
 import { GAME_STYLES, GameHeader } from "@/components/chronorok/GameChrome";
 import { RUNE_LEVELS, parseLevel, solve, step, solid, type BlockState, type Dir } from "@/lib/chronorok/rune-blocks";
+import { cheerCompanion, submitGameBest, useCompanionColour } from "@/lib/chronorok-cards";
 
 /** Rune Blocks: roll the rune stone onto the portal, standing up. Twelve
  *  puzzles, each checked solvable; stars for finishing in few rolls. */
@@ -66,7 +67,9 @@ function Board({ rows, bridgesOpen }: { rows: string[]; bridgesOpen: boolean }) 
   );
 }
 
+const DEFAULT_RUNE_GLOW = "#5a3200";
 function Stone({ state, falling, won }: { state: BlockState; falling: boolean; won: boolean }) {
+  const glow = useCompanionColour(DEFAULT_RUNE_GLOW);
   const group = useRef<THREE.Group>(null);
   const runeMap = useMemo(() => {
     const canvas = document.createElement("canvas");
@@ -91,7 +94,7 @@ function Stone({ state, falling, won }: { state: BlockState; falling: boolean; w
   });
   return (
     <group ref={group}>
-      <mesh castShadow><boxGeometry args={[0.92, 1.92, 0.92]} /><meshStandardMaterial map={runeMap} roughness={0.35} metalness={0.3} emissive="#5a3200" emissiveIntensity={0.35} /></mesh>
+      <mesh castShadow><boxGeometry args={[0.92, 1.92, 0.92]} /><meshStandardMaterial map={runeMap} roughness={0.35} metalness={0.3} emissive={glow} emissiveIntensity={glow === DEFAULT_RUNE_GLOW ? 0.35 : 0.5} /></mesh>
     </group>
   );
 }
@@ -134,6 +137,10 @@ export default function RuneBlocks({ backHref }: { backHref: string }) {
       const next: Progress = { unlocked: Math.max(progress.unlocked, levelIndex + 2), stars: { ...progress.stars, [levelIndex]: Math.max(progress.stars[levelIndex] ?? 0, earned) } };
       setProgress(next);
       try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(next)); } catch { /* per device only */ }
+      if (earned > (progress.stars[levelIndex] ?? 0)) {
+        void submitGameBest("rune-blocks", Object.values(next.stars).reduce((sum, n) => sum + n, 0)).catch(() => undefined);
+        cheerCompanion();
+      }
     }
   }, [bridgesOpen, levelIndex, moves, par, parsed, progress, restart, state, status]);
 

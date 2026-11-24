@@ -8,6 +8,7 @@ import { Environment, Lightformer } from "@react-three/drei";
 import { TrialStudentAvatar } from "@/components/world3d/SharedWorldPlayer";
 import { WORLD_AVATAR_SCALE } from "@/lib/world3d/world-scale";
 import { ArrowLeft, ArrowRight, ArrowUp, RotateCcw } from "lucide-react";
+import { cheerCompanion, submitGameBest, useCompanionColour } from "@/lib/chronorok-cards";
 
 /** Chrono Run: a tunnel runner. You run along an eight-sided tunnel floating in
  *  the time stream. Move left or right onto the walls and the tunnel turns with
@@ -190,7 +191,10 @@ function Tunnel({ game, row, era }: { game: React.RefObject<Game>; row: (i: numb
 }
 
 // The runner is the learner's own avatar (same model and outfit as the worlds).
+const DEFAULT_TRAIL = "#ffd9a0";
 function Runner({ game }: { game: React.RefObject<Game> }) {
+  // The companion Chronorok's colour lights the runner and leaves a glowing trail (looks only).
+  const trail = useCompanionColour(DEFAULT_TRAIL);
   const group = useRef<THREE.Group>(null);
   const body = useRef<THREE.Group>(null);
   const moving = useRef(false);
@@ -213,7 +217,8 @@ function Runner({ game }: { game: React.RefObject<Game> }) {
         </group>
       </group>
       {/* The runner carries its own light, so nearby tiles glow. */}
-      <pointLight position={[0, 1.6, -1.5]} intensity={40} distance={26} decay={1.6} color="#ffd9a0" />
+      <pointLight position={[0, 1.6, -1.5]} intensity={40} distance={26} decay={1.6} color={trail} />
+      <mesh position={[0, -0.93, 0.6]} rotation={[-Math.PI / 2, 0, 0]}><planeGeometry args={[0.9, 2.6]} /><meshBasicMaterial color={trail} transparent opacity={trail === DEFAULT_TRAIL ? 0 : 0.55} blending={THREE.AdditiveBlending} depthWrite={false} toneMapped={false} /></mesh>
     </group>
   );
 }
@@ -347,14 +352,13 @@ export default function ChronoRun({ backHref }: { backHref: string }) {
   function over(metres: number) {
     setPhase("over");
     setHud((current) => ({ ...current, metres }));
-    setBest((previous) => {
-      if (metres > previous) {
-        setNewBest(true);
-        try { localStorage.setItem("lul:chronorok:chrono-run:best", String(metres)); } catch { /* per device only */ }
-        return metres;
-      }
-      return previous;
-    });
+    if (metres > best) {
+      setBest(metres);
+      setNewBest(true);
+      try { localStorage.setItem("lul:chronorok:chrono-run:best", String(metres)); } catch { /* per device only */ }
+      void submitGameBest("chrono-run", metres).catch(() => undefined);
+      cheerCompanion();
+    }
   }
 
   useEffect(() => {

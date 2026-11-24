@@ -322,6 +322,7 @@
     "qa:school-hardening-db": "node scripts/school-hardening-db-test.mjs",
     "qa:learning-streak-db": "node scripts/learning-streak-db-test.mjs",
     "qa:xp-quests-db": "node scripts/xp-quests-db-test.mjs",
+    "qa:chronorok-cards-db": "node scripts/chronorok-cards-db-test.mjs",
     "qa:learning-streak-ui": "node --no-warnings --experimental-strip-types --experimental-loader ./scripts/typescript-alias-loader.mjs scripts/learning-streak-ui-test.mjs",
     "qa:week-page-look": "node scripts/week-page-look-audit.mjs",
     "qa:measurelands-ruler-objects": "node scripts/measurelands-ruler-objects-audit.mjs",

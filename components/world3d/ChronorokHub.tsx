@@ -17,6 +17,8 @@ import { useChronorokProgress } from "@/lib/useChronorokProgress";
 import { CHRONOROK_VIDEOS } from "@/data/chronorok-artwork";
 import Image from "next/image";
 import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, gradeName } from "@/lib/chronorok";
+import { FriendsBoard } from "@/components/chronorok/FriendsBoard";
+import type { ChronorokGame } from "@/lib/chronorok-cards";
 
 /** Chronorok hub: Sean's painted Chronorok art turned into a 3D depth surface
  *  (near plaza, far cliffs and spire) with mist, drifting time sparks and four
@@ -31,6 +33,8 @@ const PORTALS: Record<PortalKey, { u: number; v: number; color: string; game: st
   cave: { u: 0.69, v: 0.5, color: "#ff9a5a", game: "Time Slope", place: "The Ember Cave", blurb: "Race the time orb down the stream. It only gets faster.", art: "/images/chronorok/ember-cave.webp", href: "/world/chronorok/time-slope" },
   rune: { u: 0.82, v: 0.56, color: "#c79bff", game: "Rune Blocks", place: "The Rune Gate", blurb: "Roll the rune stone into the portal. Forty puzzles to beat.", art: "/images/chronorok/rune-gate.webp", href: "/world/chronorok/rune-blocks" },
 };
+
+const PORTAL_GAMES: Record<PortalKey, ChronorokGame> = { arena: "relic-rider", rift: "chrono-run", cave: "time-slope", rune: "rune-blocks" };
 
 export default function ChronorokHub() {
   const router = useRouter();
@@ -156,6 +160,7 @@ export default function ChronorokHub() {
             <p className="font-display text-xs font-black tracking-[0.2em]" style={{ color: active.color }}>{active.place.toUpperCase()}</p>
             <h2 className="chronoTitle mt-1 text-4xl">{active.game}</h2>
             <p className="mt-1 font-bold text-[#f3ead9]">{active.blurb}</p>
+            {portal ? <FriendsBoard key={portal} game={PORTAL_GAMES[portal]} colour={active.color} /> : null}
             {active.href ? (
               <button type="button" onClick={() => router.push(preview ? `${active.href}?teacher_preview=1` : active.href!)} className="mt-4 inline-flex h-14 items-center gap-2 rounded-full bg-white px-8 font-display text-[15px] font-black text-[#16121f]">
                 <Play className="h-4 w-4" />ENTER

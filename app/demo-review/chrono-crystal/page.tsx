@@ -1,15 +1,16 @@
 "use client";
 
-import { previewCrystalReveal } from "@/lib/chrono-crystals";
+import { previewCrystalReveal, type CrystalReveal } from "@/lib/chrono-crystals";
 
 // Review page: show each kind of Chrono Crystal reveal. Nothing is saved.
-const CASES = [
+const CASES: Array<{ label: string; reveal: CrystalReveal }> = [
   { label: "Everyday crystal (+1)", reveal: { crystals: 64, learningDays: 64, chronorok: "Chronorok Current", milestone: null } },
   { label: "First crystal", reveal: { crystals: 1, learningDays: 1, chronorok: "Chronorok Current", milestone: "first" } },
   { label: "Chronorok opens (day 5)", reveal: { crystals: 5, learningDays: 5, chronorok: "Chronorok Current", milestone: "open" } },
   { label: "25 / 50 / 75 milestone", reveal: { crystals: 50, learningDays: 50, chronorok: "Chronorok Current", milestone: "quarter" } },
   { label: "100 — the Awakening", reveal: { crystals: 100, learningDays: 100, chronorok: "Chronorok Current", milestone: "awaken" } },
-] as const;
+  { label: "First 100 — Awakening + catch-up", reveal: { crystals: 100, learningDays: 100, chronorok: "Chronorok Current", milestone: "awaken", catchUp: ["Chronorok Spark", "Chronorok Ember", "Chronorok Pulse"] } },
+];
 
 export default function Page() {
   return (

@@ -1,30 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentProfile } from "@/lib/studentIdentity";
-import { fetchStudentActivityDaily } from "@/lib/student-activity";
-import { chronorokForGrade, chronorokProgress } from "@/lib/chronorok";
+import { chronorokForGrade } from "@/lib/chronorok";
+import { useChronorok } from "@/lib/chronorok-cards";
 
-/** Uses saved learning activity, never a browser-maintained reward balance. */
+/** Crystals counted by the server (lib/chronorok-cards), never a browser-maintained balance. */
 export function useChronorokProgress() {
   const preview = useDemoPreviewMode();
-  const [state, setState] = useState<{ loading: boolean; error: string | null; signedIn: boolean; grade: string | null; progress: ReturnType<typeof chronorokProgress> | null }>({ loading: true, error: null, signedIn: false, grade: null, progress: null });
-  useEffect(() => {
-    let cancelled = false;
-    const profile = getActiveStudentProfile();
-    if (preview) {
-      queueMicrotask(() => { if (!cancelled) setState({ loading: false, error: null, signedIn: false, grade: "Year 3", progress: { learningDays: 63, crystals: 63, open: true } }); });
-    } else if (!profile?.studentId) {
-      queueMicrotask(() => { if (!cancelled) setState({ loading: false, error: null, signedIn: false, grade: null, progress: null }); });
-    } else {
-      void fetchStudentActivityDaily(profile.studentId).then(rows => {
-        if (!cancelled) setState({ loading: false, error: null, signedIn: true, grade: profile.yearLevel ?? null, progress: chronorokProgress(rows) });
-      }).catch(() => {
-        if (!cancelled) setState({ loading: false, error: "Your Chrono Crystals could not load. Please try again.", signedIn: true, grade: profile.yearLevel ?? null, progress: null });
-      });
-    }
-    return () => { cancelled = true; };
-  }, [preview]);
-  return { ...state, preview, chronorok: chronorokForGrade(state.grade) };
+  const { state, error } = useChronorok();
+  // The signed-in student lives in this browser: read it after hydration so the server render matches.
+  const mounted = useSyncExternalStore(subscribeNothing, () => true, () => false);
+  const profile = mounted ? getActiveStudentProfile() : null;
+  const signedIn = Boolean(profile?.studentId) && !preview;
+  const grade = preview ? "Year 5" : profile?.yearLevel ?? null;
+  return {
+    loading: !mounted || (!state && !error && (signedIn || preview)),
+    error: error && !state ? "Your Chrono Crystals could not load. Please try again." : null,
+    signedIn,
+    grade,
+    progress: state ? { learningDays: state.learningDays, crystals: state.crystals, open: state.open } : null,
+    cards: state,
+    preview,
+    chronorok: chronorokForGrade(grade),
+  };
 }
+
+const subscribeNothing = () => () => undefined;

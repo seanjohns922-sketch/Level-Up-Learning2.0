@@ -12,6 +12,7 @@ import { getRevealQueue, subscribeReveal } from "@/lib/gem-reveal";
  *  close by themselves after a few seconds; milestones stay until tapped. */
 
 const NONE: never[] = [];
+const listNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names[0]).replaceAll("Chronorok ", "");
 
 function Crystal({ size = 120 }: { size?: number }) {
   return (
@@ -53,16 +54,24 @@ export default function ChronoCrystalReveal() {
     : showing.milestone === "quarter" ? `${showing.crystals} Chrono Crystals!`
     : "+1 Chrono Crystal";
   const line =
-    showing.milestone === "awaken" ? "Your Chronorok RELIQ card is ready to view."
+    showing.milestone === "awaken" ? (showing.catchUp?.length ? `Your first 100! ${listNames(showing.catchUp)} wake up too.` : "Your Chronorok RELIQ card is yours to keep.")
     : showing.milestone === "open" ? "Your portal to the Chronorok games awaits in the Tower."
     : showing.milestone === "first" ? `You earn one every day you learn. Collect ${CRYSTALS_TO_AWAKEN} to awaken ${showing.chronorok}.`
+    : left === 0 ? `${showing.chronorok} is awake. Keep learning!`
     : `${left} more learning day${left === 1 ? "" : "s"} to awaken ${showing.chronorok}.`;
 
   return (
     <div className={`chronoCrystal ${big ? "isBig" : ""}`} role="status" aria-live="polite" onClick={() => !big && dismissCrystalReveal()}>
       <div className="chronoCrystalCard">
         <div className="chronoCrystalGlow" />
-        {awakened ? <Image src={awakened.images.cardFront} alt={`${awakened.name} RELIQ card`} width={180} height={252} className="relative mx-auto max-h-[35svh] w-auto object-contain" /> : <Crystal size={big ? 130 : 84} />}
+        {awakened ? (
+          <div className="relative flex items-end justify-center gap-2">
+            {(showing.catchUp ?? []).map((name) => CHRONOROKS.find((card) => card.name === name)).filter((card) => card !== undefined).map((card) => (
+              <Image key={card.id} src={card.images.cardFront} alt={`${card.name} RELIQ card`} width={70} height={98} className="max-h-[14svh] w-auto rounded-md object-contain opacity-90" />
+            ))}
+            <Image src={awakened.images.cardFront} alt={`${awakened.name} RELIQ card`} width={180} height={252} className="max-h-[35svh] w-auto object-contain" />
+          </div>
+        ) : <Crystal size={big ? 130 : 84} />}
         <p className="chronoCrystalKicker">CHRONO CRYSTALS · {showing.crystals} / {CRYSTALS_TO_AWAKEN}</p>
         <h2 className="chronoCrystalTitle">{headline}</h2>
         <div className="chronoCrystalBar"><i style={{ width: `${(showing.crystals / CRYSTALS_TO_AWAKEN) * 100}%` }} /></div>

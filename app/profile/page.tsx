@@ -21,12 +21,13 @@ import { fetchGlobalXp, getExplorerRank } from "@/lib/economy";
 import { Check, ChevronLeft, Copy, LogOut, Settings, Zap } from "lucide-react";
 import GemIcon, { cutForGem, emblemForGem } from "@/components/gems/GemIcon";
 import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
-import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokForGrade, chronorokProgress } from "@/lib/chronorok";
+import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokForGrade } from "@/lib/chronorok";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { fetchGemVault, type GemDefinition, type GemVault } from "@/lib/gems";
 import { stoneForGem } from "@/lib/gem-stones";
 import { collectedReliqsByRealm, type CollectedReliqs } from "@/lib/reliqs-collected";
+import { useChronorok } from "@/lib/chronorok-cards";
 
 const MELBOURNE_TIME_ZONE = "Australia/Melbourne";
 
@@ -266,7 +267,8 @@ export default function ProfilePage() {
     return activityRows.filter((row) => row.activity_date.startsWith(prefix)).length;
   }, [activityRows, calendarYear, monthIndex]);
   const demoPreviewMode = useDemoPreviewMode();
-  const crystals = useMemo(() => (demoPreviewMode ? { crystals: 63, open: true, learningDays: 63 } : chronorokProgress(activityRows)), [activityRows, demoPreviewMode]);
+  // Counted by the server, the same number as the hub and Chronorok.
+  const crystals = useChronorok().state ?? { crystals: 0, open: false, learningDays: 0 };
   const [yearLevel] = useState(() => getActiveStudentProfile()?.yearLevel ?? null);
   const [profileStudentId] = useState(() => getActiveStudentProfile()?.studentId ?? null);
   const xpToNextRank = Math.max(0, explorerRank.nextLevelXp - explorerRank.currentXp);
@@ -477,7 +479,7 @@ export default function ProfilePage() {
             </div>
             <p className="mt-3 text-[13px] font-bold text-[#cfc7dc]">
               {crystals.open
-                ? <>One for every day you learn · {Math.max(0, CRYSTALS_TO_AWAKEN - crystals.crystals)} more to awaken <b className="text-[#ffd76a]">{chronorokForGrade(demoPreviewMode ? "Year 3" : yearLevel).name}</b></>
+                ? <>One for every day you learn · {Math.max(0, CRYSTALS_TO_AWAKEN - crystals.crystals)} more to awaken <b className="text-[#ffd76a]">{chronorokForGrade(demoPreviewMode ? "Year 5" : yearLevel).name}</b></>
                 : <>Learn on {Math.max(0, CHRONOROK_OPEN_DAYS - crystals.learningDays)} more day{CHRONOROK_OPEN_DAYS - crystals.learningDays === 1 ? "" : "s"} to open Chronorok</>}
             </p>
           </button>

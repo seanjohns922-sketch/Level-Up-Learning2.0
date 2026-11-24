@@ -198,3 +198,13 @@ export function stepBike(bike: Bike, track: Track, segments: Segment[], controls
   if (bike.rear.p.x >= track.finishX) bike.finished = true;
   return bike;
 }
+
+/** Stars for a track time: 3 at or under par, 2 within 35% over, else 1. */
+export function riderStars(time: number, par: number) {
+  return time <= par ? 3 : time <= par * 1.35 ? 2 : 1;
+}
+
+/** All the stars from a player's best times (track index → seconds). */
+export function riderTotalStars(best: Record<number, number>) {
+  return Object.entries(best).reduce((sum, [index, time]) => sum + riderStars(time, RIDER_TRACKS[Number(index)]?.par ?? 99), 0);
+}
