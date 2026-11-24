@@ -232,13 +232,13 @@ function Lengths({ p }: { p: Extract<Picture, { kind: "lengths" }> }) {
   const colours = ["#f472b6", "#a78bfa", "#38bdf8"];
   const placed = p.pieces.map((q, i) => ({ ...q, i, at: 20 + p.pieces.slice(0, i).reduce((s, r) => s + r.length * scale, 0) }));
   return <svg viewBox="0 0 380 130" className="mx-auto block h-auto max-h-[170px] w-full" role="img" aria-label={number7PictureSpeech(p)}>
-    <defs><pattern id="n7-rope" width="12" height="16" patternUnits="userSpaceOnUse"><rect width="12" height="16" fill="#c8a165" /><path d="M0 16L12 0" stroke="#a67c3d" strokeWidth="3" /></pattern></defs>
+    <defs><pattern id="n7-rope" width="12" height="16" patternUnits="userSpaceOnUse"><rect width="12" height="16" fill="#c8a165" /><path d="M0 16L12 0" stroke="#a67c3d" strokeWidth="3" /></pattern><linearGradient id="n7-pipe" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#e2e8f0" /><stop offset=".5" stopColor="#94a3b8" /><stop offset="1" stopColor="#64748b" /></linearGradient></defs>
     {placed.map((q) => <g key={q.i}>
-      <rect x={q.at} y={44} width={q.length * scale - (p.object === "ribbon" ? 3 : 0)} height={p.object === "rope" ? 16 : 20} rx={p.object === "rope" ? 8 : 2} fill={p.object === "rope" ? "url(#n7-rope)" : colours[q.i % 3]} opacity={q.cut ? 0.55 : 1} />
+      <rect x={q.at} y={44} width={q.length * scale - (p.object === "ribbon" ? 3 : 0)} height={p.object === "ribbon" ? 20 : 16} rx={p.object === "ribbon" ? 2 : p.object === "pipe" ? 3 : 8} fill={p.object === "rope" ? "url(#n7-rope)" : p.object === "pipe" ? "url(#n7-pipe)" : colours[q.i % 3]} opacity={q.cut ? 0.55 : 1} />
       {q.cut && <path d={`M${q.at + q.length * scale} 36v40`} stroke="#334155" strokeWidth={2} strokeDasharray="4 3" />}
       <Chip x={q.at + (q.length * scale) / 2} y={q.label.includes("?") ? 98 : 26} text={q.label} size={14} />
     </g>)}
-    {p.object === "ribbon" && <Chip x={190} y={110} text={`? ${p.ask}`} size={14} />}
+    {p.object !== "rope" && <Chip x={190} y={110} text={`? ${p.ask}`} size={14} />}
   </svg>;
 }
 
@@ -304,7 +304,7 @@ function Receipt({ p }: { p: Extract<Picture, { kind: "receipt" }> }) {
     <path d={`M40 10h260v${h - 20}l-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10z`} fill="#fffdf7" stroke="#d6d3c7" strokeWidth={1.5} />
     <text x={170} y={42} textAnchor="middle" fontSize={16} fill={INK} {...FONT}>{p.title.toUpperCase()}</text>
     <line x1={60} x2={280} y1={56} y2={56} stroke="#cbd5e1" strokeDasharray="4 4" />
-    {p.lines.map(([a, b], i) => <g key={i}><text x={60} y={84 + i * 30} fontSize={15} fill={INK} fontFamily="ui-monospace, Menlo, monospace">{a}</text><text x={280} y={84 + i * 30} textAnchor="end" fontSize={15} fill={INK} fontFamily="ui-monospace, Menlo, monospace">{b}</text></g>)}
+    {p.lines.map(([a, b], i) => <g key={i}><text x={60} y={84 + i * 30} fontSize={15} fill={INK} fontFamily="ui-monospace, Menlo, monospace">{a}</text><text x={280} y={84 + i * 30} textAnchor="end" fontSize={15} fill={INK} fontFamily="ui-monospace, Menlo, monospace">{b.replace(/\.$/, "")}</text></g>)}
     <line x1={60} x2={280} y1={66 + p.lines.length * 30} y2={66 + p.lines.length * 30} stroke="#cbd5e1" strokeDasharray="4 4" />
     <Chip x={170} y={94 + p.lines.length * 30} text={`? ${p.ask}`} size={14} />
   </svg>;
@@ -321,6 +321,20 @@ function Jugs({ p }: { p: Extract<Picture, { kind: "jugs" }> }) {
       <Chip x={x + W / 2} y={30 + H + 26} text={j.label} size={13} />
     </g>; })}
     <Chip x={190} y={226} text={`? ${p.ask}`} size={13} />
+  </svg>;
+}
+
+function MapScale({ p }: { p: Extract<Picture, { kind: "map" }> }) {
+  const cm = 34, len = p.mapCm * cm, x0 = (380 - len) / 2;
+  return <svg viewBox="0 0 380 220" className="mx-auto block h-auto max-h-[240px] w-full" role="img" aria-label={number7PictureSpeech(p)}>
+    <rect x={10} y={10} width={360} height={150} rx={10} fill="#e8f3df" stroke="#9cbf8b" />
+    <path d="M10 120q80-40 160-10t200-30" stroke="#93c5fd" strokeWidth={10} fill="none" opacity={0.8} />
+    <path d="M40 30q60 40 120 20t160 30" stroke="#d6c7a1" strokeWidth={5} fill="none" />
+    {[x0, x0 + len].map((x, i) => <g key={i}><circle cx={x} cy={85} r={8} fill="#dc2626" stroke="#fff" strokeWidth={2} /><text x={x} y={70} textAnchor="middle" fontSize={13} fill={INK} {...FONT}>{i ? "Town B" : "Town A"}</text></g>)}
+    <line x1={x0} y1={100} x2={x0 + len} y2={100} stroke={TEAL} strokeWidth={2} strokeDasharray="5 4" />
+    <Chip x={x0 + len / 2} y={118} text={`${p.mapCm} cm on the map`} size={13} />
+    <Chip x={110} y={190} text={`Scale ${p.scale}`} size={14} />
+    <Chip x={280} y={190} text="? km apart" size={14} />
   </svg>;
 }
 
@@ -360,5 +374,6 @@ export default function Number7Picture({ picture }: { picture: Picture }) {
     {picture.kind === "receipt" && <Receipt p={picture} />}
     {picture.kind === "jugs" && <Jugs p={picture} />}
     {picture.kind === "barmodel" && <BarModel p={picture} />}
+    {picture.kind === "map" && <MapScale p={picture} />}
   </figure>;
 }

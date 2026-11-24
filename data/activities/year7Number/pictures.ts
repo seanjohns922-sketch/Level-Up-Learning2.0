@@ -31,7 +31,7 @@ export type Number7Picture =
   /** A tank divided into equal fractions, some used. */
   | { kind: "tank"; title: string; capacity: string; parts: number; used: number }
   /** Lengths of rope or ribbon laid end to end. */
-  | { kind: "lengths"; title: string; object: "rope" | "ribbon"; pieces: { length: number; label: string; cut?: boolean }[]; ask: string }
+  | { kind: "lengths"; title: string; object: "rope" | "ribbon" | "pipe"; pieces: { length: number; label: string; cut?: boolean }[]; ask: string }
   /** A whole (100%) with part of it marked; the unknown is shown as "?". */
   | { kind: "percentbar"; title: string; whole: string; part: number; partLabel: string; of: number; ask: string }
   /** A thermometer or sea-level scale with labelled readings; only the labelled values are shown. */
@@ -43,6 +43,8 @@ export type Number7Picture =
   /** Measuring jugs; each holds a labelled amount out of `of` litres, drawn to scale. */
   | { kind: "jugs"; title: string; jugs: { amount: number; label: string; role?: "add" | "use" | "result" }[]; ask: string }
   /** A bar model for a fraction of a fraction: whole split into `a` parts, `b` taken, then that part split into `c`, `d` taken. */
+  /** A map with two towns, the measured map distance and the scale. */
+  | { kind: "map"; title: string; scale: string; mapCm: number }
   | { kind: "barmodel"; title: string; whole: string; a: number; b: number; c: number; d: number; first: string; second: string };
 
 const n = (s: string) => Number(s.replace(/,/g, ""));
@@ -93,6 +95,8 @@ export function number7PictureSpeech(p: Number7Picture): string {
       return `${p.title}. ${p.lines.map(([a, b]) => `${a}: ${b}`).join(". ")}. Find ${p.ask}.`;
     case "jugs":
       return `${p.title}. ${p.jugs.map((j) => j.label).join(". ")}. Find ${p.ask}.`;
+    case "map":
+      return `${p.title}. Two towns ${p.mapCm} centimetres apart on the map. Scale ${p.scale}. Find the real distance.`;
     case "barmodel":
       return `${p.title}. A bar for ${p.whole}, split into ${p.a} equal parts with ${p.b} marked: ${p.first}. That part is split into ${p.c} equal parts with ${p.d} marked: ${p.second}.`;
     case "percentbar":
@@ -187,6 +191,55 @@ const RULES: Rule[] = [
   // Week 8 Lesson 3
   [/You have (\d+\/\d+) L of juice\. Each bottle holds (\d+\/\d+) L/, (m) => ({ kind: "jugs", title: "Juice and bottles", jugs: [{ amount: mixed(m[1]), label: `Juice: ${m[1]} L` }, { amount: mixed(m[2]), label: `One bottle: ${m[2]} L`, role: "result" }], ask: "full bottles" })],
   [/A ribbon (\d+) m long is cut into pieces (\d+\/\d+) m long/, (m) => { const piece = mixed(m[2]), total = n(m[1]); return { kind: "lengths", title: "Cutting the ribbon", object: "ribbon", pieces: [{ length: piece, label: `${m[2]} m` }, { length: piece, label: `${m[2]} m` }, { length: total - 2 * piece, label: `… ${m[1]} m in all` }], ask: "complete pieces" }; }],
+
+  // Week 9 Lesson 1
+  [/You pay with \$(\d+) for items costing \$([\d.]+), \$([\d.]+) and \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Shopping", lines: [["Item 1", `$${m[2]}`], ["Item 2", `$${m[3]}`], ["Item 3", `$${m[4]}`], ["Paid", `$${m[1]}`]], ask: "change" })],
+  [/^You buy (\d+) items at \$([\d.]+) each\. What is the total/, (m) => ({ kind: "receipt", title: "Shopping", lines: [[`Items × ${m[1]}`, `$${m[2]} each`]], ask: "total" })],
+  // Week 9 Lesson 2
+  [/There are ([\d.]+) kg of seed\. Reserve ([\d.]+) kg, then divide the rest into ([\d.]+) kg bags/, (m) => ({ kind: "receipt", title: "Seed store", lines: [["Seed", `${m[1]} kg`], ["Kept back", `${m[2]} kg`], ["Each bag", `${m[3]} kg`]], ask: "full bags" })],
+  [/A ([\d.]+) m pipe is cut into ([\d.]+) m lengths/, (m) => { const piece = Number(m[2]), total = Number(m[1]); return { kind: "lengths", title: "Cutting the pipe", object: "pipe", pieces: [{ length: piece, label: `${m[2]} m` }, { length: piece, label: `${m[2]} m` }, { length: total - 2 * piece, label: `… ${m[1]} m in all` }], ask: "lengths" }; }],
+  // Week 9 Lesson 3
+  [/^(\d+)% of the (\d+) students in a year group attended/, (m) => ({ kind: "percentbar", title: "Attendance", whole: `${m[2]} students`, part: n(m[1]), of: 100, partLabel: `${m[1]}% attended`, ask: "students attended" })],
+  [/^Find ([\d.]+)% of (\d+)\.$/, (m) => ({ kind: "percentbar", title: `${m[1]}% of ${m[2]}`, whole: m[2], part: Number(m[1]), of: 100, partLabel: `${m[1]}%`, ask: "the amount" })],
+  [/grant is \$(\d+)\. Equipment uses ([\d.]+)% and transport uses ([\d.]+)%/, (m) => ({ kind: "percentbar", title: "Grant spending", whole: `$${m[1]}`, part: Number(m[2]) + Number(m[3]), of: 100, partLabel: `${m[2]}% + ${m[3]}% spent`, ask: "dollars left" })],
+  [/A \$(\d+) bike is discounted by (\d+)%, then a further (\d+)% off the new price/, (m) => ({ kind: "receipt", title: "Bike sale", lines: [["Price", `$${m[1]}`], ["First discount", `${m[2]}% off`], ["Then", `${m[3]}% off new price`]], ask: "final price" })],
+  [/Which calculation uses a fraction equivalent to ([\d.]+)% to find \1% of (\d+)/, (m) => ({ kind: "percentbar", title: `${m[1]}% of ${m[2]}`, whole: m[2], part: Number(m[1]), of: 100, partLabel: `${m[1]}%`, ask: "the calculation" })],
+  // Week 10 Lesson 1
+  [/^Blue:gold crystals = (\d+):(\d+)\. Which fraction of all crystals is blue/, (m) => ({ kind: "counters", title: "Crystals in the ratio", groups: [{ count: n(m[1]), label: "blue", colour: "blue" }, { count: n(m[2]), label: "gold", colour: "gold" }] })],
+  [/A bag has (\d+) blue and (\d+) gold crystals\. Add (\d+) blue crystals/, (m) => (n(m[1]) + n(m[3]) <= 60 && n(m[2]) <= 60 ? { kind: "counters", title: "Crystals after adding", groups: [{ count: n(m[1]) + n(m[3]), label: `blue (${m[1]} + ${m[3]} added)`, colour: "blue" }, { count: n(m[2]), label: "gold", colour: "gold" }] } : { kind: "receipt", title: "Crystal bag", lines: [["Blue", m[1]], ["Gold", m[2]], ["Blue added", m[3]]], ask: "blue share as a decimal" })],
+  [/ratio of boys to girls is (\d+):(\d+)\. There are (\d+) students/, (m) => ({ kind: "fractionbar", title: "Boys : girls", parts: n(m[1]) + n(m[2]), shaded: n(m[1]), caption: `${m[1]} boys : ${m[2]} girls in every ${n(m[1]) + n(m[2])}. ${m[3]} students in total.` })],
+  // Week 10 Lesson 2
+  [/^Share \$(\d+) in the ratio (\d+):(\d+)\./, (m) => ({ kind: "fractionbar", title: `Sharing $${m[1]}`, parts: n(m[2]) + n(m[3]), shaded: n(m[2]), caption: `$${m[1]} shared ${m[2]} : ${m[3]} (shaded: first share)` })],
+  [/Mia and Leo share money in the ratio (\d+):(\d+)\. Mia receives \$(\d+)/, (m) => ({ kind: "fractionbar", title: "Mia : Leo", parts: n(m[1]) + n(m[2]), shaded: n(m[1]), caption: `Mia's ${m[1]} part${m[1] === "1" ? " is" : "s are"} $${m[3]} (shaded).` })],
+  [/Mia and Leo share \$(\d+) in the ratio (\d+):(\d+)/, (m) => ({ kind: "fractionbar", title: "Mia : Leo", parts: n(m[2]) + n(m[3]), shaded: n(m[2]), caption: `$${m[1]} shared ${m[2]} : ${m[3]} (shaded: Mia)` })],
+  [/^([A-Z][a-z]+):([a-z]+) = (\d+):(\d+)\. There are (\d+) [a-z]+\. How many ([a-z]+) are there/, (m) => ({ kind: "fractionbar", title: `${m[1]} : ${m[2]}`, parts: n(m[3]) + n(m[4]), shaded: n(m[3]), caption: `${m[3]} part${m[3] === "1" ? "" : "s"} ${m[1].toLowerCase()} (shaded) : ${m[4]} part${m[4] === "1" ? "" : "s"} ${m[2]}. There are ${m[5]} ${m[1].toLowerCase()}.` })],
+  // Week 10 Lesson 3
+  [/^Concentrate:water = (\d+):(\d+)\. (?:A mixture totals|Which model finds the water in a) (\d+) mL/, (m) => ({ kind: "fractionbar", title: "Concentrate : water", parts: n(m[1]) + n(m[2]), shaded: n(m[1]), caption: `${m[1]} part concentrate : ${m[2]} parts water. ${m[3]} mL in total.` })],
+  [/drink contains (\d+) mL concentrate and (\d+) mL water\. Add (\d+) mL concentrate/, (m) => ({ kind: "jugs", title: "The drink", jugs: [{ amount: n(m[1]) + n(m[3]), label: `Concentrate: ${m[1]} + ${m[3]} mL` }, { amount: n(m[2]), label: `Water: ${m[2]} mL` }], ask: "extra water" })],
+  [/map has a scale of 1:(\d+)\. Two towns are (\d+) cm apart on the map/, (m) => ({ kind: "map", title: "Map", scale: `1 : ${n(m[1]).toLocaleString("en-AU")}`, mapCm: n(m[2]) })],
+  // Week 11 Lesson 1 and Week 12 Lesson 3
+  [/A \$(\d+) bag is (\d+)% off(?:\. Delivery (?:adds|of)|, then)\s*\$(\d+)/, (m) => ({ kind: "receipt", title: "Bag order", lines: [["Bag", `$${m[1]}`], ["Discount", `${m[2]}% off`], ["Delivery", `$${m[3]}`]], ask: "final cost" })],
+  [/Store A sells a \$(\d+) bag at (\d+)% off plus \$(\d+) delivery\. Store B charges \$(\d+)/, (m) => ({ kind: "receipt", title: "Two stores", lines: [["Store A bag", `$${m[1]}`], ["Store A discount", `${m[2]}% off`], ["Store A delivery", `$${m[3]}`], ["Store B total", `$${m[4]}`]], ask: "how much cheaper A is" })],
+  [/A \$(\d+) game is (\d+)% off\. How many dollars do you save/, (m) => ({ kind: "percentbar", title: "Game sale", whole: `$${m[1]}`, part: n(m[2]), of: 100, partLabel: `${m[2]}% off`, ask: "saving" })],
+  // Week 11 Lesson 2
+  [/An event costs \$(\d+) and earns \$(\d+)/, (m) => ({ kind: "receipt", title: "Event", lines: [["Cost", `$${m[1]}`], ["Earned", `$${m[2]}`]], ask: n(m[2]) >= n(m[1]) ? "% profit" : "% loss" })],
+  [/fundraiser spends \$(\d+) on supplies and \$(\d+) on a venue\. It earns \$(\d+)/, (m) => ({ kind: "receipt", title: "Fundraiser", lines: [["Supplies", `$${m[1]}`], ["Venue", `$${m[2]}`], ["Earned", `$${m[3]}`]], ask: "% profit on total cost" })],
+  [/shop buys a toy for \$(\d+) and sells it for \$(\d+)/, (m) => ({ kind: "receipt", title: "Toy", lines: [["Bought for", `$${m[1]}`], ["Sold for", `$${m[2]}`]], ask: "% profit" })],
+  // Week 11 Lesson 3
+  [/^A pack of (\d+) notebooks costs \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Notebook pack", lines: [["Notebooks", m[1]], ["Pack price", `$${m[2]}`]], ask: "cost of one" })],
+  [/^(\d+) notebooks cost \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Notebooks", lines: [["Notebooks", m[1]], ["Price", `$${m[2]}`]], ask: "cost of one" })],
+  [/Pack A: (\d+) notebooks for \$([\d.]+)\. Pack B: (\d+) for \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Two packs", lines: [[`Pack A (${m[1]})`, `$${m[2]}`], [`Pack B (${m[3]})`, `$${m[4]}`]], ask: "lower price each" })],
+  [/A (\d+) g bag of rice costs \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Rice", lines: [["Bag", `${m[1]} g`], ["Price", `$${m[2]}`]], ask: "price per 100 g" })],
+  // Week 12 Lesson 1
+  [/^Buy (\d+) supplies at \$([\d.]+) each, plus \$(\d+) delivery\. How much remains from \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Supplies budget", lines: [["Budget", `$${m[4]}`], [`Supplies × ${m[1]}`, `$${m[2]} each`], ["Delivery", `$${m[3]}`]], ask: "money left" })],
+  [/^You have \$(\d+)\. Buy (\d+) supplies at \$([\d.]+) each and pay one delivery fee of \$(\d+)/, (m) => ({ kind: "receipt", title: "Supplies budget", lines: [["Budget", `$${m[1]}`], [`Supplies × ${m[2]}`, `$${m[3]} each`], ["Delivery", `$${m[4]}`]], ask: "money left" })],
+  [/^You have \$(\d+)\. You buy (\d+) kits at \$([\d.]+) each/, (m) => ({ kind: "receipt", title: "Kit budget", lines: [["Budget", `$${m[1]}`], [`Kits × ${m[2]}`, `$${m[3]} each`]], ask: "money left" })],
+  // Week 12 Lesson 2
+  [/A lift starts at floor ([-−]\d+), rises (\d+) floors, then descends (\d+)\b/, (m) => ({ kind: "moves", title: "Lift (floor 0 is ground)", start: Number(m[1].replace("−", "-")), startLabel: `floor ${m[1].replace("-", "−")}`, moves: [n(m[2]), -n(m[3])], moveLabels: [`up ${m[2]} floors`, `down ${m[3]} floors`], ask: "the final floor" })],
+  [/A lift starts at floor ([-−]\d+), rises (\d+) floors, then descends to floor ([-−]\d+)/, (m) => ({ kind: "moves", title: "Lift (floor 0 is ground)", start: Number(m[1].replace("−", "-")), startLabel: `floor ${m[1].replace("-", "−")}`, moves: [n(m[2]), Number(m[3].replace("−", "-")) - Number(m[1].replace("−", "-")) - n(m[2])], moveLabels: [`up ${m[2]} floors`, `down ? floors to ${m[3].replace("-", "−")}`], ask: "how many floors down" })],
+  // Week 12 Lesson 3
+  [/^(\d+)% of (\d+) students buy a ticket costing \$([\d.]+)/, (m) => ({ kind: "receipt", title: "Ticket sales", lines: [["Students", m[2]], ["Buying a ticket", `${m[1]}%`], ["Ticket price", `$${m[3]}`]], ask: "revenue" })],
+  [/^(\d+)% of (\d+) students attend an event and pay \$([\d.]+) each\. Total event costs are \$(\d+)/, (m) => ({ kind: "receipt", title: "Event", lines: [["Students", m[2]], ["Attending", `${m[1]}%`], ["Each pays", `$${m[3]}`], ["Event costs", `$${m[4]}`]], ask: "profit" })],
 ];
 
 export function number7Picture(prompt: string): Number7Picture | undefined {
