@@ -1,14 +1,6 @@
+/* Level 7 caverns. The world display (logo, mission card, stats, dock and prompts) is the shared WorldHUD;
+   only the help panel and the saved-progress alert are cavern-specific. */
 .cavern-world{color:#f8f5ed}
-/* One slim bar keeps the cavern in view: realm, Continue, week jump, help and exits. */
-.cavern-bar{position:absolute;top:16px;left:20px;right:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--cavern-surface);border:1px solid var(--cavern-border);border-radius:16px;padding:8px 10px 8px 16px;box-shadow:0 8px 30px #0005}
-.cavern-title{min-width:0;margin-right:6px}.cavern-title small{display:block;font-size:9px;letter-spacing:.14em;color:var(--cavern-accent);font-weight:900}.cavern-title h1{font-size:20px;font-weight:900;margin:1px 0 0;line-height:1.1}
-.cavern-primary{background:var(--cavern-cta);border:1px solid var(--cavern-accent);border-radius:10px;padding:10px 16px;color:white;font-weight:900;min-height:44px;cursor:pointer}.cavern-primary:hover:not(:disabled){filter:brightness(1.15)}.cavern-primary:disabled{opacity:.7;cursor:default}
-.cavern-jump{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;opacity:.9}.cavern-jump select{background:#151724;padding:9px 8px;border:1px solid var(--cavern-border);border-radius:8px;min-height:44px}
-.cavern-icon,.cavern-exits a,.cavern-help button{background:#141723ee;border:1px solid var(--cavern-border);padding:10px 12px;border-radius:9px;min-height:44px;font-weight:700}
-.cavern-exits{display:flex;align-items:center;gap:8px}.cavern-exits>a{display:inline-flex;align-items:center}
-.cavern-alert{position:absolute;top:96px;left:50%;transform:translateX(-50%);background:#3a1414ee;border:1px solid #f08a80;padding:10px 14px;border-radius:10px;font-size:13px}
-.cavern-help{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(90vw,540px);background:var(--cavern-surface);border:1px solid var(--cavern-border);border-radius:16px;padding:18px;box-shadow:0 8px 30px #0005}.cavern-help h2{font-size:22px;font-weight:900}.cavern-help p{font-size:13px;line-height:1.6;margin:8px 0 14px}.cavern-help button{margin:8px}
-.cavern-world button:focus-visible,.cavern-world a:focus-visible,.cavern-world select:focus-visible{outline:3px solid var(--cavern-accent);outline-offset:3px}
-.cavern-world .summit-action>span{background:var(--cavern-surface);border:1px solid var(--cavern-border);color:var(--cavern-accent)}
-@media(max-width:900px){.cavern-exits{order:9;width:100%;justify-content:flex-end}}
-@media(max-width:700px){.cavern-bar{left:10px;right:10px;top:56px;padding:8px}.cavern-title h1{font-size:16px}.cavern-title small{font-size:8px}.cavern-jump span{display:none}.cavern-exits a{font-size:11px;padding:8px}.cavern-world .summit-action{bottom:140px}}
+.cavern-alert{position:absolute;top:96px;left:50%;transform:translateX(-50%);z-index:20;background:#3a1414ee;border:1px solid #f08a80;padding:10px 14px;border-radius:10px;font-size:13px}
+.cavern-help{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:30;width:min(90vw,540px);background:var(--cavern-surface);border:1px solid var(--cavern-border);border-radius:16px;padding:18px;box-shadow:0 8px 30px #0005}.cavern-help h2{font-size:22px;font-weight:900}.cavern-help p{font-size:13px;line-height:1.6;margin:8px 0 14px}.cavern-help button{margin:8px;background:#141723ee;border:1px solid var(--cavern-border);padding:10px 12px;border-radius:9px;min-height:44px;font-weight:700}
+.cavern-world button:focus-visible{outline:3px solid var(--cavern-accent);outline-offset:3px}

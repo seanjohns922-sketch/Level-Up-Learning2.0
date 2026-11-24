@@ -77,6 +77,8 @@ export function WorldHUD({
   contextAction,
   realmId,
   hideStreakReminder = false,
+  primaryLabel: primaryLabelOverride,
+  primaryDisabled = false,
 }: {
   context: WorldHUDContext;
   preview?: boolean;
@@ -91,6 +93,10 @@ export function WorldHUD({
   realmId?: CanonicalRealmId;
   /** Central hub: no streak reminder (while visiting a friend, where the visit banner sits there). */
   hideStreakReminder?: boolean;
+  /** Worlds whose main button does something specific ("CONTINUE · WEEK 3") instead of the journey's next activity. */
+  primaryLabel?: string;
+  /** Holds the main button while the world is still loading what it will open. */
+  primaryDisabled?: boolean;
 }) {
   const router = useRouter();
   const [journey, setJourney] = useState<WorldJourney>(fallbackJourney);
@@ -180,12 +186,12 @@ export function WorldHUD({
   const hubLayout = context === "central" || context === "tower";
   // The main button says exactly what happens next.
   const lessonMatch = /lesson\s*(\d+)/i.exec(journey.activityLabel);
-  const primaryLabel = context === "realm"
+  const primaryLabel = primaryLabelOverride ?? (context === "realm"
     ? (/post-?test/i.test(journey.activityLabel) ? "TAKE THE POST-TEST" : /pre-?test/i.test(journey.activityLabel) ? "TAKE THE PRE-TEST" : /quiz/i.test(journey.activityLabel) ? "TAKE THE QUIZ" : lessonMatch ? `START LESSON ${lessonMatch[1]}` : "QUICK START")
-    : "QUICK START";
+    : "QUICK START");
   const worldActionsSpeech = joinSpeechParts([
     "World actions",
-    hubLayout ? (contextAction ? `${contextAction.label}. Button.` : null) : quickStartBusy ? "Quick Start is opening" : `Quick Start. ${journey.activityLabel}`,
+    hubLayout ? (contextAction ? `${contextAction.label}. Button.` : null) : quickStartBusy ? "Quick Start is opening" : primaryLabelOverride ? `${primaryLabelOverride}. Button.` : `Quick Start. ${journey.activityLabel}`,
     "Realms. Opens fast travel to the learning realms.",
     hubLayout ? primaryActionSpeech : null,
   ]);
@@ -285,7 +291,7 @@ export function WorldHUD({
             </button>
           ) : null}
           <button type="button" className="worldHudSecondary worldHudWithLabel" onClick={() => setTeleportOpen(true)}><Sparkles size={17} />REALMS</button>
-          <button type="button" className="worldHudPrimary" disabled={quickStartBusy} onClick={() => void quickStart()}><Play size={16} fill="currentColor" />{quickStartBusy ? "OPENING..." : primaryLabel}</button>
+          <button type="button" className="worldHudPrimary" disabled={quickStartBusy || primaryDisabled} onClick={() => void quickStart()}><Play size={16} fill="currentColor" />{quickStartBusy ? "OPENING..." : primaryLabel}</button>
           {hubLayout && primaryAction ? <button type="button" className="worldHudSecondary worldHudWithLabel" onClick={primaryAction.onClick}>{primaryAction.icon === "door" ? <DoorOpen size={17} /> : <Hammer size={17} />}{primaryAction.label}</button> : null}
         </nav>
 
