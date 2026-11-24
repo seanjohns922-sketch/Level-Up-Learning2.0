@@ -2038,3 +2038,46 @@ isolate the interaction between event reads and other dashboard read sources
 using read-only, alternating-order workloads before changing request scheduling.
 No migration, production setting, or 10,000-user capacity claim results from this
 profile.
+
+### 25 November: read-only dashboard source interactions
+
+Extended the event-chain profiler with `--interactions`, using production attempt
+readers and the same live/daily activity queries as the local dashboard workload.
+Use `--experimental-strip-types --experimental-loader` with the absolute path to
+`scripts/typescript-alias-loader.mjs`. The seven combinations are events alone,
+events plus each of the five other sources, and all six sources together. Four
+teachers run each combination concurrently; a second round reverses the order.
+Companion reads launch immediately before event reads, so this is a source
+interaction probe, not an exact reproduction of UI scheduling.
+
+All 56 snapshots passed: stable complete ordered event data, no duplicate or
+out-of-class event rows, identical repeated companion results, successful HTTP
+responses, and no event fallback. Each event snapshot still used seven requests;
+the full six-source snapshot used 17. Syntax and diff checks passed. No application
+code, schema, or learning data was changed; no release build was needed.
+
+Median event-chain times in the forward/reverse rounds were:
+
+| Companion source | Forward | Reverse |
+| --- | ---: | ---: |
+| None | 605 ms | 369 ms |
+| Lesson attempts | 443 ms | 458 ms |
+| Quiz attempts | 405 ms | 391 ms |
+| Assessments | 392 ms | 449 ms |
+| Live activity | 349 ms | 445 ms |
+| Daily activity | 599 ms | 419 ms |
+| All five | 963 ms | 1,471 ms |
+
+The all-source burst was slower in both orders; no individual companion reproduced
+its full delay. This supports investigating combined request contention, without
+identifying a specific SQL statement or establishing causality. Warm-up/order/host
+variation remain visible. Student writes, browser rendering and hosted conditions
+are absent. Do not present this as a production improvement or capacity pass.
+
+Keep production behaviour unchanged. The next diagnostic should compare controlled
+source scheduling with this same read-only workload, retaining complete results
+and measuring the total dashboard duration as well as event duration. The earlier
+mixed-workload 3-versus-6 concurrency experiment already failed to establish a
+reliable win; do not ship a scheduling change based on this isolation test alone.
+Aggregates are in `event-chain-interactions-2026-11-25.json`; full local request
+timings remain in the private fixture directory.

@@ -1,0 +1,271 @@
+{
+  "at": "2026-11-24T20:59:38.648Z",
+  "checks": [
+    "56 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes"
+  ],
+  "limitation": "Four synthetic teachers; read-only source combinations, no student writes. Alternating order is observational, not proof of a production bottleneck or 10,000-user capacity.",
+  "rounds": [
+    {
+      "round": 0,
+      "mode": "events",
+      "eventMs": [
+        593,
+        607,
+        627,
+        603
+      ],
+      "medianEventMs": 605,
+      "requestsPerTeacher": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "companionMaxMs": 0
+    },
+    {
+      "round": 0,
+      "mode": "student_lesson_attempts",
+      "eventMs": [
+        450,
+        441,
+        436,
+        445
+      ],
+      "medianEventMs": 443,
+      "requestsPerTeacher": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "companionMaxMs": 328
+    },
+    {
+      "round": 0,
+      "mode": "student_weekly_quiz_attempts",
+      "eventMs": [
+        403,
+        412,
+        407,
+        396
+      ],
+      "medianEventMs": 405,
+      "requestsPerTeacher": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "companionMaxMs": 102
+    },
+    {
+      "round": 0,
+      "mode": "student_realm_assessments",
+      "eventMs": [
+        395,
+        353,
+        415,
+        390
+      ],
+      "medianEventMs": 392,
+      "requestsPerTeacher": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "companionMaxMs": 198
+    },
+    {
+      "round": 0,
+      "mode": "live_student_activity",
+      "eventMs": [
+        363,
+        404,
+        335,
+        326
+      ],
+      "medianEventMs": 349,
+      "requestsPerTeacher": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "companionMaxMs": 35
+    },
+    {
+      "round": 0,
+      "mode": "get_live_class_activity_today",
+      "eventMs": [
+        595,
+        602,
+        587,
+        609
+      ],
+      "medianEventMs": 599,
+      "requestsPerTeacher": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "companionMaxMs": 69
+    },
+    {
+      "round": 0,
+      "mode": "all",
+      "eventMs": [
+        960,
+        929,
+        995,
+        967
+      ],
+      "medianEventMs": 963,
+      "requestsPerTeacher": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "companionMaxMs": 611
+    },
+    {
+      "round": 1,
+      "mode": "all",
+      "eventMs": [
+        1439,
+        1479,
+        1468,
+        1474
+      ],
+      "medianEventMs": 1471,
+      "requestsPerTeacher": [
+        17,
+        17,
+        17,
+        17
+      ],
+      "companionMaxMs": 1177
+    },
+    {
+      "round": 1,
+      "mode": "get_live_class_activity_today",
+      "eventMs": [
+        415,
+        406,
+        439,
+        424
+      ],
+      "medianEventMs": 419,
+      "requestsPerTeacher": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "companionMaxMs": 21
+    },
+    {
+      "round": 1,
+      "mode": "live_student_activity",
+      "eventMs": [
+        452,
+        479,
+        437,
+        407
+      ],
+      "medianEventMs": 445,
+      "requestsPerTeacher": [
+        8,
+        8,
+        8,
+        8
+      ],
+      "companionMaxMs": 33
+    },
+    {
+      "round": 1,
+      "mode": "student_realm_assessments",
+      "eventMs": [
+        444,
+        455,
+        434,
+        459
+      ],
+      "medianEventMs": 449,
+      "requestsPerTeacher": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "companionMaxMs": 191
+    },
+    {
+      "round": 1,
+      "mode": "student_weekly_quiz_attempts",
+      "eventMs": [
+        380,
+        408,
+        403,
+        374
+      ],
+      "medianEventMs": 391,
+      "requestsPerTeacher": [
+        9,
+        9,
+        9,
+        9
+      ],
+      "companionMaxMs": 106
+    },
+    {
+      "round": 1,
+      "mode": "student_lesson_attempts",
+      "eventMs": [
+        488,
+        429,
+        405,
+        499
+      ],
+      "medianEventMs": 458,
+      "requestsPerTeacher": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "companionMaxMs": 194
+    },
+    {
+      "round": 1,
+      "mode": "events",
+      "eventMs": [
+        374,
+        365,
+        385,
+        358
+      ],
+      "medianEventMs": 369,
+      "requestsPerTeacher": [
+        7,
+        7,
+        7,
+        7
+      ],
+      "companionMaxMs": 0
+    }
+  ],
+  "rowCountsByTeacher": [
+    2824,
+    2828,
+    2829,
+    2825
+  ],
+  "interpretation": "All-source bursts were slower in both orders, but no individual companion accounts for the full delay. Companion reads are launched immediately before events; this is a source-interaction probe, not exact UI scheduling. No student writes or production changes."
+}
