@@ -1999,3 +1999,42 @@ Decision: retain the current application reader and keep the prototype experimen
 Next, profile initial event-history work under a stable local baseline. The separate
 assessment-insert test remains unrun following automatic approval review's rejection;
 this experiment does not resolve that gate or prove 10,000-user capacity.
+
+### 25 November: isolate initial event-history reads
+
+Added `scripts/staging/event-chain-profile-local.mjs`, which uses the production
+`fetchLiveClassEvents` reader against four existing synthetic local teachers.
+Run from the fixture checkout with Node 24 and `--experimental-strip-types`.
+The runner permits only local authentication, the event head GET, and the compact
+page RPC. It does not seed fixtures, alter schema, or write learning data.
+
+Across three alternating sequential/concurrent rounds, all 24 full snapshots
+returned identical ordered rows for each teacher: 2,824–2,829 rows, one head and
+six compact pages each. Duplicate and class/student scope checks passed, with no
+fallback requests. Syntax validation passed. Application code was unchanged, so
+an application build was not run.
+
+The first sequential read took 1,394 ms; retain this result rather than hiding it
+in a warmed average. In rounds two and three, sequential snapshots ranged from
+191–218 ms (median 201), and four concurrent snapshots from 227–245 ms (median
+236). These are complete event-history reads without the other dashboard sources
+or student activity writes. Authentication happened before timing.
+
+Re-analysis of the four previous mixed-workload traces shows seven event requests
+per teacher in every case. Their summed response-header waits ranged from
+878–2,191 ms. Some chains were dominated by the head request; others by subsequent
+pages. These sums exclude response-body processing and gaps between requests;
+upstream timing includes API/connection queuing and is not SQL execution time.
+The samples and redacted historical aggregates are recorded in
+`event-chain-profile-2026-11-25.json`.
+
+Interpretation: a warm event chain alone does not reproduce the mixed dashboard
+slowdown. Warm-up, competing requests and workload interactions warrant controlled
+investigation; this comparison does not isolate their individual causes. The
+historical mixed runs used different fixture counts and a timing proxy, whereas
+this isolated run measures direct fetch headers, so the numbers are observational,
+not a speedup claim. Keep the current production reader and full history. Next,
+isolate the interaction between event reads and other dashboard read sources
+using read-only, alternating-order workloads before changing request scheduling.
+No migration, production setting, or 10,000-user capacity claim results from this
+profile.

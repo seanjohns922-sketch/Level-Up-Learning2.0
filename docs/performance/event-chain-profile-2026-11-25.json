@@ -1,0 +1,1231 @@
+{
+  "at": "2026-11-24T20:51:56.478Z",
+  "environment": "Isolated local synthetic fixtures; production event reader; no student workload",
+  "checks": [
+    "24 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Only production head and compact-page routes; no fallback",
+    "No application, schema or learning-data writes"
+  ],
+  "limitation": "Four synthetic teachers, event history only, no student activity workload. Header waits include network and API queuing, not just SQL. Not hosted latency or capacity proof.",
+  "samples": [
+    {
+      "teacherIndex": 0,
+      "mode": "sequential",
+      "round": 0,
+      "rows": 2824,
+      "totalMs": 1394.080792,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 361.2684999999999
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 686.477208
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 51.11241599999994
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 68.91104199999995
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 67.26820900000007
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 71.96370900000011
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 60.8332919999998
+        }
+      ]
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "sequential",
+      "round": 0,
+      "rows": 2828,
+      "totalMs": 351.8777500000001,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 35.23070800000005
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 94.37141700000029
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 54.91849999999977
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.12779099999989
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 42.94974999999977
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.322791999999936
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.64195800000016
+        }
+      ]
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "sequential",
+      "round": 0,
+      "rows": 2829,
+      "totalMs": 306.62987499999963,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 8.172375000000102
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 58.88466699999981
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 63.92833300000029
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 40.12562500000013
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.193040999999994
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 56.43604099999993
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.375082999999904
+        }
+      ]
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "sequential",
+      "round": 0,
+      "rows": 2825,
+      "totalMs": 264.6849579999998,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 8.12087500000007
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 69.38599999999997
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.709249999999884
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 31.465250000000196
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 44.00933299999997
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.70783399999982
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 32.337666000000354
+        }
+      ]
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "concurrent",
+      "round": 0,
+      "rows": 2824,
+      "totalMs": 245.03820799999994,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 5.192250000000058
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 46.832540999999765
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.7314580000002
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.526208000000224
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.79441600000018
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.00279199999977
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 44.014000000000124
+        }
+      ]
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "concurrent",
+      "round": 0,
+      "rows": 2828,
+      "totalMs": 248.44641600000023,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 19.5642499999999
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.371708000000126
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 41.64162499999975
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 31.991500000000087
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.61370799999986
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.60500000000002
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.650333000000046
+        }
+      ]
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "concurrent",
+      "round": 0,
+      "rows": 2829,
+      "totalMs": 264.0317500000001,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 16.716833999999835
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 42.749624999999924
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 39.84345799999983
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 32.54637500000035
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.40437500000007
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 43.37908299999981
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 44.11216700000023
+        }
+      ]
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "concurrent",
+      "round": 0,
+      "rows": 2825,
+      "totalMs": 285.14995799999997,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 17.937917000000198
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 42.40754199999992
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 47.42083300000013
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 47.12870800000019
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 43.62916700000005
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.61879200000021
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 44.860291999999845
+        }
+      ]
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "concurrent",
+      "round": 1,
+      "rows": 2828,
+      "totalMs": 228.85658299999977,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 4.498500000000149
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.162083000000166
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.843875000000025
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.41562500000009
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.02629100000013
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.76491699999997
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.835291999999754
+        }
+      ]
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "concurrent",
+      "round": 1,
+      "rows": 2829,
+      "totalMs": 234.58779200000026,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 4.927083000000039
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.853000000000065
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.69062500000018
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.8019589999999
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.33162500000026
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.573291000000154
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.2322079999999
+        }
+      ]
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "concurrent",
+      "round": 1,
+      "rows": 2824,
+      "totalMs": 240.015042,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 5.068083000000115
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 40.7777500000002
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.17374999999993
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.787166999999954
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.40266600000041
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.30787499999997
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.75304199999982
+        }
+      ]
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "concurrent",
+      "round": 1,
+      "rows": 2825,
+      "totalMs": 244.75837500000034,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 3.2711669999998776
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.088209000000006
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 44.94679200000019
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.427708999999595
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.94916599999988
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.273499999999785
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 40.656584000000294
+        }
+      ]
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "sequential",
+      "round": 1,
+      "rows": 2824,
+      "totalMs": 202.22291600000017,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 4.545000000000073
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.795208000000002
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.140957999999955
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.42008399999986
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.666791999999987
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.048291000000063
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.187208000000282
+        }
+      ]
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "sequential",
+      "round": 1,
+      "rows": 2828,
+      "totalMs": 210.68220800000017,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 3.2292499999998654
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.38745800000015
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 32.15504099999998
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.638958999999886
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.628584000000046
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 40.46016700000018
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.56341599999996
+        }
+      ]
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "sequential",
+      "round": 1,
+      "rows": 2829,
+      "totalMs": 194.87262500000088,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 4.159874999999374
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 31.05420800000047
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.569416999999703
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.007249999999658
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 28.909459000000425
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.99683399999958
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 28.97950000000037
+        }
+      ]
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "sequential",
+      "round": 1,
+      "rows": 2825,
+      "totalMs": 207.43862499999977,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 3.749499999999898
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.92108400000052
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.612084000000323
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 39.641208000000006
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.059541000000536
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.147291999999652
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 28.188125000000582
+        }
+      ]
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "sequential",
+      "round": 2,
+      "rows": 2824,
+      "totalMs": 196.88829199999964,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 3.25
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.93395800000053
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.325082999999722
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.14037499999995
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 35.14512500000001
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.095000000000255
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 28.416666999999507
+        }
+      ]
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "sequential",
+      "round": 2,
+      "rows": 2828,
+      "totalMs": 217.5223329999999,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 3.2979160000004413
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.05450000000019
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.84862499999963
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.058083999999326
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.622834000000694
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 44.7552910000004
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.125334000000294
+        }
+      ]
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "sequential",
+      "round": 2,
+      "rows": 2829,
+      "totalMs": 198.80074999999943,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 4.929791000000478
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 31.678499999999985
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 31.1117090000007
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.883749999999964
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.13324999999986
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.384417000000212
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 27.862166999999317
+        }
+      ]
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "sequential",
+      "round": 2,
+      "rows": 2825,
+      "totalMs": 190.907416,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 3.9040420000001177
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 30.336333000000195
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.78662499999973
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.3412500000004
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.65191700000014
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 29.475000000000364
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 28.169541999999637
+        }
+      ]
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "concurrent",
+      "round": 2,
+      "rows": 2828,
+      "totalMs": 226.94733300000007,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 8.944625000000087
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.895292000000154
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.56579199999942
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.55512499999986
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.271874999999454
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.24229100000048
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.22454199999993
+        }
+      ]
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "concurrent",
+      "round": 2,
+      "rows": 2824,
+      "totalMs": 233.04883299999983,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 6.783167000000503
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.98329100000046
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.03150000000005
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.376125000000684
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 39.058875000000626
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 32.30216699999983
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 31.586833999999726
+        }
+      ]
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "concurrent",
+      "round": 2,
+      "rows": 2829,
+      "totalMs": 236.50583300000017,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 10.002290999999786
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.385041999999885
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.118083999999726
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.3446670000003
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 32.55191599999944
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 34.103916999999456
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.6553329999997
+        }
+      ]
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "concurrent",
+      "round": 2,
+      "rows": 2825,
+      "totalMs": 239.97329200000058,
+      "requests": [
+        {
+          "route": "live_activity_events",
+          "status": 200,
+          "headersMs": 9.347208000000137
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.54266700000062
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 36.16362500000014
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 38.88633299999947
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.98016699999971
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 33.66099999999915
+        },
+        {
+          "route": "get_live_class_compact_event_page_secure",
+          "status": 200,
+          "headersMs": 37.967750000000706
+        }
+      ]
+    }
+  ],
+  "mixedTraceObservations": [
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "direct",
+      "teacherIndex": 0,
+      "requests": 7,
+      "sumHeadersMs": 1922.8,
+      "sumUpstreamMs": 1754,
+      "headMs": 272.6,
+      "largestPageMs": 388.6
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "direct",
+      "teacherIndex": 1,
+      "requests": 7,
+      "sumHeadersMs": 2190.5,
+      "sumUpstreamMs": 2043,
+      "headMs": 138.2,
+      "largestPageMs": 706.2
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "direct",
+      "teacherIndex": 2,
+      "requests": 7,
+      "sumHeadersMs": 2023.1,
+      "sumUpstreamMs": 1858,
+      "headMs": 389.7,
+      "largestPageMs": 417.4
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "direct",
+      "teacherIndex": 3,
+      "requests": 7,
+      "sumHeadersMs": 2177.9,
+      "sumUpstreamMs": 2048,
+      "headMs": 262.9,
+      "largestPageMs": 964.6
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "scoped",
+      "teacherIndex": 0,
+      "requests": 7,
+      "sumHeadersMs": 1438.2,
+      "sumUpstreamMs": 1329,
+      "headMs": 225.3,
+      "largestPageMs": 329.2
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "scoped",
+      "teacherIndex": 1,
+      "requests": 7,
+      "sumHeadersMs": 1455.7,
+      "sumUpstreamMs": 1371,
+      "headMs": 373.3,
+      "largestPageMs": 485.1
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "scoped",
+      "teacherIndex": 2,
+      "requests": 7,
+      "sumHeadersMs": 1241.8,
+      "sumUpstreamMs": 1145,
+      "headMs": 82.7,
+      "largestPageMs": 311.3
+    },
+    {
+      "pair": "scoped-activity",
+      "attemptMode": "scoped",
+      "teacherIndex": 3,
+      "requests": 7,
+      "sumHeadersMs": 1505.5,
+      "sumUpstreamMs": 1433,
+      "headMs": 59.3,
+      "largestPageMs": 390.4
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "direct",
+      "teacherIndex": 0,
+      "requests": 7,
+      "sumHeadersMs": 1103.9,
+      "sumUpstreamMs": 1071,
+      "headMs": 842.2,
+      "largestPageMs": 67.7
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "direct",
+      "teacherIndex": 1,
+      "requests": 7,
+      "sumHeadersMs": 877.9,
+      "sumUpstreamMs": 807,
+      "headMs": 220.2,
+      "largestPageMs": 194.4
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "direct",
+      "teacherIndex": 2,
+      "requests": 7,
+      "sumHeadersMs": 979.6,
+      "sumUpstreamMs": 908,
+      "headMs": 51.1,
+      "largestPageMs": 229.4
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "direct",
+      "teacherIndex": 3,
+      "requests": 7,
+      "sumHeadersMs": 1083.4,
+      "sumUpstreamMs": 1036,
+      "headMs": 647.3,
+      "largestPageMs": 157.7
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "scoped",
+      "teacherIndex": 0,
+      "requests": 7,
+      "sumHeadersMs": 1213.7,
+      "sumUpstreamMs": 1050,
+      "headMs": 127.7,
+      "largestPageMs": 291.6
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "scoped",
+      "teacherIndex": 1,
+      "requests": 7,
+      "sumHeadersMs": 1355.6,
+      "sumUpstreamMs": 1173,
+      "headMs": 212.3,
+      "largestPageMs": 329.2
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "scoped",
+      "teacherIndex": 2,
+      "requests": 7,
+      "sumHeadersMs": 1391.6,
+      "sumUpstreamMs": 1247,
+      "headMs": 125.0,
+      "largestPageMs": 555.5
+    },
+    {
+      "pair": "scoped-activity-reverse",
+      "attemptMode": "scoped",
+      "teacherIndex": 3,
+      "requests": 7,
+      "sumHeadersMs": 1483.4,
+      "sumUpstreamMs": 1302,
+      "headMs": 506.7,
+      "largestPageMs": 590.1
+    }
+  ]
+}
