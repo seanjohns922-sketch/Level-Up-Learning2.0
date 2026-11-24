@@ -39,12 +39,14 @@ export function readBattleToPlay(params: URLSearchParams): BattleToPlay | null {
   if (!realm || !Number.isFinite(seed) || (mode !== "live" && mode !== "turns") || !id || !friendId || !friendName) return null;
   return { id, seed, realm, mode, friendId, friendName };
 }
-/** Back to the hub's Battles panel, with the same friend and realm picked: REMATCH. */
-export function rematchHref(play: BattleToPlay, preview: boolean) {
-  const params = new URLSearchParams({ battles: "1", friend: play.friendId, realm: play.realm });
+/** The hub's Battles panel with a friend (and a realm) already picked: BATTLE on a friend's page, or REMATCH. */
+export function battlesPanelHref(friendId: string, preview: boolean, realm?: BattleRealm) {
+  const params = new URLSearchParams({ battles: "1", friend: friendId });
+  if (realm) params.set("realm", realm);
   if (preview) params.set("teacher_preview", "1");
   return `/world?${params}`;
 }
+export const rematchHref = (play: BattleToPlay, preview: boolean) => battlesPanelHref(play.friendId, preview, play.realm);
 
 export type BattleResult = { status: string; xp: number; myScore?: number; friendScore?: number | null; won?: boolean | null; draw?: boolean };
 

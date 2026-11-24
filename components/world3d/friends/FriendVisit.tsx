@@ -12,8 +12,11 @@ const possessive = (name: string) => `${name.toUpperCase()}${name.toLowerCase().
 export function VisitBanner({ name, canBuild, onGoHome }: { name: string; canBuild: boolean; onGoHome: () => void }) {
   return (
     <div style={{ position: "absolute", top: "max(84px, calc(env(safe-area-inset-top) + 76px))", left: 0, right: 0, display: "flex", justifyContent: "center", gap: 10, zIndex: 56, pointerEvents: "none", padding: "0 16px", flexWrap: "wrap" }}>
-      <div style={{ background: canBuild ? "#2fa36b" : "#C94DF2", color: "#fff", padding: "10px 22px", borderRadius: 999, fontFamily: "Montserrat, Inter, sans-serif", fontWeight: 900, fontSize: "clamp(14px, 2.2vw, 19px)", letterSpacing: ".04em", boxShadow: "0 10px 30px rgba(0,0,0,.35)", textAlign: "center" }}>
+      <div style={{ background: canBuild ? "#2fa36b" : "#C94DF2", color: "#fff", padding: "8px 22px", borderRadius: 22, fontFamily: "Montserrat, Inter, sans-serif", fontWeight: 900, fontSize: "clamp(14px, 2.2vw, 19px)", letterSpacing: ".04em", boxShadow: "0 10px 30px rgba(0,0,0,.35)", textAlign: "center" }}>
         {canBuild ? `HELPING BUILD ${possessive(name)} WORLD` : `VISITING ${possessive(name)} WORLD`}
+        <small style={{ display: "block", fontFamily: "Inter, sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 0, opacity: .92 }}>
+          {canBuild ? `Tap BUILD to place and move things. ${name} can keep or undo it.` : "Visit only: look around. Nothing here changes."}
+        </small>
       </div>
       <button type="button" onClick={onGoHome} style={{ ...pill("rgba(20,14,40,.9)"), pointerEvents: "auto", display: "inline-flex", alignItems: "center", gap: 8, border: "1.5px solid rgba(255,255,255,.3)" }}><Home size={17} aria-hidden="true" />GO HOME</button>
     </div>

@@ -2,8 +2,16 @@
 // Friends: add each other with a friend code (never the explorer code), visit worlds, and let chosen
 // friends help build. The server checks everything (see the friends migration); demo and teacher-preview
 // sessions get a pretend friends list that lives in this tab.
+import type { AvatarOutfit } from "@/components/avatar/StudentAvatar";
+import type { BattleRealm } from "@/lib/battle-questions";
+import { outfitFromLayers } from "@/lib/economy";
 import { supabase } from "@/lib/supabase";
 import type { CentralWorldGroundTile, CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
+
+/** What an explorer is wearing, as the server sends it: their base look and each equipped layer. */
+export type FriendOutfit = { base: AvatarOutfit; layers: Partial<Record<string, unknown>> };
+/** A friend's explorer to draw (StudentAvatar). */
+export const friendLook = (outfit: FriendOutfit | undefined): AvatarOutfit => (outfit ? outfitFromLayers(outfit.base ?? {}, outfit.layers ?? {}) : {});
 
 export type Friend = {
   friendshipId: string;
@@ -15,8 +23,20 @@ export type Friend = {
   theyCanBuild: boolean;
   /** May I build in theirs? (their switch) */
   iCanBuild: boolean;
+  friendsSince?: string | null;
+  outfit?: FriendOutfit;
 };
-export type FriendsState = { code: string; enabled: boolean; buildingEnabled: boolean; friends: Friend[] };
+/** `hasClass`: in a class, so MY CLASS has classmates to add (home learners use codes). */
+export type FriendsState = { code: string; enabled: boolean; buildingEnabled: boolean; hasClass?: boolean; friends: Friend[] };
+/** Someone in my class, and where we are: not asked yet, friends, I asked, or they asked me. */
+export type Classmate = { studentId: string; name: string; outfit?: FriendOutfit; status: "none" | "friend" | "outgoing" | "incoming" };
+export type FriendBattleResult = { id: string; realm: BattleRealm; at: string; myScore: number; friendScore: number; won: boolean; draw: boolean };
+/** A friend's page. Never their level, lesson or quiz results, or RELIQS (those show how far through maths they are). */
+export type FriendProfile = {
+  friendshipId: string; studentId: string; name: string; outfit?: FriendOutfit; friendsSince: string | null; sameClass: boolean;
+  theyCanBuild: boolean; iCanBuild: boolean; buildingEnabled: boolean; battlesEnabled: boolean; worldItems: number;
+  record: { won: number; lost: number; drawn: number }; recent: FriendBattleResult[];
+};
 export type FriendWorld = { name: string; placements: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; canBuild: boolean; owned: string[] };
 export type SendResult = "sent" | "accepted" | "already" | "not_found" | "self" | "off";
 export type VisitorChange = {
@@ -39,17 +59,32 @@ export const visitScope = (friendId: string) => `${VISIT_SCOPE_PREFIX}${friendId
 export const visitedFriendId = (scope: string) => (scope.startsWith(VISIT_SCOPE_PREFIX) ? scope.slice(VISIT_SCOPE_PREFIX.length) : null);
 
 /** Demo mode has no real students, so it gets pretend friends (clearly named) to show visiting and battles. */
+const demoOutfit = (base: AvatarOutfit): FriendOutfit => ({ base, layers: {} });
+const DEMO_OUTFITS: Record<string, FriendOutfit> = {
+  "demo-mia": demoOutfit({ hairStyle: "curlyPony", hair: "#2b1a12", hairShade: "#140b06", skin: "#c98e63", skinShade: "#a8714a", shirt: "#e11d74", shirtTrim: "#f9a8d4", face: "bigSmile" }),
+  "demo-leo": demoOutfit({ hairStyle: "fade", hair: "#111111", hairShade: "#000000", skin: "#8a5a3b", skinShade: "#6b4329", shirt: "#0ea5e9", shirtTrim: "#bae6fd", hat: "cap", hatColor: "#f59e0b", face: "confident" }),
+  "demo-zara": demoOutfit({ hairStyle: "spaceBuns", hair: "#b45309", hairShade: "#7c2d12", skin: "#f1c8a6", skinShade: "#d6a07a", shirt: "#16a34a", shirtTrim: "#bbf7d0", face: "happy" }),
+  "demo-isla": demoOutfit({ hairStyle: "waves", hair: "#e8c26a", hairShade: "#b8902e", skin: "#f6d3b8", skinShade: "#dcae8c", shirt: "#7c3aed", shirtTrim: "#ddd6fe", face: "rosy" }),
+  "demo-kai": demoOutfit({ hairStyle: "twists", hair: "#1c1410", hairShade: "#0a0705", skin: "#a86e47", skinShade: "#86522f", shirt: "#f97316", shirtTrim: "#fed7aa", face: "determined" }),
+};
 const DEMO_STATE: FriendsState = {
   code: "PAL-D3MQ",
   enabled: true,
   buildingEnabled: true,
+  hasClass: true,
   friends: [
-    { friendshipId: "demo-1", studentId: "demo-mia", name: "Demo Mia", status: "friend", theyCanBuild: true, iCanBuild: true },
-    { friendshipId: "demo-2", studentId: "demo-leo", name: "Demo Leo", status: "friend", theyCanBuild: false, iCanBuild: false },
-    { friendshipId: "demo-3", studentId: "demo-zara", name: "Demo Zara", status: "incoming", theyCanBuild: false, iCanBuild: false },
+    { friendshipId: "demo-1", studentId: "demo-mia", name: "Demo Mia", status: "friend", theyCanBuild: true, iCanBuild: true, friendsSince: "2026-11-02T09:00:00Z", outfit: DEMO_OUTFITS["demo-mia"] },
+    { friendshipId: "demo-2", studentId: "demo-leo", name: "Demo Leo", status: "friend", theyCanBuild: false, iCanBuild: false, friendsSince: "2026-11-16T09:00:00Z", outfit: DEMO_OUTFITS["demo-leo"] },
+    { friendshipId: "demo-3", studentId: "demo-zara", name: "Demo Zara", status: "incoming", theyCanBuild: false, iCanBuild: false, outfit: DEMO_OUTFITS["demo-zara"] },
   ],
 };
+/** The demo class: the demo friends plus two classmates not asked yet. */
+const DEMO_CLASSMATES = [
+  { studentId: "demo-isla", name: "Demo Isla" },
+  { studentId: "demo-kai", name: "Demo Kai" },
+];
 let demoState = DEMO_STATE;
+let demoAsked: readonly string[] = [];
 
 async function call<T>(name: string, args: Record<string, unknown>): Promise<T> {
   const { data, error } = await supabase.rpc(name, args);
@@ -69,6 +104,52 @@ export async function sendFriendRequest(studentId: string | null, demo: boolean,
   if (demo || !studentId) return FRIEND_CODE_PATTERN.test(code) ? "sent" : "not_found";
   return call<SendResult>("send_friend_request_secure", { p_student_id: studentId, p_code: code });
 }
+export async function fetchClassmates(studentId: string | null, demo: boolean): Promise<Classmate[]> {
+  if (demo || !studentId) {
+    const known = demoState.friends.map((f): Classmate => ({ studentId: f.studentId, name: f.name, outfit: f.outfit, status: f.status }));
+    const others = DEMO_CLASSMATES.map((c): Classmate => ({ ...c, outfit: DEMO_OUTFITS[c.studentId], status: demoAsked.includes(c.studentId) ? "outgoing" : "none" }));
+    return [...known, ...others].sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return call<Classmate[]>("get_classmates_secure", { p_student_id: studentId });
+}
+/** MY CLASS: ask a classmate (they still say yes). */
+export async function sendClassmateRequest(studentId: string | null, demo: boolean, classmateId: string): Promise<SendResult> {
+  if (demo || !studentId) {
+    const incoming = demoState.friends.find((f) => f.studentId === classmateId && f.status === "incoming");
+    if (incoming) { await respondToFriend(studentId, demo, incoming.friendshipId, true); return "accepted"; }
+    demoAsked = [...demoAsked, classmateId];
+    return "sent";
+  }
+  return call<SendResult>("send_classmate_request_secure", { p_student_id: studentId, p_classmate_id: classmateId });
+}
+
+export async function fetchFriendProfile(studentId: string | null, demo: boolean, friendId: string): Promise<FriendProfile | null> {
+  if (demo || !studentId) {
+    const friend = demoState.friends.find((f) => f.studentId === friendId && f.status === "friend");
+    if (!friend) return null;
+    const mia = friend.studentId === "demo-mia";
+    return {
+      friendshipId: friend.friendshipId, studentId: friend.studentId, name: friend.name, outfit: friend.outfit, friendsSince: friend.friendsSince ?? null,
+      sameClass: true, theyCanBuild: friend.theyCanBuild, iCanBuild: friend.iCanBuild, buildingEnabled: true, battlesEnabled: true, worldItems: mia ? 46 : 12,
+      record: mia ? { won: 3, lost: 2, drawn: 0 } : { won: 0, lost: 0, drawn: 0 },
+      recent: mia ? [
+        { id: "demo-r1", realm: "number", at: "2026-11-23T04:00:00Z", myScore: 14, friendScore: 11, won: true, draw: false },
+        { id: "demo-r2", realm: "space", at: "2026-11-21T04:00:00Z", myScore: 9, friendScore: 12, won: false, draw: false },
+        { id: "demo-r3", realm: "measurement", at: "2026-11-19T04:00:00Z", myScore: 13, friendScore: 10, won: true, draw: false },
+      ] : [],
+    };
+  }
+  return call<FriendProfile>("get_friend_profile_secure", { p_student_id: studentId, p_friend_id: friendId });
+}
+/** A friend's own page (app/world/friend). */
+export function friendPageHref(friendId: string, preview: boolean) {
+  return `/world/friend?id=${encodeURIComponent(friendId)}${preview ? "&teacher_preview=1" : ""}`;
+}
+/** Their world, to look around (or help build, if they've said yes). */
+export function visitHref(friendId: string, preview: boolean) {
+  return `/world?visit=${encodeURIComponent(friendId)}${preview ? "&teacher_preview=1" : ""}`;
+}
+
 export async function respondToFriend(studentId: string | null, demo: boolean, friendshipId: string, accept: boolean) {
   if (demo || !studentId) {
     demoState = { ...demoState, friends: demoState.friends.flatMap((f) => (f.friendshipId !== friendshipId ? [f] : accept ? [{ ...f, status: "friend" as const }] : [])) };

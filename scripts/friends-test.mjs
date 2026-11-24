@@ -3,7 +3,7 @@
 // hub/teacher/parent wiring.
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { FRIEND_CODE_PATTERN, normaliseFriendCode, visitScope, visitedFriendId } from "../lib/friends.ts";
+import { FRIEND_CODE_PATTERN, fetchClassmates, fetchFriendProfile, fetchFriends, friendLook, friendPageHref, normaliseFriendCode, sendClassmateRequest, visitHref, visitScope, visitedFriendId } from "../lib/friends.ts";
 import { describeFriendChanges, summariseFriendChanges, undoFriendChanges } from "../lib/world3d/friend-changes.ts";
 import { isSyncedWorldScope } from "../lib/world3d/central-world-sync.ts";
 
@@ -54,11 +54,44 @@ assert.ok(migration.includes("revoke all on public.student_friend_codes, public.
 assert.ok(migration.includes("public.can_manage_class(p_class_id)") && migration.includes("parent_student_links"), "adults' switches check the class or the child");
 assert.ok(!/drop\s+table|alter\s+table\s+\S+\s+drop/i.test(migration.replace(/^--.*$/gm, "")), "nothing dropped");
 
+// Friends, take two: MY CLASS, real explorers, and a friend's own page.
+const takeTwo = readFileSync(new URL("../supabase/migrations/20261127090000_friends_my_class_and_profiles.sql", import.meta.url), "utf8");
+for (const fn of ["get_classmates_secure", "send_classmate_request_secure", "get_friend_profile_secure", "get_friends_secure", "send_friend_request_secure"]) {
+  assert.ok(takeTwo.includes(`create or replace function public.${fn}(`), fn);
+}
+const takeTwoCode = takeTwo.replace(/^--.*$/gm, "");
+assert.ok(/send_classmate_request_secure[\s\S]*student_class_ids\(p_classmate_id\)[\s\S]*friend_request_to\(p_student_id, p_classmate_id\)/.test(takeTwoCode), "MY CLASS only asks someone in my class, and they still say yes");
+assert.ok(/get_classmates_secure[\s\S]*if not public\.friends_allowed\(p_student_id\) then return '\[\]'::jsonb/.test(takeTwoCode), "the class Friends switch also turns off MY CLASS");
+assert.ok(/get_friend_profile_secure[\s\S]*friendship\.status is distinct from 'accepted'/.test(takeTwoCode), "only friends see a friend's page");
+assert.ok(!/(challenger|opponent)_level|student_progress|lesson|quiz|legend|reliq/i.test(takeTwoCode), "a friend's level, lessons, quizzes and RELIQS are never sent");
+assert.ok(!/drop\s+table|alter\s+table/i.test(takeTwoCode), "no schema changes");
+const demoFriends = await fetchFriends(null, true);
+assert.ok(demoFriends.hasClass && demoFriends.friends.every((f) => f.outfit), "demo friends come dressed");
+assert.equal(friendLook(demoFriends.friends[0].outfit).hairStyle, "curlyPony", "a friend's face is drawn from what they wear");
+assert.deepEqual(friendLook(undefined), {}, "no outfit: the default explorer");
+const mates = await fetchClassmates(null, true);
+const isla = mates.find((m) => m.name === "Demo Isla");
+assert.equal(isla.status, "none");
+assert.equal(await sendClassmateRequest(null, true, isla.studentId), "sent");
+assert.equal((await fetchClassmates(null, true)).find((m) => m.name === "Demo Isla").status, "outgoing", "ADD turns into ASKED");
+assert.equal(await sendClassmateRequest(null, true, "demo-zara"), "accepted", "adding someone who asked you says yes");
+const mia = await fetchFriendProfile(null, true, "demo-mia");
+assert.deepEqual(mia.record, { won: 3, lost: 2, drawn: 0 });
+assert.ok(!("level" in mia) && !("reliqs" in mia), "the page has no level or RELIQS");
+assert.equal(await fetchFriendProfile(null, true, "nobody"), null);
+assert.equal(friendPageHref("a b", true), "/world/friend?id=a%20b&teacher_preview=1");
+assert.equal(visitHref("f1", false), "/world?visit=f1");
+
 // Wiring.
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 const hub = read("components/world3d/CentralWorld.tsx");
 assert.ok(hub.includes("visitId ? visitScope(visitId)") && hub.includes("<VisitBanner ") && hub.includes("<FriendsPanel ") && hub.includes("<VisitorChangesCard "), "the hub visits, shows friends and the change card");
 assert.ok(hub.includes("primaryAction={walkBuild || !canBuildHere ? undefined"), "BUILD only where you may build");
+assert.ok(hub.includes("<FriendRequestToast ") && hub.includes("onOpenFriend={(friend) => router.push(friendPageHref("), "requests pop up; tapping a friend opens their page");
+assert.ok(read("app/world/friend/page.tsx").includes("<FriendPageEntry />"), "a friend's page has its own route");
+const page = read("components/world3d/friends/FriendPage.tsx");
+assert.ok(page.includes("How to battle") && page.includes("Help build in") && page.includes("in your world") && page.includes("<WorldAccessChoice "), "the page says how to battle, how to build, and VISIT ONLY or CAN HELP BUILD");
+assert.ok(read("components/world3d/friends/FriendBits.tsx").includes("VISIT ONLY") && read("components/world3d/friends/FriendVisit.tsx").includes("Visit only: look around"), "visit-only is said in plain words");
 assert.ok(read("app/teacher/dashboard/page.tsx").includes("setClassFriends(selectedClassId"), "teachers switch friends per class");
 assert.ok(read("components/parent/ParentPortal.tsx").includes("<ParentFriends "), "parents switch friends per child");
 console.log("friends: codes, visiting, change summaries and undo, server rules, hub, teacher and parent wiring all check out");

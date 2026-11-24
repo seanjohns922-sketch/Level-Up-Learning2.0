@@ -3,8 +3,8 @@
 import { Fragment, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { fetchFriends, type Friend } from "@/lib/friends";
-import { initialOf } from "@/components/world3d/friends/FriendsPanel";
+import { fetchFriends, friendPageHref, type Friend } from "@/lib/friends";
+import { FriendFace } from "@/components/world3d/friends/FriendBits";
 import { BATTLE_PLAY_XP, BATTLE_WIN_XP, fetchBattles, type Battle } from "@/lib/battles";
 import { BATTLE_QUESTIONS } from "@/lib/battle-questions";
 
@@ -640,10 +640,8 @@ function StreakFlame() {
   );
 }
 
-// Friends & Battles: your friends, a CHALLENGE button and your recent battles. Adding friends and battling
-// happen in the hub (these links open its Friends and Battles panels).
-const FRIEND_COLOURS = ["#f472b6", "#38bdf8", "#a3e635", "#fbbf24", "#c084fc", "#2dd4bf"];
-const friendColour = (name: string) => FRIEND_COLOURS[[...name].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % FRIEND_COLOURS.length];
+// Friends & Battles: your friends (tap one for their page), a CHALLENGE button and your recent battles.
+// Adding friends and battling happen in the hub (these links open its Friends and Battles panels).
 
 function FriendsAndBattles({ initial, studentId, demo }: { initial: string; studentId: string | null; demo: boolean }) {
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -662,30 +660,30 @@ function FriendsAndBattles({ initial, studentId, demo }: { initial: string; stud
     <section className="relative mt-8 overflow-hidden rounded-3xl border border-[#D86BF7]/35 bg-gradient-to-br from-[#8C2EAC]/45 via-[#161222]/85 to-[#161222]/85 p-6 shadow-[0_10px_30px_rgba(0,0,0,0.28)]" aria-label="Friends and Battles">
       <p className="font-display text-xs font-black uppercase tracking-[0.14em] text-[#ffd76a]">Friends &amp; Battles</p>
       <h2 className="mt-2 font-display text-[26px] font-black">Challenge your friends!</h2>
-      <p className="mt-1 max-w-[640px] font-semibold text-[#e3dbef]">Add friends with their friend code, visit each other&apos;s worlds, and battle with {BATTLE_QUESTIONS} quick questions at your own level. +{BATTLE_WIN_XP} XP for a win, +{BATTLE_PLAY_XP} for playing.</p>
+      <p className="mt-1 max-w-[640px] font-semibold text-[#e3dbef]">Add friends from your class or with a friend code, visit each other&apos;s worlds, and battle with {BATTLE_QUESTIONS} quick questions at your own level. +{BATTLE_WIN_XP} XP for a win, +{BATTLE_PLAY_XP} for playing.</p>
       <div className="mt-5 grid gap-3.5 md:grid-cols-[1.2fr_1fr_1fr]">
         <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
           <p className="mb-3 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">MY FRIENDS</p>
           <div className="flex flex-wrap gap-3">
             {friends.slice(0, 6).map((friend) => (
-              <div key={friend.friendshipId} className="flex w-16 flex-col items-center gap-1">
-                <span className="grid h-[52px] w-[52px] place-items-center rounded-full font-display text-xl font-black text-[#1a1026]" style={{ background: friendColour(friend.name) }}>{initialOf(friend.name)}</span>
+              <Link key={friend.friendshipId} href={friendPageHref(friend.studentId, demo)} className="flex w-16 flex-col items-center gap-1">
+                <FriendFace outfit={friend.outfit} size={52} />
                 <span className="max-w-full truncate text-[13px] font-extrabold">{friend.name}</span>
-              </div>
+              </Link>
             ))}
             <Link href={hub("friends")} className="flex w-16 flex-col items-center gap-1">
               <span className="grid h-[52px] w-[52px] place-items-center rounded-full border-2 border-dashed border-white/35 bg-white/10 text-xl font-black">+</span>
               <span className="text-[13px] font-extrabold">Add friend</span>
             </Link>
           </div>
-          {!friends.length ? <p className="mt-3 text-[13px] font-semibold text-[#bdb3cc]">Tap Add friend and type a friend&apos;s friend code, or share yours.</p> : null}
+          {!friends.length ? <p className="mt-3 text-[13px] font-semibold text-[#bdb3cc]">Tap Add friend to add someone from your class, or swap friend codes.</p> : null}
         </div>
         <div className="rounded-2xl border border-white/[0.08] bg-[#0a0812]/45 p-4">
           <p className="mb-3 font-display text-[11px] font-black tracking-[0.14em] text-[#cbb6e6]">BATTLE</p>
           <div className="flex items-center justify-center gap-4">
             <span className="grid h-16 w-16 place-items-center rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] font-display text-2xl font-black">{initial}</span>
             <span className="font-display text-xl font-black text-[#ffd76a]">VS</span>
-            <span className="grid h-16 w-16 place-items-center rounded-full font-display text-2xl font-black text-[#1a1026]" style={{ background: rival ? friendColour(rival.name) : "rgba(255,255,255,.15)" }}>{rival ? initialOf(rival.name) : "?"}</span>
+            {rival ? <FriendFace outfit={rival.outfit} size={64} /> : <span className="grid h-16 w-16 place-items-center rounded-full bg-white/15 font-display text-2xl font-black">?</span>}
           </div>
           <Link href={hub("battles")} className="mt-3.5 block rounded-full bg-gradient-to-br from-[#D86BF7] to-[#8C2EAC] py-3 text-center font-display text-[13px] font-black tracking-[0.05em]">⚔️ CHALLENGE A FRIEND</Link>
           <p className="mt-2 text-center text-[13px] font-semibold text-[#bdb3cc]">{BATTLE_QUESTIONS} questions each · at your own level · in the Battle Arena</p>

@@ -51,11 +51,11 @@ import { BoatRider } from "@/components/world3d/premium-items/BoatRider";
 import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, hubWaterDepth, HUB_V2_WATER_Y, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
-import { FriendsPanel } from "@/components/world3d/friends/FriendsPanel";
+import { FriendRequestToast, FriendsPanel } from "@/components/world3d/friends/FriendsPanel";
 import { BattleInviteToast, BattlesPanel, type BattlesPanelStart } from "@/components/world3d/battle/BattlePanels";
 import { battleRoomHref, fetchBattles, readBattleRealm, useOnlineFriends, type Battle, type BattleToPlay } from "@/lib/battles";
 import { VisitBanner, VisitorChangesCard } from "@/components/world3d/friends/FriendVisit";
-import { fetchFriends, fetchFriendWorld, fetchVisitorChanges, resolveVisitorChange, visitScope, type Friend, type VisitorChange } from "@/lib/friends";
+import { fetchFriends, fetchFriendWorld, fetchVisitorChanges, friendPageHref, resolveVisitorChange, respondToFriend, visitHref, visitScope, type Friend, type VisitorChange } from "@/lib/friends";
 import { undoFriendChanges } from "@/lib/world3d/friend-changes";
 import { RexDinosaur } from "@/components/world3d/rex/RexDinosaur";
 import { RexHud } from "@/components/world3d/rex/RexHud";
@@ -801,13 +801,26 @@ export default function CentralWorld() {
   const [friendsList, setFriendsList] = useState<Friend[]>([]);
   const [battlesOpen, setBattlesOpen] = useState<BattlesPanelStart | null>(() => (searchParams.get("battles") === "1" && !visitId ? { friendId: searchParams.get("friend"), realm: readBattleRealm(searchParams.get("realm")) } : null));
   const [battleInvite, setBattleInvite] = useState<Battle | null>(null);
+  // A friend request pops up until you answer it or tap ✕ (then it waits in the Friends panel).
+  const [friendsReload, setFriendsReload] = useState(0);
+  const [dismissedRequests, setDismissedRequests] = useState<readonly string[]>([]);
+  const [answeringRequest, setAnsweringRequest] = useState(false);
+  const friendRequest = friendsList.find((f) => f.status === "incoming" && !dismissedRequests.includes(f.friendshipId)) ?? null;
+  const answerRequest = (friend: Friend, accept: boolean) => {
+    setAnsweringRequest(true);
+    void respondToFriend(student?.studentId ?? null, preview, friend.friendshipId, accept)
+      .catch(() => setDismissedRequests((list) => [...list, friend.friendshipId]))
+      .finally(() => { setAnsweringRequest(false); setFriendsReload((n) => n + 1); });
+  };
   useEffect(() => {
     if (!hubV2 || visitId) return;
     let cancelled = false;
     const load = () => void fetchFriends(student?.studentId ?? null, preview).then((state) => { if (!cancelled) setFriendsList(state.friends); }).catch(() => undefined);
     const timer = window.setTimeout(load, 0);
-    return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [hubV2, visitId, student?.studentId, preview, friendsOpen, battlesOpen]);
+    // Checked every 20 seconds too, so a friend request pops up while you're playing.
+    const poll = preview ? 0 : window.setInterval(load, 20_000);
+    return () => { cancelled = true; window.clearTimeout(timer); window.clearInterval(poll); };
+  }, [hubV2, visitId, student?.studentId, preview, friendsOpen, battlesOpen, friendsReload]);
   const friendIds = useMemo(() => friendsList.filter((f) => f.status === "friend").map((f) => f.studentId), [friendsList]);
   const onlineFriends = useOnlineFriends(student?.studentId ?? null, friendIds, hubV2 && !preview && !visitId);
   // A friend's battle invite pops up while you're in the hub (checked every 10 seconds).
@@ -821,7 +834,7 @@ export default function CentralWorld() {
   }, [hubV2, preview, visitId, student?.studentId]);
   const startBattle = useCallback((play: BattleToPlay) => router.push(battleRoomHref(play, preview)), [router, preview]);
   const goHome = () => router.push(preview ? "/world?teacher_preview=1" : "/world");
-  const visitFriend = (friend: Friend) => router.push(`/world?visit=${encodeURIComponent(friend.studentId)}${preview ? "&teacher_preview=1" : ""}`);
+  const visitFriend = (friend: Friend) => router.push(visitHref(friend.studentId, preview));
   // Back home: what friends changed while you were away, to keep or undo.
   const [visitorChanges, setVisitorChanges] = useState<VisitorChange[]>([]);
   const [resolvingChange, setResolvingChange] = useState(false);
@@ -2078,7 +2091,8 @@ export default function CentralWorld() {
       </div>
 
       {visiting && friendWorld && !editorOpen && !race && !drive && !boat ? <VisitBanner name={friendWorld.name} canBuild={friendWorld.canBuild} onGoHome={goHome} /> : null}
-      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} onVisit={visitFriend} onChallenge={(friend) => { setFriendsOpen(false); setBattlesOpen({ friendId: friend.studentId }); }} onClose={() => setFriendsOpen(false)} /> : null}
+      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} online={onlineFriends} onVisit={visitFriend} onChallenge={(friend) => { setFriendsOpen(false); setBattlesOpen({ friendId: friend.studentId }); }} onOpenFriend={(friend) => router.push(friendPageHref(friend.studentId, preview))} onClose={() => setFriendsOpen(false)} /> : null}
+      {friendRequest && !friendsOpen && !battlesOpen && !battleInvite && !visiting ? <FriendRequestToast friend={friendRequest} busy={answeringRequest} onYes={() => answerRequest(friendRequest, true)} onLater={() => setDismissedRequests((list) => [...list, friendRequest.friendshipId])} /> : null}
       {battlesOpen && !visiting ? <BattlesPanel studentId={student?.studentId ?? null} demo={preview} friends={friendsList} online={onlineFriends} start={battlesOpen} onPlay={startBattle} onClose={() => setBattlesOpen(null)} /> : null}
       {battleInvite && !battlesOpen && !visiting ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({}); }} onDismiss={() => setBattleInvite(null)} /> : null}
       {!visiting && visitorChanges[0] && !editorOpen && !race && !drive && !boat ? <VisitorChangesCard change={visitorChanges[0]} busy={resolvingChange} onKeep={() => void resolveChange(false)} onUndo={() => void resolveChange(true)} /> : null}

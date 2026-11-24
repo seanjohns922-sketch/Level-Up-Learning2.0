@@ -215,14 +215,20 @@ export async function fetchDemoEconomy(fallbackItems: EconomyItem[] = []): Promi
  * stack independently.
  */
 export function mergeAvatarOutfit(state: EconomyState): AvatarOutfit {
-  const out: Record<string, unknown> = { ...(state.avatarBase ?? {}) };
+  const byKey = new Map(state.items.map((i) => [i.item_key, i]));
+  const layers: Partial<Record<string, unknown>> = {};
+  for (const [slot, key] of Object.entries(state.equipped)) layers[slot] = byKey.get(key)?.metadata;
+  return outfitFromLayers(state.avatarBase ?? {}, layers);
+}
+
+/** An explorer's look from their free base and the metadata of each equipped layer, in slot order (later
+ *  layers win). Also draws a friend's explorer from what the server sends (lib/friends.ts). */
+export function outfitFromLayers(base: AvatarOutfit, layers: Partial<Record<string, unknown>>): AvatarOutfit {
+  const out: Record<string, unknown> = { ...base };
   // Premium garment shapes must come from equipped catalogue layers, not the free base.
   if (realmOutfit(String(out.top ?? "")) || adventureOutfit(out.top)) out.top = "hoodie";
-  const byKey = new Map(state.items.map((i) => [i.item_key, i]));
   for (const slot of AVATAR_LAYER_SLOTS) {
-    const key = state.equipped[slot];
-    if (!key) continue;
-    const meta = byKey.get(key)?.metadata;
+    const meta = layers[slot];
     if (!meta || typeof meta !== "object") continue;
     for (const [k, v] of Object.entries(meta)) {
       if (k !== "slot") out[k] = v;
