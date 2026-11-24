@@ -4,12 +4,13 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { readScopedAttemptPages } from './scoped-attempt-reader.mjs';
 import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
 const groups = Array.from({ length: 20 }, (_, i) => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${i ? `-${i + 1}` : ''}.json`, 'utf8')));
 const name = 'reliq_probe_scoped_attempt_page';
-const signature = `public.${name}(uuid[],uuid[],integer)`;
+const signature = `public.${name}(uuid[],uuid[],integer,uuid[])`;
 const tables = ['student_lesson_attempts', 'student_weekly_quiz_attempts', 'student_realm_assessments'];
 const columns = [
   'student_id,realm_id,working_level,week,lesson,lesson_id,attempt_no,correct_count,total_questions,accuracy_percent,completed,completed_at',
@@ -27,11 +28,12 @@ function sql(input) {
 const pageQueries = tables.map((table, i) => `(select coalesce(jsonb_agg(to_jsonb(t) order by t.id),'[]'::jsonb)
   from (select id,${columns[i]} from public.${table}
   where student_id=any(permitted) ${i === 0 ? 'and completed=true' : ''}
+  and id<=bounds[${i + 1}]
   and (p_after[${i + 1}] is null or id>p_after[${i + 1}]) order by id limit p_limit) t)`);
 const setup = `begin;
-create function public.${name}(p_ids uuid[],p_after uuid[],p_limit integer) returns jsonb
+create function public.${name}(p_ids uuid[],p_after uuid[],p_limit integer,p_through uuid[] default null) returns jsonb
 language plpgsql stable security definer set search_path=public,pg_temp as $$
-declare requested uuid[]; permitted uuid[];
+declare requested uuid[]; permitted uuid[]; bounds uuid[];
 begin
  if auth.uid() is null then raise exception 'Authentication required' using errcode='42501'; end if;
  if p_ids is null or cardinality(p_ids)>500 or p_limit is null or p_limit<1 or p_limit>500
@@ -42,7 +44,17 @@ begin
  select coalesce(array_agg(s.id order by s.id),'{}') into permitted from public.students s
  where s.id=any(requested) and public.can_view_student_learning(s.id);
  if permitted<>requested or array_position(p_ids,null) is not null then return jsonb_build_object('supported',false); end if;
- return jsonb_build_object('supported',true,'data',jsonb_build_array(${pageQueries.join(',')}));
+ if p_through is not null and (cardinality(p_through)<>3 or array_ndims(p_through)<>1 or array_lower(p_through,1)<>1) then
+  raise exception 'Three upper bounds required' using errcode='22023';
+ end if;
+ if p_through is null then
+  if exists(select 1 from unnest(p_after) a where a is not null) then
+   raise exception 'First page requires empty cursors' using errcode='22023';
+  end if;
+  bounds:=array[${tables.map((table,i)=>`(select id from public.${table} where student_id=any(permitted) ${i===0?'and completed=true':''} order by id desc limit 1)`).join(',')}];
+ else bounds:=p_through;
+ end if;
+ return jsonb_build_object('supported',true,'through',to_jsonb(bounds),'data',jsonb_build_array(${pageQueries.join(',')}));
 end $$;
 revoke all on function ${signature} from public,anon;
 grant execute on function ${signature} to authenticated;
@@ -51,7 +63,7 @@ notify pgrst,'reload schema';`;
 const report = { at: new Date().toISOString(), environment: 'isolated local PostgREST; synthetic accounts only', cases: [], checks: [], restored: false,
   limitation: 'Attempt reads only, with static fixtures. Not a full dashboard, concurrent student writes, legacy-role matrix, hosted latency or 10,000-user capacity proof. No application integration.' };
 const newClient = () => createClient(config.API_URL, config.ANON_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
-const args = (ids, limit = 500, after = [null, null, null]) => ({ p_ids: ids, p_after: after, p_limit: limit });
+const args = (ids, limit = 500, after = [null, null, null], through = null) => ({ p_ids: ids, p_after: after, p_limit: limit, p_through: through });
 const idsFor = group => group.students.map(s => s.studentId);
 // Drain all requests before throwing so cleanup never races an unfinished read.
 async function settled(tasks) {
@@ -64,34 +76,33 @@ async function snapshot(client, ids, candidate, limit = 500) {
   let requests = 0;
   const rows = [[], [], []];
   if (candidate) {
-    const after = [null, null, null], done = [false, false, false];
-    for (let page = 0; ; page++) {
-      assert(page < 10000, 'Pagination must terminate');
-      const result = await client.rpc(name, args(ids, limit, after)); requests++;
-      assert.equal(result.error, null); assert.equal(result.data.supported, true);
-      for (let i = 0; i < 3; i++) {
-        const batch = result.data.data[i];
-        assert(batch.length <= limit);
-        if (!done[i]) {
-          rows[i].push(...batch);
-          if (batch.length) after[i] = batch.at(-1).id;
-          done[i] = batch.length < limit;
-        }
-      }
-      if (done.every(Boolean)) break;
-    }
+    const resultRows = await readScopedAttemptPages(async ({ after, through }) => {
+      requests++;
+      return client.rpc(name, args(ids, limit, after, through));
+    }, async () => {
+      const original = await snapshot(client, ids, false, limit);
+      requests += original.requests;
+      return original.rows;
+    }, ids, limit);
+    rows.splice(0, 3, ...resultRows);
   } else {
     await settled(tables.map(async (table, i) => {
+      let head = client.from(table).select('id').in('student_id', ids).order('id', { ascending: false }).limit(1);
+      if (i === 0) head = head.eq('completed', true);
+      const upper = await head; requests++;
+      assert.equal(upper.error, null);
+      if (!upper.data.length) return;
+      const through = upper.data[0].id;
       let after = null;
       for (let page = 0; ; page++) {
         assert(page < 10000, 'Pagination must terminate');
-        let query = client.from(table).select(`id,${columns[i]}`).in('student_id', ids).order('id').limit(limit);
+        let query = client.from(table).select(`id,${columns[i]}`).in('student_id', ids).order('id').lte('id', through).limit(limit);
         if (i === 0) query = query.eq('completed', true);
         if (after) query = query.gt('id', after);
         const result = await query; requests++;
         assert.equal(result.error, null);
         rows[i].push(...result.data);
-        if (result.data.length < limit) break;
+        if (!result.data.length || result.data.at(-1).id === through) break;
         after = result.data.at(-1).id;
       }
     }));
@@ -124,13 +135,19 @@ async function main() {
       assert.equal(response.error, null); assert.deepEqual(response.data, { supported: false });
     }
     report.checks.push('mixed-school, null and unknown scopes return no data');
-    for (const invalid of [args(null), args(Array(501).fill(first.ids[0])), args(first.ids, 501), args(first.ids, 0), args(first.ids, 500, [])]) {
+    const mixedIds = [...first.ids, teachers[1].ids[0]];
+    const mixedOriginal = await snapshot(first.client, mixedIds, false, 37);
+    const mixedFallback = await snapshot(first.client, mixedIds, true, 37);
+    assert.deepEqual(mixedFallback.rows, mixedOriginal.rows);
+    assert(mixedOriginal.rows.some(rows => rows.length > 0));
+    report.checks.push('unsupported mixed-school scope falls back to complete permitted original rows');
+    for (const invalid of [args(null), args(Array(501).fill(first.ids[0])), args(first.ids, 501), args(first.ids, 0), args(first.ids, 500, []), args(first.ids, 500, [null,null,null], [])]) {
       const response = await first.client.rpc(name, invalid);
       assert.equal(response.error?.code, '22023');
     }
     report.checks.push('invalid scope, page size and cursor shape rejected');
     const empty = await first.client.rpc(name, args([]));
-    assert.equal(empty.error, null); assert.deepEqual(empty.data, { supported: true, data: [[], [], []] });
+    assert.equal(empty.error, null); assert.deepEqual(empty.data, { supported: true, through: [null, null, null], data: [[], [], []] });
     const small = await snapshot(first.client, first.ids, true, 37);
     const baseline = await snapshot(first.client, first.ids, false, 500);
     assert.deepEqual(small.rows, baseline.rows);

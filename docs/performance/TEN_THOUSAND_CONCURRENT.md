@@ -1802,3 +1802,46 @@ No migration or production changes. Node syntax, affected reader QA, SQL parity,
 rollback verification and whitespace checks passed; no app build for test-only
 changes. Aggregate: `scoped-compatibility-summary-2026-11-23.json`. Full private
 results: `/Users/seanjohns/reliq-audits/2026-11-23/scoped-compatibility/`.
+
+### Bounded attempt HTTP reader and fallback — 24 November 2026
+
+Updated only the local HTTP experiment. The temporary endpoint now establishes
+three upper UUID bounds on its first page, applies those bounds on subsequent
+pages, validates cursor/bound array shapes and rechecks the entire authorised scope
+on every request. The local reader checks stable bounds, scope and advancing IDs,
+continues through short nonempty pages, and rejects malformed/error responses.
+An explicit unsupported response discards all accumulated candidate rows and reads
+the whole requested scope through the original table RLS. Arbitrary API/transport
+errors never trigger fallback. The direct comparison also uses fixed upper bounds.
+These bounds do not provide a frozen database snapshot during concurrent edits.
+
+Nine focused journal/concurrency/reader tests passed. Reader cases include a later
+unsupported page, changed bounds, duplicate/non-advancing cursors, foreign rows and
+transport/permission errors. Existing production history-reader QA passed without
+application edits. The authenticated local HTTP experiment passed anonymous denial,
+invalid inputs, empty/duplicate scopes, mixed-school fallback preserving permitted
+records, 37-row pagination and full result equality. Three alternating-order rounds
+at concurrency 1/4/20 compared 150 complete snapshots across both readers.
+
+| Concurrent teachers | Direct attempt reads p95 | Prototype p95 |
+| --- | ---: | ---: |
+| 1 | 905 ms | 175 ms |
+| 4 | 1,094 ms | 186 ms |
+| 20 | 3,762 ms | 445 ms |
+
+At concurrency 20, the 60 snapshots per mode used 480 direct requests versus 144
+prototype requests. These are static synthetic attempt histories only, not the
+complete dashboard, student-write contention, browser performance or 10,000-user
+capacity. No comparison with older experiment timings is claimed.
+
+Local preflight passed. The temporary function was removed in finally and confirmed
+absent. No production, application, permanent schema or fixture permission changes.
+Syntax, affected QA, focused tests, result parity and diff checks passed; no app
+build for local diagnostic-only changes. Results:
+`bounded-attempt-http-2026-11-24.json`; private copy:
+`/Users/seanjohns/reliq-audits/2026-11-24/bounded-attempt-http/`.
+
+Remaining integration gates: actual HTTP individual-assignment/revocation between
+pages (later-page fallback currently has a mocked test), concurrent-write behaviour
+of this prototype, cancellation, and the complete mixed dashboard workload. Do not
+connect this experimental reader to the app until those are checked.
