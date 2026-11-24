@@ -8,10 +8,12 @@ import { fileURLToPath } from 'node:url';
 import { signature, setup, sql, name, newClient, groups } from './scoped-attempts-http-local.mjs';
 import { localDir } from './local-config.mjs';
 const repo = fileURLToPath(new URL('../../', import.meta.url));
+const order = (process.env.SCALE_COMPARISON_ORDER ?? 'direct,scoped').split(',');
+assert.ok(['direct,scoped','scoped,direct'].includes(order.join(',')), 'Comparison must contain each mode exactly once');
 const out = path.join(localDir, `scoped-activity-${Date.now()}`);
 fs.mkdirSync(out);
-const report = { at: new Date().toISOString(), order: ['direct','scoped'], rounds: [], restored: false,
-  limitations: ['One sequential pair; no reverse control or production capacity proof.', 'Activity, presence and event writes only; attempt histories stay static.', 'Scoped pages use 500 rows per table; direct production reader uses 1000.', 'No browser/realtime coverage.'] };
+const report = { at: new Date().toISOString(), order, rounds: [], restored: false,
+  limitations: ['One sequential pair per invocation; compare recorded order explicitly. Not production capacity proof.', 'Activity, presence and event writes only; attempt histories stay static.', 'Scoped pages use 500 rows per table; direct production reader uses 1000.', 'No browser/realtime coverage.'] };
 const run = mode => new Promise((resolve, reject) => {
   const fd = fs.openSync(path.join(out, `${mode}.log`), 'w');
   const child = spawn(process.execPath, ['--no-warnings','--experimental-strip-types','--experimental-loader',path.join(repo,'scripts/typescript-alias-loader.mjs'),path.join(repo,'scripts/staging/capacity-local.mjs')], {

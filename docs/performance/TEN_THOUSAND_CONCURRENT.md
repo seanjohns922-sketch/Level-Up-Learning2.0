@@ -1960,3 +1960,42 @@ No production/app changes or migration, so no app build. Evidence:
 Next: repeat in reversed order before deciding whether to pursue integration.
 Concurrent assessment/lesson-attempt inserts remain unverified; the automatic
 approval rejection of that separate fixture mutation still applies.
+
+### Reversed mixed-dashboard comparison — 24 November 2026
+
+Added validated `SCALE_COMPARISON_ORDER=direct,scoped|scoped,direct` to the local
+orchestrator and ran the reversed pair with the same default API settings and
+100-student/four-teacher activity-only workload. No assessment/lesson inserts.
+
+| Run order | Reader | Dashboard p95 | Login p95 | Latency gate |
+| --- | --- | ---: | ---: | --- |
+| Earlier pair, first | Direct | 2,666 ms | 1,045 ms | Failed |
+| Earlier pair, second | Prototype | 1,535 ms | 557 ms | Failed |
+| Reversed pair, first | Prototype | 1,499 ms | 648 ms | Failed |
+| Reversed pair, second | Direct | 1,121 ms | 428 ms | Failed |
+
+The apparent prototype advantage did not hold in reverse order. The direct reader
+was faster in the second pair; do not integrate or claim a consistent speedup.
+Cache/host/order effects remain plausible explanations, not established causes.
+Neither reader passed the latency gate. In the latest direct run, initial event
+history was 1,119 ms while attempt sources were 532/707/925 ms, so initial event
+history is a useful next profiling target before adding application complexity.
+Do not increase scale on these results.
+
+Each reversed round completed all 100 student journeys without failed operations
+or journey failures. Each wrote and acknowledged 201 activity increments and 201
+events. The extra iteration is allowed by the existing closed-loop deadline, not
+a retry or duplicate: all journal intents were acknowledged, captured readback
+deltas matched 30 seconds per write, and event sequence checks passed. Prototype
+attempt histories matched every projected production row. This is captured
+per-run API readback verification, not a separate post-run database-total audit.
+
+Temporary endpoint removal and local preflight passed. Order-option syntax,
+whitespace and aggregate journal checks passed; no app changes, migration or build.
+Evidence: `scoped-activity-reverse-2026-11-24.json`; private logs and journals:
+`/Users/seanjohns/reliq-audits/2026-11-24/scoped-activity-reverse/`.
+
+Decision: retain the current application reader and keep the prototype experimental.
+Next, profile initial event-history work under a stable local baseline. The separate
+assessment-insert test remains unrun following automatic approval review's rejection;
+this experiment does not resolve that gate or prove 10,000-user capacity.
