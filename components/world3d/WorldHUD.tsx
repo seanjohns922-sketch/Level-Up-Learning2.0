@@ -6,7 +6,9 @@ import StatisticsExtensionLinks from "@/components/assessment/StatisticsExtensio
 import SpaceExtensionLinks from "@/components/assessment/SpaceExtensionLinks";
 import MeasurementExtensionLinks from "@/components/assessment/MeasurementExtensionLinks";
 import NumberExtensionLinks from "@/components/assessment/NumberExtensionLinks";
-import { Car, DoorOpen, Dribbble, Flag, Hammer, Home, Map, Play, Sparkles, UserRound, X, Zap } from "lucide-react";
+import { Car, Castle, DoorOpen, Dribbble, Flag, Hammer, Home, Map, Play, Sparkles, Swords, UserRound, Users, X, Zap } from "lucide-react";
+import { isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { CENTRAL_WORLD_ANCHORS } from "@/lib/world3d/central-world-config";
 import { RELIQ_LETTERS_PATH, RELIQ_Q_PATH } from "@/lib/brand-reliq-logo-paths";
 import { WorldLoadingVeil } from "@/components/world3d/WorldLoadingVeil";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
@@ -184,6 +186,18 @@ export function WorldHUD({
   const missionSpeech = joinSpeechParts([displayedMission.eyebrow ?? (context === "realm" ? "Current mission" : "Current journey"), displayedMission.title, displayedMission.detail]);
   const primaryActionSpeech = primaryAction ? `${primaryAction.label}. Button.` : null;
   const hubLayout = context === "central" || context === "tower";
+  // Every world shows the Central Hub's own tabs first, so the top bar is the same everywhere. Away from the
+  // hub they take you back to that spot or panel; Night and Plan act on the hub itself, so they stay there.
+  const hubHref = (query: string) => `/world?${query}${preview ? "&teacher_preview=1" : ""}`;
+  const hubTabs: NonNullable<typeof navActions> = context === "central" ? [] : [
+    { key: "hub-home", label: "Home", icon: <Home size={15} />, onClick: () => router.push(hubHref(`spawn=${CENTRAL_WORLD_ANCHORS.myHomeExitSpawn}`)) },
+    ...(context === "tower" ? [] : [{ key: "hub-tower", label: "Tower", icon: <Castle size={15} />, onClick: () => router.push(preview ? "/world/tower?teacher_preview=1" : "/world/tower") }]),
+    ...(isCentralWorldV2Enabled() ? [
+      { key: "hub-friends", label: "Friends", icon: <Users size={15} />, onClick: () => router.push(hubHref("friends=1")) },
+      { key: "hub-battles", label: "Battles", icon: <Swords size={15} />, onClick: () => router.push(hubHref("battles=1")) },
+    ] : []),
+  ];
+  const tabs = [...hubTabs, ...(navActions ?? [])];
   // The main button says exactly what happens next.
   const lessonMatch = /lesson\s*(\d+)/i.exec(journey.activityLabel);
   const primaryLabel = primaryLabelOverride ?? (context === "realm"
@@ -235,9 +249,9 @@ export function WorldHUD({
             background="rgba(24,22,21,.82)"
             border="1px solid rgba(255,235,195,.28)"
           />
-          {navActions?.length || (!hubLayout && !preview) ? (
+          {tabs.length ? (
             <div className="worldHudNavGroup">
-              {(navActions ?? []).map((action) => (
+              {tabs.map((action) => (
                 <button key={action.key} type="button" className="worldHudGoBtn" onClick={action.onClick} aria-label={action.label}>{action.icon}<span>{action.label}</span></button>
               ))}
             </div>
