@@ -11,7 +11,7 @@ import { supabase } from "@/lib/supabase";
  *  XP, and best game scores (migration 20261127150000_chronorok_cards.sql). The server decides everything. */
 
 export type ChronorokCardId = (typeof CHRONOROKS)[number]["id"];
-export type OwnedCard = { cardId: string; year: number; how: "awakened" | "catch_up" | "bought"; handedOver: boolean };
+export type OwnedCard = { cardId: string; year: number; how: "awakened" | "catch_up" | "bought" };
 export type ChronorokState = {
   year: number; learningDays: number; crystals: number; open: boolean;
   /** 0 = Prep (Spark) … 6 = Grade 6 and above (Eternal); null when the grade isn't known. */
@@ -41,10 +41,10 @@ const DEMO_YEAR = new Date().getFullYear();
 export const DEMO_CHRONOROK: ChronorokState = {
   year: DEMO_YEAR, learningDays: 240, crystals: 63, open: true, gradeIndex: 5, buyXp: 5000,
   cards: [
-    { cardId: "chronorok-spark-y0", year: DEMO_YEAR - 2, how: "catch_up", handedOver: true },
-    { cardId: "chronorok-ember-y1", year: DEMO_YEAR - 2, how: "catch_up", handedOver: true },
-    { cardId: "chronorok-pulse-y2", year: DEMO_YEAR - 2, how: "catch_up", handedOver: true },
-    { cardId: "chronorok-current-y3", year: DEMO_YEAR - 2, how: "awakened", handedOver: false },
+    { cardId: "chronorok-spark-y0", year: DEMO_YEAR - 2, how: "catch_up" },
+    { cardId: "chronorok-ember-y1", year: DEMO_YEAR - 2, how: "catch_up" },
+    { cardId: "chronorok-pulse-y2", year: DEMO_YEAR - 2, how: "catch_up" },
+    { cardId: "chronorok-current-y3", year: DEMO_YEAR - 2, how: "awakened" },
   ],
   newly: [],
 };
@@ -126,7 +126,7 @@ export function buyableCards(state: ChronorokState) {
 export async function buyChronorokCard(cardId: string): Promise<ChronorokState> {
   if (isDemoPreviewMode()) {
     const base = current ?? DEMO_CHRONOROK;
-    return setCurrent({ ...base, cards: [...base.cards, { cardId, year: base.year, how: "bought", handedOver: false }], newly: [cardId] });
+    return setCurrent({ ...base, cards: [...base.cards, { cardId, year: base.year, how: "bought" }], newly: [cardId] });
   }
   const studentId = getActiveStudentProfile()?.studentId;
   if (!studentId) throw new Error("Sign in to unlock a Chronorok.");
@@ -143,18 +143,6 @@ export function onChronorokAwakened(handler: (state: ChronorokState) => void) { 
 
 /** Clears the "just awakened" list once it has been celebrated. */
 export function clearNewlyAwakened() { if (current?.newly.length) setCurrent({ ...current, newly: [] }); }
-
-// Parents and teachers. ------------------------------------------------------------------------
-
-export async function fetchChronorokFor(studentId: string): Promise<ChronorokState | null> {
-  const { data, error } = await supabase.rpc("get_chronorok_secure", { p_student_id: studentId });
-  if (error) throw error;
-  return parse(data);
-}
-export async function markCardHandedOver(studentId: string, cardId: string) {
-  const { error } = await supabase.rpc("set_chronorok_handed_over_secure", { p_student_id: studentId, p_card_id: cardId });
-  if (error) throw error;
-}
 
 // Best game scores. ----------------------------------------------------------------------------
 

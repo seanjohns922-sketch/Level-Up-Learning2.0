@@ -106,16 +106,8 @@ DO $$DECLARE r jsonb; BEGIN
   IF jsonb_path_query_array(r, '$.top[*].name') <> '["Ben","Ava"]'::jsonb OR (r->>'myBest')::int <> 300 THEN RAISE EXCEPTION 'board %', r; END IF;
 END$$;
 
--- Hand-over: not by the student's own session; yes by a linked parent.
-SET test.session = 'student-token';
-DO $$BEGIN PERFORM set_chronorok_handed_over_secure('${id(1)}', 'chronorok-current-y3'); RAISE EXCEPTION 'student marked their own card'; EXCEPTION WHEN insufficient_privilege THEN NULL; END$$;
-RESET ROLE;
-INSERT INTO parent_student_links VALUES ('${id(900)}', '${id(1)}', 'active');
-SET ROLE authenticated;
-SET test.uid = '${id(900)}';
-DO $$BEGIN IF NOT set_chronorok_handed_over_secure('${id(1)}', 'chronorok-current-y3') THEN RAISE EXCEPTION 'parent hand-over'; END IF; END$$;
-SET test.read = 'on';
-DO $$BEGIN IF NOT (SELECT bool_or((c->>'handedOver')::boolean) FROM jsonb_array_elements(get_chronorok_secure('${id(1)}')->'cards') c WHERE c->>'cardId' = 'chronorok-current-y3') THEN RAISE EXCEPTION 'read'; END IF; END$$;
+-- Student only: no parent or teacher functions.
+DO $$BEGIN IF to_regprocedure('set_chronorok_handed_over_secure(uuid,text)') IS NOT NULL OR to_regprocedure('get_chronorok_secure(uuid)') IS NOT NULL THEN RAISE EXCEPTION 'parent functions remain'; END IF; END$$;
 `;
 
 try {
@@ -129,8 +121,9 @@ try {
   const psql = ['exec', '-i', container, 'psql', '-X', '-U', 'postgres', '-v', 'ON_ERROR_STOP=1'];
   docker(psql, fixture);
   docker(psql, readFileSync('supabase/migrations/20261127150000_chronorok_cards.sql', 'utf8'));
+  docker(psql, readFileSync('supabase/migrations/20261127160000_chronorok_student_only.sql', 'utf8'));
   docker(psql, tests);
-  console.log('PASS Chronorok cards: 100 server-counted days awakens the grade card once (first time with the earlier grades), Prep and Year 8 map right, missed earlier grades cost 5,000 XP (not this year\'s, not owned, not before a first card, not without the XP), bests only go up within caps, the board is friends only, hand-over by a parent and never the student.');
+  console.log('PASS Chronorok cards: 100 server-counted days awakens the grade card once (first time with the earlier grades), Prep and Year 8 map right, missed earlier grades cost 5,000 XP (not this year\'s, not owned, not before a first card, not without the XP), bests only go up within caps, the board is friends only, and nothing for parents or teachers.');
 } finally {
   docker(['rm', '-f', container]);
 }
