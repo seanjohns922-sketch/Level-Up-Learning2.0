@@ -19,7 +19,8 @@ export function cavernWeek(value:unknown,realm:ExpeditionRealm="number") {
   return Number.isInteger(week)&&week>=1&&week<=cave7WeekCount(realm)?week:1;
 }
 export function cavernDoor(week:number):SummitPoint {return [week%2===1?-6:6,0,-8-(week-1)*16];}
-export function cavernSpawn(week:number):SummitPoint {const door=cavernDoor(week);return [door[0]/3,0,door[2]+1];}
+/** A few steps before the doorway, on the path, so its week sign and arch are in view ahead. */
+export function cavernSpawn(week:number):SummitPoint {const door=cavernDoor(week);return [door[0]/4,0,door[2]+6];}
 export function cavernFloor(x:number,z:number,realm:ExpeditionRealm="number"):number|null {return Math.abs(x)<=7&&z>=-28-(cave7WeekCount(realm)-1)*16&&z<=16?0:null;}
 export function cavernNearest(x:number,z:number,realm:ExpeditionRealm="number"):number|null {
   for(let week=1;week<=cave7WeekCount(realm);week++){const p=cavernDoor(week);if(Math.hypot(x-p[0],z-p[2])<5)return week;}

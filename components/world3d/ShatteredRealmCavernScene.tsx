@@ -85,21 +85,37 @@ function CaptiveCore({realm,colour}:{realm:ExpeditionRealm;colour:string}){
   <group ref={rings} position={[0,4,0]}>{[0,1].map(i=><mesh key={i}><torusGeometry args={[2.3+i*.25,.06,6,48]}/><meshBasicMaterial color={seal} toneMapped={false}/></mesh>)}</group>
   {Array.from({length:9},(_,i)=>{const a=-Math.PI*.42+i*Math.PI*.105;return <mesh key={i} position={[Math.sin(a)*3.4,3.6,Math.cos(a)*3.4]}><cylinderGeometry args={[.08,.08,7.2,6]}/><meshStandardMaterial color="#5b5866" metalness={.6} roughness={.4}/></mesh>;})}
   <pointLight position={[0,4,2]} color="#a463ff" intensity={30} distance={16} decay={1.7}/>
-  <WorldPlaque at={[0,9.2,1.5]} title="THE CORE IS STILL CAPTIVE" subtitle="LEVEL 8 · THE FINAL BATTLE" width={8} colour="#c59bff"/>
+  <WorldPlaque at={[0,7.4,3.6]} title="THE CORE IS STILL CAPTIVE" subtitle="LEVEL 8 · THE FINAL BATTLE" width={8} colour="#c59bff"/>
  </group>;
 }
 
-function Doorway({week,unlocked,current,colour}:{week:number;unlocked:boolean;current:boolean;colour:string}){
- const p=cavernDoor(week),side=week%2===1?-1:1;
- return <group position={p} rotation={[0,side===-1?Math.PI/2:-Math.PI/2,0]}>
-  <group scale={.82}><StoneArch colour={colour} open={unlocked} seed={week} brightness={current?1.8:1.3}/></group>
-  <WorldPlaque at={[0,8.6,.4]} title={`WEEK ${week}`} subtitle={!unlocked?'LOCKED':current?'CONTINUE HERE':'ENTER WEEK'} width={4.8} colour={unlocked?colour:'#a8a8ad'}/>
-  {current&&<Brazier at={[-3.3,0,1.3]} colour={colour} scale={.8}/>}
-  {current&&<Brazier at={[3.3,0,1.3]} colour={colour} scale={.8}/>}
- </group>;
+type DoorState='loading'|'locked'|'open'|'current'|'done';
+const DOOR_LABEL:Record<DoorState,string>={loading:'',locked:'LOCKED',open:'ENTER WEEK',current:'CONTINUE HERE',done:'COMPLETE ✓'};
+const DONE_GOLD='#ffd36a';
+/** A slowly turning crystal on a finished week's sign: the student's progress, visible from the path. */
+function RestoredCrystal({colour}:{colour:string}){
+ const reduced=useReducedMotion(),ref=useRef<THREE.Mesh>(null);
+ useFrame(({clock})=>{if(ref.current&&!reduced.current)ref.current.rotation.y=clock.elapsedTime*.8;});
+ return <group position={[0,4.75,0]}><mesh ref={ref} scale={[.32,.62,.32]}><octahedronGeometry args={[1,0]}/><meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={2} flatShading/></mesh><pointLight color={colour} intensity={12} distance={9} decay={1.6}/></group>;
+}
+function Doorway({week,state,colour}:{week:number;state:DoorState;colour:string}){
+ const p=cavernDoor(week),side=week%2===1?-1:1,lit=state==='done'?DONE_GOLD:state==='locked'||state==='loading'?'#a8a8ad':colour;
+ return <>
+  <group position={p} rotation={[0,side===-1?Math.PI/2:-Math.PI/2,0]}>
+   <group scale={.82}><StoneArch colour={state==='done'?DONE_GOLD:colour} open={state!=='locked'} seed={week} brightness={state==='current'?1.8:state==='done'?1.6:1.3}/></group>
+   {state==='current'&&<Brazier at={[-3.3,0,1.3]} colour={colour} scale={.8}/>}
+   {state==='current'&&<Brazier at={[3.3,0,1.3]} colour={colour} scale={.8}/>}
+  </group>
+  {/* Eye-level sign between the path and the doorway, facing the student as they walk in. */}
+  <group position={[side*3.9,0,p[2]+2.2]}>
+   <mesh position={[0,1.2,0]}><boxGeometry args={[.14,2.4,.14]}/><meshStandardMaterial color="#3b3a44" roughness={.8}/></mesh>
+   <WorldPlaque at={[0,2.85,0]} title={`WEEK ${week}`} subtitle={DOOR_LABEL[state]} width={3.2} colour={lit}/>
+   {state==='done'&&<RestoredCrystal colour={DONE_GOLD}/>}
+  </group>
+ </>;
 }
 
-export default function ShatteredRealmCavernScene({realm,position,unlockedWeeks,current}:{realm:ExpeditionRealm;position:React.RefObject<THREE.Vector3>;unlockedWeeks:number[];current:number}){
+export default function ShatteredRealmCavernScene({realm,position,unlockedWeeks,finishedWeeks,ready,current}:{realm:ExpeditionRealm;position:React.RefObject<THREE.Vector3>;unlockedWeeks:number[];finishedWeeks:number[];ready:boolean;current:number}){
  // The trail colours keep each cavern consistent with its trail gate and summit gateway.
  const colour=EXPEDITION_TRAILS.find(t=>t.id===realm)?.colour??getRealmTheme(realm).accentText;
  const ambient=useRef<THREE.AmbientLight>(null),fog=useRef<THREE.Fog>(null),glow=useRef<THREE.PointLight>(null);
@@ -118,7 +134,7 @@ export default function ShatteredRealmCavernScene({realm,position,unlockedWeeks,
   <pointLight position={[currentDoor[0]*.6,3.5,currentDoor[2]]} color={colour} intensity={40} distance={16} decay={1.6}/>
   <CaveShell realm={realm} colour={colour}/>
   {realmWeeks(realm).map((week,i)=><group key={week} ref={g=>{sections.current[i]=g;}}>
-   <Doorway week={week} unlocked={unlockedWeeks.includes(week)} current={week===current} colour={colour}/>
+   <Doorway week={week} state={!ready?'loading':finishedWeeks.includes(week)?'done':week===current?'current':unlockedWeeks.includes(week)?'open':'locked'} colour={colour}/>
    <Features realm={realm} colour={colour} week={week}/>
   </group>)}
   <CaptiveCore realm={realm} colour={colour}/>

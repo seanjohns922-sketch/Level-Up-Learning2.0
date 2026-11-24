@@ -147,6 +147,16 @@ function ProgramPage() {
   const isPrep = curriculumYear === "Prep";
   const lastWeek = Math.max(program.length, 1);
   const isMeasurementRealm = realmId === "measurement";
+  /** Realm-coloured glow behind the student avatar on the week page. */
+  const avatarGlow = isStarpathRealm
+    ? "rgba(34,211,238,0.34)"
+    : isStatisticsRealm
+    ? "rgba(240,107,100,0.3)"
+    : isChanceRealm
+    ? "rgba(251,113,133,0.32)"
+    : isMeasurementRealm
+    ? "rgba(251,191,36,0.28)"
+    : "rgba(94,234,212,0.30)";
 
   const legacyProgramMode = sp.get("legacy") === "1";
   const demoPreviewMode = useDemoPreviewMode();
@@ -827,27 +837,18 @@ function ProgramPage() {
         )}
       </div>}
 
-      {/* ── Student avatar (shared component — appears on every Week page) ── */}
-      <div
+      {/* ── Student avatar (shared component — appears on every Week page). Cave and stronghold weeks
+           place it beside the progress bar instead, because their lesson cards fill the bottom edge. ── */}
+      {!isExpeditionWeek && <div
         aria-hidden
         className="pointer-events-none fixed left-1/2 -translate-x-1/2 z-[5] hidden md:block"
         style={{ bottom: "1.5rem" }}
       >
         <CanonicalStudentAvatar
           height={160}
-          glowColor={
-            isStarpathRealm
-              ? "rgba(34,211,238,0.34)"
-              : isStatisticsRealm
-              ? "rgba(240,107,100,0.3)"
-              : isChanceRealm
-              ? "rgba(251,113,133,0.32)"
-              : isMeasurementRealm
-              ? "rgba(251,191,36,0.28)"
-              : "rgba(94,234,212,0.30)"
-          }
+          glowColor={avatarGlow}
         />
-      </div>
+      </div>}
 
       {/* ── Hero header ── */}
       <div className="relative z-10">
@@ -929,7 +930,13 @@ function ProgramPage() {
             ) : null}
 
             {/* Week progress */}
-            <div className={`${WEEK_GLASS} mx-auto mt-3 flex max-w-[480px] items-center gap-4 rounded-[18px] px-[18px] py-3 text-left`}>
+            <div className="relative mx-auto mt-3 max-w-[480px]">
+            {isExpeditionWeek && (
+              <div aria-hidden className="pointer-events-none absolute bottom-[-10px] right-full mr-4 hidden md:block">
+                <CanonicalStudentAvatar height={132} glowColor={avatarGlow} />
+              </div>
+            )}
+            <div className={`${WEEK_GLASS} flex items-center gap-4 rounded-[18px] px-[18px] py-3 text-left`}>
               <div className="min-w-0 flex-1">
                 <div className="flex justify-between gap-3 text-[15px] font-extrabold text-white">
                   <span>{weekStatusLine}</span>
@@ -949,6 +956,7 @@ function ProgramPage() {
                   <ChevronRight aria-hidden className="h-4 w-4" />
                 </button>
               ) : null}
+            </div>
             </div>
 
 
