@@ -35,7 +35,10 @@ export function pickLevel7LessonQuiz<Q extends { prompt: string; answer: string 
     let fallback: Q | undefined, lastResort: Q | undefined;
     for (let attempt = 0; attempt < 300; attempt++) {
       const q = make(role, baseSeed + slot * 7919 + attempt * 104729), key = fingerprint(q);
+      // Identical wording reads as the same question whatever the numbers in its picture, so a prompt is reused
+      // only when the lesson has no other wording left for this slot.
       if (seen.has(key)) continue;
+      if (seen.has('prompt:' + q.prompt) && attempt < 280) continue;
       // A worked example is used only if the lesson has nothing else left for this slot.
       if (shown.has(q.prompt + '|' + q.answer)) { lastResort ??= q; continue; }
       fallback ??= q;
@@ -51,6 +54,7 @@ export function pickLevel7LessonQuiz<Q extends { prompt: string; answer: string 
     if (!fallback) throw Error(`Insufficient ${label} quiz variations for slot ${slot + 1} (${role})`);
     picked.push(fallback);
     seen.add(fingerprint(fallback));
+    seen.add('prompt:' + fallback.prompt);
     forms.add(promptTemplate(fallback.prompt));
     seen.add('form:' + promptTemplate(fallback.prompt));
     answers.add(fallback.answer);

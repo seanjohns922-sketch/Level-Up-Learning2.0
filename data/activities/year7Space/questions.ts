@@ -1,3 +1,4 @@
+import { tidyDisplayText } from "@/lib/display-text";
 import type {Lesson} from '@/data/programs/year1';
 import type {LessonActivity} from '@/data/programs/types';
 import type {MultipleChoiceQuestion} from '@/data/activities/year2/lessonEngine';
@@ -33,7 +34,7 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  // At least one column has stacks in both rows, so hidden cubes matter in every view question.
  if(![0,1,2].some(i=>heights[i]>0&&heights[i+3]>0)){heights[1]=int(1,3);heights[4]=int(1,3);}
  const plan=()=>{visual={mode:'choice',diagram:'plans',instruction:'Back row is first. Front view looks from the marked front; side profile is listed back row first.',cols:3,rows:2,heights,showModel:true};};
- const planText=`Height plan, back row [${heights.slice(0,3).join(', ')}], front row [${heights.slice(3).join(', ')}]. `;
+ const planText=`Height plan: back row ${heights.slice(0,3).join(", ")}; front row ${heights.slice(3).join(", ")}. `;
  const front=[0,1,2].map(i=>Math.max(heights[i],heights[i+3])),sums=[0,1,2].map(i=>heights[i]+heights[i+3]),side=[Math.max(...heights.slice(0,3)),Math.max(...heights.slice(3))],total=heights.reduce((s,n)=>s+n,0),occupied=heights.filter(Boolean).length;
  // Labelled drawings for the triangle and quadrilateral questions; "?" marks the unknown.
  const tri=(lengths:number[],labels:string[])=>{const [base,left,right]=lengths,apexX=(base*base+left*left-right*right)/(2*base);polygon({points:[{x:0,y:0},{x:base,y:0},{x:apexX,y:Math.sqrt(Math.max(0.01,left*left-apexX*apexX))}],sideLabels:labels,caption:'Triangle with the stated side lengths. Not to scale.'});};
@@ -375,7 +376,7 @@ export function space7Question(week:number,lesson:number,seed:number,role:Space7
  }
  const options=[...new Set([answer,...wrong])].slice(0,4);if(!prompt||options.length!==4)throw Error(`Invalid options ${key}/${role}: ${prompt}`);
  for(let i=3;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
- return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt,answer,options,explanation,spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,build,place:placeSpec,sorter:sorterSpec,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
+ return {readabilityRevision:SPACE7_READABILITY_REVISION,kind:'multiple_choice',prompt:tidyDisplayText(prompt),answer,options,explanation:tidyDisplayText(explanation),spaceVisual:visual,lessonId:`y7-space-w${week}-l${lesson}`,version:2,skillKey:key,tier:role,answerLabels,build,place:placeSpec,sorter:sorterSpec,steps:[guide.idea,explanation,`Answer: ${answer}. Check against the stated properties and direction.`]};
 }
 export function generateSpace7Question(_level:unknown,lesson:Lesson,activity:LessonActivity){return space7Question(lesson.week,lesson.lesson,Math.floor(Math.random()*0x7fffffff),activity.config.rotationRole as Space7Role);}
 export function space7Quiz(week:number,attempt=0){

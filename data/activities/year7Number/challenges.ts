@@ -1,3 +1,4 @@
+import { tidyDisplayText } from "@/lib/display-text";
 import type { MultipleChoiceQuestion } from '@/data/activities/year2/lessonEngine';
 import { number7Guide, number7ContentKey, NUMBER7_READABILITY_REVISION } from './curriculum';
 
@@ -40,7 +41,9 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   // Money answers show cents (5.50, not 5.5) whenever any choice is not a whole number of dollars.
   const numeric = (prompt: string, answer: number, wrong: number[], explanation: string, money = false) => {
     const options = [answer];
-    for (const v of wrong) if (Number.isFinite(v) && !options.some(x => Math.abs(x - v) < 1e-7)) options.push(v);
+    // A wrong choice is shown only if it is as tidy as the answer (at most two decimal places), so no option reads 25.66666667.
+    const tidy = (v: number) => !/\.\d{5,}/.test(fmt(v));
+    for (const v of wrong) if (Number.isFinite(v) && (tidy(v) || !tidy(answer)) && !options.some(x => Math.abs(x - v) < 1e-7)) options.push(v);
     for (let delta = 1; options.length < 4; delta++) if (!options.some(x => Math.abs(x - answer - delta) < 1e-7)) options.push(answer + delta);
     const show = money && options.slice(0, 4).some(v => !Number.isInteger(Math.round(v * 1e8) / 1e8)) ? (v: number) => v.toFixed(2) : fmt;
     choice(prompt, show(answer), options.slice(1, 4).map(show), explanation);
@@ -192,9 +195,9 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
     }
     case 23: {
       const x=a*.6,y=.3;
-      model(`Which whole-number division is equivalent to ${fmt(x)} ÷ ${y}?`,
-        [`${a*6} ÷ 3`,a*2], [[`${a*6} ÷ 30`,a/5],[`${a*60} ÷ 3`,a*20],[`3 ÷ ${a*6}`,1/(a*2)]],
-        'Scale the dividend and divisor by the same factor of 10. Scaling only one changes the quotient.'); break;
+      // Typed as a single number: the box holds the scaled dividend, so the answer is not forced into fraction boxes.
+      numeric(`${fmt(x)} ÷ ${y} = ■ ÷ 3. What number goes in the box?`, a*6, [a*60, x, a*6+3],
+        `Multiply both numbers by 10: ${fmt(x)} × 10 = ${a*6} and ${y} × 10 = 3, so ${fmt(x)} ÷ ${y} = ${a*6} ÷ 3 = ${a*2}. Scaling only one number changes the quotient.`); break;
     }
     case 24: {
       const total=n*8;
@@ -354,7 +357,7 @@ export function number7Challenge(week: number, lesson: number, seed: number, rol
   if (!task) throw Error(`Missing Level 7 challenge ${key}/${role}`);
   for (let i=task.options.length-1;i>0;i--) { const j=int(0,i); [task.options[i],task.options[j]]=[task.options[j],task.options[i]]; }
   return {
-    ...task, visual, paintContext, diagramSpeech, readabilityRevision: NUMBER7_READABILITY_REVISION, kind: 'multiple_choice' as const, skill: guide.code, seed,
+    ...task, prompt: tidyDisplayText(task.prompt), explanation: tidyDisplayText(task.explanation), visual, paintContext, diagramSpeech, readabilityRevision: NUMBER7_READABILITY_REVISION, kind: 'multiple_choice' as const, skill: guide.code, seed,
     lessonId: `y7-w${week}-l${lesson}`, version: 2 as const, tier: role,
     helper: 'Choose one answer.',
   } satisfies MultipleChoiceQuestion & {skill:string;seed:number;lessonId:string;version:2;tier:string;diagramSpeech?:string};

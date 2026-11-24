@@ -112,7 +112,7 @@ export function validChallenge(key,q,option) {
     case 20: return v[2]/v[3]>0&&v[2]/v[3]<1&&option.startsWith('It is smaller because')&&option.includes('positive and less than 1');
     case 21: answer=v[0]/v[1]/(v[2]/v[3]);break;
     case 22: answer=v[0]+v[1];break;
-    case 23: answer=v[0]/v[1];break;
+    case 23: answer=v[0]/v[1]*v[2];break; // 3.6 ÷ 0.3 = ■ ÷ 3, so ■ = (3.6 ÷ 0.3) × 3
     case 24: answer=v[2]*v[0]/100;break;
     case 25: return o[0]===Math.min(...v)&&Math.abs(o[0])===Math.max(...v.map(Math.abs))&&option.endsWith('greater magnitude but the smaller value.');
     case 26: return o[0]===v[0]&&o[1]===Math.abs(v[1])&&o[2]===v[0]+v[1]&&option.includes(v[1]<0?'left':'right');

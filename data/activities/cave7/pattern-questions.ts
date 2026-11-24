@@ -205,7 +205,7 @@ export function pattern7Question(week:number,lesson:number,seed:number,role:Cave
  case 28:{
   if(F){formula(`y = ${a}x + ${b}`,'Write points as (x, y).');choose(`Write the point on the graph of y = ${a}x + ${b} where x = ${x}.`,`(${x}, ${a*x+b})`,[`(${a*x+b}, ${x})`,`(${x}, ${a*x})`,`(${x}, ${x+a+b})`,`(${x}, ${a*x+b+a})`],`y = ${a} × ${x} + ${b} = ${a*x+b}, so the point is (${x}, ${a*x+b}).`);}
   else if(R){formula(`y = ${a}x + ${b}`,'Write points as (x, y).');choose(`A student plotted the point for x = ${x} on y = ${a}x + ${b} as (${a*x+b}, ${x}). Write the correct point.`,`(${x}, ${a*x+b})`,[`(${a*x+b}, ${x})`,`(${x}, ${a*x})`,`(${x+1}, ${a*x+b})`],'The horizontal coordinate comes first: (x, y).');}
-  else{formula(`y = ${a}x + ${b}`,'Write points as (x, y).');choose(`Which point on the graph of y = ${a}x + ${b} has y = ${a*x+b}? Write it as (x, y).`,`(${x}, ${a*x+b})`,[`(${a*x+b}, ${x})`,`(${x+1}, ${a*x+b})`,`(${(a*x+b)/a}, ${a*x+b})`],`Solve ${a}x + ${b} = ${a*x+b}: x = ${x}.`);}
+  else{formula(`y = ${a}x + ${b}`,'Write points as (x, y).');choose(`Which point on the graph of y = ${a}x + ${b} has y = ${a*x+b}? Write it as (x, y).`,`(${x}, ${a*x+b})`,[`(${a*x+b}, ${x})`,`(${x+1}, ${a*x+b})`,Number.isInteger((a*x+b)/a)?`(${(a*x+b)/a}, ${a*x+b})`:`(${x-1}, ${a*x+b})`],`Solve ${a}x + ${b} = ${a*x+b}: x = ${x}.`);}
   break;}
  case 29:{
   const slope=int(2,4),start=int(1,6),pts:[number,number][]=[0,1,2,3].map(n=>[n,slope*n+start]);

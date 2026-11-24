@@ -1,3 +1,4 @@
+import { tidyDisplayText } from "@/lib/display-text";
 import type {MultipleChoiceQuestion} from '@/data/activities/year2/lessonEngine';
 import type {ChanceVisual} from '@/data/activities/year1/practice-task';
 export type Cave7Role='fast_thinking'|'reasoning'|'apply_create';
@@ -9,8 +10,9 @@ export function random(seed:number){let state=(seed>>>0)||1;return(lo:number,hi:
 export function scalar(text:string){if(!/^-?\d+(?:\.\d+)?(?:\/\d+)?$/.test(text))return null;const [a,b]=text.split('/').map(Number);return b===undefined?a:a/b;}
 export const round=(n:number)=>Math.round(n*10000)/10000;
 export function makeQuestion(input:{realm:Cave7Question['realm'];week:number;lesson:number;seed:number;role:Cave7Role;prompt:string;answer:string|number;wrong:(string|number)[];explanation:string;idea:string;visual?:Cave7Visual;answerUnit?:string;answerLabels?:string[]}):Cave7Question{
- const {realm,week,lesson,role,prompt,explanation,idea,visual}=input,answer=String(input.answer),raw=[...input.wrong.map(String),...(realm==='chance'&&scalar(answer)!==null?['0','1','1/3','2/3','1/4','3/4','1/5','4/5']:[])],options=[answer];
- for(const choice of raw){if(options.some(existing=>existing===choice||(scalar(existing)!==null&&scalar(choice)!==null&&Math.abs(scalar(existing)!-scalar(choice)!)<1e-9)))continue;options.push(choice);if(options.length===4)break;}
+ const {realm,week,lesson,role,idea,visual}=input,prompt=tidyDisplayText(input.prompt),explanation=tidyDisplayText(input.explanation),answer=String(input.answer),raw=[...input.wrong.map(String),...(realm==='chance'&&scalar(answer)!==null?['0','1','1/3','2/3','1/4','3/4','1/5','4/5']:[])],options=[answer];
+ const long=(x:string)=>/\d\.\d{5,}/.test(x),ordered=[...raw.filter(c=>!long(c)||long(answer)),...raw.filter(c=>long(c)&&!long(answer))];
+ for(const choice of ordered){if(options.some(existing=>existing===choice||(scalar(existing)!==null&&scalar(choice)!==null&&Math.abs(scalar(existing)!-scalar(choice)!)<1e-9)))continue;options.push(choice);if(options.length===4)break;}
  if(!prompt||!explanation||options.length!==4)throw Error(`Invalid ${realm} question ${week}/${lesson}: ${JSON.stringify(input)}`);
  const int=random(input.seed^0x5f3759df);for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
  return {readabilityRevision:CAVE7_READABILITY_REVISION[realm],kind:'multiple_choice',prompt,answer,options,explanation,cave7Visual:visual,...(input.answerUnit!==undefined?{answerUnit:input.answerUnit}:{}),...(input.answerLabels?{answerLabels:input.answerLabels}:{}),lessonId:`y7-${realm}-w${week}-l${lesson}`,version:1,tier:role,steps:[idea,explanation,`Check: ${answer}. Explain how it fits the question.`],skillKey:(week-1)*3+lesson,realm};

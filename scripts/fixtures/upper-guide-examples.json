@@ -1097,15 +1097,15 @@
   },
   "7/space/2/2": {
     "title": "Infer a front view",
-    "signature": "934e585806232323c0286b84ebadeafad69a3c8af25f7bd41e2a6720981d9bd9"
+    "signature": "f991c06b0c8a33a1f909b1770b576eddc6a77b0d7ad6db79998b914f1595c4f0"
   },
   "7/space/2/3": {
     "title": "Infer a side view",
-    "signature": "a81026c0c2b660c18d83dcdae71f4d1f4ed222e685f070259cff07e5c7937ff2"
+    "signature": "0a4be415c246b9d681dc36ee3fad60878d6444b33f90d6bcb3665423e4066b3e"
   },
   "7/space/3/1": {
     "title": "Reconstruct a cube model",
-    "signature": "433c2e2d4657bfe384f946c3239b8b20e210d06a718e9ba2ffcd25ff5a226804"
+    "signature": "81ca1daba5b72a0f2c9da3c0e5830a6e46e920c854bfc98c32ac23536762126b"
   },
   "7/space/3/2": {
     "title": "Identify missing information",

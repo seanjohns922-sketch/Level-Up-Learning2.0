@@ -17,7 +17,7 @@ export default function FeedbackValue({ value, unit, labels }: { value: unknown;
     const abs = Math.abs(number).toLocaleString("en-AU", { minimumFractionDigits: Number.isInteger(number) ? 0 : 2, maximumFractionDigits: 2 });
     text = `${number < 0 ? "-" : ""}$${abs}`;
   } else if (number !== null && unit) {
-    text = unit === "%" || unit === "°C" || unit === "°F" ? `${text}${unit}` : `${text} ${unit}`;
+    text = unit === "%" || unit === "°" || unit === "°C" || unit === "°F" ? `${text}${unit}` : `${text} ${unit}`;
   }
   // An improper fraction also shows its mixed number, so it matches working that ends "= −4 11/12".
   const improper = text.match(/^(-?)(\d+)\/(\d+)$/);

@@ -1,3 +1,4 @@
+import { tidyDisplayText } from "@/lib/display-text";
 import {polygonAngleVisual} from './polygonVisual';
 import type { Lesson } from '@/data/programs/year1';
 import type { LessonActivity } from '@/data/programs/types';
@@ -91,7 +92,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
   if(apply){
    const y=int(5,15),p=int(3,4),q=int(1,2),m1=angle-p*y,m2=target-q*y;
    v('parallel',[angle],{relation,angleLabels:[`(${linear(p,m1)})°`,`(${linear(q,m2)})°`]});
-   task(`${parallelText} Both marked angles are written in terms of y. Find y.`,y,'',relation==='cointerior'?`(180 − (${m1}) − (${m2})) ÷ ${p+q}`:`(${m2} − (${m1})) ÷ ${p-q}`,relation==='cointerior'?`Co-interior angles sum to 180°: ${linear(p,m1)} + ${linear(q,m2)} = 180, so y = ${y}.`:`${NAME[relation][0].toUpperCase()+NAME[relation].slice(1)} angles are equal: ${linear(p,m1)} = ${linear(q,m2)}, so y = ${y}.`,[y+5,2*y,y*p]);
+   task(`${parallelText} Both marked angles are written in terms of y. Find y.`,y,'',(()=>{const less=(x:number)=>x<0?` + ${-x}`:` − ${x}`,share=(top:string,by:number)=>by===1?top:`(${top}) ÷ ${by}`;return relation==='cointerior'?share(`180${less(m1)}${less(m2)}`,p+q):share(`${m2}${less(m1)}`,p-q);})(),relation==='cointerior'?`Co-interior angles sum to 180°: ${linear(p,m1)} + ${linear(q,m2)} = 180, so y = ${y}.`:`${NAME[relation][0].toUpperCase()+NAME[relation].slice(1)} angles are equal: ${linear(p,m1)} = ${linear(q,m2)}, so y = ${y}.`,[y+5,2*y,y*p]);
   } else {
    const kk=int(2,5),y=int(5,Math.floor((target-5)/kk)),m=target-kk*y,other=relation==='cointerior'?angle:180-angle;
    v('parallel',[angle],{relation,angleLabels:[`${angle}°`,`(${linear(kk,m)})°`]});
@@ -207,7 +208,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
  if(!prompt||options.length!==4||new Set(options).size!==4)throw Error(`Invalid question ${key}/${role}`);
  for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
  const steps=role==='reasoning'?[guide.idea,reasonAnswer,'Check that the stated relationship applies to the given measurements.']:[guide.idea,`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}.`,explanation];
- return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt,options,answer:result,explanation:role==='reasoning'?explanation:`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}. ${explanation}`,measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
+ return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt:tidyDisplayText(prompt),options,answer:result,explanation:tidyDisplayText(role==='reasoning'?explanation:`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}. ${explanation}`),measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
 }
 export function generateMeasurement7Question(_level:unknown,lesson:Lesson,activity:LessonActivity) {
  if(!/^y7-measurement-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw Error('Unsupported Measurement Level 7 lesson');
