@@ -1,7 +1,6 @@
 "use client";
-// Shared by the Friends panel, MY CLASS, the request pop-up and a friend's page: a friend's real explorer
-// face, the "in my world" choice (VISIT ONLY or CAN HELP BUILD), and the plain-words how-tos.
-import { Eye, Hammer } from "lucide-react";
+// Shared by the Friends panel, MY CLASS, the request pop-up, the knock screens and a friend's page: a friend's
+// real explorer face, the panel look, and the plain-words how-tos.
 import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { friendLook, type FriendOutfit } from "@/lib/friends";
 
@@ -44,44 +43,11 @@ export function FriendFace({ outfit, size = 52, online = false }: { outfit?: Fri
 /** "When was that": Friends since 2 Nov. */
 export const shortDate = (at: string | null | undefined) => (at ? new Date(at).toLocaleDateString("en-AU", { day: "numeric", month: "short" }) : null);
 
-/**
- * The owner's choice for one friend in their world: VISIT ONLY (look around, nothing changes) or CAN HELP
- * BUILD (place and move things; the owner keeps or undoes it after). Off when a teacher or grown-up has
- * switched building together off.
- */
-export function WorldAccessChoice({ name, canBuild, enabled, busy, onChange, compact = false }: { name: string; canBuild: boolean; enabled: boolean; busy?: boolean; onChange: (canBuild: boolean) => void; compact?: boolean }) {
-  const option = (build: boolean) => {
-    const on = canBuild === build;
-    const Icon = build ? Hammer : Eye;
-    return (
-      <button type="button" role="radio" aria-checked={on} disabled={busy || !enabled || on} onClick={() => onChange(build)}
-        style={{
-          flex: 1, minWidth: 0, border: `2px solid ${on ? (build ? GREEN : LILAC) : "transparent"}`, borderRadius: 14, padding: compact ? "8px 8px" : "12px 12px",
-          background: on ? (build ? "rgba(125,255,138,.16)" : "rgba(233,184,250,.16)") : "rgba(255,255,255,.06)", color: "#fff", cursor: busy || !enabled || on ? "default" : "pointer",
-          textAlign: "left", display: "flex", flexDirection: "column", gap: 3, opacity: !enabled && build ? 0.45 : 1,
-        }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: HEADING, fontWeight: 900, fontSize: compact ? 12 : 14, letterSpacing: ".04em", color: on ? (build ? GREEN : LILAC) : "#fff" }}>
-          <Icon size={compact ? 14 : 17} aria-hidden="true" />{build ? "CAN HELP BUILD" : "VISIT ONLY"}
-        </span>
-        {compact ? null : <span style={{ fontSize: 13, fontWeight: 600, opacity: .85, lineHeight: 1.35 }}>
-          {build ? `${name} can place and move things. You'll see what changed and can keep it or undo it.` : `${name} can walk around and look. Nothing in your world changes.`}
-        </span>}
-      </button>
-    );
-  };
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-      <div role="radiogroup" aria-label={`What ${name} can do in your world`} style={{ display: "flex", gap: 8 }}>{option(false)}{option(true)}</div>
-      {!enabled ? <span style={{ fontSize: 12, fontWeight: 600, opacity: .75 }}>Building together is switched off by your teacher or grown-up. Friends can still visit.</span> : null}
-    </div>
-  );
-}
-
 /** The three things friends do, in plain words (Friends panel and a friend's page). */
 export function howTos(name = "your friend") {
   return [
     { key: "battle", title: "Battle", text: `Tap BATTLE, pick a realm, then LIVE (you both play now) or TAKE TURNS (${name} plays later). You each get 20 quick questions at your own level. Most right wins.` },
-    { key: "build", title: "Build in their world", text: `${name} has to choose CAN HELP BUILD for you. Then tap VISIT WORLD and BUILD to place and move things. They can keep or undo what you change.` },
-    { key: "visit", title: "Visit only", text: "Every friend can visit your world and look around. Choose VISIT ONLY and nothing they do changes it. CAN HELP BUILD lets them build too." },
+    { key: "visit", title: "Visit their world", text: `When ${name} is in the hub, tap KNOCK. They let you in to LOOK (walk around, nothing changes) or to BUILD.` },
+    { key: "build", title: "Build together", text: "Building only happens while the owner is there and has said BUILD. They can switch you to LOOK or send you home any time, and keep or undo what you built." },
   ] as const;
 }

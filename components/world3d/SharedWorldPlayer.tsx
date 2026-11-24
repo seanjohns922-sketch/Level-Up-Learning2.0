@@ -2,6 +2,7 @@
 
 import WorldAvatarJump from "./WorldAvatarJump";
 import { WORLD_AVATAR_SCALE, WORLD_AVATAR_SCALE_OFFSET } from "@/lib/world3d/world-scale";
+import type { ExplorerPose } from "@/lib/world-together";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
@@ -162,6 +163,7 @@ export function SharedThirdPersonPlayer({
   seeThrough = false,
   speed = 4.6,
   positionRef,
+  poseRef,
   aimRef,
   groundHeightAt,
   canStandAt,
@@ -194,6 +196,8 @@ export function SharedThirdPersonPlayer({
   seeThrough?: boolean;
   speed?: number;
   positionRef?: React.MutableRefObject<{ x: number; z: number }>;
+  /** Where the explorer is, which way they face and whether they're walking (shared with friends in the world). */
+  poseRef?: React.MutableRefObject<ExplorerPose>;
   /** Written each frame: the way the camera looks, as a heading (0 looks along +z). Steady while the avatar turns to walk. */
   aimRef?: React.MutableRefObject<number>;
   /** Optional terrain: ground height under the player (added to the spawn height). */
@@ -383,6 +387,11 @@ export function SharedThirdPersonPlayer({
       positionRef.current.z = player.position.z;
     }
     if (aimRef) aimRef.current = yaw.current + Math.PI;
+    if (poseRef) {
+      const pose = poseRef.current;
+      pose.x = player.position.x; pose.y = player.position.y; pose.z = player.position.z;
+      pose.heading = player.rotation.y; pose.moving = movingRef.current;
+    }
 
     if (cameraEnabled) {
       const cosPitch = Math.cos(pitch.current);

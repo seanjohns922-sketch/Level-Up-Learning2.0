@@ -15,6 +15,14 @@ const SAVE_DELAY_MS = 1500;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const pending = new Map<string, () => { placements: unknown[]; groundTiles: unknown[] }>();
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
+const savedListeners = new Set<(scope: string) => void>();
+
+/** Called after a world is saved to the account (so friends in it can load the change straight away). */
+export function onWorldSaved(listener: (scope: string) => void) {
+  savedListeners.add(listener);
+  return () => { savedListeners.delete(listener); };
+}
+const announceSaved = (scope: string) => savedListeners.forEach((listener) => listener(scope));
 
 /** Only real learner accounts sync (your own world, or a friend's you're helping build); demo preview and guests stay in the browser. */
 export function isSyncedWorldScope(scope: string) {
@@ -40,7 +48,9 @@ async function send(scope: string) {
   const friendId = visitedFriendId(scope), me = getActiveStudentIdentity().studentId;
   if (friendId) {
     if (!me) return;
-    await saveFriendWorld(me, friendId, { placements, groundTiles }).catch((error) => console.warn("[central-world] your friend's world could not be saved", error));
+    await saveFriendWorld(me, friendId, { placements, groundTiles })
+      .then(() => announceSaved(scope))
+      .catch((error) => console.warn("[central-world] your friend's world could not be saved", error));
     return;
   }
   const { error } = await supabase.rpc("save_student_world_layout_secure", {
@@ -50,6 +60,7 @@ async function send(scope: string) {
   });
   // The browser copy is still there; the next edit or visit retries the save.
   if (error) console.warn("[central-world] world layout could not be saved to the account", error);
+  else announceSaved(scope);
 }
 
 /** Schedules a save; `read` is called when it is sent, so it always sends the latest layout. */

@@ -24,6 +24,5 @@ export default function FriendPageEntry() {
   }, [friendId, allowed, demo, router]);
 
   if (!friendId || !allowed) return null;
-  const myName = student?.displayName?.split(" ")[0] || "you";
-  return <FriendPage friendId={friendId} studentId={demo ? null : student?.studentId ?? null} myName={myName} demo={demo} />;
+  return <FriendPage friendId={friendId} studentId={demo ? null : student?.studentId ?? null} demo={demo} />;
 }

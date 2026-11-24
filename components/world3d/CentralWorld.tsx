@@ -49,13 +49,18 @@ import { buildWaterAreas, placedLakes, swimSurfaceAt, SWIM_SPEED, waterReach, wi
 import { BOAT_SPECS, boatToRide, boatWaterAt, nearestBank, openWaterHeading, ownedBoats, type BoatStyle } from "@/lib/world3d/boats";
 import { BoatRider } from "@/components/world3d/premium-items/BoatRider";
 import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, hubWaterDepth, HUB_V2_WATER_Y, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
-import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
+import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope, onWorldSaved } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { FriendRequestToast, FriendsPanel } from "@/components/world3d/friends/FriendsPanel";
+import { KnockDoor, KnockToast, VisitOverCard, VisitorsCard } from "@/components/world3d/friends/VisitDoor";
+import { WorldMates } from "@/components/world3d/friends/WorldMates";
+import { VISIT_HEARTBEAT_MS, answerKnock, endVisit, setVisitBuild, useHostVisits, visitStatus, type KnockAnswer, type VisitGuest } from "@/lib/friend-visits";
+import { NO_POSE, useDemoMate, useWorldTogether, type ExplorerPose, type WorldMate, type WorldNudge } from "@/lib/world-together";
+import { useCanonicalAvatarAppearance } from "@/lib/avatar-appearance";
 import { BattleInviteToast, BattlesPanel, type BattlesPanelStart } from "@/components/world3d/battle/BattlePanels";
 import { battleRoomHref, fetchBattles, readBattleRealm, useOnlineFriends, type Battle, type BattleToPlay } from "@/lib/battles";
 import { VisitBanner, VisitorChangesCard } from "@/components/world3d/friends/FriendVisit";
-import { fetchFriends, fetchFriendWorld, fetchVisitorChanges, friendPageHref, resolveVisitorChange, respondToFriend, visitHref, visitScope, type Friend, type VisitorChange } from "@/lib/friends";
+import { fetchFriends, fetchFriendWorld, fetchVisitorChanges, friendLook, friendPageHref, resolveVisitorChange, respondToFriend, visitHref, visitScope, type Friend, type FriendOutfit, type VisitorChange } from "@/lib/friends";
 import { undoFriendChanges } from "@/lib/world3d/friend-changes";
 import { RexDinosaur } from "@/components/world3d/rex/RexDinosaur";
 import { RexHud } from "@/components/world3d/rex/RexHud";
@@ -371,7 +376,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt }: { waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt, poseRef, mates, matePoses }: { poseRef: React.MutableRefObject<ExplorerPose>; mates: readonly WorldMate[]; matePoses: React.RefObject<Map<string, ExplorerPose>>; waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -547,6 +552,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         hidden={!roaming}
         speed={hubV2 ? 5.6 : 4.2}
         positionRef={avatarPosRef}
+        poseRef={poseRef}
         aimRef={aimRef}
       />
       {boat ? <BoatRider key={boat.nonce} start={boat.start} style={boat.style} waterAt={boatWaterAt} moveInput={moveInput} hudRef={carHud} poseRef={carPose} night={night} /> : null}
@@ -561,6 +567,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
       {walking ? <WalkTapSurface cellSize={buildRules.grid.cellSize} onTap={onWalkTap} /> : null}
       {eraseTarget ? <BuildFootprint placement={eraseTarget.placement} item={eraseTarget.item} tone="blocked" /> : null}
       {hubV2 && !frozen ? <HubWadingRipples positionRef={avatarPosRef} /> : null}
+      <WorldMates mates={mates} poses={matePoses} />
       {hubV2 && rexPhase !== "away" ? <Suspense fallback={null}><RexDinosaur phase={rexPhase} avatarPosRef={avatarPosRef} aimRef={aimRef} groundAt={groundAt} /></Suspense> : null}
       {hubV2 ? <HubAdaptiveResolution /> : null}
       <CentralWorldMetricsReporter quality={quality} />
@@ -771,26 +778,32 @@ export default function CentralWorld() {
       .catch((error) => console.warn("[central-world] account world could not be loaded; using this browser's copy", error));
     return () => { cancelled = true; };
   }, [placementScope, preview, visitId]);
-  // A friend's world: their layout, the items they own (so their homes show their levels and, if they've
-  // let you help build, your build bar holds their items) and whether you may build.
-  const [friendWorld, setFriendWorld] = useState<{ name: string; canBuild: boolean; owned: string[] } | null>(null);
-  useEffect(() => {
-    if (!visitId) return;
+  // A friend's world, once they've let you in (knock first): their layout, the items they own (so their homes
+  // show their levels and, if they've said BUILD, your build bar holds their items) and whether you may build.
+  const [friendWorld, setFriendWorld] = useState<{ visitId: string; name: string; outfit?: FriendOutfit; canBuild: boolean; owned: string[] } | null>(null);
+  // The visit is over (they left, sent you home, or never let you in): the card that takes you home.
+  const [visitOver, setVisitOver] = useState<string | null>(null);
+  const showLayout = useCallback((layout: { placements: unknown[]; groundTiles: unknown[] }) => {
+    applyAccountCentralWorld(placementScope, layout);
+    setPlacedCustomisations(readCentralWorldPlacements(placementScope));
+    setGroundTiles(readCentralWorldGroundTiles(placementScope));
+  }, [placementScope]);
+  const loadFriendWorld = useCallback(() => {
+    if (!visitId) return () => undefined;
     let cancelled = false;
     void fetchFriendWorld(student?.studentId ?? null, preview, visitId)
       .then((world) => {
         if (cancelled || !world) return;
         // The demo has no real friends: it shows its own world as the friend's.
-        const layout = preview ? { placements: readCentralWorldPlacements("demo-preview"), groundTiles: readCentralWorldGroundTiles("demo-preview") } : world;
-        applyAccountCentralWorld(placementScope, layout);
-        setPlacedCustomisations(readCentralWorldPlacements(placementScope));
-        setGroundTiles(readCentralWorldGroundTiles(placementScope));
-        setFriendWorld({ name: world.name, canBuild: world.canBuild, owned: world.owned });
+        // An edit of yours still waiting to save wins; it's about to be sent anyway.
+        if (!hasPendingWorldLayoutSave(placementScope)) showLayout(preview ? { placements: readCentralWorldPlacements("demo-preview"), groundTiles: readCentralWorldGroundTiles("demo-preview") } : world);
+        setFriendWorld({ visitId: world.visitId, name: world.name, outfit: world.outfit, canBuild: world.canBuild, owned: world.owned });
         if (!preview) setOwnedItemKeys(new Set(world.owned));
       })
-      .catch(() => { if (!cancelled) setEconomyMessage("You can't visit that world right now."); });
+      .catch(() => { if (!cancelled) setVisitOver("You need to knock and be let in to visit this world."); });
     return () => { cancelled = true; };
-  }, [visitId, placementScope, preview, student?.studentId]);
+  }, [visitId, placementScope, preview, student?.studentId, showLayout]);
+  useEffect(() => loadFriendWorld(), [loadFriendWorld]);
   const visiting = Boolean(visitId);
   const canBuildHere = !visiting || Boolean(friendWorld?.canBuild);
   // ?friends=1 or ?battles=1 (from the profile page, or REMATCH in the arena) opens that panel straight away;
@@ -833,17 +846,91 @@ export default function CentralWorld() {
     return () => window.clearInterval(poll);
   }, [hubV2, preview, visitId, student?.studentId]);
   const startBattle = useCallback((play: BattleToPlay) => router.push(battleRoomHref(play, preview)), [router, preview]);
-  const goHome = () => router.push(preview ? "/world?teacher_preview=1" : "/world");
-  const visitFriend = (friend: Friend) => router.push(visitHref(friend.studentId, preview));
+  const goHome = () => {
+    if (visiting && friendWorld && !visitOver) void endVisit(student?.studentId ?? null, preview, friendWorld.visitId).catch(() => undefined);
+    router.push(preview ? "/world?teacher_preview=1" : "/world");
+  };
+
+  // Knock to come in. Visitor: knock on a friend's door from the Friends panel and wait to be let in.
+  const [knockingFriend, setKnockingFriend] = useState<Friend | null>(null);
+  // Owner, in their own hub: say "I'm here" so friends can knock, answer knocks, and look after visitors.
+  const studentId = student?.studentId ?? null;
+  const host = useHostVisits(studentId, preview, hubV2 && !visiting && (preview || Boolean(studentId)));
+  const [hostBusy, setHostBusy] = useState(false);
+  // Everyone in this world sees each other's explorers: the owner's world while visiting, else my own.
+  const poseRef = useRef<ExplorerPose>({ ...NO_POSE });
+  const myAppearance = useCanonicalAvatarAppearance(studentId);
+  const me = useMemo(() => (studentId && myAppearance ? { id: studentId, name: student?.displayName?.split(" ")[0] || "Explorer", outfit: myAppearance } : null), [studentId, myAppearance, student?.displayName]);
+  const onWorldNudge = useRef<(nudge: WorldNudge) => void>(() => undefined);
+  const together = useWorldTogether({
+    worldId: visiting ? visitId : studentId, me, poseRef, onNudge: (nudge) => onWorldNudge.current(nudge),
+    enabled: hubV2 && !preview && (visiting ? Boolean(friendWorld) : true),
+  });
+  // Demo and teacher preview: the pretend friend you let in (or are visiting) walks around near you.
+  const demoMate = useMemo<WorldMate | null>(() => {
+    if (!preview) return null;
+    if (visiting) return friendWorld ? { id: `demo-${friendWorld.name}`, name: friendWorld.name, outfit: friendLook(friendWorld.outfit) } : null;
+    const guest = host.visitors[0];
+    return guest ? { id: guest.studentId, name: guest.name, outfit: friendLook(guest.outfit ?? friendsList.find((f) => f.studentId === guest.studentId)?.outfit) } : null;
+  }, [preview, visiting, friendWorld, host.visitors, friendsList]);
+  useDemoMate(demoMate, poseRef, together.poses);
+  const worldMates = preview ? (demoMate ? [demoMate] : []) : together.mates;
+  const hostAct = (job: () => Promise<unknown>) => {
+    setHostBusy(true);
+    void job().catch(() => setEconomyMessage("That didn't work just now. Try again in a moment.")).finally(() => {
+      setHostBusy(false);
+      // Tell the visitor straight away (they also check every few seconds).
+      together.nudge("answer");
+      host.refresh();
+    });
+  };
+  const answerDoor = (guest: VisitGuest, answer: KnockAnswer) => hostAct(() => answerKnock(studentId, preview, guest.visitId, answer));
+  // Visitor: still let in? (every 15 seconds, and at once when the owner answers or switches LOOK/BUILD)
+  const stopBuilding = useRef<() => void>(() => undefined);
+  const checkVisit = useCallback(() => {
+    if (!friendWorld || visitOver) return;
+    void visitStatus(studentId, preview, friendWorld.visitId).then((status) => {
+      if (status.status !== "inside") { stopBuilding.current(); setVisitOver(`${friendWorld.name} had to go, so you're heading home.`); return; }
+      if (status.canBuild !== friendWorld.canBuild) {
+        if (!status.canBuild) stopBuilding.current();
+        setFriendWorld((world) => (world ? { ...world, canBuild: status.canBuild } : world));
+      }
+    }).catch(() => undefined);
+  }, [friendWorld, visitOver, studentId, preview]);
+  useEffect(() => {
+    if (!visiting || !friendWorld || visitOver) return;
+    const beat = window.setInterval(checkVisit, VISIT_HEARTBEAT_MS);
+    return () => window.clearInterval(beat);
+  }, [visiting, friendWorld, visitOver, checkVisit]);
+  useEffect(() => {
+    if (!visitOver) return;
+    const leave = window.setTimeout(() => router.push(preview ? "/world?teacher_preview=1" : "/world"), 4_000);
+    return () => window.clearTimeout(leave);
+  }, [visitOver, router, preview]);
+  // Builds show up for everyone in the world: after a save, nudge; on a nudge, load the latest.
+  const nudgeWorld = together.nudge;
+  useEffect(() => onWorldSaved((scope) => { if (scope === placementScope) nudgeWorld("layout"); }), [placementScope, nudgeWorld]);
+  useEffect(() => {
+    onWorldNudge.current = (nudge) => {
+      if (nudge === "knock" && !visiting) host.refresh();
+      else if (nudge === "answer" && visiting) checkVisit();
+      else if (nudge === "layout") {
+        if (visiting) loadFriendWorld();
+        else if (studentId && !hasPendingWorldLayoutSave(placementScope)) void fetchServerWorldLayout(studentId).then((layout) => { if (layout && !hasPendingWorldLayoutSave(placementScope)) showLayout(layout); }).catch(() => undefined);
+      }
+    };
+  });
   // Back home: what friends changed while you were away, to keep or undo.
   const [visitorChanges, setVisitorChanges] = useState<VisitorChange[]>([]);
   const [resolvingChange, setResolvingChange] = useState(false);
+  // Checked again whenever a visitor leaves, so KEEP IT / UNDO shows once they've gone.
+  const visitorCount = host.visitors.length;
   useEffect(() => {
-    if (visitId || preview || !student?.studentId) return;
+    if (visitId || preview || !student?.studentId || visitorCount > 0) return;
     let cancelled = false;
     void fetchVisitorChanges(student.studentId, false).then((changes) => { if (!cancelled) setVisitorChanges(changes); }).catch(() => undefined);
     return () => { cancelled = true; };
-  }, [visitId, preview, student?.studentId]);
+  }, [visitId, preview, student?.studentId, visitorCount]);
   async function resolveChange(undo: boolean) {
     const change = visitorChanges[0];
     if (!change || !student?.studentId) return;
@@ -1422,6 +1509,8 @@ export default function CentralWorld() {
     setBuildPlacement(null);
     setSelectedPlacementId(null);
   }
+  // Visiting: when the owner switches you back to LOOK (or the visit ends), building stops.
+  useEffect(() => { stopBuilding.current = () => { stopWalkBuild(); closeWorldEditor(); }; });
 
   // ---- Walk-and-place building ----
   const viewFor = (item: EconomyItem): PlaceView => placeViews[itemSize(item, itemGroundSize(item))];
@@ -2081,7 +2170,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} poseRef={poseRef} mates={worldMates} matePoses={together.poses} />
         </CarWorldContext.Provider>
         </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
@@ -2091,13 +2180,17 @@ export default function CentralWorld() {
       </div>
 
       {visiting && friendWorld && !editorOpen && !race && !drive && !boat ? <VisitBanner name={friendWorld.name} canBuild={friendWorld.canBuild} onGoHome={goHome} /> : null}
-      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} online={onlineFriends} onVisit={visitFriend} onChallenge={(friend) => { setFriendsOpen(false); setBattlesOpen({ friendId: friend.studentId }); }} onOpenFriend={(friend) => router.push(friendPageHref(friend.studentId, preview))} onClose={() => setFriendsOpen(false)} /> : null}
-      {friendRequest && !friendsOpen && !battlesOpen && !battleInvite && !visiting ? <FriendRequestToast friend={friendRequest} busy={answeringRequest} onYes={() => answerRequest(friendRequest, true)} onLater={() => setDismissedRequests((list) => [...list, friendRequest.friendshipId])} /> : null}
+      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} online={onlineFriends} onKnock={(friend) => { setFriendsOpen(false); setKnockingFriend(friend); }} onChallenge={(friend) => { setFriendsOpen(false); setBattlesOpen({ friendId: friend.studentId }); }} onOpenFriend={(friend) => router.push(friendPageHref(friend.studentId, preview))} onClose={() => setFriendsOpen(false)} /> : null}
+      {knockingFriend ? <KnockDoor friend={knockingFriend} studentId={studentId} demo={preview} onIn={() => { setKnockingFriend(null); router.push(visitHref(knockingFriend.studentId, preview)); }} onClose={() => setKnockingFriend(null)} /> : null}
+      {!visiting && host.knocks[0] ? <KnockToast guest={host.knocks[0]} buildingEnabled={host.buildingEnabled} busy={hostBusy} onAnswer={(answer) => answerDoor(host.knocks[0], answer)} /> : null}
+      {!visiting && host.visitors.length && !editorOpen ? <VisitorsCard visitors={host.visitors} buildingEnabled={host.buildingEnabled} busy={hostBusy} onSetBuild={(guest, canBuild) => hostAct(() => setVisitBuild(studentId, preview, guest.visitId, canBuild))} onSendHome={(guest) => hostAct(() => endVisit(studentId, preview, guest.visitId))} /> : null}
+      {visitOver ? <VisitOverCard message={visitOver} onGoHome={goHome} /> : null}
+      {friendRequest && !friendsOpen && !battlesOpen && !battleInvite && !visiting && !host.knocks.length ? <FriendRequestToast friend={friendRequest} busy={answeringRequest} onYes={() => answerRequest(friendRequest, true)} onLater={() => setDismissedRequests((list) => [...list, friendRequest.friendshipId])} /> : null}
       {battlesOpen && !visiting ? <BattlesPanel studentId={student?.studentId ?? null} demo={preview} friends={friendsList} online={onlineFriends} start={battlesOpen} onPlay={startBattle} onClose={() => setBattlesOpen(null)} /> : null}
-      {battleInvite && !battlesOpen && !visiting ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({}); }} onDismiss={() => setBattleInvite(null)} /> : null}
-      {!visiting && visitorChanges[0] && !editorOpen && !race && !drive && !boat ? <VisitorChangesCard change={visitorChanges[0]} busy={resolvingChange} onKeep={() => void resolveChange(false)} onUndo={() => void resolveChange(true)} /> : null}
+      {battleInvite && !battlesOpen && !visiting && !host.knocks.length ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({}); }} onDismiss={() => setBattleInvite(null)} /> : null}
+      {!visiting && visitorChanges[0] && !host.visitors.length && !host.knocks.length && !editorOpen && !race && !drive && !boat ? <VisitorChangesCard change={visitorChanges[0]} busy={resolvingChange} onKeep={() => void resolveChange(false)} onUndo={() => void resolveChange(true)} /> : null}
       {!editorOpen && !race && !drive && !boat && hubV2 && !visiting ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onChooseRealm={enterRealmForRex} /> : null}
-      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" hideStreakReminder={visiting} primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),

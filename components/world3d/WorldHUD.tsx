@@ -74,6 +74,7 @@ export function WorldHUD({
   onQuickStart,
   contextAction,
   realmId,
+  hideStreakReminder = false,
 }: {
   context: WorldHUDContext;
   preview?: boolean;
@@ -86,6 +87,8 @@ export function WorldHUD({
   contextAction?: WorldHUDAction;
   /** Realm worlds: colours the logo's Q with the realm's official RELIQS colour. */
   realmId?: CanonicalRealmId;
+  /** Central hub: no streak reminder (while visiting a friend, where the visit banner sits there). */
+  hideStreakReminder?: boolean;
 }) {
   const router = useRouter();
   const [journey, setJourney] = useState<WorldJourney>(fallbackJourney);
@@ -262,7 +265,7 @@ export function WorldHUD({
           </div>
         </div>
 
-        {context === "central" && streak && streak.streak > 0 && !streak.todayDone && !streakReminderClosed ? (
+        {context === "central" && !hideStreakReminder && streak && streak.streak > 0 && !streak.todayDone && !streakReminderClosed ? (
           <div className="worldHudStreakReminder" role="status">
             <span className="worldHudStreakBadge"><StreakFlame className="h-7 w-7" /></span>
             <span className="worldHudStreakText">

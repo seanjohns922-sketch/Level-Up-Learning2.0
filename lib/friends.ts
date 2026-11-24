@@ -1,10 +1,11 @@
 "use client";
-// Friends: add each other with a friend code (never the explorer code), visit worlds, and let chosen
-// friends help build. The server checks everything (see the friends migration); demo and teacher-preview
-// sessions get a pretend friends list that lives in this tab.
+// Friends: add each other (MY CLASS or a friend code, never the explorer code), visit worlds when they let
+// you in (lib/friend-visits.ts), and battle. The server checks everything (see the friends migrations);
+// demo and teacher-preview sessions get a pretend friends list that lives in this tab.
 import type { AvatarOutfit } from "@/components/avatar/StudentAvatar";
 import type { BattleRealm } from "@/lib/battle-questions";
 import { outfitFromLayers } from "@/lib/economy";
+import { demoLetsBuild, demoVisitId } from "@/lib/friend-visits";
 import { supabase } from "@/lib/supabase";
 import type { CentralWorldGroundTile, CentralWorldPlacement } from "@/lib/world3d/central-world-layout";
 
@@ -19,10 +20,6 @@ export type Friend = {
   name: string;
   /** friend: accepted. incoming: they asked me. outgoing: I asked them. */
   status: "friend" | "incoming" | "outgoing";
-  /** May they build in my world? (my switch) */
-  theyCanBuild: boolean;
-  /** May I build in theirs? (their switch) */
-  iCanBuild: boolean;
   friendsSince?: string | null;
   outfit?: FriendOutfit;
 };
@@ -34,10 +31,11 @@ export type FriendBattleResult = { id: string; realm: BattleRealm; at: string; m
 /** A friend's page. Never their level, lesson or quiz results, or RELIQS (those show how far through maths they are). */
 export type FriendProfile = {
   friendshipId: string; studentId: string; name: string; outfit?: FriendOutfit; friendsSince: string | null; sameClass: boolean;
-  theyCanBuild: boolean; iCanBuild: boolean; buildingEnabled: boolean; battlesEnabled: boolean; worldItems: number;
+  battlesEnabled: boolean; worldItems: number;
   record: { won: number; lost: number; drawn: number }; recent: FriendBattleResult[];
 };
-export type FriendWorld = { name: string; placements: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; canBuild: boolean; owned: string[] };
+/** A friend's world while they've let me in: `canBuild` while they've said BUILD. */
+export type FriendWorld = { visitId: string; name: string; outfit?: FriendOutfit; placements: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; canBuild: boolean; owned: string[] };
 export type SendResult = "sent" | "accepted" | "already" | "not_found" | "self" | "off";
 export type VisitorChange = {
   id: string; helperName: string; at: string;
@@ -73,9 +71,9 @@ const DEMO_STATE: FriendsState = {
   buildingEnabled: true,
   hasClass: true,
   friends: [
-    { friendshipId: "demo-1", studentId: "demo-mia", name: "Demo Mia", status: "friend", theyCanBuild: true, iCanBuild: true, friendsSince: "2026-11-02T09:00:00Z", outfit: DEMO_OUTFITS["demo-mia"] },
-    { friendshipId: "demo-2", studentId: "demo-leo", name: "Demo Leo", status: "friend", theyCanBuild: false, iCanBuild: false, friendsSince: "2026-11-16T09:00:00Z", outfit: DEMO_OUTFITS["demo-leo"] },
-    { friendshipId: "demo-3", studentId: "demo-zara", name: "Demo Zara", status: "incoming", theyCanBuild: false, iCanBuild: false, outfit: DEMO_OUTFITS["demo-zara"] },
+    { friendshipId: "demo-1", studentId: "demo-mia", name: "Demo Mia", status: "friend", friendsSince: "2026-11-02T09:00:00Z", outfit: DEMO_OUTFITS["demo-mia"] },
+    { friendshipId: "demo-2", studentId: "demo-leo", name: "Demo Leo", status: "friend", friendsSince: "2026-11-16T09:00:00Z", outfit: DEMO_OUTFITS["demo-leo"] },
+    { friendshipId: "demo-3", studentId: "demo-zara", name: "Demo Zara", status: "incoming", outfit: DEMO_OUTFITS["demo-zara"] },
   ],
 };
 /** The demo class: the demo friends plus two classmates not asked yet. */
@@ -130,7 +128,7 @@ export async function fetchFriendProfile(studentId: string | null, demo: boolean
     const mia = friend.studentId === "demo-mia";
     return {
       friendshipId: friend.friendshipId, studentId: friend.studentId, name: friend.name, outfit: friend.outfit, friendsSince: friend.friendsSince ?? null,
-      sameClass: true, theyCanBuild: friend.theyCanBuild, iCanBuild: friend.iCanBuild, buildingEnabled: true, battlesEnabled: true, worldItems: mia ? 46 : 12,
+      sameClass: true, battlesEnabled: true, worldItems: mia ? 46 : 12,
       record: mia ? { won: 3, lost: 2, drawn: 0 } : { won: 0, lost: 0, drawn: 0 },
       recent: mia ? [
         { id: "demo-r1", realm: "number", at: "2026-11-23T04:00:00Z", myScore: 14, friendScore: 11, won: true, draw: false },
@@ -161,15 +159,11 @@ export async function removeFriend(studentId: string | null, demo: boolean, frie
   if (demo || !studentId) { demoState = { ...demoState, friends: demoState.friends.filter((f) => f.friendshipId !== friendshipId) }; return; }
   await call("remove_friend_secure", { p_student_id: studentId, p_friendship_id: friendshipId });
 }
-export async function setFriendCanBuild(studentId: string | null, demo: boolean, friendshipId: string, canBuild: boolean) {
-  if (demo || !studentId) { demoState = { ...demoState, friends: demoState.friends.map((f) => (f.friendshipId === friendshipId ? { ...f, theyCanBuild: canBuild } : f)) }; return; }
-  await call("set_friend_can_build_secure", { p_student_id: studentId, p_friendship_id: friendshipId, p_can_build: canBuild });
-}
 
 export async function fetchFriendWorld(studentId: string | null, demo: boolean, friendId: string): Promise<FriendWorld | null> {
   if (demo || !studentId) {
     const friend = demoState.friends.find((f) => f.studentId === friendId);
-    return friend ? { name: friend.name, placements: [], groundTiles: [], canBuild: friend.iCanBuild, owned: [] } : null;
+    return friend ? { visitId: demoVisitId(friendId), name: friend.name, outfit: friend.outfit, placements: [], groundTiles: [], canBuild: demoLetsBuild(friendId), owned: [] } : null;
   }
   return call<FriendWorld>("get_friend_world_secure", { p_student_id: studentId, p_friend_id: friendId });
 }

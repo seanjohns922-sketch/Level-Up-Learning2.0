@@ -90,8 +90,29 @@ assert.ok(hub.includes("primaryAction={walkBuild || !canBuildHere ? undefined"),
 assert.ok(hub.includes("<FriendRequestToast ") && hub.includes("onOpenFriend={(friend) => router.push(friendPageHref("), "requests pop up; tapping a friend opens their page");
 assert.ok(read("app/world/friend/page.tsx").includes("<FriendPageEntry />"), "a friend's page has its own route");
 const page = read("components/world3d/friends/FriendPage.tsx");
-assert.ok(page.includes("How to battle") && page.includes("Help build in") && page.includes("in your world") && page.includes("<WorldAccessChoice "), "the page says how to battle, how to build, and VISIT ONLY or CAN HELP BUILD");
-assert.ok(read("components/world3d/friends/FriendBits.tsx").includes("VISIT ONLY") && read("components/world3d/friends/FriendVisit.tsx").includes("Visit only: look around"), "visit-only is said in plain words");
+assert.ok(page.includes("How to battle") && page.includes("Visit {name}") && page.includes("knocks on your door") && page.includes("<KnockDoor "), "the page says how to battle, how to visit and build, and what happens when they knock");
+assert.ok(read("components/world3d/friends/VisitDoor.tsx").includes("LET IN TO LOOK") && read("components/world3d/friends/FriendVisit.tsx").includes("Nothing here changes"), "look-only is said in plain words");
+
+// Knock to come in: only while the owner is in the hub and lets you in; building only while they're there.
+const knockSql = readFileSync(new URL("../supabase/migrations/20261127110000_friend_visits_knock.sql", import.meta.url), "utf8").replace(/^--.*$/gm, "");
+for (const fn of ["host_heartbeat_secure", "host_leave_secure", "knock_secure", "visit_status_secure", "answer_knock_secure", "set_visit_build_secure", "end_visit_secure", "get_friend_world_secure", "save_friend_world_secure"]) {
+  assert.ok(knockSql.includes(`create or replace function public.${fn}(`), fn);
+}
+assert.ok(/knock_secure[\s\S]*student_hub_presence where student_id = p_owner_id and seen_at >= now\(\) - interval '45 seconds'[\s\S]*'offline'/.test(knockSql), "no knocking when the owner isn't in the hub");
+assert.ok(/get_friend_world_secure[\s\S]*visit := public\.live_visit\(p_friend_id, p_student_id\);\s*if visit\.id is null then raise exception 'Not let in'/.test(knockSql), "a friend's world only opens once they've let you in");
+assert.ok(/save_friend_world_secure[\s\S]*live_visit\(p_friend_id, p_student_id\);\s*if visit\.id is null or not visit\.can_build/.test(knockSql), "building needs a live visit the owner said BUILD to");
+assert.ok(/live_visit[\s\S]*owner_seen_at >= now\(\) - interval '45 seconds'/.test(knockSql), "the owner has to be there");
+assert.ok(knockSql.includes("revoke all on function public.set_friend_can_build_secure(uuid, uuid, boolean) from public, anon, authenticated;"), "the old always-on switch is retired");
+assert.ok(!/limit\s+\d|count\(\*\)\s*>=/.test(knockSql.slice(knockSql.indexOf("knock_secure"))), "no cap on visitors");
+const visits = await import("../lib/friend-visits.ts");
+const door = await visits.knock(null, true, "demo-mia");
+assert.equal(door.result, "knocking");
+assert.equal((await visits.visitStatus(null, true, door.visitId)).status, "knocking", "waiting at the door first");
+assert.equal(visits.demoVisitId("demo-mia"), door.visitId);
+await visits.endVisit(null, true, door.visitId);
+assert.equal((await visits.visitStatus(null, true, door.visitId)).status, "ended", "CANCEL ends the knock");
+const hub2 = read("components/world3d/CentralWorld.tsx");
+assert.ok(hub2.includes("<KnockToast ") && hub2.includes("<VisitorsCard ") && hub2.includes("<WorldMates ") && hub2.includes("useHostVisits(") && hub2.includes('nudgeWorld("layout")'), "the hub answers the door, shows visitors and their explorers, and shares builds live");
 assert.ok(read("app/teacher/dashboard/page.tsx").includes("setClassFriends(selectedClassId"), "teachers switch friends per class");
 assert.ok(read("components/parent/ParentPortal.tsx").includes("<ParentFriends "), "parents switch friends per child");
 console.log("friends: codes, visiting, change summaries and undo, server rules, hub, teacher and parent wiring all check out");

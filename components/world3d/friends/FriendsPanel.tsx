@@ -1,14 +1,14 @@
 "use client";
 // The Friends panel in the hub. FRIENDS: requests to say yes to, then a card per friend (their explorer,
-// VISIT WORLD, BATTLE, and VISIT ONLY / CAN HELP BUILD for my world); tap a friend for their own page.
+// KNOCK to visit their world while they're on, and BATTLE); tap a friend for their own page.
 // MY CLASS: classmates to ask with one tap. CODE: friend codes for kids outside the class. No chat anywhere.
-import { Check, ChevronRight, Home, RefreshCw, Swords, X } from "lucide-react";
+import { Check, ChevronRight, DoorOpen, RefreshCw, Swords, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import {
-  FRIEND_CODE_PATTERN, fetchClassmates, fetchFriends, newFriendCode, normaliseFriendCode, respondToFriend, sendClassmateRequest, sendFriendRequest, setFriendCanBuild,
+  FRIEND_CODE_PATTERN, fetchClassmates, fetchFriends, newFriendCode, normaliseFriendCode, respondToFriend, sendClassmateRequest, sendFriendRequest,
   type Classmate, type Friend, type FriendsState, type SendResult,
 } from "@/lib/friends";
-import { FriendFace, GOLD, GREEN, HEADING, LILAC, VIOLET, WorldAccessChoice, howTos, labelStyle, panelStyle, pill, shortDate, stopHub } from "./FriendBits";
+import { FriendFace, GOLD, GREEN, HEADING, LILAC, VIOLET, howTos, labelStyle, panelStyle, pill, shortDate, stopHub } from "./FriendBits";
 
 const SEND_MESSAGES: Record<SendResult, string> = {
   sent: "Friend request sent! They need to say yes.",
@@ -21,9 +21,10 @@ const SEND_MESSAGES: Record<SendResult, string> = {
 const card: React.CSSProperties = { background: "rgba(255,255,255,.06)", border: "1.5px solid rgba(255,255,255,.08)", borderRadius: 18, padding: 12, display: "flex", flexDirection: "column", gap: 10 };
 type Tab = "friends" | "class" | "code";
 
-export function FriendsPanel({ studentId, demo, online, onVisit, onChallenge, onOpenFriend, onClose }: {
+export function FriendsPanel({ studentId, demo, online, onKnock, onChallenge, onOpenFriend, onClose }: {
   studentId: string | null; demo: boolean; online: ReadonlySet<string>;
-  onVisit: (friend: Friend) => void; onChallenge: (friend: Friend) => void; onOpenFriend: (friend: Friend) => void; onClose: () => void;
+  /** KNOCK on a friend's door (only while they're online). */
+  onKnock: (friend: Friend) => void; onChallenge: (friend: Friend) => void; onOpenFriend: (friend: Friend) => void; onClose: () => void;
 }) {
   const [state, setState] = useState<FriendsState | null>(null);
   const [classmates, setClassmates] = useState<Classmate[] | null>(null);
@@ -93,7 +94,8 @@ export function FriendsPanel({ studentId, demo, online, onVisit, onChallenge, on
           </div>
         ))}
         {friends.map((friend) => {
-          const isOnline = online.has(friend.studentId);
+          // Demo friends are always "in".
+          const isOnline = demo || online.has(friend.studentId);
           const since = shortDate(friend.friendsSince);
           return (
             <div key={friend.friendshipId} style={card}>
@@ -102,17 +104,12 @@ export function FriendsPanel({ studentId, demo, online, onVisit, onChallenge, on
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: "block", fontFamily: HEADING, fontWeight: 900, fontSize: 18 }}>{friend.name}</span>
                   <small style={{ display: "block", fontWeight: 700, fontSize: 12, color: isOnline ? GREEN : "#ffffffaa" }}>{isOnline ? "● In the hub now" : since ? `Friends since ${since}` : "Friend"}</small>
-                  <small style={{ display: "block", fontWeight: 600, fontSize: 12, opacity: .75 }}>{friend.iCanBuild ? "You can help build in their world" : "You can visit their world"}</small>
                 </span>
                 <ChevronRight size={20} aria-hidden="true" style={{ opacity: .6 }} />
               </button>
               <div style={{ display: "flex", gap: 8 }}>
-                <button type="button" onClick={() => onVisit(friend)} style={{ ...pill(VIOLET), flex: 1 }}><Home size={16} aria-hidden="true" />VISIT WORLD</button>
+                <button type="button" disabled={!isOnline} onClick={() => onKnock(friend)} style={{ ...pill(isOnline ? VIOLET : "rgba(255,255,255,.08)", isOnline ? "#fff" : "#ffffff99"), flex: 1, cursor: isOnline ? "pointer" : "default" }}><DoorOpen size={16} aria-hidden="true" />{isOnline ? "KNOCK" : "NOT ONLINE"}</button>
                 <button type="button" onClick={() => onChallenge(friend)} style={{ ...pill(GOLD, "#3a2a00"), flex: 1 }}><Swords size={16} aria-hidden="true" />BATTLE</button>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <span style={{ ...labelStyle, fontSize: 11 }}>{friend.name.toUpperCase()} IN YOUR WORLD</span>
-                <WorldAccessChoice compact name={friend.name} canBuild={friend.theyCanBuild} enabled={Boolean(state?.buildingEnabled)} busy={busy} onChange={(build) => void act(() => setFriendCanBuild(studentId, demo, friend.friendshipId, build))} />
               </div>
             </div>
           );

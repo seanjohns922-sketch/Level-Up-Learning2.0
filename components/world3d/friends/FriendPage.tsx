@@ -1,8 +1,8 @@
 "use client";
-// A friend's own page (/world/friend?id=…): their explorer, VISIT WORLD and BATTLE, our battles, and in plain
-// words how to battle, how to help build in their world, and what they can do in mine (VISIT ONLY or CAN
-// HELP BUILD). Never their level, lesson or quiz results, or RELIQS (those show how far through maths they are).
-import { ArrowLeft, Eye, Hammer, Home, Swords, UserMinus } from "lucide-react";
+// A friend's own page (/world/friend?id=…): their explorer, KNOCK and BATTLE, our battles, and in plain words
+// how to battle, how to visit and build in their world, and what happens when they knock on mine. Never their
+// level, lesson or quiz results, or RELIQS (those show how far through maths they are).
+import { ArrowLeft, DoorOpen, Eye, Hammer, Swords, UserMinus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -10,9 +10,10 @@ import StudentAvatar from "@/components/avatar/StudentAvatar";
 import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 import { BATTLE_QUESTIONS } from "@/lib/battle-questions";
 import { battleRoomHref, battlesPanelHref, fetchBattles, useOnlineFriends, type Battle } from "@/lib/battles";
-import { fetchFriendProfile, friendLook, removeFriend, setFriendCanBuild, visitHref, type FriendProfile } from "@/lib/friends";
+import { fetchFriendProfile, friendLook, removeFriend, visitHref, type FriendProfile } from "@/lib/friends";
 import { getRealmDefinition } from "@/lib/realms/realm-registry";
-import { GOLD, GREEN, HEADING, LILAC, VIOLET, WorldAccessChoice, labelStyle, pill, shortDate } from "./FriendBits";
+import { GOLD, GREEN, HEADING, LILAC, VIOLET, labelStyle, pill, shortDate } from "./FriendBits";
+import { KnockDoor } from "./VisitDoor";
 
 const section: React.CSSProperties = {
   background: "linear-gradient(180deg, rgba(44,28,84,.92), rgba(24,16,48,.92))", border: "1.5px solid rgba(233,184,250,.22)", borderRadius: 24,
@@ -30,13 +31,14 @@ function SectionTitle({ icon, colour, children }: { icon: React.ReactNode; colou
   return <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 10, fontFamily: HEADING, fontWeight: 900, fontSize: 20 }}><span aria-hidden="true" style={{ width: 36, height: 36, borderRadius: 12, display: "grid", placeItems: "center", background: `${colour}26`, color: colour }}>{icon}</span>{children}</h2>;
 }
 
-export function FriendPage({ friendId, studentId, myName, demo }: { friendId: string; studentId: string | null; myName: string; demo: boolean }) {
+export function FriendPage({ friendId, studentId, demo }: { friendId: string; studentId: string | null; demo: boolean }) {
   const router = useRouter();
   const [profile, setProfile] = useState<FriendProfile | null | "missing">(null);
   const [battles, setBattles] = useState<Battle[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  const [knocking, setKnocking] = useState(false);
   /** Back to the hub with a panel open (friends=1, battles=1). */
   const hubWith = (query: string) => (demo ? `/world?teacher_preview=1&${query}` : `/world?${query}`);
 
@@ -61,17 +63,14 @@ export function FriendPage({ friendId, studentId, myName, demo }: { friendId: st
   }
 
   const { name } = profile;
+  const canKnock = demo || online;
   const since = shortDate(profile.friendsSince);
   const myTurn = battles.filter((b) => b.status === "active" && b.myScore === null);
   const invited = battles.filter((b) => b.status === "invited" && !b.iChallenged);
   const waitingOnThem = battles.filter((b) => b.status === "active" && b.myScore !== null);
   const { won, lost, drawn } = profile.record;
   const played = won + lost + drawn;
-  const act = async (job: () => Promise<unknown>) => {
-    setBusy(true);
-    try { await job(); await load(); } catch { setMessage("That didn't work just now. Try again in a moment."); }
-    setBusy(false);
-  };
+
 
   return (
     <main style={{ minHeight: "100dvh", background: "radial-gradient(1200px 600px at 20% -10%, #4a2a8a 0%, #1a1036 55%, #0e0820 100%)", color: "#fff", fontFamily: "Inter, system-ui, sans-serif", paddingInline: 16, paddingBlock: "max(16px, env(safe-area-inset-top)) 48px" }}>
@@ -92,7 +91,7 @@ export function FriendPage({ friendId, studentId, myName, demo }: { friendId: st
               {profile.sameClass ? <span style={{ ...labelStyle, background: "rgba(255,255,255,.08)", borderRadius: 99, padding: "5px 12px" }}>IN YOUR CLASS</span> : null}
             </div>
             <div style={{ display: "flex", gap: 10, width: "100%", flexWrap: "wrap" }}>
-              <button type="button" onClick={() => router.push(visitHref(friendId, demo))} style={{ ...pill(VIOLET), flex: "1 1 140px", padding: "15px 14px", fontSize: 16 }}><Home size={19} aria-hidden="true" />VISIT WORLD</button>
+              <button type="button" disabled={!canKnock} onClick={() => setKnocking(true)} style={{ ...pill(canKnock ? VIOLET : "rgba(255,255,255,.08)", canKnock ? "#fff" : "#ffffff99"), flex: "1 1 140px", padding: "15px 14px", fontSize: 16, cursor: canKnock ? "pointer" : "default" }}><DoorOpen size={19} aria-hidden="true" />{canKnock ? "KNOCK" : "NOT ONLINE"}</button>
               {profile.battlesEnabled ? <button type="button" onClick={() => router.push(battlesPanelHref(friendId, demo))} style={{ ...pill(GOLD, "#3a2a00"), flex: "1 1 140px", padding: "15px 14px", fontSize: 16 }}><Swords size={19} aria-hidden="true" />BATTLE</button> : null}
             </div>
             <p style={{ margin: 0, fontSize: 13, opacity: .75 }}>{profile.worldItems ? `${name} has built ${profile.worldItems} thing${profile.worldItems === 1 ? "" : "s"} in their world.` : `${name} hasn't built much yet.`}</p>
@@ -127,31 +126,24 @@ export function FriendPage({ friendId, studentId, myName, demo }: { friendId: st
               ))}</div> : null}
             </section> : null}
 
-            {/* Building in their world. */}
-            <section style={section} aria-label={`Building in ${name}'s world`}>
-              <SectionTitle icon={<Hammer size={20} />} colour={GREEN}>Help build in {name}&apos;s world</SectionTitle>
-              {profile.iCanBuild ? <>
-                <p style={{ margin: 0, fontWeight: 800, color: GREEN }}>✓ {name} said you can help build.</p>
-                <Steps colour={GREEN} items={[
-                  <>Tap <b>VISIT WORLD</b>.</>,
-                  <>Tap <b>BUILD</b> to place, move and paint things, just like in your own world.</>,
-                  <>{name} sees what you changed and can keep it or undo it.</>,
-                ]} />
-              </> : <>
-                <p style={{ margin: 0, fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}><Eye size={17} aria-hidden="true" style={{ flex: "none" }} />Right now you can visit and look around.</p>
-                <Steps colour={LILAC} items={[
-                  <>Ask {name} to open <b>your</b> friend page (or the Friends panel).</>,
-                  <>They choose <b>CAN HELP BUILD</b> for {myName}.</>,
-                  <>Then tap <b>VISIT WORLD</b> and <b>BUILD</b>.</>,
-                ]} />
-              </>}
+            {/* Visiting and building in their world. */}
+            <section style={section} aria-label={`Visiting ${name}'s world`}>
+              <SectionTitle icon={<DoorOpen size={20} />} colour={GREEN}>Visit {name}&apos;s world</SectionTitle>
+              <Steps colour={GREEN} items={[
+                <>{name} needs to be <b>in the hub</b>{online || demo ? <> (<b style={{ color: GREEN }}>they are now!</b>)</> : " (they're not on right now)"}.</>,
+                <>Tap <b>KNOCK</b>. {name} lets you in to <b>LOOK</b> (walk around, nothing changes) or to <b>BUILD</b>.</>,
+                <>Let in to build? Tap <b>BUILD</b> inside. It only works while {name} is there, and they can keep or undo what you made.</>,
+              ]} />
             </section>
 
-            {/* What they can do in my world. */}
-            <section style={section} aria-label={`${name} in your world`}>
-              <SectionTitle icon={<Eye size={20} />} colour={LILAC}>{name} in your world</SectionTitle>
-              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, opacity: .9 }}>Friends can always visit your world. You choose whether {name} can change it.</p>
-              <WorldAccessChoice name={name} canBuild={profile.theyCanBuild} enabled={profile.buildingEnabled} busy={busy} onChange={(build) => void act(() => setFriendCanBuild(studentId, demo, profile.friendshipId, build))} />
+            {/* When they knock on mine. */}
+            <section style={section} aria-label={`${name} visiting your world`}>
+              <SectionTitle icon={<Eye size={20} />} colour={LILAC}>When {name} knocks on your door</SectionTitle>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 8 }}>
+                <div style={{ background: "rgba(233,184,250,.12)", border: `2px solid ${LILAC}66`, borderRadius: 14, padding: 12 }}><span style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: HEADING, fontWeight: 900, fontSize: 13, color: LILAC }}><Eye size={15} aria-hidden="true" />LET IN TO LOOK</span><p style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 600, lineHeight: 1.4 }}>{name} walks around with you. Nothing changes.</p></div>
+                <div style={{ background: "rgba(125,255,138,.1)", border: `2px solid ${GREEN}66`, borderRadius: 14, padding: 12 }}><span style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: HEADING, fontWeight: 900, fontSize: 13, color: GREEN }}><Hammer size={15} aria-hidden="true" />LET IN TO BUILD</span><p style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 600, lineHeight: 1.4 }}>{name} builds while you&apos;re there. Keep it or undo it after.</p></div>
+              </div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, opacity: .85 }}>Or tap <b>NOT NOW</b>. While {name}&apos;s over you can switch between LOOK and BUILD, or send them home, any time. Nobody gets in unless you&apos;re there and say yes.</p>
             </section>
 
             {message ? <p role="status" style={{ margin: 0, fontWeight: 700 }}>{message}</p> : null}
@@ -165,6 +157,7 @@ export function FriendPage({ friendId, studentId, myName, demo }: { friendId: st
           </div>
         </div>
       </div>
+      {knocking ? <KnockDoor friend={{ studentId: friendId, name, outfit: profile.outfit }} studentId={studentId} demo={demo} onIn={() => router.push(visitHref(friendId, demo))} onClose={() => setKnocking(false)} /> : null}
     </main>
   );
 }
