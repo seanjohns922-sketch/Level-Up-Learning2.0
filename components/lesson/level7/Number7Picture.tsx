@@ -253,6 +253,90 @@ function PercentBar({ p }: { p: Extract<Picture, { kind: "percentbar" }> }) {
   </svg>;
 }
 
+function Vertical({ p }: { p: Extract<Picture, { kind: "vertical" }> }) {
+  const vals = [...p.readings.map((r) => r.value), 0], lo = Math.min(...vals), hi = Math.max(...vals), pad = Math.max(2, (hi - lo) * 0.15);
+  const min = lo - pad, max = hi + pad, top = 20, bottom = 230, Y = (v: number) => bottom - ((v - min) / (max - min)) * (bottom - top);
+  const thermo = p.object === "thermometer";
+  return <svg viewBox="0 0 380 260" className="mx-auto block h-auto max-h-[280px] w-full max-w-md" role="img" aria-label={number7PictureSpeech(p)}>
+    {thermo ? <g>
+      <rect x={110} y={top - 6} width={28} height={bottom - top + 12} rx={14} fill="#fff" stroke="#64748b" strokeWidth={3} />
+      <rect x={118} y={Y(Math.max(...p.readings.map((r) => r.value)))} width={12} height={bottom - Y(Math.max(...p.readings.map((r) => r.value)))} rx={6} fill="#ef4444" />
+      <circle cx={124} cy={bottom + 12} r={16} fill="#ef4444" stroke="#64748b" strokeWidth={3} />
+    </g> : <g>
+      <rect x={60} y={top} width={160} height={Y(0) - top} fill="#e0f2fe" />
+      <rect x={60} y={Y(0)} width={160} height={bottom - Y(0)} fill="#0ea5e9" opacity={0.75} />
+      <path d={`M60 ${Y(0)}q20 -6 40 0t40 0 40 0 40 0`} stroke="#e0f2fe" strokeWidth={2} fill="none" />
+    </g>}
+    {thermo ? <g><line x1={150} y1={Y(0)} x2={170} y2={Y(0)} stroke={INK} strokeWidth={2} /><text x={176} y={Y(0) + 5} fontSize={13} fill={INK} {...FONT}>0 °C</text></g>
+      : <text x={66} y={Y(0) + 18} fontSize={12} fill="#fff" {...FONT}>sea level (0 m)</text>}
+    {p.readings.map((r, i) => <g key={i}>
+      <circle cx={thermo ? 124 : 140} cy={Y(r.value)} r={6} fill={TEAL} stroke="#fff" strokeWidth={2} />
+      <line x1={thermo ? 140 : 150} y1={Y(r.value)} x2={thermo ? 200 : 228} y2={Y(r.value)} stroke={TEAL} strokeWidth={1.5} strokeDasharray="3 3" />
+      <Chip x={thermo ? 270 : 300} y={Y(r.value) + 5} text={r.label} size={13} />
+    </g>)}
+    <Chip x={190} y={252} text={`? ${p.ask}`} size={13} />
+  </svg>;
+}
+
+function Moves({ p }: { p: Extract<Picture, { kind: "moves" }> }) {
+  const stops = p.moves.reduce<number[]>((acc, m) => [...acc, acc[acc.length - 1] + m], [p.start]);
+  const lo = Math.min(...stops, 0), hi = Math.max(...stops, 0), pad = Math.max(1, (hi - lo) * 0.08), X = (v: number) => 30 + ((v - lo + pad) / (hi - lo + 2 * pad)) * 340;
+  const rise = 36;
+  return <svg viewBox={`0 0 400 ${130 + p.moves.length * rise}`} className="mx-auto block h-auto max-h-[260px] w-full" role="img" aria-label={number7PictureSpeech(p)}>
+    <defs><marker id="n7-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#d48a10" /></marker></defs>
+    {(() => { const y = 70 + p.moves.length * rise; return <g>
+      <line x1={20} y1={y} x2={380} y2={y} stroke={INK} strokeWidth={2.5} />
+      <line x1={X(0)} y1={y - 9} x2={X(0)} y2={y + 9} stroke={INK} strokeWidth={2.5} /><text x={X(0)} y={y + 28} textAnchor="middle" fontSize={15} fill={INK} {...FONT}>0</text>
+      <circle cx={X(p.start)} cy={y} r={7} fill={TEAL} /><Chip x={X(p.start)} y={y + 30} text={p.startLabel} size={13} />
+      <circle cx={X(stops[stops.length - 1])} cy={y} r={7} fill={UNKNOWN} stroke="#b86e00" />
+      {p.moves.map((m, i) => { const yy = 40 + i * rise; return <g key={i}>
+        <line x1={X(stops[i])} y1={yy} x2={X(stops[i + 1])} y2={yy} stroke="#d48a10" strokeWidth={3} markerEnd="url(#n7-arrow)" />
+        <text x={(X(stops[i]) + X(stops[i + 1])) / 2} y={yy - 6} textAnchor="middle" fontSize={12} fill="#7a3e00" {...FONT}>{p.moveLabels[i]}</text>
+      </g>; })}
+      <Chip x={200} y={y + 58} text={`? ${p.ask}`} size={13} />
+    </g>; })()}
+  </svg>;
+}
+
+function Receipt({ p }: { p: Extract<Picture, { kind: "receipt" }> }) {
+  const h = 70 + p.lines.length * 30 + 44;
+  return <svg viewBox={`0 0 340 ${h + 10}`} className="mx-auto block h-auto max-h-[260px] w-full max-w-sm" role="img" aria-label={number7PictureSpeech(p)}>
+    <path d={`M40 10h260v${h - 20}l-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10-13 10-13-10z`} fill="#fffdf7" stroke="#d6d3c7" strokeWidth={1.5} />
+    <text x={170} y={42} textAnchor="middle" fontSize={16} fill={INK} {...FONT}>{p.title.toUpperCase()}</text>
+    <line x1={60} x2={280} y1={56} y2={56} stroke="#cbd5e1" strokeDasharray="4 4" />
+    {p.lines.map(([a, b], i) => <g key={i}><text x={60} y={84 + i * 30} fontSize={15} fill={INK} fontFamily="ui-monospace, Menlo, monospace">{a}</text><text x={280} y={84 + i * 30} textAnchor="end" fontSize={15} fill={INK} fontFamily="ui-monospace, Menlo, monospace">{b}</text></g>)}
+    <line x1={60} x2={280} y1={66 + p.lines.length * 30} y2={66 + p.lines.length * 30} stroke="#cbd5e1" strokeDasharray="4 4" />
+    <Chip x={170} y={94 + p.lines.length * 30} text={`? ${p.ask}`} size={14} />
+  </svg>;
+}
+
+function Jugs({ p }: { p: Extract<Picture, { kind: "jugs" }> }) {
+  const cap = Math.max(1, ...p.jugs.map((j) => j.amount)), H = 140, W = 90, gap = 40, total = p.jugs.length * W + (p.jugs.length - 1) * gap, x0 = (380 - total) / 2;
+  return <svg viewBox="0 0 380 240" className="mx-auto block h-auto max-h-[260px] w-full" role="img" aria-label={number7PictureSpeech(p)}>
+    <defs><linearGradient id="n7-juice" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#7dd3fc" /><stop offset="1" stopColor="#0284c7" /></linearGradient></defs>
+    {p.jugs.map((j, i) => { const x = x0 + i * (W + gap), fill = (j.amount / cap) * (H - 10); return <g key={i}>
+      <rect x={x} y={30 + H - fill} width={W} height={fill} fill={j.role === "use" ? "#fca5a5" : "url(#n7-juice)"} opacity={0.9} />
+      <path d={`M${x} 30v${H}h${W}V30`} fill="none" stroke="#334155" strokeWidth={4} strokeLinejoin="round" />
+      <path d={`M${x + W} 50q22 0 22 30t-22 30`} fill="none" stroke="#334155" strokeWidth={4} />
+      <Chip x={x + W / 2} y={30 + H + 26} text={j.label} size={13} />
+    </g>; })}
+    <Chip x={190} y={226} text={`? ${p.ask}`} size={13} />
+  </svg>;
+}
+
+function BarModel({ p }: { p: Extract<Picture, { kind: "barmodel" }> }) {
+  const L = 30, Wd = 340, part = Wd / p.a, takenW = part * p.b, sub = takenW / p.c;
+  return <svg viewBox="0 0 400 210" className="mx-auto block h-auto max-h-[240px] w-full" role="img" aria-label={number7PictureSpeech(p)}>
+    <Chip x={200} y={18} text={p.whole} size={14} />
+    {Array.from({ length: p.a }, (_, i) => <rect key={i} x={L + i * part} y={34} width={part} height={42} fill={i < p.b ? TEAL_FILL : "#fff"} stroke={TEAL} strokeWidth={1.8} />)}
+    <text x={L + takenW / 2} y={96} textAnchor="middle" fontSize={13} fill={TEAL} {...FONT}>{p.first}</text>
+    <path d={`M${L} 104L${L} 120M${L + takenW} 104L${L + takenW} 120`} stroke="#94a3b8" strokeDasharray="3 3" />
+    {Array.from({ length: p.c }, (_, i) => <rect key={i} x={L + i * sub} y={120} width={sub} height={42} fill={i < p.d ? "#ffd28a" : "#ecfeff"} stroke="#d48a10" strokeWidth={1.8} />)}
+    <text x={L + (sub * p.d) / 2} y={182} textAnchor="middle" fontSize={13} fill="#7a3e00" {...FONT}>{p.second}</text>
+    <Chip x={L + (sub * p.d) / 2} y={202} text="?" size={13} />
+  </svg>;
+}
+
 export default function Number7Picture({ picture }: { picture: Picture }) {
   return <figure className="m-0 rounded-2xl border border-[#d6e6e2] bg-gradient-to-b from-[#eef8f5] to-[#e2f2ee] p-3 text-slate-900 sm:p-4">
     <div className="mb-2 flex items-center justify-between gap-3"><figcaption className="font-bold">{picture.title}</figcaption><ReadAloudBtn text={number7PictureSpeech(picture)} label="Read diagram" /></div>
@@ -271,5 +355,10 @@ export default function Number7Picture({ picture }: { picture: Picture }) {
     {picture.kind === "tank" && <Tank p={picture} />}
     {picture.kind === "lengths" && <Lengths p={picture} />}
     {picture.kind === "percentbar" && <PercentBar p={picture} />}
+    {picture.kind === "vertical" && <Vertical p={picture} />}
+    {picture.kind === "moves" && <Moves p={picture} />}
+    {picture.kind === "receipt" && <Receipt p={picture} />}
+    {picture.kind === "jugs" && <Jugs p={picture} />}
+    {picture.kind === "barmodel" && <BarModel p={picture} />}
   </figure>;
 }

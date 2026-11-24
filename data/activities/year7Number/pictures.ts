@@ -33,7 +33,17 @@ export type Number7Picture =
   /** Lengths of rope or ribbon laid end to end. */
   | { kind: "lengths"; title: string; object: "rope" | "ribbon"; pieces: { length: number; label: string; cut?: boolean }[]; ask: string }
   /** A whole (100%) with part of it marked; the unknown is shown as "?". */
-  | { kind: "percentbar"; title: string; whole: string; part: number; partLabel: string; of: number; ask: string };
+  | { kind: "percentbar"; title: string; whole: string; part: number; partLabel: string; of: number; ask: string }
+  /** A thermometer or sea-level scale with labelled readings; only the labelled values are shown. */
+  | { kind: "vertical"; title: string; object: "thermometer" | "sea"; unit: string; readings: { value: number; label: string }[]; ask: string }
+  /** Moves along a number line, drawn to scale; only zero and the start are labelled, so the end must be worked out. */
+  | { kind: "moves"; title: string; start: number; startLabel: string; moves: number[]; moveLabels: string[]; ask: string }
+  /** A receipt: given lines and the unknown total. */
+  | { kind: "receipt"; title: string; lines: [string, string][]; ask: string }
+  /** Measuring jugs; each holds a labelled amount out of `of` litres, drawn to scale. */
+  | { kind: "jugs"; title: string; jugs: { amount: number; label: string; role?: "add" | "use" | "result" }[]; ask: string }
+  /** A bar model for a fraction of a fraction: whole split into `a` parts, `b` taken, then that part split into `c`, `d` taken. */
+  | { kind: "barmodel"; title: string; whole: string; a: number; b: number; c: number; d: number; first: string; second: string };
 
 const n = (s: string) => Number(s.replace(/,/g, ""));
 const side = (area: number) => Math.sqrt(area);
@@ -75,6 +85,16 @@ export function number7PictureSpeech(p: Number7Picture): string {
       return `${p.title}. A tank holding ${p.capacity}, split into ${p.parts} equal parts; ${p.used} parts are used.`;
     case "lengths":
       return `${p.title}. Pieces of ${p.object}: ${p.pieces.map((q) => `${q.label}${q.cut ? " cut off" : ""}`).join(", ")}. Find ${p.ask}.`;
+    case "vertical":
+      return `${p.title}. A ${p.object === "sea" ? "sea-level scale with 0 at sea level" : "thermometer"}. ${p.readings.map((r) => r.label).join(". ")}. Find ${p.ask}.`;
+    case "moves":
+      return `${p.title}. A number line with 0 marked. Start at ${p.startLabel}. ${p.moveLabels.join(", then ")}. Find ${p.ask}.`;
+    case "receipt":
+      return `${p.title}. ${p.lines.map(([a, b]) => `${a}: ${b}`).join(". ")}. Find ${p.ask}.`;
+    case "jugs":
+      return `${p.title}. ${p.jugs.map((j) => j.label).join(". ")}. Find ${p.ask}.`;
+    case "barmodel":
+      return `${p.title}. A bar for ${p.whole}, split into ${p.a} equal parts with ${p.b} marked: ${p.first}. That part is split into ${p.c} equal parts with ${p.d} marked: ${p.second}.`;
     case "percentbar":
       return `${p.title}. A bar showing ${p.whole} as 100 percent, with ${p.partLabel} marked. Find the ${p.ask.replace("%", "percentage")}.`;
   }
@@ -141,6 +161,32 @@ const RULES: Rule[] = [
   [/Which pair equals (\d+)%\?/, (m) => ({ kind: "fractionbar", title: `${m[1]}% of a hundred grid`, parts: 100, shaded: n(m[1]), grid: true })],
   [/^(\d+) of a club's (\d+) members attend/, (m) => ({ kind: "percentbar", title: "Club attendance", whole: `${m[2]} members`, part: n(m[1]), of: n(m[2]), partLabel: `${m[1]} attend`, ask: "% attend" })],
   [/A \$(\d+) jacket is reduced by (\d+)%/, (m) => ({ kind: "percentbar", title: "Jacket sale", whole: `$${m[1]}`, part: n(m[2]), of: 100, partLabel: `${m[2]}% off`, ask: "sale price" })],
+
+  // Week 5 Lesson 1
+  [/Four sites have elevations ([-−\d, ]+) m\./, (m) => { const vs = m[1].split(",").map((x) => Number(x.trim().replace("−", "-"))); return { kind: "vertical", title: "Site elevations", object: "sea", unit: "m", readings: vs.map((v) => ({ value: v, label: `${String(v).replace("-", "−")} m` })), ask: "the gap from lowest to highest" }; }],
+  [/temperature was ([-−]?\d+) °C at (\d+ [ap]m) and ([-−]?\d+) °C at (\d+ [ap]m)/, (m) => ({ kind: "vertical", title: "Temperature", object: "thermometer", unit: "°C", readings: [{ value: Number(m[1].replace("−", "-")), label: `${m[2]}: ${m[1].replace("-", "−")} °C` }, { value: Number(m[3].replace("−", "-")), label: `${m[4]}: ${m[3].replace("-", "−")} °C` }], ask: "the rise" })],
+  // Week 5 Lesson 2
+  [/diver starts at ([-−]\d+) m relative to sea level, rises (\d+) m, then descends (\d+) m/, (m) => { const s0 = Number(m[1].replace("−", "-")); return { kind: "moves", title: "Diver's moves", start: s0, startLabel: `${m[1].replace("-", "−")} m`, moves: [n(m[2]), -n(m[3])], moveLabels: [`up ${m[2]} m`, `down ${m[3]} m`], ask: "the final position" }; }],
+  [/bank balance is [-−]\$(\d+)\. How much must she deposit to have \$(\d+)/, (m) => ({ kind: "moves", title: "Bank balance", start: -n(m[1]), startLabel: `−$${m[1]}`, moves: [n(m[1]) + n(m[2])], moveLabels: [`deposit ? to reach $${m[2]}`], ask: "the deposit" })],
+  // Week 5 Lesson 3
+  [/account balance is [-−]\$(\d+)\. A charge of \$(\d+) is made, then a mistaken debit of \$(\d+) is reversed/, (m) => ({ kind: "moves", title: "Account balance", start: -n(m[1]), startLabel: `−$${m[1]}`, moves: [-n(m[2]), n(m[3])], moveLabels: [`charge $${m[2]}`, `$${m[3]} given back`], ask: "the final balance" })],
+  [/Five daily temperature changes are ([+−\-\d, and]+) °C/, (m) => { const vs = m[1].replace(" and ", ", ").split(",").map((x) => Number(x.trim().replace("−", "-").replace("+", ""))); return { kind: "moves", title: "Five days of changes", start: 0, startLabel: "start", moves: vs, moveLabels: vs.map((v) => `${v > 0 ? "+" : "−"}${Math.abs(v)} °C`), ask: "the overall change" }; }],
+  // Week 6 Lesson 3
+  [/At dawn it is ([-−][\d ]+(?:\/\d+)?) °C\. At noon it is (\d+) °C/, (m) => { const dawn = -mixed(m[1].replace(/[-−]/, "")); return Number.isFinite(dawn) ? { kind: "vertical", title: "Temperature", object: "thermometer", unit: "°C", readings: [{ value: dawn, label: `Dawn: ${m[1].replace("-", "−").trim()} °C` }, { value: n(m[2]), label: `Noon: ${m[2]} °C` }], ask: "the rise" } : undefined; }],
+  // Week 7 Lesson 1
+  [/^Fabric: (\d+) m at \$([\d.]+) per metre/, (m) => ({ kind: "receipt", title: "Fabric order", lines: [["Fabric", `${m[1]} m`], ["Price per metre", `$${m[2]}`]], ask: "total, to the cent" })],
+  [/^(\d+) friends share a \$([\d.]+) bill equally/, (m) => ({ kind: "receipt", title: "Shared bill", lines: [["Bill total", `$${m[2]}`], ["Friends sharing", m[1]]], ask: "each share, to the cent" })],
+  // Week 7 Lesson 3
+  [/Estimate the cost of (\d+) items at \$([\d.]+) each plus \$(\d+) delivery/, (m) => ({ kind: "receipt", title: "Order estimate", lines: [[`Items × ${m[1]}`, `$${m[2]} each`], ["Delivery", `$${m[3]}`]], ask: "estimated total" })],
+  // Week 8 Lesson 1
+  [/^A jug holds (\d+\/\d+) L\. (Add|Use) (\d+\/\d+) L/, (m) => ({ kind: "jugs", title: "Measuring jugs", jugs: [{ amount: mixed(m[1]), label: `In the jug: ${m[1]} L` }, { amount: mixed(m[3]), label: `${m[2] === "Add" ? "Added" : "Used"}: ${m[3]} L`, role: m[2] === "Add" ? "add" : "use" }], ask: m[2] === "Add" ? "litres now" : "litres left" })],
+  [/One jug holds (\d+\/\d+) L of water and another holds (\d+\/\d+) L/, (m) => ({ kind: "jugs", title: "Two jugs poured together", jugs: [{ amount: mixed(m[1]), label: `Jug 1: ${m[1]} L` }, { amount: mixed(m[2]), label: `Jug 2: ${m[2]} L` }], ask: "litres in the third jug" })],
+  // Week 8 Lesson 2
+  [/tank holds (\d+) L\. First (\d+)\/(\d+) of the water is set aside\. Then (\d+)\/(\d+) of that amount is used/, (m) => ({ kind: "barmodel", title: "Bar model", whole: `${m[1]} L`, a: n(m[3]), b: n(m[2]), c: n(m[5]), d: n(m[4]), first: `${m[2]}/${m[3]} set aside`, second: `${m[4]}/${m[5]} of that used` })],
+  [/class has (\d+) students\. (\d+)\/(\d+) of them play sport, and (\d+)\/(\d+) of those play netball/, (m) => ({ kind: "barmodel", title: "Bar model", whole: `${m[1]} students`, a: n(m[3]), b: n(m[2]), c: n(m[5]), d: n(m[4]), first: `${m[2]}/${m[3]} play sport`, second: `${m[4]}/${m[5]} of those play netball` })],
+  // Week 8 Lesson 3
+  [/You have (\d+\/\d+) L of juice\. Each bottle holds (\d+\/\d+) L/, (m) => ({ kind: "jugs", title: "Juice and bottles", jugs: [{ amount: mixed(m[1]), label: `Juice: ${m[1]} L` }, { amount: mixed(m[2]), label: `One bottle: ${m[2]} L`, role: "result" }], ask: "full bottles" })],
+  [/A ribbon (\d+) m long is cut into pieces (\d+\/\d+) m long/, (m) => { const piece = mixed(m[2]), total = n(m[1]); return { kind: "lengths", title: "Cutting the ribbon", object: "ribbon", pieces: [{ length: piece, label: `${m[2]} m` }, { length: piece, label: `${m[2]} m` }, { length: total - 2 * piece, label: `… ${m[1]} m in all` }], ask: "complete pieces" }; }],
 ];
 
 export function number7Picture(prompt: string): Number7Picture | undefined {
