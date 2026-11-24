@@ -7,6 +7,8 @@ import { TrialStudentAvatar, type WorldMoveInput, type WorldLookInput } from './
 import { TRAIL_SAMPLES, nearestTrail } from '@/lib/world3d/expedition-crossroads';
 import { summitFloor, type SummitPoint } from '@/lib/world3d/number-summit';
 
+/** How close to a trail's cave gate the Enter prompt appears; covers the spot students return to. */
+const GATE_REACH=10;
 export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn,spawnKey,paused,overview,position,onNearest,onAltitude,floorResolver,nearestResolver}:{move:WorldMoveInput;look:WorldLookInput;unlocked:number;volcanoOpen:boolean;spawn:SummitPoint;spawnKey:number;paused:boolean;overview:boolean;position:MutableRefObject<THREE.Vector3>;onNearest:(index:number|null)=>void;onAltitude:(height:number)=>void;floorResolver?:(x:number,z:number)=>number|null;nearestResolver?:(x:number,z:number)=>number|null}){
  const group=useRef<THREE.Group>(null),keys=useRef(new Set<string>()),moving=useRef(false),sprinting=useRef(false),yaw=useRef(0),pitch=useRef(.04),nearest=useRef<number|null>(null),lastHeight=useRef(-1),snapCamera=useRef(true);
  const {camera,gl}=useThree();
@@ -60,7 +62,7 @@ export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn
   const safeDesired=safeCamera(desired);
   if(snapCamera.current){camera.position.copy(safeDesired);snapCamera.current=false;}else camera.position.lerp(safeDesired,1-Math.exp(-delta*5));
   camera.position.copy(safeCamera(camera.position.clone()));camera.lookAt(target);
-  let close:number|null=nearestResolver?nearestResolver(g.position.x,g.position.z):null;if(!nearestResolver)TRAIL_SAMPLES.forEach((path,i)=>{const p=path[58];if(Math.hypot(g.position.x-p[0],g.position.z-p[2])<6&&Math.abs(g.position.y-.75-p[1])<2)close=i;});
+  let close:number|null=nearestResolver?nearestResolver(g.position.x,g.position.z):null;if(!nearestResolver)TRAIL_SAMPLES.forEach((path,i)=>{const p=path[58];if(Math.hypot(g.position.x-p[0],g.position.z-p[2])<GATE_REACH&&Math.abs(g.position.y-.75-p[1])<2)close=i;});
   if(close!==nearest.current){nearest.current=close;onNearest(close);}
   const altitude=Math.max(0,Math.round(g.position.y-.75));if(altitude!==lastHeight.current){lastHeight.current=altitude;onAltitude(altitude);}
  });

@@ -10,7 +10,5 @@
 .cavern-help{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:min(90vw,540px);background:var(--cavern-surface);border:1px solid var(--cavern-border);border-radius:16px;padding:18px;box-shadow:0 8px 30px #0005}.cavern-help h2{font-size:22px;font-weight:900}.cavern-help p{font-size:13px;line-height:1.6;margin:8px 0 14px}.cavern-help button{margin:8px}
 .cavern-world button:focus-visible,.cavern-world a:focus-visible,.cavern-world select:focus-visible{outline:3px solid var(--cavern-accent);outline-offset:3px}
 .cavern-world .summit-action>span{background:var(--cavern-surface);border:1px solid var(--cavern-border);color:var(--cavern-accent)}
-/* Mouse and keyboard: walk with WASD, so the touch sticks and buttons stay hidden. */
-@media (hover:hover) and (pointer:fine){.cavern-world [data-world-joystick],.cavern-world [data-world-jump],.cavern-world [data-world-sprint]{display:none!important}}
 @media(max-width:900px){.cavern-exits{order:9;width:100%;justify-content:flex-end}}
 @media(max-width:700px){.cavern-bar{left:10px;right:10px;top:56px;padding:8px}.cavern-title h1{font-size:16px}.cavern-title small{font-size:8px}.cavern-jump span{display:none}.cavern-exits a{font-size:11px;padding:8px}.cavern-world .summit-action{bottom:140px}}

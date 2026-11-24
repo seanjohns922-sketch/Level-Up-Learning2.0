@@ -19,6 +19,8 @@ class SummitErrorBoundary extends Component<{children:ReactNode},{failed:boolean
  state={failed:false};static getDerivedStateFromError(){return {failed:true};}
  render(){return this.state.failed?<div className="summit-fallback"><h2>The expedition could not open</h2><p>Try reloading in a browser with WebGL enabled.</p><a href="/world/tower">Back to tower</a></div>:this.props.children;}
 }
+/** Coming back from a cave, stand a few steps down the trail so the whole gate is in view. */
+const RETURN_SAMPLE=55;
 type Dialog='menu'|'help'|'map'|'pass'|{realm:number;level:7|8}|null;
 import type {ExpeditionAccess,ExpeditionRealm} from '@/lib/world3d/expedition-access';
 export default function NumberAdventure3DWorld({access}:{access?:ExpeditionAccess}){
@@ -34,7 +36,7 @@ export default function NumberAdventure3DWorld({access}:{access?:ExpeditionAcces
  const [move,setMove]=useState(EMPTY_WORLD_MOVE_INPUT),[look,setLook]=useState(EMPTY_WORLD_LOOK_INPUT);
  const [nearest,setNearest]=useState<number|null>(null),[nearVolcano,setNearVolcano]=useState<number|null>(null);
  const [trailIndex,setTrailIndex]=useState<number|null>(null),[onVolcano,setOnVolcano]=useState(false),[altitude,setAltitude]=useState(0);
- const [spawn,setSpawn]=useState<SummitPoint>(summitReturn?VOLCANO_SUMMIT:returnTrail>=0?TRAIL_SAMPLES[returnTrail][57]:EXPEDITION_START),[spawnKey,setSpawnKey]=useState(0);
+ const [spawn,setSpawn]=useState<SummitPoint>(summitReturn?VOLCANO_SUMMIT:returnTrail>=0?TRAIL_SAMPLES[returnTrail][RETURN_SAMPLE]:EXPEDITION_START),[spawnKey,setSpawnKey]=useState(0);
  const position=useRef(new THREE.Vector3(0,.75,87)),action=useRef<()=>void>(()=>{}),actionButton=useRef<HTMLButtonElement>(null);
  function stop(){setMove(EMPTY_WORLD_MOVE_INPUT);setLook(EMPTY_WORLD_LOOK_INPUT);}
  function open(d:Dialog){if(d==='map')setMapPosition([position.current.x,position.current.z]);setDialog(d);stop();}

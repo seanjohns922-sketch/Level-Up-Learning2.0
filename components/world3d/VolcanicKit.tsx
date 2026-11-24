@@ -130,8 +130,9 @@ export function Brazier({at,colour='#ff7a2a',scale=1,light=false}:{at:SummitPoin
  </group>;
 }
 
-const ARCH_RADIUS=2.25,ARCH_SPRING=5.05;
-function archShape(){const s=new THREE.Shape();s.moveTo(-ARCH_RADIUS,0);s.lineTo(-ARCH_RADIUS,ARCH_SPRING);s.absarc(0,ARCH_SPRING,ARCH_RADIUS,Math.PI,0,true);s.lineTo(ARCH_RADIUS,0);s.closePath();return new THREE.ShapeGeometry(s,24);}
+export const ARCH_RADIUS=2.25,ARCH_SPRING=5.05;
+/** The archway opening (x from −radius to radius, y from 0 to spring + radius), shared by portals and windows. */
+export function archShape(){const s=new THREE.Shape();s.moveTo(-ARCH_RADIUS,0);s.lineTo(-ARCH_RADIUS,ARCH_SPRING);s.absarc(0,ARCH_SPRING,ARCH_RADIUS,Math.PI,0,true);s.lineTo(ARCH_RADIUS,0);s.closePath();return new THREE.ShapeGeometry(s,24);}
 const PORTAL_VERTEX=`varying vec2 vPos;void main(){vPos=position.xy;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
 // A dark, still doorway with a faint drift of the realm's colour: no glow, no bloom.
 const PORTAL_FRAGMENT=`uniform float uTime;uniform vec3 uA;uniform vec3 uB;varying vec2 vPos;

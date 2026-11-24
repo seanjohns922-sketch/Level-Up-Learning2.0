@@ -2,7 +2,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import WorldPlaque from './WorldPlaque';
-import {Brazier,StoneArch} from './VolcanicKit';
+import {ARCH_RADIUS,ARCH_SPRING,Brazier,StoneArch,archShape} from './VolcanicKit';
+import {useTexture} from '@react-three/drei';
 import ExpeditionForest from './ExpeditionForest';
 import ExpeditionDistanceDetail from './ExpeditionDistanceDetail';
 import * as THREE from 'three';
@@ -45,11 +46,21 @@ function Waymark({index}:{index:number}){
   {[0,Math.PI].map(a=><mesh key={a} rotation={[0,a,0]} position={[0,3,a===0?.15:-.15]}><planeGeometry args={[4.5,1.12]}/><meshBasicMaterial map={label} toneMapped={false} fog={false}/></mesh>)}
  </group>;
 }
-/** The Level 7 lesson gate at the end of each trail: a stone archway that opens in the realm's colour. */
+/** Cave art the arch frames (1672 × 941), shown as a centred vertical slice so the gate looks into the realm. */
+const CAVE_ART_ASPECT=1672/941,ARCH_HEIGHT=ARCH_SPRING+ARCH_RADIUS;
+function CaveWindow({realm}:{realm:string}){
+ const art=useTexture(`/images/shattered-realms/${realm}-cavern.webp`),shape=useMemo(()=>archShape(),[]);
+ // Shape UVs are raw arch coordinates; scale them into a slice of the landscape art centred a little right of middle.
+ const map=useMemo(()=>{const t=art.clone();t.colorSpace=THREE.SRGBColorSpace;const slice=(2*ARCH_RADIUS/ARCH_HEIGHT)/CAVE_ART_ASPECT;t.repeat.set(slice/(2*ARCH_RADIUS),1/ARCH_HEIGHT);t.offset.set(.56,0);t.needsUpdate=true;return t;},[art]);
+ useEffect(()=>()=>{shape.dispose();map.dispose();},[shape,map]);
+ return <mesh geometry={shape} position={[0,.35,.08]}><meshBasicMaterial map={map} toneMapped={false} side={THREE.DoubleSide}/></mesh>;
+}
+/** The Level 7 lesson gate at the end of each trail: a stone archway that opens onto the realm's cave. */
 function Barrier({index,open}:{index:number;open:boolean}){
  const path=TRAIL_SAMPLES[index],p=path[58],n=path[60],angle=Math.atan2(n[0]-p[0],n[2]-p[2]),t=EXPEDITION_TRAILS[index];
  return <group position={p} rotation={[0,angle+Math.PI,0]}>
   <StoneArch colour={t.colour} open={open} seed={index} brightness={1.3}/>
+  {open&&<CaveWindow realm={t.id}/>}
   <Brazier at={[-4.4,0,1.2]} colour={t.colour}/><Brazier at={[4.4,0,1.2]} colour={t.colour}/>
   <WorldPlaque at={[0,10.4,.4]} title={t.name.toUpperCase()} subtitle={open?'LEVEL 7 · WEEKLY LESSONS':'LEVEL 7 · LOCKED'} width={8} colour={t.colour}/>
  </group>;
