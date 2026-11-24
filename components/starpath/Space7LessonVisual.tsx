@@ -1,6 +1,6 @@
 'use client';
 import ReadAloudBtn from '@/components/ReadAloudBtn';
-import {CubeNet} from './Level5StarpathAssessmentCard';
+import {PremiumCubeNet} from './Space7Net';
 import {Plans,Plane} from './Level7StarpathAssessmentCard';
 import Level7Flowchart from './Level7Flowchart';
 import {PrismDrawing,SolidNetDrawing,FootprintDrawing,LessonPolygon} from './Space7Solids';
@@ -22,7 +22,7 @@ export default function Space7LessonVisual({visual:v,reveal=false}:{visual:Task7
  return <div className="my-4 rounded-xl border p-4 [&_svg]:mx-auto [&_svg]:max-h-72 [&_svg]:max-w-full" style={{background:theme.surfaceTint,borderColor:theme.borderRing}}>
   <div className="mb-3 flex items-start justify-between gap-3"><p className="text-sm font-semibold" style={{color:theme.ctaFrom}}>{v.instruction}</p><ReadAloudBtn text={space7VisualSpeech(v,reveal)} label="Read diagram"/></div>
   {v.plane7&&<div className="[&_svg]:!max-h-[24rem]"><LessonPlane spec={v.plane7} reveal={reveal}/></div>}
-  {v.diagram==='net'&&<CubeNet cells={v.cells!} marked={v.marked} labels/>}
+  {v.diagram==='net'&&<PremiumCubeNet cells={v.cells!} marked={v.marked}/>}
   {v.diagram==='plans'&&(v.solidNet?<div className="flex items-center gap-2"><div className="min-w-0 flex-[2] [&_svg]:!max-h-40"><Plans t={v}/></div><figure className="min-w-0 flex-1 text-center text-sm [&_svg]:!max-h-40"><SolidNetDrawing net={v.solidNet}/><figcaption>Net</figcaption></figure></div>:<Plans t={v}/>)}
   {v.diagram==='plane'&&<div className="[&_svg]:!max-h-80"><Plane t={{...v,mode:'choice'}} a={{selected:[],value:"",pair:{x:"",y:""},points:[],commands:[],assignments:{},decisions:[]}} onChange={()=>{}}/></div>}
   {v.polygons?.map((p,i)=><LessonPolygon key={i} spec={p}/>)}

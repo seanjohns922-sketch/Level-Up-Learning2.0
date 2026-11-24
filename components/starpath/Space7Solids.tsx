@@ -46,7 +46,14 @@ export function SolidNetDrawing({ net }: { net: Space7SolidNet }) {
   }
   return (
     <svg viewBox="0 0 300 220" role="img" aria-label="Flat net of a solid">
-      {shapes.map((s, i) => <polygon key={i} points={poly(s)} fill={FILL} stroke={STROKE} strokeWidth="2.5" strokeLinejoin="round" />)}
+      {/* Premium net: shaded card faces with a soft shadow; inner edges read as folds, outer edges as cuts. */}
+      <defs>
+        <linearGradient id="s7-solid-face" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#d9c8fa" /><stop offset="1" stopColor="#a98be8" /></linearGradient>
+        <filter id="s7-solid-shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#2a1a4a" floodOpacity=".25" /></filter>
+      </defs>
+      <g filter="url(#s7-solid-shadow)">{shapes.map((s, i) => <polygon key={i} points={poly(s)} fill="url(#s7-solid-face)" />)}</g>
+      {shapes.map((s, i) => <polygon key={`f${i}`} points={poly(s)} fill="none" stroke="#fff" strokeWidth="1.6" strokeDasharray="5 4" strokeLinejoin="round" />)}
+      {shapes.map((s, i) => <polygon key={`o${i}`} points={poly(s)} fill="none" stroke={STROKE} strokeWidth="1.6" strokeLinejoin="round" opacity=".85" />)}
     </svg>
   );
 }
