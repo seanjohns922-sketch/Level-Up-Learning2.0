@@ -977,7 +977,7 @@
   },
   "7/measurement/4/2": {
     "title": "Connect volume and capacity",
-    "signature": "e2fa9989f789a65a625b28917c2bc8293dcafb0943d2f0e29fc9f6f9d63d7851"
+    "signature": "72e75f944816def0acde07c44a31f1d38d45aec0cc34ef9299f34250a150e989"
   },
   "7/measurement/4/3": {
     "title": "Compare storage designs",
@@ -997,7 +997,7 @@
   },
   "7/measurement/6/1": {
     "title": "Find circumference from radius",
-    "signature": "4f0bc4380edd96a7b20a01b88efa050bcc30e93ab936f84f008c8d6932a04f32"
+    "signature": "6730afe4527141c0206d5f8bd1d63854419dcdb07ba9bc96d05274daa624a999"
   },
   "7/measurement/6/2": {
     "title": "Work backwards around a circle",
@@ -1005,7 +1005,7 @@
   },
   "7/measurement/6/3": {
     "title": "Model circular journeys",
-    "signature": "276f07e21ac1bfc72371328c666da9e3e8ba09d2b5047effb49adb45fee1773a"
+    "signature": "50da5bc823494909171ee3d77ab9315f5e664c59b06fb7a2fee007d0e7625c68"
   },
   "7/measurement/7/1": {
     "title": "Recognise corresponding angles",
@@ -1029,7 +1029,7 @@
   },
   "7/measurement/8/3": {
     "title": "Model parallel supports",
-    "signature": "ab7c7bc024a8b3d205691801696427c37035975a65ca78901f795218ab41c96d"
+    "signature": "4a0a7ae7fb8f7560940327d6abdd9bfeddf0571f5314c0409dba0cfd818d7de8"
   },
   "7/measurement/9/1": {
     "title": "Derive the triangle angle sum",
@@ -1069,7 +1069,7 @@
   },
   "7/measurement/12/1": {
     "title": "Restore a mixture",
-    "signature": "5332a83964c2cc029384b685fd7e02b14eec23d346a8cce508e6094a4446c937"
+    "signature": "25356bb2b3f0c15aaa46bd6c549e65039f9052e7b43de9836d9dd9d9ecdac87e"
   },
   "7/measurement/12/2": {
     "title": "Scale a construction plan",
@@ -1213,19 +1213,19 @@
   },
   "7/pattern/2/1": {
     "title": "Translate words into symbols",
-    "signature": "1df4763132e13f5ae5ac5227a5535d1f0e0622ffef210cba5bca089d20bd3903"
+    "signature": "42a7d0af24221f57a1a3cd23fd4ce08f9a6025e28a65daee92ba6838988341c4"
   },
   "7/pattern/2/2": {
     "title": "Represent a changing cost",
-    "signature": "d781ef6787479c11829feff5d652742fc270ab3b5ca5bd0dbe57c9a79c756bae"
+    "signature": "64733192c8b3c97c3befc81ec1d0f584a9600c25694a7126c8ea27585dea3ca4"
   },
   "7/pattern/2/3": {
     "title": "Write perimeter expressions",
-    "signature": "5c9647a5266351373288493075e2f63faddfce171828f33ce17577f7a7ae74b4"
+    "signature": "19b669210f58af1d7ebc17fef81bef4f80e9be9ff5c9a671589c6c0f6c3a6974"
   },
   "7/pattern/3/1": {
     "title": "Preserve the calculation order",
-    "signature": "3ac788bdedbe13494937caa0682f06b478d8c0f11f1cf071213e005ca34b9513"
+    "signature": "3f0a24920e397ff77517728628b82c44e32eeca6cf0aa9470fd823b3e3f74299"
   },
   "7/pattern/3/2": {
     "title": "Compare expressions",
@@ -1265,7 +1265,7 @@
   },
   "7/pattern/6/2": {
     "title": "Form an equation from a story",
-    "signature": "a3c26ed53403c9b156f468b244c3c6a8ee674cfff976fe3ff801d072971b5dc3"
+    "signature": "fb1cec27fc4a894e969a3ac4873ccbfe850ebd27a6ba1e49427843a01a747624"
   },
   "7/pattern/6/3": {
     "title": "Diagnose an equation error",
@@ -1469,7 +1469,7 @@
   },
   "7/chance/1/2": {
     "title": "Identify a favourable event",
-    "signature": "8c794150630648a3a62fbcf1a4997cd458c35bdc96d9048c34f4e54112efdd34"
+    "signature": "3befac7cb2834828d635d2b1f7d67635dca9b4fc3a6a5fdf0a69e0cc812698a3"
   },
   "7/chance/1/3": {
     "title": "Check a complete sample space",

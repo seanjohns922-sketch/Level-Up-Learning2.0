@@ -1,4 +1,6 @@
 'use client';
+import Number7Picture from '@/components/lesson/level7/Number7Picture';
+import {number7GuidePicture} from '@/data/activities/year7Number/pictures';
 import {level7WorkedSteps} from '@/data/activities/teaching/level7-working';
 import Number7DecimalExample, {DECIMAL_EXAMPLES,type DecimalExampleMode} from './Number7DecimalExample';
 import Number7RatioVisual from '@/components/activities/Number7RatioVisual';
@@ -30,6 +32,8 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
  const line=content===9&&lesson===2;
  const fractionModel=content===4&&lesson===1?{total:24,shaded:18,label:'18 of 24 equal parts = 3/4'}:content===7&&lesson===2?{total:12,shaded:6,label:'2/3 of 3/4 = 6/12 = 1/2'}:content===7&&lesson===3?{total:8,shaded:6,label:'3/4 contains 6 eighths'}:null;
  const ratioModel=content===10&&lesson===1;
+ // Lessons without a built-in model show a picture drawn from the worked example's own numbers.
+ const guidePicture=!square&&!line&&!fractionModel&&!ratioModel&&!fractionAddition&&!decimals&&content!==5?number7GuidePicture(week,lesson):undefined;
  const visualSpeech=square?'There are four rows, each containing four crystals. Four times four equals sixteen.':line?'Number line from negative six to eight. Start at negative four and move seven places to the right, ending at three.':fractionModel?`${fractionModel.label}. ${fractionModel.shaded} of ${fractionModel.total} equal-sized parts are shaded.`:ratioModel?'Two blue crystals and three gold crystals show the ratio two to three. There are five crystals altogether.':content===5&&lesson===1?'Number line from 0 to 2. Each whole has four equal spaces. P is seven quarter-steps from zero: one and three quarters, or 1.75.':content===5&&lesson===2?'Number line from negative 3 to 0. Each whole has two equal spaces. P is halfway between negative 2 and negative 1, at negative 1.5.':guide.example;
  return <section className={`${layout.guide} rounded-2xl border border-teal-200 bg-[#fffdf5] p-5 text-slate-900 shadow-xl sm:p-8`} aria-label="Learn the skill">
   <div className="text-xs font-bold uppercase tracking-widest text-teal-800">Learn the skill · Week {week} · Lesson {lesson}</div>
@@ -45,6 +49,7 @@ export default function Number7SkillGuide({week,lesson,onContinue,review=false}:
    {content===5&&lesson===1&&<FractionNumberLineVisual visual={{type:"fraction_number_line",title:"Seven quarter-steps",leftLabel:"",rightLabel:"",leftPosition:0,rightPosition:2,min:0,max:2,subdivisions:4,markers:[{label:"P",position:1.75}]}}/>}
    {content===5&&lesson===2&&<FractionNumberLineVisual visual={{type:"fraction_number_line",title:"Halfway between −2 and −1",leftLabel:"",rightLabel:"",leftPosition:-3,rightPosition:0,min:-3,max:0,subdivisions:2,markers:[{label:"P",position:-1.5}]}}/>}
    {line&&<IntegerNumberLineVisual visual={{type:'integer_number_line',min:-6,max:8,start:-4,jump:7,end:3}}/>}
+   {guidePicture&&<div className="mb-4"><Number7Picture picture={guidePicture}/></div>}
    {!fractionAddition&&!decimals&&<div className="text-center text-xl font-bold leading-relaxed sm:text-2xl"><MathFormattedText text={guide.example}/></div>}
   </div>
   <div data-guide-steps><div className="flex items-center justify-between gap-3"><h3 className="font-bold uppercase tracking-wide text-teal-800">How to solve it</h3><ReadAloudBtn text={steps.map((s,i)=>`Step ${i+1}. ${s}`).join(' ')} /></div>

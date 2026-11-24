@@ -246,3 +246,28 @@ export function number7Picture(prompt: string): Number7Picture | undefined {
   for (const [re, make] of RULES) { const m = prompt.match(re); if (m) return make(m); }
   return undefined;
 }
+
+/** Pictures for the skill guides' worked examples, drawn from each example's own numbers. */
+const GUIDE: Record<string, Number7Picture> = {
+  '1-2': { kind: 'plots', title: 'A square of area 81', plots: [{ w: 9, h: 9, material: 'plain', centre: 'area 81', bottom: '9' }] },
+  '1-3': { kind: 'squarestrip', title: 'Square numbers near 43', from: 5, to: 8, target: 43 },
+  '2-1': { kind: 'primes', title: 'Prime factors of 72', primes: [2, 2, 2, 3, 3] },
+  '2-2': { kind: 'power', title: 'Read the power', base: 3, exponent: 4 },
+  '3-1': { kind: 'powerstrip', title: 'Powers of ten', from: 1, to: 4, showUpTo: 4 },
+  '3-2': { kind: 'placevalue', title: '34 205 in a place-value chart', places: 5, rows: [{ label: '34 205', digits: [3, 4, 2, 0, 5] }] },
+  '3-3': { kind: 'placevalue', title: 'Rebuilt in a place-value chart', places: 5, rows: [{ label: '60 802', digits: [6, 0, 8, 0, 2] }] },
+  '4-2': { kind: 'fractionbar', title: '3/8 of a bar', parts: 8, shaded: 3 },
+  '4-3': { kind: 'fractionbar', title: '3/5 of a bar', parts: 5, shaded: 3, scale: 'percent' },
+  '5-1': { kind: 'vertical', title: 'Temperatures in order', object: 'thermometer', unit: '°C', readings: [{ value: -7, label: '−7 °C' }, { value: -2, label: '−2 °C' }, { value: 4, label: '4 °C' }], ask: 'the order from coldest to warmest' },
+  '5-3': { kind: 'moves', title: 'Subtracting a negative', start: 3, startLabel: '3', moves: [5], moveLabels: ['− (−5) is + 5'], ask: 'where you finish' },
+  '9-3': { kind: 'percentbar', title: '12.5% of 80', whole: '80', part: 12.5, of: 100, partLabel: '12.5% = 1/8', ask: 'the amount' },
+  '10-2': { kind: 'fractionbar', title: 'Sharing $40 in the ratio 3 : 5', parts: 8, shaded: 3, caption: '8 equal parts: 3 for the first share (shaded), 5 for the second.' },
+  '10-3': { kind: 'fractionbar', title: 'Concentrate : water = 1 : 4', parts: 5, shaded: 1, caption: '1 part concentrate (shaded) : 4 parts water. 500 mL in total.' },
+  '11-1': { kind: 'receipt', title: 'Sale order', lines: [['Price', '$80'], ['Discount', '25% off'], ['Delivery', '$6']], ask: 'final cost' },
+  '11-2': { kind: 'receipt', title: 'Profit check', lines: [['Cost', '$50'], ['Revenue', '$65']], ask: '% profit' },
+  '11-3': { kind: 'receipt', title: 'Two packs', lines: [['4 for', '$10'], ['6 for', '$12']], ask: 'price each' },
+  '12-1': { kind: 'receipt', title: 'Supplies', lines: [['Supplies × 3', '$4.50 each'], ['Delivery', '$2']], ask: 'total' },
+  '12-2': { kind: 'moves', title: 'Lift (floor 0 is ground)', start: -3, startLabel: 'floor −3', moves: [8, -2], moveLabels: ['up 8', 'down 2'], ask: 'the final floor' },
+  '12-3': { kind: 'receipt', title: 'Bag order', lines: [['Bag', '$60'], ['Discount', '20% off'], ['Delivery', '$5']], ask: 'final cost' },
+};
+export const number7GuidePicture = (week: number, lesson: number): Number7Picture | undefined => GUIDE[`${week}-${lesson}`];

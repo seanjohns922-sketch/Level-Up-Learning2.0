@@ -1,5 +1,6 @@
 import { tidyDisplayText } from "@/lib/display-text";
 import {polygonAngleVisual} from './polygonVisual';
+import { measurement7PromptVisual } from './pictures';
 import type { Lesson } from '@/data/programs/year1';
 import type { LessonActivity } from '@/data/programs/types';
 import type { MultipleChoiceQuestion } from '@/data/activities/year2/lessonEngine';
@@ -7,6 +8,14 @@ import type { Measurement7Visual } from '@/data/assessments/revisions/year7Measu
 import { measurement7Guide, MEASUREMENT7_READABILITY_REVISION } from './curriculum';
 import { pickLevel7LessonQuiz } from '@/lib/level7-quiz';
 import { distinctQuizPrompts } from '@/lib/level7-quiz';
+/** Real-world scenes: tanks hold water; railway, road and brace questions show tracks or timber rails. */
+function withScene(visual:Measurement7Visual|undefined,prompt:string):Measurement7Visual|undefined{
+ if(!visual)return undefined;
+ if((visual.task==='rectPrism'||visual.task==='triPrism')&&/\btank\b|\bwater\b/i.test(prompt))return {...visual,water:true};
+ if(visual.task==='parallel'&&/railway|tracks|\brails?\b|brace|road|shel(f|ves)/i.test(prompt+' '+visual.description))return {...visual,rails:true};
+ if(visual.task==='circle'&&/\bwheel\b/i.test(prompt))return {...visual,wheel:true};
+ return visual;
+}
 export type Measurement7Role='fast_thinking'|'reasoning'|'apply_create';
 export type Measurement7Question=MultipleChoiceQuestion & {lessonId:string;version:1;tier:Measurement7Role;steps:string[];answerUnit?:string};
 type Relation='corresponding'|'alternate'|'cointerior';
@@ -209,7 +218,7 @@ export function measurement7Question(week:number,lesson:number,seed:number,role:
  if(!prompt||options.length!==4||new Set(options).size!==4)throw Error(`Invalid question ${key}/${role}`);
  for(let i=options.length-1;i>0;i--){const j=int(0,i);[options[i],options[j]]=[options[j],options[i]];}
  const steps=role==='reasoning'?[guide.idea,reasonAnswer,'Check that the stated relationship applies to the given measurements.']:[guide.idea,`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}.`,explanation];
- return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt:tidyDisplayText(prompt),options,answer:result,explanation:tidyDisplayText(role==='reasoning'?explanation:`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}. ${explanation}`),measurementVisual:visual,lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
+ return {readabilityRevision:MEASUREMENT7_READABILITY_REVISION,kind:'multiple_choice',prompt:tidyDisplayText(prompt),options,answer:result,explanation:tidyDisplayText(role==='reasoning'?explanation:`${formula} = ${fmt(answer)}${unit==='°'?'°':unit?' '+unit:''}. ${explanation}`),measurementVisual:withScene(visual??measurement7PromptVisual(prompt),prompt),lessonId:`y7-measurement-w${week}-l${lesson}`,version:1,tier:role,steps,answerUnit:role==='reasoning'||!unit?undefined:unit};
 }
 export function generateMeasurement7Question(_level:unknown,lesson:Lesson,activity:LessonActivity) {
  if(!/^y7-measurement-w(?:[1-9]|1[0-2])-l[1-3]$/.test(lesson.id))throw Error('Unsupported Measurement Level 7 lesson');

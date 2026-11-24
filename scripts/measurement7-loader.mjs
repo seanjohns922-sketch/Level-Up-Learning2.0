@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import ts from 'typescript';
 const cache=new Map();
 export function loadMeasurement7(name){
- if(!['curriculum','questions','polygonVisual','level7-quiz','display-text'].includes(name))throw Error('Unexpected module');
+ if(!['curriculum','questions','polygonVisual','pictures','level7-quiz','display-text'].includes(name))throw Error('Unexpected module');
  if(cache.has(name))return cache.get(name);
  const module={exports:{}};
  const js=ts.transpileModule(fs.readFileSync(name==='level7-quiz'?'lib/level7-quiz.ts':name==='display-text'?'lib/display-text.ts':`data/activities/year7Measurement/${name}.ts`,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;

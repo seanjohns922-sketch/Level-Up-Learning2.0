@@ -6,6 +6,7 @@ import {domHarness} from './test-support/react-dom-harness.mjs';
 import {level8Question} from '../data/activities/level8/questions.ts';
 import {LEVEL7_WORKED_STEPS} from '../data/activities/teaching/level7-working.ts';
 import {LEVEL8_TEACHING,level8TeachingGuide} from '../data/activities/level8/teaching/index.ts';
+import {level7Answer} from '../lib/level7-answer.ts';
 const reviewed=JSON.parse(fs.readFileSync('scripts/fixtures/upper-guide-examples.json','utf8'));
 const rows=guideInventory();
 assert.equal(rows.length,390);
@@ -139,7 +140,8 @@ try{
    assert(page.includes('The key idea')&&page.includes('Check and use it again'));
 
   }
-  if((r.level===8||['pattern','statistics','chance'].includes(r.realm))&&r.example.options?.length>1)for(const option of r.example.options)assert(spoken.includes(option),`${r.key}: choice missing from read-aloud`);
+  // Choices are shown (and read) only where practice is multiple choice; typed Level 7 questions show none.
+  if((r.level===8||(['pattern','statistics','chance'].includes(r.realm)&&!level7Answer(r.example)))&&r.example.options?.length>1)for(const option of r.example.options)assert(spoken.includes(option),`${r.key}: choice missing from read-aloud`);
   const button=[...h.document.querySelectorAll('button')].find(b=>b.textContent.includes('Let’s practise'));
   await h.click(button);
  }
