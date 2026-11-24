@@ -6,7 +6,8 @@
  * jaw clacks are made on the fly. Unlike the other game sounds they're on unless Rex is muted on this
  * device (the speaker on his panel). `near` (0 far .. 1 beside you) sets the volume.
  */
-import { playSynth } from "./synth";
+import { makeSoundSwitch } from "./sound-switch";
+import { noiseSource, playSynth } from "./synth";
 
 const CLIPS = ["roar", "growl-1", "growl-2", "tamed", "huff", "snarl"] as const;
 type RexClip = (typeof CLIPS)[number];
@@ -46,23 +47,6 @@ function speak(gap: number, clip: RexClip, loud: number) {
   return playSynth("rex-voice", gap, (audio, at) => clipVoice(audio, at, buffer, loud), rexSoundsOn);
 }
 
-let noise: AudioBuffer | null = null;
-/** Two seconds of white noise, made once and shared. */
-function noiseBuffer(audio: AudioContext) {
-  if (noise && noise.sampleRate === audio.sampleRate) return noise;
-  noise = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate);
-  const data = noise.getChannelData(0);
-  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-  return noise;
-}
-function noiseSource(audio: AudioContext, at: number, length: number) {
-  const source = audio.createBufferSource();
-  source.buffer = noiseBuffer(audio);
-  source.start(at, Math.random());
-  source.stop(at + length + 0.05);
-  return source;
-}
-
 function stompVoice(audio: AudioContext, at: number, loud: number) {
   const thud = audio.createOscillator(), gain = audio.createGain();
   thud.type = "sine";
@@ -98,21 +82,9 @@ function snapVoice(audio: AudioContext, at: number) {
 
 const loudness = (near: number) => Math.max(0.08, Math.min(1, near));
 
-const MUTE_KEY = "reliq:rex:muted";
-const MUTE_EVENT = "reliq:rex-mute-change";
 /** Rex is heard unless he's been muted on this device. */
-export function rexSoundsOn() {
-  try { return window.localStorage.getItem(MUTE_KEY) !== "1"; } catch { return true; }
-}
-export function setRexMuted(muted: boolean) {
-  try { window.localStorage.setItem(MUTE_KEY, muted ? "1" : "0"); } catch { /* the choice just isn't remembered */ }
-  window.dispatchEvent(new Event(MUTE_EVENT));
-}
-export function subscribeRexMute(onChange: () => void) {
-  window.addEventListener(MUTE_EVENT, onChange);
-  window.addEventListener("storage", onChange);
-  return () => { window.removeEventListener(MUTE_EVENT, onChange); window.removeEventListener("storage", onChange); };
-}
+const rexSwitch = makeSoundSwitch("reliq:rex:muted");
+export const rexSoundsOn = rexSwitch.on, setRexMuted = rexSwitch.setMuted, subscribeRexMute = rexSwitch.subscribe;
 
 /** Seconds between his growls while he's near (chasing or being answered), and his huffs once tamed. */
 export const REX_GROWL_GAP = 20, REX_HUFF_GAP = 30;

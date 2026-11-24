@@ -48,3 +48,20 @@ export function synthTone(audio: AudioContext, at: number, { type, from, to, len
   osc.start(at);
   osc.stop(at + length + 0.02);
 }
+
+let noise: AudioBuffer | null = null;
+/** Two seconds of white noise, made once and shared. */
+function noiseBuffer(audio: AudioContext) {
+  if (noise && noise.sampleRate === audio.sampleRate) return noise;
+  noise = audio.createBuffer(1, audio.sampleRate * 2, audio.sampleRate);
+  const data = noise.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  return noise;
+}
+export function noiseSource(audio: AudioContext, at: number, length: number) {
+  const source = audio.createBufferSource();
+  source.buffer = noiseBuffer(audio);
+  source.start(at, Math.random());
+  source.stop(at + length + 0.05);
+  return source;
+}

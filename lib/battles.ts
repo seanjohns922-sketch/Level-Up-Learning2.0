@@ -5,7 +5,7 @@
 // pretend battle against a friend who answers as they go.
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import type { BattleRealm } from "@/lib/battle-questions";
+import { BATTLE_REALMS, type BattleRealm } from "@/lib/battle-questions";
 
 /** XP set by the server (shown here): for playing, and for winning. */
 export const BATTLE_PLAY_XP = 15;
@@ -21,6 +21,31 @@ export type Battle = {
   myScore: number | null; friendScore: number | null; won: boolean | null; draw: boolean;
   expiresAt: string; createdAt: string;
 };
+/** A battle about to be played: which, against whom. */
+export type BattleToPlay = { id: string; seed: number; realm: BattleRealm; mode: BattleMode; friendId: string; friendName: string };
+
+export function readBattleRealm(value: string | null | undefined): BattleRealm | undefined {
+  return BATTLE_REALMS.find((realm) => realm === value);
+}
+/** The Battle Arena room for a battle (app/world/battle). The server checks it's really your battle when you finish. */
+export function battleRoomHref(play: BattleToPlay, preview: boolean) {
+  const params = new URLSearchParams({ id: play.id, seed: String(play.seed), realm: play.realm, mode: play.mode, friend: play.friendId, name: play.friendName });
+  if (preview) params.set("teacher_preview", "1");
+  return `/world/battle?${params}`;
+}
+export function readBattleToPlay(params: URLSearchParams): BattleToPlay | null {
+  const realm = readBattleRealm(params.get("realm")), seed = Number(params.get("seed")), mode = params.get("mode");
+  const id = params.get("id"), friendId = params.get("friend"), friendName = params.get("name");
+  if (!realm || !Number.isFinite(seed) || (mode !== "live" && mode !== "turns") || !id || !friendId || !friendName) return null;
+  return { id, seed, realm, mode, friendId, friendName };
+}
+/** Back to the hub's Battles panel, with the same friend and realm picked: REMATCH. */
+export function rematchHref(play: BattleToPlay, preview: boolean) {
+  const params = new URLSearchParams({ battles: "1", friend: play.friendId, realm: play.realm });
+  if (preview) params.set("teacher_preview", "1");
+  return `/world?${params}`;
+}
+
 export type BattleResult = { status: string; xp: number; myScore?: number; friendScore?: number | null; won?: boolean | null; draw?: boolean };
 
 async function call<T>(name: string, args: Record<string, unknown>): Promise<T> {

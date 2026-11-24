@@ -39,7 +39,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Map as MapIcon, Anchor, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Users, Waves, X, type LucideIcon } from "lucide-react";
+import { Map as MapIcon, Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Users, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -48,13 +48,12 @@ import { HubNightGlow, HubSkyLights, readHubNight, writeHubNight } from "@/compo
 import { buildWaterAreas, placedLakes, swimSurfaceAt, SWIM_SPEED, waterReach, withSwimming, type WaterAreas } from "@/lib/world3d/swimming";
 import { BOAT_SPECS, boatToRide, boatWaterAt, nearestBank, openWaterHeading, ownedBoats, type BoatStyle } from "@/lib/world3d/boats";
 import { BoatRider } from "@/components/world3d/premium-items/BoatRider";
-import { HUB_V2_ARENA, hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, hubWaterDepth, HUB_V2_WATER_Y, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
+import { hubCanStand, hubGroundHeight, hubSpeedFactor, hubSwimSurfaceAt, hubV2Spot, hubWaterDepth, HUB_V2_WATER_Y, HUB_V2_BUILD_RULES, HUB_V2_HOME_CARPORT, HUB_V2_PLAY_RADIUS, HUB_V2_TREEHOUSE_ANCHORS, isCentralWorldV2Enabled } from "@/lib/world3d/central-world-v2";
 import { fetchServerWorldLayout, hasPendingWorldLayoutSave, isSyncedWorldScope } from "@/lib/world3d/central-world-sync";
 import { WorldHUD } from "@/components/world3d/WorldHUD";
 import { FriendsPanel } from "@/components/world3d/friends/FriendsPanel";
-import { BattleInviteToast, BattlePlay, BattlesPanel, type BattleToPlay } from "@/components/world3d/battle/BattlePanels";
-import { fetchBattles, useOnlineFriends, type Battle } from "@/lib/battles";
-import { restoreStudentStateFromServer } from "@/lib/student-progress-sync";
+import { BattleInviteToast, BattlesPanel, type BattlesPanelStart } from "@/components/world3d/battle/BattlePanels";
+import { battleRoomHref, fetchBattles, readBattleRealm, useOnlineFriends, type Battle, type BattleToPlay } from "@/lib/battles";
 import { VisitBanner, VisitorChangesCard } from "@/components/world3d/friends/FriendVisit";
 import { fetchFriends, fetchFriendWorld, fetchVisitorChanges, resolveVisitorChange, visitScope, type Friend, type VisitorChange } from "@/lib/friends";
 import { undoFriendChanges } from "@/lib/world3d/friend-changes";
@@ -372,7 +371,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt, battleClash }: { battleClash: number | null; waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt }: { waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -508,7 +507,6 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         editCursor={walkCursor ?? focusCell}
         buildGridCells={walkCursor ? walkGridCells : 16}
         justPlacedId={justPlacedId}
-        battleClash={battleClash}
         onEnterTower={onEnterTower}
         onEnterHome={onEnterHome}
         onToggleDrawbridge={onToggleDrawbridge}
@@ -535,8 +533,6 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
           ...raceStarts.map(({ id, item }) => ({ id, position: gridToWorld(item.gridX, item.gridZ), distance: 6 })),
           ...courts.map(({ id, court }) => ({ id, position: [court.x, 0, court.z] as [number, number, number], distance: court.reach })),
           ...carports.map(({ id, pose }) => ({ id, position: [pose.x, 0, pose.z] as [number, number, number], distance: 4.6 })),
-          // The Battle Arena's two launch podiums.
-          ...(hubV2 ? [-1, 1].map((side) => ({ id: BATTLE_ARENA_TARGET, position: [HUB_V2_ARENA.x + side * (HUB_V2_ARENA.podium + 3.2), 0, HUB_V2_ARENA.z] as [number, number, number], distance: 5 })) : []),
         ]}
         onNearestTargetId={handleNearestTarget}
         initialPitch={-0.1}
@@ -665,7 +661,6 @@ type RaceStartTarget = { id: string; item: PlacedRaceItem };
 /** A court or pitch the explorer can play on: basketball or one of the Sports set, its targets in world space. */
 type CourtTarget = { id: string; kind: "basketball" | SportKind; court: { x: number; z: number; reach: number; targets: Array<readonly [number, number, number]> } };
 const CARPORT_TARGET_PREFIX = "carport:";
-const BATTLE_ARENA_TARGET = "battle-arena";
 type CarportTarget = { id: string; pose: CarPose };
 type DriveSession = { start: CarPose; style: CarStyle; colour: string; lights: boolean; nonce: number };
 type BoatRide = { start: CarPose; style: BoatStyle; nonce: number };
@@ -798,13 +793,13 @@ export default function CentralWorld() {
   }, [visitId, placementScope, preview, student?.studentId]);
   const visiting = Boolean(visitId);
   const canBuildHere = !visiting || Boolean(friendWorld?.canBuild);
-  // ?friends=1 or ?battles=1 (from the profile page) opens that panel straight away.
+  // ?friends=1 or ?battles=1 (from the profile page, or REMATCH in the arena) opens that panel straight away;
+  // for a rematch, ?friend= and ?realm= say who and what.
   const [friendsOpen, setFriendsOpen] = useState(() => searchParams.get("friends") === "1" && !visitId);
-  // Friend battles: the Battles panel (from the arena or a friend's CHALLENGE), a battle in play, and its tug of war.
+  // Friend battles: the Battles panel (from the hub bar or a friend's BATTLE button) and friends' invites.
+  // The battle itself is played in its own room, the Battle Arena (/world/battle).
   const [friendsList, setFriendsList] = useState<Friend[]>([]);
-  const [battlesOpen, setBattlesOpen] = useState<{ preselect: Friend | null } | null>(() => (searchParams.get("battles") === "1" && !visitId ? { preselect: null } : null));
-  const [battle, setBattle] = useState<{ play: BattleToPlay; level: number } | null>(null);
-  const [battleClash, setBattleClash] = useState<number | null>(null);
+  const [battlesOpen, setBattlesOpen] = useState<BattlesPanelStart | null>(() => (searchParams.get("battles") === "1" && !visitId ? { friendId: searchParams.get("friend"), realm: readBattleRealm(searchParams.get("realm")) } : null));
   const [battleInvite, setBattleInvite] = useState<Battle | null>(null);
   useEffect(() => {
     if (!hubV2 || visitId) return;
@@ -817,20 +812,14 @@ export default function CentralWorld() {
   const onlineFriends = useOnlineFriends(student?.studentId ?? null, friendIds, hubV2 && !preview && !visitId);
   // A friend's battle invite pops up while you're in the hub (checked every 10 seconds).
   useEffect(() => {
-    if (!hubV2 || preview || visitId || !student?.studentId || battle) return;
+    if (!hubV2 || preview || visitId || !student?.studentId) return;
     const studentId = student.studentId;
     const check = () => void fetchBattles(studentId, false).then((list) => setBattleInvite(list.find((b) => !b.iChallenged && (b.status === "invited" || (b.status === "active" && b.myScore === null))) ?? null)).catch(() => undefined);
     check();
     const poll = window.setInterval(check, 10_000);
     return () => window.clearInterval(poll);
-  }, [hubV2, preview, visitId, student?.studentId, battle]);
-  const startBattle = useCallback((play: BattleToPlay) => {
-    setBattlesOpen(null);
-    setBattleInvite(null);
-    const level = (year?: string | null) => setBattle({ play, level: rexLevelFrom(year, student?.yearLevel) });
-    if (preview || !student?.studentId) { level(null); return; }
-    void restoreStudentStateFromServer(student.studentId, play.realm).then((restored) => level(restored.progress?.year)).catch(() => level(null));
-  }, [preview, student?.studentId, student?.yearLevel]);
+  }, [hubV2, preview, visitId, student?.studentId]);
+  const startBattle = useCallback((play: BattleToPlay) => router.push(battleRoomHref(play, preview)), [router, preview]);
   const goHome = () => router.push(preview ? "/world?teacher_preview=1" : "/world");
   const visitFriend = (friend: Friend) => router.push(`/world?visit=${encodeURIComponent(friend.studentId)}${preview ? "&teacher_preview=1" : ""}`);
   // Back home: what friends changed while you were away, to keep or undo.
@@ -1191,7 +1180,6 @@ export default function CentralWorld() {
     const timer = window.setTimeout(() => setShotMessage(null), 1400);
     return () => window.clearTimeout(timer);
   }, [shotMessage]);
-  const nearArena = activeTargetId === BATTLE_ARENA_TARGET;
   const hasAvailableAction = !race && !drive && !boat && (onBoatWater || activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance || activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance || nearRaceStart !== null || nearCourt !== null || nearCarport !== null);
   const activeBuildItemKey = editorOpen || walkBuild ? selectedInventoryItemKey ?? selectedSceneryItemKey ?? null : null;
   const buildItem = activeBuildItemKey ? itemsById.get(activeBuildItemKey) ?? null : null;
@@ -2053,7 +2041,6 @@ export default function CentralWorld() {
     if (nearRaceStart) startRace(nearRaceStart.item);
     if (nearCourt) shoot(nearCourt);
     if (nearCarport) startDrive(nearCarport);
-    if (nearArena) setBattlesOpen({ preselect: null });
   }
 
   function teleport(position: [number, number, number], yaw = 0) {
@@ -2081,7 +2068,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} battleClash={battleClash} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} />
         </CarWorldContext.Provider>
         </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
@@ -2091,13 +2078,12 @@ export default function CentralWorld() {
       </div>
 
       {visiting && friendWorld && !editorOpen && !race && !drive && !boat ? <VisitBanner name={friendWorld.name} canBuild={friendWorld.canBuild} onGoHome={goHome} /> : null}
-      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} onVisit={visitFriend} onChallenge={(friend) => { setFriendsOpen(false); setBattlesOpen({ preselect: friend }); }} onClose={() => setFriendsOpen(false)} /> : null}
-      {battlesOpen && !visiting && !battle ? <BattlesPanel studentId={student?.studentId ?? null} demo={preview} friends={friendsList} online={onlineFriends} preselect={battlesOpen.preselect} onPlay={startBattle} onClose={() => setBattlesOpen(null)} /> : null}
-      {battle ? <BattlePlay battle={battle.play} level={battle.level} studentId={student?.studentId ?? null} demo={preview} onClash={setBattleClash} onClose={() => setBattle(null)} /> : null}
-      {battleInvite && !battle && !battlesOpen && !visiting ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({ preselect: null }); }} onDismiss={() => setBattleInvite(null)} /> : null}
+      {friendsOpen && !visiting ? <FriendsPanel studentId={student?.studentId ?? null} demo={preview} onVisit={visitFriend} onChallenge={(friend) => { setFriendsOpen(false); setBattlesOpen({ friendId: friend.studentId }); }} onClose={() => setFriendsOpen(false)} /> : null}
+      {battlesOpen && !visiting ? <BattlesPanel studentId={student?.studentId ?? null} demo={preview} friends={friendsList} online={onlineFriends} start={battlesOpen} onPlay={startBattle} onClose={() => setBattlesOpen(null)} /> : null}
+      {battleInvite && !battlesOpen && !visiting ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({}); }} onDismiss={() => setBattleInvite(null)} /> : null}
       {!visiting && visitorChanges[0] && !editorOpen && !race && !drive && !boat ? <VisitorChangesCard change={visitorChanges[0]} busy={resolvingChange} onKeep={() => void resolveChange(false)} onUndo={() => void resolveChange(true)} /> : null}
       {!editorOpen && !race && !drive && !boat && hubV2 && !visiting ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onChooseRealm={enterRealmForRex} /> : null}
-      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : nearArena ? { label: "BATTLE", icon: "flag", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
@@ -2105,6 +2091,8 @@ export default function CentralWorld() {
         ...(walkBuild || !canBuildHere ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
         // Friends: visit their worlds and choose who can help build yours (not while visiting).
         ...(visiting || !hubV2 ? [] : [{ key: "friends", label: "Friends", icon: <Users size={15} />, onClick: () => setFriendsOpen(true) }]),
+        // Battles: challenge a friend, then into the Battle Arena.
+        ...(visiting || !hubV2 ? [] : [{ key: "battles", label: "Battles", icon: <Swords size={15} />, onClick: () => { setFriendsOpen(false); setBattlesOpen({}); } }]),
       ]} /> : null}
 
       {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive || boat)} />{race || drive || boat ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
