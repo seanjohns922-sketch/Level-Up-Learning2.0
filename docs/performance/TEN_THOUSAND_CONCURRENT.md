@@ -1883,3 +1883,33 @@ so no application build was needed. Committed aggregate:
 Next gates remain concurrent-write behaviour and the complete mixed dashboard
 workload with the candidate enabled only in the local harness. These access tests
 are not a new capacity measurement or approval to deploy the prototype.
+
+### Read-only HTTP boundaries; concurrent insert check blocked — 24 November 2026
+
+The earlier four commits were pushed to the existing review branch through
+06b9a57d, with no main merge. Preparation for a concurrent assessment-insert test
+found assessment triggers that update learning-cycle metadata and derived live
+progression. Automatic approval review rejected the proposed test because trigger
+side effects might exceed its restoration scope and explicit approval was absent.
+The insertion test did not execute. Its unrun draft is preserved privately at
+`/Users/seanjohns/reliq-audits/2026-11-24/attempt-boundaries/concurrent-insert-NOT-RUN.mjs`.
+Do not treat that draft as verified or run it without resolving the approval block.
+
+Completed a safer read-only fixture test instead:
+`scripts/staging/scoped-attempt-boundaries-local.mjs`. It requests one-row pages
+through explicit upper bounds on all three attempt tables, proves that the API
+returns no rows beyond those bounds despite more existing records, and verifies
+that a fresh refresh returns the complete original RLS histories (78 lessons,
+21 quizzes, 42 assessments). This tests boundary enforcement, **not concurrent
+inserts, updates or deletes**. No learning or permission records were modified.
+
+The first attempt hit PGRST202 because the temporary endpoint's schema reload had
+not completed. Added a ten-second setup-only readiness check that retries only
+schema-cache absence; all other errors fail immediately. The final run passed,
+the temporary endpoint was confirmed removed, and local preflight passed. Syntax
+and whitespace checks passed. No production/application/migration changes or app
+build. Aggregate: `attempt-boundaries-http-2026-11-24.json`.
+
+Concurrent-write behaviour remains unverified. Resolve the rejected write test's
+approval/safety issue before claiming that gate passed. Full mixed-dashboard
+measurement and production integration remain outstanding.

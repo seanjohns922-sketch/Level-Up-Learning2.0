@@ -1,0 +1,15 @@
+{
+  "at": "2026-11-24T01:40:41.650Z",
+  "environment": "isolated local read-only fixture HTTP boundary test",
+  "checks": [
+    "all three tables stop at explicit upper bounds despite more existing records",
+    "fresh unbounded-start refresh returns complete original RLS history"
+  ],
+  "restored": true,
+  "limitation": "Uses existing rows and explicit bounds. Does not test concurrent database inserts, updates or deletes.",
+  "rows": [
+    78,
+    21,
+    42
+  ]
+}
