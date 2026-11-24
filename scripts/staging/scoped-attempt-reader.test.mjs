@@ -36,3 +36,17 @@ test('changed upper bounds and duplicate cursors fail without partial results', 
       () => assert.fail('must not fallback'), ['student'], 37));
   }
 });
+
+test('cancellation before dispatch makes no request', async () => {
+  await assert.rejects(readScopedAttemptPages(() => assert.fail('no request'), () => assert.fail('no fallback'), ['student'], 37, () => false), /cancelled/);
+});
+test('cancellation during a page exposes no accumulated result or fallback', async () => {
+  let active = true;
+  await assert.rejects(readScopedAttemptPages(async () => { active = false; return response([row('a')]); },
+    () => assert.fail('no fallback'), ['student'], 37, () => active), /cancelled/);
+});
+test('cancellation during fallback exposes no original result', async () => {
+  let active = true;
+  await assert.rejects(readScopedAttemptPages(async () => ({ data: { supported: false } }),
+    async () => { active = false; return [[row('a')], [], []]; }, ['student'], 37, () => active), /cancelled/);
+});

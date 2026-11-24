@@ -1,0 +1,26 @@
+{
+  "at": "2026-11-24T01:36:10.768Z",
+  "environment": "isolated local synthetic HTTP revocation",
+  "checks": [
+    {
+      "name": "school membership revoked after first page",
+      "rowCounts": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "name": "school membership restoration preserves complete history"
+    },
+    {
+      "name": "one individual assignment revoked after first page",
+      "rowCounts": [
+        75,
+        21,
+        42
+      ]
+    }
+  ],
+  "restored": true
+}

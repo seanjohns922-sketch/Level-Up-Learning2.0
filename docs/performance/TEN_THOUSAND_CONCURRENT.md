@@ -1845,3 +1845,41 @@ Remaining integration gates: actual HTTP individual-assignment/revocation betwee
 pages (later-page fallback currently has a mocked test), concurrent-write behaviour
 of this prototype, cancellation, and the complete mixed dashboard workload. Do not
 connect this experimental reader to the app until those are checked.
+
+### Actual HTTP access revocation and cancellation — 24 November 2026
+
+Added `scripts/staging/scoped-attempt-revocation-local.mjs`, guarded by the existing
+loopback-only local configuration. It authenticates a synthetic teacher, reads a
+real first page, changes synthetic permissions, then requests the next page through
+the real API. This closes the earlier mocked-only later-page fallback gap.
+
+- Revoking school membership after the first page caused the next request to
+  return unsupported with no candidate data. Whole-scope original-RLS fallback
+  returned zero rows; no earlier candidate records escaped.
+- Restoring membership restored the complete original histories.
+- With class staffing disabled and two individual assignments active, candidate
+  results matched original histories. Revoking one assignment after the first
+  page caused fallback to retain exactly the other student's 75 lesson, 21 quiz
+  and 42 assessment rows. Pre-revocation data for the removed student was discarded.
+
+The script refuses to replace existing individual assignments or an existing
+endpoint. It restores the prechecked active memberships, removes only its own
+random-ID assignments, removes the temporary endpoint in finally and verifies the
+restored state. These permission edits must be committed briefly to be visible to
+independent HTTP requests; this is a **local synthetic test**, not a rollback-only
+SQL test or production change. Do not interrupt the process during cleanup. The
+final run confirmed all restoration checks and local preflight passed afterward.
+
+The experimental reader now accepts an optional cancellation predicate, checked
+before and after pages and after fallback. Three tests prove cancellation before
+dispatch, during a page and during fallback returns no results. It does not abort
+an already-issued network request; it prevents its result being returned. All 12
+focused reader/journal/concurrency tests passed, plus existing application history
+reader QA, Node syntax and whitespace checks. No app code or migration changed,
+so no application build was needed. Committed aggregate:
+`attempt-revocation-http-2026-11-24.json`; private evidence:
+`/Users/seanjohns/reliq-audits/2026-11-24/attempt-revocation/`.
+
+Next gates remain concurrent-write behaviour and the complete mixed dashboard
+workload with the candidate enabled only in the local harness. These access tests
+are not a new capacity measurement or approval to deploy the prototype.

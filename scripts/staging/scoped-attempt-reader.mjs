@@ -1,17 +1,22 @@
 // Experimental local reader. Not imported by the application.
 import assert from 'node:assert/strict';
-export async function readScopedAttemptPages(read, fallback, ids, limit) {
+export async function readScopedAttemptPages(read, fallback, ids, limit, isActive = () => true) {
   const rows = [[], [], []], after = [null, null, null];
   let through = null;
   const scope = new Set(ids);
+  const checkActive = () => { if (!isActive()) throw new Error('Attempt read cancelled'); };
   for (let page = 0; page < 10000; page++) {
+    checkActive();
     const result = await read({ after: [...after], through });
+    checkActive();
     if (result.error) throw new Error(result.error.message || 'Attempt page failed');
     const value = result.data;
     if (value?.supported === false) {
       assert.deepEqual(value, { supported: false }, 'Unsupported response must contain no data');
       // Discard ALL candidate rows, even after successful earlier pages.
-      return fallback();
+      const original = await fallback();
+      checkActive();
+      return original;
     }
     assert.equal(value?.supported, true);
     assert.ok(Array.isArray(value.through) && value.through.length === 3);
