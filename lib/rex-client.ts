@@ -4,6 +4,7 @@
 // (add ?rex=now to see him straight away).
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { claimXpRewards } from "@/lib/xp-quests";
 import { REX_WAKE_MINUTES, REX_XP } from "@/lib/rex";
 
 export type RexVisit = { id: string; source: "teacher" | "parent" | "timer"; tamed: boolean };
@@ -103,6 +104,7 @@ export function useRexVisit({ studentId, demo, active, wakeNow = false }: { stud
     const { data, error } = await supabase.rpc("tame_rex_secure", { p_student_id: studentId, p_visit_id: visit.id, p_correct: correct });
     setVisit({ ...visit, tamed: true });
     setPaidXp(error ? 0 : Number(data ?? 0));
+    if (!error) void claimXpRewards();
   }, [visit, demo, studentId]);
 
   /** Off to a lesson. The server sends him away when it's finished; the pretend demo Rex just goes. */

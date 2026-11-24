@@ -12,6 +12,7 @@ import DemoPreviewBanner from "@/components/demo/DemoPreviewBanner";
 import GemRevealHost from "@/components/gems/GemRevealHost";
 import ChronoCrystalReveal from "@/components/chronorok/ChronoCrystalReveal";
 import StreakRewardReveal from "@/components/streak/StreakRewardReveal";
+import { XpRewardReveal } from "@/components/quests/QuestParts";
 import VercelClientInsights from "@/components/VercelClientInsights";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({
           <GemRevealHost />
           <ChronoCrystalReveal />
           <StreakRewardReveal />
+          <XpRewardReveal />
           {process.env.NODE_ENV === "production" ? <VercelClientInsights /> : null}
         </ErrorBoundary>
       </body>

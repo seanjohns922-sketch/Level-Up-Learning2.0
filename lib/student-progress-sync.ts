@@ -2,6 +2,7 @@
 
 import { checkChronoCrystal } from "@/lib/chrono-crystals";
 import { claimLearningStreak } from "@/lib/learning-streak";
+import { claimXpRewards } from "@/lib/xp-quests";
 import { LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
 import { xpAwardDone, xpAwardFailed, xpAwardSaving } from "@/lib/xp-award-store";
 import { YEAR_ORDER } from "@/data/yearOrder";
@@ -360,7 +361,11 @@ export async function saveRealmLessonAttempt(
   xpAwardDone("lesson", completed === true ? LESSON_XP : 0);
   void checkChronoCrystal(studentId);
   // Only a first completion can make today a learning day.
-  if (completed === true) void claimLearningStreak();
+  if (completed === true) {
+    void claimLearningStreak();
+    // Quests, the accuracy bonus and week bonuses all follow a first completion.
+    void claimXpRewards();
+  }
 
   if (completed === true) {
     const { error: discoveryError } = await supabase.rpc("discover_realm_collectible_secure", {
@@ -463,6 +468,8 @@ export async function saveRealmAssessment(
   if (error) throw error;
 
   void awardAndReveal(studentId, "assessment", completionKey);
+  // Finishing the end-of-level test pays the level bonus.
+  if (assessmentType === "posttest") void claimXpRewards();
 }
 
 export async function saveNumberAssessment(

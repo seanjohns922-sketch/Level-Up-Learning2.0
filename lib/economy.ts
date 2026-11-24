@@ -6,6 +6,7 @@ import { REALM_OUTFIT_CATALOGUE } from "@/lib/avatar/realm-outfit-catalogue";
 import { supabase } from "@/lib/supabase";
 import { EXPLORER_XP_LEVEL_BASE, getExplorerRankTitle } from "@/data/explorer-ranks";
 import { isDemoPreviewMode } from "@/lib/demo-mode";
+import { claimXpRewards } from "@/lib/xp-quests";
 import type { AvatarOutfit } from "@/components/avatar/StudentAvatar";
 
 /** Equip slots that make up a layered avatar (base look + these stack on top). */
@@ -294,6 +295,8 @@ export async function purchaseEconomyItem(
     p_purchase_key: crypto.randomUUID(),
   });
   if (error) throw error;
+  // Unlocking or upgrading can complete today's build quest.
+  void claimXpRewards();
   return normalizeEconomyState(data);
 }
 

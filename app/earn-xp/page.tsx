@@ -2,23 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { BATTLE_PLAY_XP, BATTLE_WIN_XP } from "@/lib/battles";
-import { ArrowLeft, BookOpen, CheckCircle2, Swords, Zap } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Crown, Flag, Swords, Target, Trophy, Zap } from "lucide-react";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
 import { StreakFlame } from "@/components/streak/StreakParts";
 import { STREAK_REPEAT_XP, STREAK_REWARDS, useLearningStreak } from "@/lib/learning-streak";
 import { BRAIN_BREAK_XP_CAP, LESSON_XP, QUIZ_PASS_XP } from "@/lib/xp-rules";
+import { REX_XP } from "@/lib/rex";
+import { ACCURACY_XP, LEVEL_CLEARED_XP, QUEST_ALL_BONUS_XP, WEEK_CLEARED_XP } from "@/lib/xp-quests";
 
 const WAYS = [
+  { icon: Target, title: "Daily quests", detail: `Three new ones every day, in the hub. Do all three for +${QUEST_ALL_BONUS_XP} more`, xp: "+20 to +30" },
   { icon: BookOpen, title: "Finish a lesson", detail: "The first time you finish it", xp: `+${LESSON_XP}` },
+  { icon: Trophy, title: "Get it right first go", detail: `In a new lesson: every answer right +${ACCURACY_XP.perfect}, or 80% or more +${ACCURACY_XP.good}`, xp: `up to +${ACCURACY_XP.perfect}` },
+  { icon: Flag, title: "Clear a week", detail: "Finish all 3 lessons of a week in a realm", xp: `+${WEEK_CLEARED_XP}` },
+  { icon: Crown, title: "Clear a level", detail: "Finish a level's end-of-level test in a realm", xp: `+${LEVEL_CLEARED_XP.toLocaleString()}` },
   { icon: CheckCircle2, title: "Pass a weekly quiz", detail: "Score 80% or more", xp: `+${QUIZ_PASS_XP}` },
   { icon: Zap, title: "Win a brain break", detail: "During your lessons", xp: `up to +${BRAIN_BREAK_XP_CAP}` },
   { icon: Swords, title: "Win a friend battle", detail: `+${BATTLE_PLAY_XP} just for playing, in the Battle Arena`, xp: `+${BATTLE_WIN_XP}` },
+  { icon: Zap, title: "Answer Rex", detail: "When the maths T-rex visits your hub", xp: `+${REX_XP}` },
 ];
 
 const SPOKEN = [
   "Ways to earn X P. You spend X P on homes, rides, pets and more in your world.",
   `Keep a streak: do a lesson or quiz each day. Weekends never break it. ${STREAK_REWARDS.map((r) => `Day ${r.day}, ${r.xp} X P.`).join(" ")} After that, ${STREAK_REPEAT_XP} X P every fifth day.`,
-  ...WAYS.map((way) => `${way.title}. ${way.detail}. ${way.xp.replace("+", "")} X P.`),
+  ...WAYS.map((way) => `${way.title}. ${way.detail}. ${way.xp.replaceAll("+", "")} X P.`),
 ].join(" ");
 
 export default function EarnXpPage() {

@@ -14,7 +14,7 @@ import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 import { readProgress, type ProgressRealmScope } from "@/data/progress";
 import { formatStudentLevelLabel } from "@/lib/studentLevelLabel";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { fetchStudentEconomy } from "@/lib/economy";
 import { fetchStudentActivityDaily } from "@/lib/student-activity";
 import { CHRONOROK_OPEN_DAYS, CRYSTALS_TO_AWAKEN, chronorokProgress } from "@/lib/chronorok";
@@ -27,6 +27,8 @@ import { joinSpeechParts, WorldVoiceButton } from "@/components/world3d/WorldVoi
 import DemoModeNavigationControls from "@/components/demo/DemoModeNavigationControls";
 import { StreakFlame } from "@/components/streak/StreakParts";
 import { streakPrompt, useLearningStreak } from "@/lib/learning-streak";
+import { HubQuestCard } from "@/components/quests/QuestParts";
+import { getXpPaidSinceLoad, subscribeXpQuests } from "@/lib/xp-quests";
 
 export type WorldHUDContext = "central" | "tower" | "realm";
 
@@ -96,7 +98,10 @@ export function WorldHUD({
   const [teleportOpen, setTeleportOpen] = useState(false);
   const [busyRealmId, setBusyRealmId] = useState<CanonicalRealmId | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [xp, setXp] = useState<number | null>(null);
+  const [loadedXp, setLoadedXp] = useState<{ balance: number; paidBefore: number } | null>(null);
+  // Quest and bonus rewards paid after the balance loaded are added on as they land.
+  const paidSinceLoad = useSyncExternalStore(subscribeXpQuests, getXpPaidSinceLoad, () => 0);
+  const xp = loadedXp ? loadedXp.balance + paidSinceLoad - loadedXp.paidBefore : null;
   const streak = useLearningStreak();
   const [streakReminderClosed, setStreakReminderClosed] = useState(false);
   const [crystals, setCrystals] = useState<{ crystals: number; open: boolean; learningDays: number } | null>(null);
@@ -116,8 +121,8 @@ export function WorldHUD({
     if (!profile?.studentId) return;
     let cancelled = false;
     void fetchStudentEconomy(profile.studentId)
-      .then((economy) => { if (!cancelled) setXp(economy.wallet.xp_balance); })
-      .catch(() => { if (!cancelled) setXp(null); });
+      .then((economy) => { if (!cancelled) setLoadedXp({ balance: economy.wallet.xp_balance, paidBefore: getXpPaidSinceLoad() }); })
+      .catch(() => { if (!cancelled) setLoadedXp(null); });
     return () => { cancelled = true; };
   }, []);
 
@@ -265,6 +270,7 @@ export function WorldHUD({
           </div>
         </div>
 
+        {context === "central" && !hideStreakReminder ? <HubQuestCard /> : null}
         {context === "central" && !hideStreakReminder && streak && streak.streak > 0 && !streak.todayDone && !streakReminderClosed ? (
           <div className="worldHudStreakReminder" role="status">
             <span className="worldHudStreakBadge"><StreakFlame className="h-7 w-7" /></span>

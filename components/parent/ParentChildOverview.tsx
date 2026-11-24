@@ -5,6 +5,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Gem, ShieldCheck } from "lucide-react";
 import { StreakFlame } from "@/components/streak/StreakParts";
 import { DEMO_STREAK, fetchLearningStreak, STREAK_SHIELD_LIMIT, type LearningStreak } from "@/lib/learning-streak";
+import { DEMO_QUESTS, fetchDailyQuests, type DailyQuests } from "@/lib/xp-quests";
+import { ParentQuestCard } from "@/components/quests/QuestParts";
 import GemIcon, { cutForGem, GEM_RARITY } from "@/components/gems/GemIcon";
 import ParentReportButton from "@/components/parent/ParentReportButton";
 import SkipWeekDialog, { type SkipWeekRequest } from "@/components/parent/SkipWeekDialog";
@@ -160,6 +162,16 @@ export default function ParentChildOverview({
       .catch(() => { if (active) setStreak(null); });
     return () => { active = false; };
   }, [child.studentId, preview]);
+  const [quests, setQuests] = useState<DailyQuests | null>(preview ? DEMO_QUESTS : null);
+  useEffect(() => {
+    if (preview) return;
+    let active = true;
+    fetchDailyQuests(child.studentId)
+      .then((value) => { if (active) setQuests(value); })
+      // Before the migration is applied the card stays hidden.
+      .catch(() => { if (active) setQuests(null); });
+    return () => { active = false; };
+  }, [child.studentId, preview]);
 
   async function afterSkip() {
     setSkipRequest(null);
@@ -185,6 +197,7 @@ export default function ParentChildOverview({
       {!child.homeAccess ? <HomeAccessBanner child={child} onActivated={onChanged} preview={isPreview} /> : null}
       <ChildHero child={child} activity={activity} streak={streak} />
       {streak ? <ParentStreakCard firstName={child.firstName} streak={streak} /> : null}
+      {quests ? <ParentQuestCard firstName={child.firstName} quests={quests} /> : null}
 
       <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
         <div className="flex flex-wrap items-end justify-between gap-3 px-5 pb-4 pt-5 sm:px-7">

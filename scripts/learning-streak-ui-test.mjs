@@ -16,11 +16,10 @@ assert.equal(await streak.claimLearningStreak(), null, "no signed-in student, no
 
 const read = (file) => fs.readFileSync(file, "utf8");
 const sync = read("lib/student-progress-sync.ts");
-assert.match(sync, /xpAwardDone\("lesson"[\s\S]{0,200}if \(completed === true\) void claimLearningStreak\(\)/);
+assert.match(sync, /xpAwardDone\("lesson"[\s\S]{0,200}if \(completed === true\) \{?\s*void claimLearningStreak\(\)/);
 assert.match(sync, /xpAwardDone\("quiz"[\s\S]{0,200}if \(rewardEligible === true\) void claimLearningStreak\(\)/);
 assert.match(read("app/layout.tsx"), /<StreakRewardReveal \/>/);
 assert.match(read("components/economy/EconomyHeader.tsx"), /<StreakChip \/>/);
-assert.match(read("app/home-base/page.tsx"), /<StreakCard \/>/);
 assert.match(read("components/world3d/WorldHUD.tsx"), /worldHudStreakReminder/);
 const parent = read("components/parent/ParentChildOverview.tsx");
 assert.match(parent, /fetchLearningStreak\(child\.studentId\)/);

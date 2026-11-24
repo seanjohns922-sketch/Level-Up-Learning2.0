@@ -5,6 +5,7 @@
 // pretend battle against a friend who answers as they go.
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { claimXpRewards } from "@/lib/xp-quests";
 import { BATTLE_REALMS, type BattleRealm } from "@/lib/battle-questions";
 
 /** XP set by the server (shown here): for playing, and for winning. */
@@ -80,7 +81,10 @@ export async function submitBattleScore(studentId: string | null, demo: boolean,
     demoBattles = demoBattles.map((b) => (b.id === battleId ? { ...b, status: "finished", myScore: correct, friendScore, won, draw } : b));
     return { status: "finished", xp: BATTLE_PLAY_XP + (won ? BATTLE_WIN_XP : 0), myScore: correct, friendScore, won, draw };
   }
-  return call<BattleResult>("submit_battle_score_secure", { p_student_id: studentId, p_battle_id: battleId, p_correct: correct, p_level: level });
+  const result = await call<BattleResult>("submit_battle_score_secure", { p_student_id: studentId, p_battle_id: battleId, p_correct: correct, p_level: level });
+  // A finished battle can complete today's battle quest.
+  if (result.status === "finished") void claimXpRewards();
+  return result;
 }
 export async function setClassBattles(classId: string, enabled: boolean) {
   await call("set_class_battles_secure", { p_class_id: classId, p_enabled: enabled });
