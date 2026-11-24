@@ -1,0 +1,229 @@
+{
+  "at": "2026-11-24T01:42:38.598Z",
+  "order": [
+    "direct",
+    "scoped"
+  ],
+  "rounds": [
+    {
+      "mode": "direct",
+      "failedRecordedOperations": 0,
+      "journeyFailures": 0,
+      "verifiedStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedEvents": 200,
+      "gatePassed": false,
+      "dashboardChecks": [
+        {
+          "historyCounts": [
+            1609,
+            516,
+            1032
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2675,
+            1609,
+            516,
+            1032,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1631,
+            523,
+            1046
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2673,
+            1631,
+            523,
+            1046,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1622,
+            520,
+            1040
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2678,
+            1622,
+            520,
+            1040,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1614,
+            518,
+            1036
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2678,
+            1614,
+            518,
+            1036,
+            25
+          ]
+        }
+      ],
+      "p95Ms": {
+        "teacher_login": 171,
+        "student_login_lookup": 1045,
+        "get_student_runtime_context_secure": 806,
+        "upsert_live_student_activity_secure": 802,
+        "dashboard_daily_activity": 1740,
+        "dashboard_live_activity": 1729,
+        "get_student_activity_daily_secure": 577,
+        "touch_live_student_presence_secure": 744,
+        "dashboard_quiz_attempts": 2660,
+        "dashboard_lesson_attempts": 2394,
+        "upsert_student_activity_daily_secure": 1339,
+        "dashboard_assessments": 2081,
+        "insert_live_activity_event_secure": 939,
+        "dashboard_events_initial": 2248,
+        "dashboard_refresh": 2666,
+        "dashboard_events_incremental": 2358,
+        "get_live_student_activity_secure": 217
+      }
+    },
+    {
+      "mode": "scoped",
+      "failedRecordedOperations": 0,
+      "journeyFailures": 0,
+      "verifiedStudents": 100,
+      "verifiedActivityWrites": 200,
+      "expectedEvents": 200,
+      "gatePassed": false,
+      "dashboardChecks": [
+        {
+          "historyCounts": [
+            1614,
+            518,
+            1036
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2728,
+            1614,
+            518,
+            1036,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1609,
+            516,
+            1032
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2725,
+            1609,
+            516,
+            1032,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1631,
+            523,
+            1046
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2723,
+            1631,
+            523,
+            1046,
+            25
+          ]
+        },
+        {
+          "historyCounts": [
+            1622,
+            520,
+            1040
+          ],
+          "refreshes": 3,
+          "observedNewEvents": 50,
+          "finalRowCounts": [
+            25,
+            2728,
+            1622,
+            520,
+            1040,
+            25
+          ]
+        }
+      ],
+      "p95Ms": {
+        "teacher_login": 130,
+        "student_login_lookup": 557,
+        "get_student_runtime_context_secure": 675,
+        "dashboard_live_activity": 350,
+        "dashboard_daily_activity": 658,
+        "upsert_live_student_activity_secure": 565,
+        "get_student_activity_daily_secure": 594,
+        "touch_live_student_presence_secure": 468,
+        "upsert_student_activity_daily_secure": 350,
+        "insert_live_activity_event_secure": 322,
+        "dashboard_lesson_attempts": 1512,
+        "dashboard_quiz_attempts": 1512,
+        "dashboard_assessments": 1512,
+        "dashboard_events_initial": 1534,
+        "dashboard_refresh": 1535,
+        "dashboard_events_incremental": 596,
+        "get_live_student_activity_secure": 170
+      }
+    }
+  ],
+  "restored": true,
+  "limitations": [
+    "One sequential pair; no reverse control or production capacity proof.",
+    "Activity, presence and event writes only; attempt histories stay static.",
+    "Scoped pages use 500 rows per table; direct production reader uses 1000.",
+    "No browser/realtime coverage."
+  ],
+  "journalReadbackChecks": [
+    {
+      "mode": "direct",
+      "students": 100,
+      "acknowledgedActivity": 200,
+      "acknowledgedEvents": 200,
+      "unacknowledgedIntents": 0
+    },
+    {
+      "mode": "scoped",
+      "students": 100,
+      "acknowledgedActivity": 200,
+      "acknowledgedEvents": 200,
+      "unacknowledgedIntents": 0
+    }
+  ],
+  "journalLimit": "Uses per-run API readbacks captured in journal, not retrospective DB deltas after the second run."
+}

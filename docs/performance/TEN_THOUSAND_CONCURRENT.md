@@ -1913,3 +1913,50 @@ build. Aggregate: `attempt-boundaries-http-2026-11-24.json`.
 Concurrent-write behaviour remains unverified. Resolve the rejected write test's
 approval/safety issue before claiming that gate passed. Full mixed-dashboard
 measurement and production integration remain outstanding.
+
+### Mixed dashboard with activity writes — 24 November 2026
+
+Added an opt-in `SCALE_ATTEMPT_MODE=scoped` to the local capacity harness; default
+remains the production reader. Each refresh shares one bounded three-table
+prototype request sequence among its three attempt sources. The other dashboard
+sources, student sessions, presence, daily activity and event writes are unchanged.
+The prototype's final histories are compared row-for-row with the production
+reader, in addition to the existing exact-count and duplicate checks.
+
+`scripts/staging/scoped-activity-comparison-local.mjs` ran one direct/scoped pair:
+100 students, four teachers, 60-second closed-loop activity workload in each mode.
+It installs only the temporary attempt read endpoint and removes it after child
+workloads finish. It does not run the older canonical-completion mixed harness,
+insert assessments or lesson attempts, or bypass the rejected insert experiment.
+Attempt histories remain static throughout this test.
+
+| Metric (p95) | Direct | Prototype |
+| --- | ---: | ---: |
+| Whole dashboard refresh | 2,666 ms | 1,535 ms |
+| Student login | 1,045 ms | 557 ms |
+| Initial event history | 2,248 ms | 1,534 ms |
+| Incremental event read | 2,358 ms | 596 ms |
+
+Both runs had zero failed recorded operations and zero journey failures. Each
+verified 100 student journeys, 200 activity increments and 200 new events. The
+journal/readback check found exactly the expected increments and no unacknowledged
+intents for all students in each run. This uses the per-run captured API readbacks,
+not retrospective first-run database totals after the second run's writes.
+Prototype histories matched every projected production row across all four classes.
+Its three attempt-source timings share one promise and are not independent work.
+
+Both latency gates failed. This is one sequential pair without reversed order;
+cache/host variation, growing event history and the prototype's 500-row-per-table
+pages versus direct 1000-row pages prevent a causal speedup claim. The candidate
+RPC is labelled `other` in the existing redacted HTTP profiler; whole-refresh
+latencies are measured independently. No 10,000-user claim or deployment approval.
+
+Twelve focused tests, production attempt-reader QA, staging-isolation QA, syntax,
+whitespace and journal checks passed. Temporary endpoint removal was verified.
+No production/app changes or migration, so no app build. Evidence:
+`scoped-activity-comparison-2026-11-24.json`; private logs and journals:
+`/Users/seanjohns/reliq-audits/2026-11-24/scoped-activity/`.
+
+Next: repeat in reversed order before deciding whether to pursue integration.
+Concurrent assessment/lesson-attempt inserts remain unverified; the automatic
+approval rejection of that separate fixture mutation still applies.

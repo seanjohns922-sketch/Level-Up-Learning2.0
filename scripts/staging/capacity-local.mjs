@@ -21,6 +21,10 @@ const studentCount = groupCount * 25;
 const scenario = process.env.SCALE_SCENARIO ?? 'mixed';
 assert.ok(['mixed', 'students-only', 'teachers-only', 'dashboard-mixed'].includes(scenario), 'Unknown local capacity scenario');
 const dashboard = scenario === 'dashboard-mixed';
+const attemptMode = process.env.SCALE_ATTEMPT_MODE ?? 'direct';
+assert.ok(['direct', 'scoped'].includes(attemptMode));
+assert.ok(attemptMode === 'direct' || dashboard, 'Scoped attempt experiment requires dashboard-mixed');
+const scopedAttemptSnapshot = attemptMode === 'scoped' ? (await import('./scoped-attempts-http-local.mjs')).snapshot : null;
 const dashboardConcurrency = Number(process.env.SCALE_DASHBOARD_CONCURRENCY ?? 6);
 assert.ok([3, 6].includes(dashboardConcurrency), 'Dashboard read concurrency must be 3 or 6');
 assert.ok(dashboard || dashboardConcurrency === 6, 'Read concurrency experiment requires dashboard-mixed');
@@ -47,7 +51,7 @@ const restUrl = restRoute === 'direct' ? 'http://127.0.0.1:56523' : `${config.AP
 const rampSeconds = Number(process.env.SCALE_LOGIN_RAMP_SECONDS ?? 0);
 assert.ok(Number.isInteger(rampSeconds) && rampSeconds >= 0 && rampSeconds <= 30, 'Login ramp must be 0–30 seconds');
 assert.ok(runStudents || rampSeconds === 0, 'Teacher-only scenario cannot ramp student logins');
-const outputSuffix = (scenario === 'mixed' ? '' : `-${scenario}`) + (eventMode === 'compact' ? '-compact' : '') + (attemptPageSize === 1000 ? '-page1000' : '') + (rampSeconds ? `-ramp${rampSeconds}` : '') + (restRoute === 'direct' ? '-direct' : '');
+const outputSuffix = (attemptMode === 'scoped' ? '-scoped-attempts' : '') + (scenario === 'mixed' ? '' : `-${scenario}`) + (eventMode === 'compact' ? '-compact' : '') + (attemptPageSize === 1000 ? '-page1000' : '') + (rampSeconds ? `-ramp${rampSeconds}` : '') + (restRoute === 'direct' ? '-direct' : '');
 const groups = Array.from({ length: groupCount }, (_, i) => i === 0 ? '' : `-${i + 1}`).map(suffix => JSON.parse(fs.readFileSync(`${localDir}/synthetic-accounts${suffix}.json`, 'utf8')));
 for (const group of groups) assert.equal(group.students.length, 25);
 for (const key of ['teacherId', 'classId', 'schoolId']) assert.equal(new Set(groups.map(g => g[key])).size, groupCount);
@@ -228,13 +232,21 @@ async function dashboardJourney({ group, client, profile }) {
     profile.phase = refreshes ? 'incremental' : 'initial';
     const start = performance.now();
     let status = 0;
+    // One bounded three-table read shared by this refresh's attempt sources.
+    // Lazy construction preserves queue scheduling and avoids duplicate requests.
+    let combinedAttempts;
+    const attemptRead = (table, index) => {
+      if (attemptMode === 'direct') return fetchLiveClassAttempts(attemptsClient, table, ids);
+      combinedAttempts ??= scopedAttemptSnapshot(client, ids, true, 500);
+      return combinedAttempts.then(result => ({ data: result.rows[index], error: null }));
+    };
     try {
       latestRows = await runReads([
         () => measured('dashboard_live_activity', client.from('live_student_activity').select('*').eq('class_id', group.classId).order('last_active_at',{ascending:false})),
         () => measured(refreshes ? 'dashboard_events_incremental' : 'dashboard_events_initial', reader.read()),
-        () => measured('dashboard_lesson_attempts', fetchLiveClassAttempts(attemptsClient, 'student_lesson_attempts', ids)),
-        () => measured('dashboard_quiz_attempts', fetchLiveClassAttempts(attemptsClient, 'student_weekly_quiz_attempts', ids)),
-        () => measured('dashboard_assessments', fetchLiveClassAttempts(attemptsClient, 'student_realm_assessments', ids)),
+        () => measured('dashboard_lesson_attempts', attemptRead('student_lesson_attempts', 0)),
+        () => measured('dashboard_quiz_attempts', attemptRead('student_weekly_quiz_attempts', 1)),
+        () => measured('dashboard_assessments', attemptRead('student_realm_assessments', 2)),
         () => measured('dashboard_daily_activity', client.rpc('get_live_class_activity_today',{p_class_id:group.classId})),
       ], dashboardConcurrency);
       if (eventMode === 'full') assert.ok(latestRows[1].length >= 5000, 'Complete historical event snapshot');
@@ -270,6 +282,11 @@ async function dashboardJourney({ group, client, profile }) {
       assert.equal(countResult.error, null);
       assert.equal(latestRows[index+2].length, countResult.count, `${table}: complete persisted history`);
       assert.equal(new Set(latestRows[index+2].map(row=>row.id)).size, countResult.count, `${table}: no duplicate attempts`);
+      if (attemptMode === 'scoped') {
+        const original = await fetchLiveClassAttempts(attemptsClient, table, ids);
+        assert.equal(original.error, null);
+        assert.deepEqual(latestRows[index+2], original.data, `${table}: every projected row matches production reader`);
+      }
       historyCounts.push(countResult.count);
     }
     dashboardChecks.push({historyCounts, refreshes, observedNewEvents:observed.length, finalRowCounts:latestRows.map(rows=>rows.length)});
@@ -315,7 +332,7 @@ const endpoints = [...new Set(samples.map(s => s.name))].map(name => {
 const failedRequests = endpoints.reduce((n,e) => n + e.failedRequests, 0);
 if (eventMode === 'compact' && compactPageRequests === 0) failures.push('Compact event RPC was never exercised');
 const report = { at: new Date().toISOString(), environment: 'local protocol rehearsal; not production capacity certification',
-  eventMode, compactPageRequests, attemptPageSize, eventRun, activityJournalFile,
+  eventMode, compactPageRequests, attemptPageSize, attemptMode, eventRun, activityJournalFile,
   workloadStartedAt: new Date(started).toISOString(),
   databaseTracing: traceDatabase, dashboardHttpProfiling: profileDashboard,
   dashboardConcurrency, readTimingScope: 'Source timings exclude queue wait; whole dashboard refresh includes queue wait.',
