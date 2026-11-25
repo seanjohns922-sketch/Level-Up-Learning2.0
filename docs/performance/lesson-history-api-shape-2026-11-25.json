@@ -1,0 +1,92 @@
+{
+  "at": "2026-11-25T02:15:04.997Z",
+  "apiShape": true,
+  "checks": [
+    "24 complete API-envelope bodies match direct ordered rows across literal/custom/generic modes",
+    "72 successful authenticated literal/custom/generic head/page plans",
+    "Read-only transactions rolled back; no schema or fixture writes",
+    "Exact production projection, completed filter, student scope, UUID order and first-page upper bound"
+  ],
+  "limitation": "Sequential local authenticated EXPLAIN ANALYZE, not concurrent HTTP, pool waits, browser latency or capacity proof. Plan conditions and fixture IDs are not exported.",
+  "groups": [
+    {
+      "kind": "head",
+      "mode": "literal",
+      "count": 12,
+      "minMs": 8.932,
+      "medianMs": 10.006,
+      "maxMs": 13.295,
+      "indexes": [
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ]
+    },
+    {
+      "kind": "head",
+      "mode": "force_custom_plan",
+      "count": 12,
+      "minMs": 8.795,
+      "medianMs": 10.01,
+      "maxMs": 16.044,
+      "indexes": [
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ]
+    },
+    {
+      "kind": "head",
+      "mode": "force_generic_plan",
+      "count": 12,
+      "minMs": 9.781,
+      "medianMs": 11.309,
+      "maxMs": 15.86,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "students_class_id_idx"
+      ]
+    },
+    {
+      "kind": "page",
+      "mode": "literal",
+      "count": 12,
+      "minMs": 12.622,
+      "medianMs": 13.817,
+      "maxMs": 28.881,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "students_class_id_idx"
+      ]
+    },
+    {
+      "kind": "page",
+      "mode": "force_custom_plan",
+      "count": 12,
+      "minMs": 12.764,
+      "medianMs": 14.046,
+      "maxMs": 47.184,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "students_class_id_idx"
+      ]
+    },
+    {
+      "kind": "page",
+      "mode": "force_generic_plan",
+      "count": 12,
+      "minMs": 13.986,
+      "medianMs": 15.29,
+      "maxMs": 27.556,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ]
+    }
+  ],
+  "limitations": [
+    "Reconstructed from local normalized PostgREST SQL; not captured bound wire query",
+    "Includes CTE, JSON aggregation, response settings and parameterized filters/limit/offset",
+    "Does not reproduce API connection handling, request GUC setup, concurrent workload or hosted conditions",
+    "Fixed mode ordering; not a comparative speed benchmark"
+  ]
+}

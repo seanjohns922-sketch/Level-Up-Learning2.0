@@ -2179,3 +2179,33 @@ read-only workload, retaining redaction of fixture identifiers and credentials.
 Aggregates are in `lesson-history-plans-2026-11-25.json`; full redacted node trees
 remain in the private fixture output. Syntax and diff checks passed. Application
 code remains unchanged; no release build or migration is required.
+
+### 25 November: inspect the observed API SQL envelope
+
+Read normalized local `pg_stat_statements` query shapes for lesson-history pages.
+They use a `pgrst_source` CTE, parameterized filters, limit and offset, then count
+and JSON aggregation with response-setting lookups. The local plan script now
+supports `--api-shape` to reconstruct that envelope, including parameterized
+completed/limit/offset values for custom and generic plans. This does not capture
+or execute raw caller-supplied SQL; generated statements remain fixed SELECTs.
+
+The first envelope run completed 72 plans in roughly 9–32 ms. Added full ordered
+body equivalence checks and repeated the run: 72 plans passed, and 24 response
+bodies/counts matched the direct queries across four teachers, two query types and
+three plan modes. The repeat ranged from 8.8–16.0 ms for heads and 12.6–47.2 ms for
+pages. Existing student-scope/primary-key and students-class indexes remained in
+use. Syntax and diff checks passed; no app build needed for diagnostic-only work.
+
+The reconstructed envelope does not reproduce the roughly one-second concurrent
+HTTP outliers. Do not conclude that all API-side SQL is fast: this remains an
+isolated, sequential SQL experiment without the exact bound wire query, request
+GUC setup, API connection handling or concurrent workload. Normalized statements
+also parameterize constants in their displayed text; the reconstruction uses
+literal response metadata constants. The extra equivalence reads change warming,
+so the two runs are not a controlled speed comparison.
+
+No index, RLS, plan-cache or production scheduling change is justified. Next focus
+on API/connection acquisition and host scheduling under repeated unchanged reads,
+with low-overhead timing rather than another speculative SQL rewrite. Aggregates
+are in `lesson-history-api-shape-2026-11-25.json`. No migration or deployment is
+required; production behaviour remains unchanged.
