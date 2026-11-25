@@ -23,23 +23,31 @@ export function Instances({geometry,material,items,obstacle=false}:{geometry:THR
  return <instancedMesh ref={ref} args={[geometry,material,items.length]} userData={obstacle?{cameraObstacle:true}:undefined}/>;
 }
 
-/** Basalt plates with thin cracks; the glow map lights only some cracks, lava orange or (neutral) white for tinting. */
-export function basaltTextures(repeat:[number,number],neutral=false){
- const size=512,map=new Uint8Array(size*size*4),glow=new Uint8Array(size*size*4);
+/** Basalt plates with thin cracks; the glow map lights only some cracks, lava orange or (neutral) white for tinting.
+ *  The pixels are computed once per glow colour and shared; each call gets its own textures for its own repeat. */
+const basaltPixels=new Map<boolean,{map:Uint8Array;glow:Uint8Array}>();
+function basaltData(neutral:boolean){
+ const cached=basaltPixels.get(neutral);if(cached)return cached;
+ const size=512,map=new Uint8Array(size*size*4),glow=new Uint8Array(size*size*4),cells=6;
  const hash=(x:number,y:number)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n);};
+ // Each cell's jittered centre and shade, looked up instead of rehashed for every pixel.
+ const jx=new Float64Array(cells*cells),jy=new Float64Array(cells*cells),shade=new Float64Array(cells*cells);
+ for(let cy=0;cy<cells;cy++)for(let cx=0;cx<cells;cx++){const k=cy*cells+cx;jx[k]=hash(cx,cy);jy[k]=hash(cx+31,cy+7);shade[k]=hash(cx+3,cy+11);}
  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
-  const px=x/size*6,py=y/size*6;let f1=9,f2=9,cell=0;
-  for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){const cx=(Math.floor(px)+i+6)%6,cy=(Math.floor(py)+j+6)%6,ox=Math.floor(px)+i,oy=Math.floor(py)+j;const d=Math.hypot(px-ox-hash(cx,cy),py-oy-hash(cx+31,cy+7));if(d<f1){f2=f1;f1=d;cell=hash(cx+3,cy+11);}else if(d<f2)f2=d;}
+  const px=x/size*cells,py=y/size*cells,fx=Math.floor(px),fy=Math.floor(py);let f1=9,f2=9,cell=0;
+  for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){const k=((fy+j+cells)%cells)*cells+(fx+i+cells)%cells,ex=px-fx-i-jx[k],ey=py-fy-j-jy[k],d=Math.sqrt(ex*ex+ey*ey);if(d<f1){f2=f1;f1=d;cell=shade[k];}else if(d<f2)f2=d;}
   const crack=1-THREE.MathUtils.smoothstep(f2-f1,.012,.06),grain=hash(x,y)*14,k=(y*size+x)*4;
   const base=34+cell*18+grain-crack*26;
   map[k]=base+4;map[k+1]=base;map[k+2]=base+2;map[k+3]=255;
   const hot=crack*(cell>.72?1:cell>.45?.28:.08);glow[k]=255*hot;glow[k+1]=(neutral?255:95)*hot;glow[k+2]=(neutral?255:30)*hot;glow[k+3]=255;
  }
+ const data={map,glow};basaltPixels.set(neutral,data);return data;
+}
+export function basaltTextures(repeat:[number,number],neutral=false){
+ const size=512,{map,glow}=basaltData(neutral);
  const make=(d:Uint8Array)=>{const t=new THREE.DataTexture(d,size,size);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...repeat);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.colorSpace=THREE.SRGBColorSpace;t.needsUpdate=true;return t;};
  return {map:make(map),glow:make(glow)};
 }
-
-/** Molten lava under drifting crust plates. Scroll its offset to make it flow. */
 export function lavaTexture(repeat:[number,number]){
  const w=128,h=512,data=new Uint8Array(w*h*4);
  const hash=(x:number,y:number)=>{const n=Math.sin(x*91.7+y*231.3)*43758.5453;return n-Math.floor(n);};

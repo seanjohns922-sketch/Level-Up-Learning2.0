@@ -1,4 +1,5 @@
-import { volcanoHeight,volcanoProjection } from './volcano-expedition';
+import { EXPEDITION_BOUNDS,volcanoHeight,volcanoProjection } from './volcano-expedition';
+import { createSegmentGrid } from './segment-grid';
 import type { SummitPoint } from './number-summit';
 
 export const CROSSROADS: SummitPoint = [0, 0, 65];
@@ -22,13 +23,13 @@ export function sampleTrail(points:readonly (readonly number[])[]):SummitPoint[]
  out.push([...points[points.length-1]] as SummitPoint);return out;
 }
 export const TRAIL_SAMPLES=EXPEDITION_TRAILS.map(t=>sampleTrail(t.points));
+/** Every trail segment in order, with its trail and position, for the shared nearest-segment index. */
+const TRAIL_SEGMENTS=TRAIL_SAMPLES.flatMap((points,trail)=>points.slice(0,-1).map((a,i)=>({ax:a[0],az:a[2],bx:points[i+1][0],bz:points[i+1][2],ay:a[1],by:points[i+1][1],trail,i,last:points.length-1})));
+const nearestTrailSegment=createSegmentGrid(TRAIL_SEGMENTS,EXPEDITION_BOUNDS,5);
+/** The nearest point on any trail: its distance, height, trail and progress along that trail (0–1). */
 export function nearestTrail(x:number,z:number){
- let best={distance:Infinity,height:0,trail:0,progress:0};
- TRAIL_SAMPLES.forEach((points,trail)=>{for(let i=0;i<points.length-1;i++){
-  const a=points[i],b=points[i+1],dx=b[0]-a[0],dz=b[2]-a[2],t=Math.max(0,Math.min(1,((x-a[0])*dx+(z-a[2])*dz)/(dx*dx+dz*dz)));
-  const distance=Math.hypot(x-a[0]-t*dx,z-a[2]-t*dz);
-  if(distance<best.distance)best={distance,height:a[1]+t*(b[1]-a[1]),trail,progress:(i+t)/(points.length-1)};
- }});return best;
+ const {segment,t,distance}=nearestTrailSegment(x,z),s=TRAIL_SEGMENTS[segment];
+ return {distance,height:s.ay+t*(s.by-s.ay),trail:s.trail,progress:(s.i+t)/s.last};
 }
 export function crossroadsFloor(x:number,z:number):number|null{
  if(Math.hypot(x+8,z-72)<1.55)return null;

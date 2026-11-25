@@ -46,12 +46,12 @@ function Waymark({index}:{index:number}){
   {[0,Math.PI].map(a=><mesh key={a} rotation={[0,a,0]} position={[0,3,a===0?.15:-.15]}><planeGeometry args={[4.5,1.12]}/><meshBasicMaterial map={label} toneMapped={false} fog={false}/></mesh>)}
  </group>;
 }
-/** Cave art the arch frames (1672 × 941), shown as a centred vertical slice so the gate looks into the realm. */
-const CAVE_ART_ASPECT=1672/941,ARCH_HEIGHT=ARCH_SPRING+ARCH_RADIUS;
+/** The slice of each realm's cave painting that its gate frames, cut at gate size by scripts/make-gate-windows.mjs. */
+const ARCH_HEIGHT=ARCH_SPRING+ARCH_RADIUS;
 function CaveWindow({realm}:{realm:string}){
- const art=useTexture(`/images/shattered-realms/${realm}-cavern.webp`),shape=useMemo(()=>archShape(),[]);
- // Shape UVs are raw arch coordinates; scale them into a slice of the landscape art centred a little right of middle.
- const map=useMemo(()=>{const t=art.clone();t.colorSpace=THREE.SRGBColorSpace;const slice=(2*ARCH_RADIUS/ARCH_HEIGHT)/CAVE_ART_ASPECT;t.repeat.set(slice/(2*ARCH_RADIUS),1/ARCH_HEIGHT);t.offset.set(.56,0);t.needsUpdate=true;return t;},[art]);
+ const art=useTexture(`/images/shattered-realms/gates/${realm}-gate.webp`),shape=useMemo(()=>archShape(),[]);
+ // Shape UVs are raw arch coordinates (x from −radius to radius, y from 0 to the crown); map them onto the whole slice.
+ const map=useMemo(()=>{const t=art.clone();t.colorSpace=THREE.SRGBColorSpace;t.repeat.set(1/(2*ARCH_RADIUS),1/ARCH_HEIGHT);t.offset.set(.5,0);t.needsUpdate=true;return t;},[art]);
  useEffect(()=>()=>{shape.dispose();map.dispose();},[shape,map]);
  return <mesh geometry={shape} position={[0,.35,.08]}><meshBasicMaterial map={map} toneMapped={false} side={THREE.DoubleSide}/></mesh>;
 }
@@ -109,8 +109,10 @@ function Scenery(){
  {TRAIL_SAMPLES.map((path,k)=>path.filter((_,i)=>i%7===0).map((p,i)=>{const side=i%2?1:-1;return <Stone key={`${k}-${i}`} at={[p[0]+side*3.8,p[1]-.1,p[2]+.6]} scale={[.45+i%3*.2,.3,.5]} colour={k===1?'#98959e':'#969889'}/>;}))}
  </>;
 }
+// Ground palette, parsed once rather than for each of the terrain's 32,000 vertices.
+const GROUND={volcanic:new THREE.Color('#3a3332'),wild:new THREE.Color('#59634e'),trail:new THREE.Color('#687352'),ash:new THREE.Color('#251f20'),ember:new THREE.Color('#5a3a2e'),threat:new THREE.Color('#62666a'),seabed:new THREE.Color('#2b2a28'),shore:new THREE.Color('#4d463c')};
 export default function ExpeditionCrossroads({openTrails=EXPEDITION_TRAILS.map(t=>t.id)}:{openTrails?:readonly string[]}){
- const ground=useMemo(()=>{const g=new THREE.PlaneGeometry(440,450,180,180);g.rotateX(-Math.PI/2);g.translate(0,0,-40);const p=g.attributes.position,colours:number[]=[];for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);p.setY(i,crossroadsTerrain(x,z));const volcanic=z<-25&&x>-65,y=p.getY(i);const c=new THREE.Color(volcanic?'#3a3332':nearestTrail(x,z).distance>8?'#59634e':'#687352');if(volcanic){c.lerp(new THREE.Color('#251f20'),Math.min(1,y/60)*.8).lerp(new THREE.Color('#5a3a2e'),Math.max(0,Math.sin(x*.21+z*.17)*Math.sin(y*.35))*.35);}else c.lerp(new THREE.Color('#62666a'),trailThreat(x,z)*.55);if(y<SEA_LEVEL+.5)c.set(y<SEA_LEVEL-.4?'#2b2a28':'#4d463c');c.multiplyScalar(.9+.1*Math.sin(x*.8+z*.4));colours.push(c.r,c.g,c.b);}g.setAttribute('color',new THREE.Float32BufferAttribute(colours,3));g.computeVertexNormals();return g;},[]);
+ const ground=useMemo(()=>{const g=new THREE.PlaneGeometry(440,450,180,180);g.rotateX(-Math.PI/2);g.translate(0,0,-40);const p=g.attributes.position,colours=new Float32Array(p.count*3),c=new THREE.Color();for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i);p.setY(i,crossroadsTerrain(x,z));const volcanic=z<-25&&x>-65,y=p.getY(i);c.copy(volcanic?GROUND.volcanic:nearestTrail(x,z).distance>8?GROUND.wild:GROUND.trail);if(volcanic){c.lerp(GROUND.ash,Math.min(1,y/60)*.8).lerp(GROUND.ember,Math.max(0,Math.sin(x*.21+z*.17)*Math.sin(y*.35))*.35);}else c.lerp(GROUND.threat,trailThreat(x,z)*.55);if(y<SEA_LEVEL+.5)c.copy(y<SEA_LEVEL-.4?GROUND.seabed:GROUND.shore);c.multiplyScalar(.9+.1*Math.sin(x*.8+z*.4));colours[i*3]=c.r;colours[i*3+1]=c.g;colours[i*3+2]=c.b;}g.setAttribute('color',new THREE.BufferAttribute(colours,3));g.computeVertexNormals();return g;},[]);
  return <group>
  <mesh geometry={ground} receiveShadow><meshLambertMaterial vertexColors/></mesh>
  {TRAIL_SAMPLES.map((p,i)=><Trail key={i} points={p} layer={i+1}/>)}<Trail points={[[0,0,102],[0,0,84],[0,0,74],[0,0,65]]}/>
