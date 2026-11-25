@@ -20,6 +20,7 @@ import { fetchPendingStudentDiagnostic } from "@/lib/whole-maths-diagnostic-clie
 import { clearDiagnosticHandoffPause } from "@/lib/diagnostic-handoff";
 import { tryNormalizeStarpathLevel } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
+import { SCHOOLS_EMAIL, SUPPORT_EMAIL, supportMailto } from "@/lib/contact";
 
 type DemoAccessDebug = {
   featureEnabledRaw?: string | null;
@@ -572,7 +573,7 @@ export default function LoginPage() {
       await supabase.auth.signOut();
       setParentError(refusal.includes("Parent access required")
         ? "That email belongs to a teacher or school account, not a parent account. Use Teacher sign-in, or create a parent account."
-        : "This account isn't active yet. Please contact support so we can switch it on.");
+        : `This account isn't active yet. Email ${SUPPORT_EMAIL} and we'll switch it on.`);
       setParentLoading(false);
       return;
     }
@@ -1439,6 +1440,11 @@ export default function LoginPage() {
               {teacherLoading ? "Please wait..." : teacherMode === "activate" ? "Activate School Account" : "Log In"}
             </button>
 
+            <p className="text-center text-xs font-semibold leading-5 text-white/45">
+              New school? Email <a href={`mailto:${SCHOOLS_EMAIL}`} className="text-white/70 underline underline-offset-2 hover:text-white">{SCHOOLS_EMAIL}</a>
+              <br />
+              Stuck? Email <a href={supportMailto("RELIQ login help")} className="text-white/70 underline underline-offset-2 hover:text-white">{SUPPORT_EMAIL}</a>
+            </p>
           </div>
         )}
 

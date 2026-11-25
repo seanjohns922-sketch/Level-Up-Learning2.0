@@ -32,6 +32,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+import { SupportLink } from "@/components/adult/SupportLink";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { ChangeEvent, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -2539,6 +2540,7 @@ export default function SchoolHomeClient({
               {isAdministrator ? "For admin" : "For teachers"}
             </p>
           </div>
+          <SupportLink icon className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#34373A] text-[#C9CCC6] hover:bg-[#222426] hover:text-white lg:hidden" />
           <FullscreenToggle icon className="h-10 w-10 rounded-lg border border-[#34373A] text-[#C9CCC6] hover:bg-[#222426] hover:text-white lg:hidden" />
           <button
             type="button"
@@ -2626,6 +2628,7 @@ export default function SchoolHomeClient({
               <span className="block truncate text-sm font-bold">{actorFullName}</span>
               <span className="block truncate text-xs text-[#8F948C]">{roleLine}</span>
             </span>
+            <SupportLink icon className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-[#C9CCC6] hover:bg-[#222426] hover:text-white" />
             <FullscreenToggle icon className="h-9 w-9 rounded-lg text-[#C9CCC6] hover:bg-[#222426] hover:text-white" />
             <button
               type="button"

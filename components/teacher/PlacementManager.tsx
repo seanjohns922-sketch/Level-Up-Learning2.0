@@ -24,6 +24,7 @@ import {
 } from "@/lib/realm-progress-compat";
 import { normalizeSchoolYearLabel } from "@/lib/studentLevelLabel";
 import RealmAccessGrid from "@/components/teacher/RealmAccessGrid";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 // Class placement in three views: realm cards (level spread, pre-test status,
 // who needs placing), a class grid (every student x every realm) and a per-realm
@@ -106,7 +107,7 @@ function placementErrorMessage(error: unknown, realmLabel: string) {
     return "Your teacher account is not authorised to place one or more of these students.";
   }
   if (/canonical progress|could not be verified/i.test(message)) {
-    return "The placement was recorded, but the student's learning program was not created. Please contact support before retrying.";
+    return `The placement was recorded, but the student's learning program was not created. Email ${SUPPORT_EMAIL} before trying again.`;
   }
   return message ? `Placements were not saved: ${message}` : "Placements were not saved. Please try again.";
 }

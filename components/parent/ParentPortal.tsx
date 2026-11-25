@@ -26,6 +26,8 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { SupportLink } from "@/components/adult/SupportLink";
+import { SUPPORT_EMAIL } from "@/lib/contact";
 import { sendRex } from "@/lib/rex-client";
 import { fetchChildFriends, setChildFriends } from "@/lib/friends";
 import { setChildBattles } from "@/lib/battles";
@@ -225,7 +227,8 @@ export function ParentShell({ children, preview = false }: { children: ReactNode
         <nav className="mt-9 space-y-1" aria-label="Parent navigation">
           {PARENT_NAV.map((item) => <ParentNavLink key={item.href} item={item} active={item.isActive(activePath)} preview={preview} />)}
         </nav>
-        <div className="mt-auto flex items-center gap-2 border-t border-white/10 pt-5">
+        <SupportLink className="mt-auto mb-3 flex min-h-11 items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white" />
+        <div className="flex items-center gap-2 border-t border-white/10 pt-5">
           <button type="button" onClick={signOut} disabled={preview} className="flex min-h-11 flex-1 items-center gap-3 rounded-md px-3 font-bold text-white/75 hover:bg-white/10 hover:text-white disabled:opacity-60"><LogOut className="h-5 w-5" /> Sign out</button>
           <FullscreenToggle icon className="h-11 w-11 rounded-md text-white/75 hover:bg-white/10 hover:text-white" />
         </div>
@@ -244,6 +247,7 @@ export function ParentShell({ children, preview = false }: { children: ReactNode
           {menuOpen ? (
             <nav id="parent-mobile-menu" className="grid gap-1 border-t border-slate-100 px-3 py-3" aria-label="Parent navigation">
               {PARENT_NAV.map((item) => <ParentMobileNav key={item.href} item={item} active={item.isActive(activePath)} preview={preview} onNavigate={() => setMenuOpen(false)} />)}
+              <SupportLink className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-left font-bold text-slate-700" />
               <button type="button" onClick={signOut} disabled={preview} className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-left font-bold text-slate-700 disabled:opacity-60"><LogOut className="h-5 w-5" /> Sign out</button>
             </nav>
           ) : null}
@@ -287,7 +291,7 @@ export type ParentPreviewData = {
 /** The parent gate's reasons, in words a parent can act on (see assert_parent_role). */
 export function parentHomeErrorMessage(reason: string | undefined) {
   if (reason?.includes("Parent access required")) return "This account isn't set up as a parent account. Sign in with the email you used to create your parent account, or link your child with their Explorer Code.";
-  if (reason?.includes("Account unavailable")) return "This account isn't active yet. Please contact support so we can switch it on.";
+  if (reason?.includes("Account unavailable")) return `This account isn't active yet. Email ${SUPPORT_EMAIL} and we'll switch it on.`;
   if (reason?.includes("Login required")) return "Your sign-in has expired. Please sign in again.";
   return "Parent Home could not be loaded. Please try again.";
 }

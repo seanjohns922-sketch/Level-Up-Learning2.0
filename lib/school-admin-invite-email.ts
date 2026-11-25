@@ -7,6 +7,7 @@
  * and a short footer. The sender name is always "RELIQ"; EMAIL_FROM only
  * supplies the sending address.
  */
+import { SUPPORT_EMAIL } from "@/lib/contact";
 
 type InviteEmailInput = {
   to: string;
@@ -23,7 +24,7 @@ export type InviteEmailDelivery = "sent" | "unconfigured" | "failed";
 
 const DEFAULT_SENDER_ADDRESS = "schools@reliq.au";
 // Replies reach a monitored inbox, not the sending address.
-const DEFAULT_REPLY_TO_ADDRESS = "support@reliq.au";
+const DEFAULT_REPLY_TO_ADDRESS = SUPPORT_EMAIL;
 const CARBON = "#121314";
 const LIME = "#83E300";
 const INK = "#121314";
@@ -47,7 +48,7 @@ export function senderAddress(configured = process.env.EMAIL_FROM) {
   return `RELIQ <${address}>`;
 }
 
-/** Where replies go: EMAIL_REPLY_TO, else support@reliq.au. */
+/** Where replies go: EMAIL_REPLY_TO, else the RELIQ support address. */
 export function replyToAddress(configured = process.env.EMAIL_REPLY_TO) {
   const value = configured?.trim() ?? "";
   return value.includes("@") ? value : DEFAULT_REPLY_TO_ADDRESS;
@@ -130,6 +131,7 @@ export function renderEmailHtml(content: EmailContent, origin: string) {
         <tr>
           <td style="padding:22px 32px 0;font:400 12px/18px ${FONT};color:${MUTED};text-align:center;">
             ${escapeHtml(content.reason)} If you weren't expecting it, you can ignore this email.<br>
+            Need help? Email <a href="mailto:${SUPPORT_EMAIL}" style="color:${INK};">${SUPPORT_EMAIL}</a> or reply to this email.<br>
             <span style="color:${INK};font-weight:700;">RELIQ</span> · BrightUp Education
           </td>
         </tr>
@@ -209,6 +211,7 @@ export function schoolAdminInviteEmail({ to, schoolName, schoolCode, baseUrl }: 
     "",
     "Your school code isn't a password. It simply connects your account to your school. After you've activated, sign in with Log In using your email and password.",
     "",
+    `Need help? Email ${SUPPORT_EMAIL} or reply to this email.`,
     "RELIQ · BrightUp Education",
   ].join("\n");
   return { to: email, subject, html, text };
@@ -249,6 +252,7 @@ export function schoolStaffInviteEmail({ to, schoolName, schoolCode, role, baseU
     "",
     "Your school code isn't a password. It simply connects your account to your school. After you've activated, sign in with Log In using your email and password.",
     "",
+    `Need help? Email ${SUPPORT_EMAIL} or reply to this email.`,
     "RELIQ · BrightUp Education",
   ].join("\n");
   return { to: email, subject, html, text };
@@ -283,6 +287,7 @@ export function schoolAdminAccessEmail({ to, schoolName, baseUrl }: Omit<InviteE
     `1. Go to ${loginUrl} and choose Log In.`,
     "2. Sign in with your usual email and password.",
     "",
+    `Need help? Email ${SUPPORT_EMAIL} or reply to this email.`,
     "RELIQ · BrightUp Education",
   ].join("\n");
   return { to: email, subject, html, text };

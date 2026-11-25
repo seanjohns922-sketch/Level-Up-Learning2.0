@@ -4,6 +4,7 @@ import { FullscreenToggle } from "@/components/FullscreenToggle";
 import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Footprints, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
+import { SupportLink } from "@/components/adult/SupportLink";
 import { SendRexDialog } from "@/components/teacher/SendRexDialog";
 import { setClassFriends } from "@/lib/friends";
 import { setClassBattles } from "@/lib/battles";
@@ -1191,6 +1192,7 @@ export default function TeacherDashboardPage() {
               )}
             </div>
 
+            <SupportLink icon className="flex h-9 w-9 items-center justify-center rounded-lg text-[#8F948C] transition hover:bg-[#222426] hover:text-white" />
             <FullscreenToggle icon className="h-9 w-9 rounded-lg text-[#8F948C] transition hover:bg-[#222426] hover:text-white" />
             <button
               onClick={async () => {
