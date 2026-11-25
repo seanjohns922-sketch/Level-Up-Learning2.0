@@ -39,7 +39,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Users, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Star, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Users, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -196,7 +196,7 @@ function GroundSwatch({ tool }: { tool: WorldEditTool }) {
   if (tool === "stone") return <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="10" width="104" height="70" rx="10" fill="#8e8a82" />{[0, 1, 2].map((r) => [0, 1, 2, 3].map((c) => <rect key={`${r}${c}`} x={14 + c * 25 + (r % 2) * 6} y={16 + r * 21} width="20" height="16" rx="3" fill="#c9c4b8" />))}</svg>;
   return <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="8" y="10" width="104" height="70" rx="10" fill="#7fb84f" /><path d="M8 52c30-18 60 14 104-8v22H8z" fill="#d6b77a" /><circle cx="40" cy="58" r="3" fill="#b8975e" /><circle cx="78" cy="56" r="2.5" fill="#b8975e" /></svg>;
 }
-const GROUND_TOOLS: Array<[WorldEditTool, string, LucideIcon]> = [
+const GROUND_TOOLS: Array<[CentralWorldGroundType, string, LucideIcon]> = [
   ["path", "Path", Route],
   ["road", "Road", Route],
   ["stone", "Stone", Route],
@@ -2273,6 +2273,16 @@ export default function CentralWorld() {
         // Build kit tabs list only the pieces the learner's kit level has unlocked.
         const tabKit = paletteTab === "skate" ? { kit: SKATE_KIT, level: skateLevel } : paletteTab === "race" ? { kit: RACE_KIT, level: raceLevel } : null;
         const sceneryInTab = paletteTab === "ground" ? [] : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(query) && (tabKit === null || Number(item.metadata.kitPieceLevel) <= tabKit.level));
+        // Every card has a star: one tap adds it to (or takes it off) the favourites on the bar.
+        const withStar = (entry: HotbarEntry, name: string, card: React.ReactNode) => {
+          const favourite = hotbar.pins.includes(entry);
+          return (
+            <div key={entry} className="worldPickCard">
+              {card}
+              <button type="button" className="worldPickStar" aria-pressed={favourite} aria-label={favourite ? `Take ${name} out of favourites` : `Add ${name} to favourites`} onClick={() => pinEntry(entry)}><Star size={18} fill={favourite ? "currentColor" : "none"} /></button>
+            </div>
+          );
+        };
         const chooseTab = (tab: TrayTab) => {
           setScenerySearch("");
           if (tab === "owned") { setLibrarySection("owned"); return; }
@@ -2298,22 +2308,22 @@ export default function CentralWorld() {
               {trayTab === "owned" ? <>
                 {ownedWorldItems.map((item) => {
                   const image = inventoryImage(item);
-                  return (
-                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdItem(item))} aria-pressed={selectedInventoryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
+                  return withStar(item.item_key, item.name, (
+                    <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdItem(item))} aria-pressed={selectedInventoryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
                       <span className="worldEditArt">{image ? <Image src={image} alt="" fill sizes="140px" style={{ objectFit: "cover" }} /> : <PackageOpen size={36} />}</span>
                       <b>{item.name}</b>
                     </button>
-                  );
+                  ));
                 })}
                 {!ownedWorldItems.length ? <p className="worldEditEmpty">Buildings and places you unlock in the Marketplace appear here.</p> : null}
                 <button type="button" className="worldEditCard worldEditShop" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")}>
                   <span className="worldEditArt"><ShoppingBag size={34} /></span><b>Get more</b>
                 </button>
-              </> : trayTab === "ground" ? GROUND_TOOLS.map(([tool, label]) => (
-                <button key={tool} type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush(tool))} aria-pressed={!heldItemKey && editTool === tool}>
+              </> : trayTab === "ground" ? GROUND_TOOLS.map(([tool, label]) => withStar(hotbarTool(tool), label, (
+                <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush(tool))} aria-pressed={!heldItemKey && editTool === tool}>
                   <span className="worldEditArt"><GroundSwatch tool={tool} /></span><b>{label}</b>
                 </button>
-              )) : <>
+              ))) : <>
                 {tabKit ? <KitTrayHeader kit={tabKit.kit} level={tabKit.level} next={nextBuildKitUpgrade(tabKit.kit, ownedItemKeys)} upgrading={upgradingHome} onUpgrade={() => upgradeKit(tabKit.kit)} /> : null}
                 {paletteTab === "fortress" ? (
                   // The Tower Shield has no placement: it goes round the Tower once unlocked, and upgrades here.
@@ -2324,11 +2334,11 @@ export default function CentralWorld() {
                       : <span>Unlock it in the Marketplace (Protect the Tower) for a giant energy shield over the Tower. Trip wires, drones, guard dogs and sentry bots are there too.</span>}
                   </div>
                 ) : null}
-                {paletteTab === "race" && raceLevel ? (
+                {paletteTab === "race" && raceLevel ? withStar(hotbarTool("track"), "Tarmac", (
                   <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush("track"))} aria-pressed={!heldItemKey && editTool === "track"}>
                     <span className="worldEditArt"><GroundSwatch tool="track" /></span><b>Paint tarmac</b>
                   </button>
-                ) : null}
+                )) : null}
                 {paletteTab === "race" && raceLevel ? (
                   // The kart garage also opens from the race screen; this makes it easy to find.
                   <button type="button" className="worldEditCard" onClick={() => { finishBuilding(); openGarage(); }}>
@@ -2338,18 +2348,18 @@ export default function CentralWorld() {
                 {sceneryInTab.map((item) => {
                   const art = freeBuildRender(String(item.metadata.worldAssetKey));
                   const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
-                  return (
-                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdItem(item))} aria-pressed={selectedSceneryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
+                  return withStar(item.item_key, item.name, (
+                    <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdItem(item))} aria-pressed={selectedSceneryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
                       <span className="worldEditArt worldEditArtFree">{art ? <Image src={art} alt="" fill sizes="140px" style={{ objectFit: "contain" }} /> : <Icon size={36} color={item.accent} />}</span>
                       <b>{item.name}</b>
                     </button>
-                  );
+                  ));
                 })}
-                {paletteTab === "rocks_water" ? (
+                {paletteTab === "rocks_water" ? withStar(hotbarTool("water"), "Water", (
                   <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush("water"))}>
                     <span className="worldEditArt"><GroundSwatch tool="water" /></span><b>Paint water</b>
                   </button>
-                ) : null}
+                )) : null}
                 {!sceneryInTab.length && !(tabKit && !tabKit.level) ? <p className="worldEditEmpty" role="status">No matching items.</p> : null}
               </>}
             </div>

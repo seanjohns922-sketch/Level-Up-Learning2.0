@@ -118,6 +118,17 @@
 /* The picker ("More"): every category over whichever view is building; the HUD's cards stay out of its way. */
 body:has(.worldPicker) :is(.worldHudActions, .worldHudStartCard) { display: none; }
 
+/* Picker cards carry a favourite star in the corner */
+.worldPickCard { position: relative; flex: 0 0 140px; }
+.worldPickCard .worldEditCard { width: 100%; }
+.worldPickStar {
+  position: absolute; right: 6px; top: 6px; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; border-radius: 999px;
+  border: 2px solid #fcd34d; background: rgba(30, 27, 46, 0.88); color: #fcd34d;
+}
+.worldPickStar[aria-pressed="true"] { background: #fcd34d; color: #78350f; }
+@media (max-height: 640px) { .worldPickCard { flex-basis: 108px; } }
+@media (max-width: 700px) { .worldPickCard { flex-basis: 96px; } .worldPickStar { width: 30px; height: 30px; } }
+
 /* A placed item someone tapped: Move / Turn / Put away beside it */
 .worldEditPicked {
   transform: translate(40px, -50%); width: 200px; display: grid; gap: 8px; padding: 12px; border-radius: 18px;
