@@ -2081,3 +2081,36 @@ mixed-workload 3-versus-6 concurrency experiment already failed to establish a
 reliable win; do not ship a scheduling change based on this isolation test alone.
 Aggregates are in `event-chain-interactions-2026-11-25.json`; full local request
 timings remain in the private fixture directory.
+
+### 25 November: isolate event-first versus event-last scheduling
+
+The local profiler now supports `--scheduling`: all six sources together, events
+before the five companion sources, or events after them. Scheduling is per teacher,
+not a global barrier across classes. Three rounds rotate the order so each mode
+runs first, middle and last once. Total duration includes completion of every
+source; event-ready time and event request duration are recorded separately.
+
+All 36 full snapshots passed complete event and companion-result equivalence.
+Each used 17 HTTP requests and all five companion sources. Offline assertions on
+recorded source start/finish times confirmed the two sequential phase boundaries.
+Syntax and diff checks passed. No schema, application or learning-data changes;
+no application build was needed.
+
+| Round | All together median / max | Events first median / max | Events last median / max |
+| --- | ---: | ---: | ---: |
+| 1 | 1,098 / 1,104 ms | 554 / 574 ms | 503 / 528 ms |
+| 2 | 425 / 441 ms | 406 / 420 ms | 394 / 413 ms |
+| 3 | 400 / 664 ms | 390 / 877 ms | 433 / 879 ms |
+
+The initial all-together burst was slower, but later medians converge and staged
+variants retain substantial outliers. In one all-together snapshot events were
+ready at 415 ms while the whole dashboard required 664 ms, illustrating why event
+time alone is an inadequate success metric. Keep the production scheduling:
+this experiment does not establish a dependable full-dashboard tail improvement.
+Do not extrapolate the small local sample to 10,000 concurrent users.
+
+Aggregates and per-snapshot timings are in
+`event-chain-scheduling-2026-11-25.json`; detailed request timings remain private in
+the local fixture directory. The next useful step is to correlate the variable
+slow requests with local API/DB waits and host activity under the unchanged full
+read workload, rather than further scheduling changes based only on medians.

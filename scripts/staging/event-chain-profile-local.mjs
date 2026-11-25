@@ -1,6 +1,6 @@
 // Read-only event profiling against the isolated synthetic local API.
 // Run with --experimental-strip-types and scripts/typescript-alias-loader.mjs
-// from the fixture checkout. Add --interactions to compare dashboard sources.
+// from the fixture checkout. Use --interactions for sources or --scheduling for order.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -10,8 +10,10 @@ import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
-const interactions = process.argv.includes('--interactions');
-assert(process.argv.slice(2).every(arg => arg === '--interactions'));
+const scheduling = process.argv.includes('--scheduling');
+const interactions = scheduling || process.argv.includes('--interactions');
+assert(process.argv.slice(2).every(arg => ['--interactions', '--scheduling'].includes(arg)));
+assert(process.argv.slice(2).length <= 1, 'Choose one diagnostic mode');
 const tables = ['student_lesson_attempts', 'student_weekly_quiz_attempts', 'student_realm_assessments'];
 const otherSources = [...tables, 'live_student_activity', 'get_live_class_activity_today'];
 const eventTypes = ['activity_started','lesson_started','quiz_started','question_loaded','answer_correct','answer_incorrect','hint_used','lesson_completed','quiz_completed','idle_detected'];
@@ -48,8 +50,8 @@ async function read(teacher, mode, round) {
   const start = performance.now();
   const sourceSamples = [];
   const ids = group.students.map(s => s.studentId);
-  const sources = !interactions || mode === 'events' ? [] : mode === 'all' ? otherSources : [mode];
-  const competing = sources.map(async source => {
+  const sources = !interactions || mode === 'events' ? [] : scheduling || mode === 'all' ? otherSources : [mode];
+  const readSource = async source => {
     const started = performance.now();
     const response = tables.includes(source) ? await fetchLiveClassAttempts(client, source, ids)
       : source === 'live_student_activity' ? await client.from(source).select('*').eq('class_id', group.classId).order('last_active_at', { ascending: false })
@@ -60,17 +62,31 @@ async function read(teacher, mode, round) {
     const key = `${teacherIndex}:${source}`;
     if (sourceBaselines.has(key)) assert.equal(digest, sourceBaselines.get(key), 'Competing source rows remain identical');
     else sourceBaselines.set(key, digest);
-    sourceSamples.push({ source, rows: response.data.length, totalMs: performance.now() - started });
-  });
-  // Install rejection handlers immediately and drain all companion reads.
-  const companions = Promise.allSettled(competing);
+    sourceSamples.push({ source, rows: response.data.length, totalMs: performance.now() - started, readyMs: performance.now() - start });
+  };
+  const readCompanions = async () => {
+    const outcomes = await Promise.allSettled(sources.map(readSource));
+    for (const outcome of outcomes) if (outcome.status === 'rejected') throw outcome.reason;
+  };
   let result;
   let eventMs;
-  try {
+  let eventDurationMs;
+  const readEvents = async () => {
+    const started = performance.now();
     result = await fetchLiveClassEvents(client, { classId: group.classId, studentIds: ids, compact: true, eventTypes });
+    eventDurationMs = performance.now() - started;
     eventMs = performance.now() - start;
-  } finally {
-    const outcomes = await companions;
+    assert.equal(result.error, null);
+  };
+  if (mode === 'events-first') {
+    await readEvents();
+    await readCompanions();
+  } else if (mode === 'events-last') {
+    await readCompanions();
+    await readEvents();
+  } else {
+    // All outcomes are drained before advancing to the next measured snapshot.
+    const outcomes = await Promise.allSettled([readCompanions(), readEvents()]);
     for (const outcome of outcomes) if (outcome.status === 'rejected') throw outcome.reason;
   }
   const totalMs = performance.now() - start;
@@ -86,14 +102,15 @@ async function read(teacher, mode, round) {
   assert.equal(eventRequests[0].route, 'live_activity_events');
   assert(eventRequests.slice(1).every(r => r.route === 'get_live_class_compact_event_page_secure'));
   assert(requests.every(r => r.status === 200));
-  const sample = { teacherIndex, mode, round, rows: result.data.length, totalMs, eventMs, sourceSamples, requests: [...requests] };
+  const sample = { teacherIndex, mode, round, rows: result.data.length, totalMs, eventMs, eventDurationMs, sourceSamples, requests: [...requests] };
   report.samples.push(sample);
   console.log(JSON.stringify({ teacherIndex, mode, round, rows: sample.rows, requests: requests.length, totalMs: Math.round(totalMs), eventMs: Math.round(eventMs) }));
 }
 // Alternate order to expose warm-up/order sensitivity. Drain reads on failure.
-const modes = interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
-for (let round = 0; round < (interactions ? 2 : 3); round++) {
-  for (const mode of round % 2 ? [...modes].reverse() : modes) {
+const modes = scheduling ? ['all', 'events-first', 'events-last'] : interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
+for (let round = 0; round < (scheduling ? 3 : interactions ? 2 : 3); round++) {
+  const order = scheduling ? [...modes.slice(round), ...modes.slice(0, round)] : round % 2 ? [...modes].reverse() : modes;
+  for (const mode of order) {
     if (mode === 'sequential') for (const teacher of teachers) await read(teacher, mode, round);
     else {
       const outcomes = await Promise.allSettled(teachers.map(t => read(t, mode, round)));
@@ -102,4 +119,4 @@ for (let round = 0; round < (interactions ? 2 : 3); round++) {
   }
 }
 report.checks = [`${report.samples.length} complete snapshots; identical ordered rows per teacher`, 'No duplicate or out-of-class rows', 'Production event head and compact-page routes; no fallback; allowed read sources only', 'No application, schema or learning-data writes'];
-fs.writeFileSync(`${localDir}/event-chain-${interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });
+fs.writeFileSync(`${localDir}/event-chain-${scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });

@@ -1,0 +1,395 @@
+{
+  "at": "2026-11-25T01:57:35.035Z",
+  "checks": [
+    "36 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes",
+    "All 36 snapshots use 17 HTTP requests and all five companion sources",
+    "Recorded timings confirm events-first and events-last phase boundaries"
+  ],
+  "limitation": "Four synthetic teachers; read-only source combinations, no student writes. Alternating order is observational, not proof of a production bottleneck or 10,000-user capacity.",
+  "samples": [
+    {
+      "teacherIndex": 0,
+      "mode": "all",
+      "round": 0,
+      "rows": 2824,
+      "totalMs": 1089.41,
+      "eventMs": 1089.4,
+      "eventDurationMs": 1088.63
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "all",
+      "round": 0,
+      "rows": 2825,
+      "totalMs": 1095.39,
+      "eventMs": 1095.38,
+      "eventDurationMs": 1095.3
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "all",
+      "round": 0,
+      "rows": 2829,
+      "totalMs": 1099.94,
+      "eventMs": 1099.94,
+      "eventDurationMs": 1099.85
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "all",
+      "round": 0,
+      "rows": 2828,
+      "totalMs": 1104.32,
+      "eventMs": 1104.32,
+      "eventDurationMs": 1104.2
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "events-first",
+      "round": 0,
+      "rows": 2829,
+      "totalMs": 531.31,
+      "eventMs": 387.6,
+      "eventDurationMs": 387.59
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "events-first",
+      "round": 0,
+      "rows": 2824,
+      "totalMs": 540.05,
+      "eventMs": 336.6,
+      "eventDurationMs": 336.6
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "events-first",
+      "round": 0,
+      "rows": 2828,
+      "totalMs": 568.57,
+      "eventMs": 439.0,
+      "eventDurationMs": 439.0
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "events-first",
+      "round": 0,
+      "rows": 2825,
+      "totalMs": 574.28,
+      "eventMs": 441.16,
+      "eventDurationMs": 441.16
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "events-last",
+      "round": 0,
+      "rows": 2825,
+      "totalMs": 489.73,
+      "eventMs": 489.72,
+      "eventDurationMs": 345.88
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "events-last",
+      "round": 0,
+      "rows": 2829,
+      "totalMs": 498.74,
+      "eventMs": 498.73,
+      "eventDurationMs": 357.48
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "events-last",
+      "round": 0,
+      "rows": 2828,
+      "totalMs": 507.38,
+      "eventMs": 507.37,
+      "eventDurationMs": 358.27
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "events-last",
+      "round": 0,
+      "rows": 2824,
+      "totalMs": 527.84,
+      "eventMs": 527.83,
+      "eventDurationMs": 375.95
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "events-first",
+      "round": 1,
+      "rows": 2829,
+      "totalMs": 393.4,
+      "eventMs": 256.85,
+      "eventDurationMs": 256.85
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "events-first",
+      "round": 1,
+      "rows": 2828,
+      "totalMs": 403.62,
+      "eventMs": 280.76,
+      "eventDurationMs": 280.76
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "events-first",
+      "round": 1,
+      "rows": 2824,
+      "totalMs": 409.19,
+      "eventMs": 259.14,
+      "eventDurationMs": 259.14
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "events-first",
+      "round": 1,
+      "rows": 2825,
+      "totalMs": 420.48,
+      "eventMs": 283.33,
+      "eventDurationMs": 283.33
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "events-last",
+      "round": 1,
+      "rows": 2825,
+      "totalMs": 387.9,
+      "eventMs": 387.89,
+      "eventDurationMs": 253.71
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "events-last",
+      "round": 1,
+      "rows": 2829,
+      "totalMs": 392.05,
+      "eventMs": 392.05,
+      "eventDurationMs": 263.37
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "events-last",
+      "round": 1,
+      "rows": 2824,
+      "totalMs": 395.63,
+      "eventMs": 395.63,
+      "eventDurationMs": 257.83
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "events-last",
+      "round": 1,
+      "rows": 2828,
+      "totalMs": 412.63,
+      "eventMs": 412.62,
+      "eventDurationMs": 265.46
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "all",
+      "round": 1,
+      "rows": 2824,
+      "totalMs": 413.41,
+      "eventMs": 413.4,
+      "eventDurationMs": 413.28
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "all",
+      "round": 1,
+      "rows": 2828,
+      "totalMs": 423.57,
+      "eventMs": 423.56,
+      "eventDurationMs": 423.53
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "all",
+      "round": 1,
+      "rows": 2829,
+      "totalMs": 427.01,
+      "eventMs": 427.01,
+      "eventDurationMs": 426.97
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "all",
+      "round": 1,
+      "rows": 2825,
+      "totalMs": 441.14,
+      "eventMs": 441.13,
+      "eventDurationMs": 441.1
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "events-last",
+      "round": 2,
+      "rows": 2825,
+      "totalMs": 419.43,
+      "eventMs": 419.42,
+      "eventDurationMs": 247.24
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "events-last",
+      "round": 2,
+      "rows": 2824,
+      "totalMs": 423.71,
+      "eventMs": 423.71,
+      "eventDurationMs": 254.48
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "events-last",
+      "round": 2,
+      "rows": 2828,
+      "totalMs": 443.25,
+      "eventMs": 443.25,
+      "eventDurationMs": 251.34
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "events-last",
+      "round": 2,
+      "rows": 2829,
+      "totalMs": 879.41,
+      "eventMs": 879.41,
+      "eventDurationMs": 255.17
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "all",
+      "round": 2,
+      "rows": 2828,
+      "totalMs": 372.95,
+      "eventMs": 372.95,
+      "eventDurationMs": 372.91
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "all",
+      "round": 2,
+      "rows": 2824,
+      "totalMs": 395.74,
+      "eventMs": 395.73,
+      "eventDurationMs": 395.64
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "all",
+      "round": 2,
+      "rows": 2825,
+      "totalMs": 404.69,
+      "eventMs": 404.69,
+      "eventDurationMs": 404.65
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "all",
+      "round": 2,
+      "rows": 2829,
+      "totalMs": 664.09,
+      "eventMs": 414.63,
+      "eventDurationMs": 414.59
+    },
+    {
+      "teacherIndex": 1,
+      "mode": "events-first",
+      "round": 2,
+      "rows": 2828,
+      "totalMs": 380.28,
+      "eventMs": 243.58,
+      "eventDurationMs": 243.58
+    },
+    {
+      "teacherIndex": 0,
+      "mode": "events-first",
+      "round": 2,
+      "rows": 2824,
+      "totalMs": 386.25,
+      "eventMs": 244.84,
+      "eventDurationMs": 244.84
+    },
+    {
+      "teacherIndex": 2,
+      "mode": "events-first",
+      "round": 2,
+      "rows": 2829,
+      "totalMs": 393.04,
+      "eventMs": 246.7,
+      "eventDurationMs": 246.7
+    },
+    {
+      "teacherIndex": 3,
+      "mode": "events-first",
+      "round": 2,
+      "rows": 2825,
+      "totalMs": 877.45,
+      "eventMs": 245.46,
+      "eventDurationMs": 245.46
+    }
+  ],
+  "roundMedians": [
+    {
+      "round": 0,
+      "mode": "all",
+      "medianTotalMs": 1098,
+      "maxTotalMs": 1104
+    },
+    {
+      "round": 0,
+      "mode": "events-first",
+      "medianTotalMs": 554,
+      "maxTotalMs": 574
+    },
+    {
+      "round": 0,
+      "mode": "events-last",
+      "medianTotalMs": 503,
+      "maxTotalMs": 528
+    },
+    {
+      "round": 1,
+      "mode": "all",
+      "medianTotalMs": 425,
+      "maxTotalMs": 441
+    },
+    {
+      "round": 1,
+      "mode": "events-first",
+      "medianTotalMs": 406,
+      "maxTotalMs": 420
+    },
+    {
+      "round": 1,
+      "mode": "events-last",
+      "medianTotalMs": 394,
+      "maxTotalMs": 413
+    },
+    {
+      "round": 2,
+      "mode": "all",
+      "medianTotalMs": 400,
+      "maxTotalMs": 664
+    },
+    {
+      "round": 2,
+      "mode": "events-first",
+      "medianTotalMs": 390,
+      "maxTotalMs": 877
+    },
+    {
+      "round": 2,
+      "mode": "events-last",
+      "medianTotalMs": 433,
+      "maxTotalMs": 879
+    }
+  ],
+  "decision": "Retain production scheduling. Warm-up and tail variability prevent claiming a reliable improvement. No student writes, hosted load or browser rendering tested."
+}
