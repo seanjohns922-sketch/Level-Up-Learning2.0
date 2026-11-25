@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { assetUrl, documentHtml, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
 import { diagnosticReportHtml, realmTestCheckpoints, type RealmTestRow } from "@/lib/documents/diagnostic-report";
 import { supabase } from "@/lib/supabase";
+import { createCoalescedRefresh } from "@/lib/coalesced-refresh";
 import { fetchLiveClassAttempts } from "@/lib/live-class-attempts";
 import { CalendarDays, Check, ChevronDown, Info, ListChecks, Lock, TrendingUp, Unlock, UserPlus, X } from "lucide-react";
 import { STANDING_META, STANDING_ORDER, expectedLevel, standingForGap } from "@/lib/proficiency";
@@ -268,7 +269,7 @@ export default function WholeMathsDiagnosticPanel({
   const [sittings, setSittings] = useState<TeacherDiagnosticSittingRow[]>([]);
   const [realmTests, setRealmTests] = useState<ClassRealmTestRow[]>([]);
   // A stable key so a re-rendered student list doesn't refetch.
-  const studentIdsKey = students.map((student) => student.id).join(",");
+  const studentIdsKey = students.map((student) => student.id).sort().join(",");
   const openDiagnosticReport = async (studentId: string) => {
     const student = students.find((item) => item.id === studentId);
     if (!student) return;
@@ -366,9 +367,15 @@ export default function WholeMathsDiagnosticPanel({
         if (!cancelled) setLiveLoading(false);
       }
     }
-    void loadLive(true);
-    const intervalId = window.setInterval(() => { void loadLive(false); }, 30_000);
-    return () => { cancelled = true; window.clearInterval(intervalId); };
+    let initial = true;
+    const refresh = createCoalescedRefresh(async () => {
+      const showLoading = initial;
+      initial = false;
+      await loadLive(showLoading);
+    }, (error) => console.warn("[WholeMathsDiagnostic] Live refresh failed", error));
+    refresh.request();
+    const intervalId = window.setInterval(() => refresh.request(), 30_000);
+    return () => { cancelled = true; refresh.dispose(); window.clearInterval(intervalId); };
   }, [selectedClass?.id]);
 
   useEffect(() => {
@@ -414,9 +421,15 @@ export default function WholeMathsDiagnosticPanel({
       }
       setDiagnosticLoading(false);
     }
-    void loadDiagnostic(true);
-    const intervalId = window.setInterval(() => { void loadDiagnostic(false); }, 30_000);
-    return () => { cancelled = true; window.clearInterval(intervalId); };
+    let initial = true;
+    const refresh = createCoalescedRefresh(async () => {
+      const showLoading = initial;
+      initial = false;
+      await loadDiagnostic(showLoading);
+    }, (error) => console.warn("[WholeMathsDiagnostic] Diagnostic refresh failed", error));
+    refresh.request();
+    const intervalId = window.setInterval(() => refresh.request(), 30_000);
+    return () => { cancelled = true; refresh.dispose(); window.clearInterval(intervalId); };
   }, [selectedClass?.id, studentIdsKey]);
 
   const studentNames = useMemo(
