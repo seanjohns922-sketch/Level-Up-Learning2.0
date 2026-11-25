@@ -2114,3 +2114,36 @@ Aggregates and per-snapshot timings are in
 the local fixture directory. The next useful step is to correlate the variable
 slow requests with local API/DB waits and host activity under the unchanged full
 read workload, rather than further scheduling changes based only on medians.
+
+### 25 November: correlate unchanged reads with sampled database waits
+
+Added `--contention` to the event profiler: twelve repeated four-teacher bursts
+with all six sources together. Request and snapshot timestamps permit correlation
+with the existing redacted connection sampler. Ran the latter at its existing
+50 ms interval for 30 seconds. It captured 601 samples, including 257 within the
+complete read workload interval. No API configuration or schema changes were made.
+
+All 48 snapshots passed complete-result checks; each made 17 successful requests.
+The correlation summary is `event-chain-waits-2026-11-25.json`. Syntax and diff
+checks passed. These are local diagnostics only, so no application build was run.
+
+The slowest burst (zero-based round 7) took 2,112–2,146 ms across all teachers.
+Several compact-page header waits exceeded 500 ms, reaching 987 ms. In that burst,
+the longest sampled active database query age was only 143 ms. This discrepancy
+is consistent with delay outside a single long-running sampled query, but does
+not identify pool waiting, API scheduling, network or host scheduling as the cause.
+Sampled query age is not total query execution time and short queries may be missed.
+
+Later isolated lesson-history header waits of 1,061, 733 and 1,039 ms coincided
+with round-level maximum sampled query ages of 982, 627 and 964 ms. These are
+correlations, not exact request-to-backend traces. Across the workload, active
+connections mostly had no reported wait event; four observations showed the
+lightweight `LockManager` wait. No sampled active `Lock` or `IO` waits were seen.
+This does not prove CPU saturation or rule out short waits between samples.
+
+The sampler adds observer overhead, and this run is not a speed comparison against
+unprofiled runs. Keep production configuration and read scheduling unchanged.
+Next investigate the longer lesson-history statements under the same authenticated
+scope with read-only query plans, comparing existing indexes and RLS costs before
+proposing any index or reader change. Do not increase the connection pool: the
+previous pool experiment failed, and this trace does not reverse that evidence.

@@ -10,9 +10,10 @@ import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
+const contention = process.argv.includes('--contention');
 const scheduling = process.argv.includes('--scheduling');
-const interactions = scheduling || process.argv.includes('--interactions');
-assert(process.argv.slice(2).every(arg => ['--interactions', '--scheduling'].includes(arg)));
+const interactions = contention || scheduling || process.argv.includes('--interactions');
+assert(process.argv.slice(2).every(arg => ['--interactions', '--scheduling', '--contention'].includes(arg)));
 assert(process.argv.slice(2).length <= 1, 'Choose one diagnostic mode');
 const tables = ['student_lesson_attempts', 'student_weekly_quiz_attempts', 'student_realm_assessments'];
 const otherSources = [...tables, 'live_student_activity', 'get_live_class_activity_today'];
@@ -34,9 +35,10 @@ for (const [teacherIndex, group] of groups.entries()) {
       const isAuth = url.pathname === '/auth/v1/token';
       assert(isAuth || ['live_activity_events', 'get_live_class_compact_event_page_secure', ...(interactions ? otherSources : [])].includes(route), 'Unexpected route or fallback');
       if (!isAuth && !url.pathname.includes('/rpc/')) assert.equal(init?.method ?? 'GET', 'GET');
+      const startedEpochMs = Date.now();
       const start = performance.now();
       const response = await fetch(input, { ...init, signal: AbortSignal.timeout(30000) });
-      if (!isAuth) requests.push({ route, status: response.status, headersMs: performance.now() - start });
+      if (!isAuth) requests.push({ route, startedEpochMs, status: response.status, headersMs: performance.now() - start });
       return response;
     } },
   });
@@ -47,6 +49,7 @@ for (const [teacherIndex, group] of groups.entries()) {
 async function read(teacher, mode, round) {
   const { client, group, teacherIndex, requests } = teacher;
   requests.length = 0;
+  const startedEpochMs = Date.now();
   const start = performance.now();
   const sourceSamples = [];
   const ids = group.students.map(s => s.studentId);
@@ -102,13 +105,13 @@ async function read(teacher, mode, round) {
   assert.equal(eventRequests[0].route, 'live_activity_events');
   assert(eventRequests.slice(1).every(r => r.route === 'get_live_class_compact_event_page_secure'));
   assert(requests.every(r => r.status === 200));
-  const sample = { teacherIndex, mode, round, rows: result.data.length, totalMs, eventMs, eventDurationMs, sourceSamples, requests: [...requests] };
+  const sample = { startedEpochMs, teacherIndex, mode, round, rows: result.data.length, totalMs, eventMs, eventDurationMs, sourceSamples, requests: [...requests] };
   report.samples.push(sample);
   console.log(JSON.stringify({ teacherIndex, mode, round, rows: sample.rows, requests: requests.length, totalMs: Math.round(totalMs), eventMs: Math.round(eventMs) }));
 }
 // Alternate order to expose warm-up/order sensitivity. Drain reads on failure.
-const modes = scheduling ? ['all', 'events-first', 'events-last'] : interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
-for (let round = 0; round < (scheduling ? 3 : interactions ? 2 : 3); round++) {
+const modes = contention ? ['all'] : scheduling ? ['all', 'events-first', 'events-last'] : interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
+for (let round = 0; round < (contention ? 12 : scheduling ? 3 : interactions ? 2 : 3); round++) {
   const order = scheduling ? [...modes.slice(round), ...modes.slice(0, round)] : round % 2 ? [...modes].reverse() : modes;
   for (const mode of order) {
     if (mode === 'sequential') for (const teacher of teachers) await read(teacher, mode, round);
@@ -119,4 +122,4 @@ for (let round = 0; round < (scheduling ? 3 : interactions ? 2 : 3); round++) {
   }
 }
 report.checks = [`${report.samples.length} complete snapshots; identical ordered rows per teacher`, 'No duplicate or out-of-class rows', 'Production event head and compact-page routes; no fallback; allowed read sources only', 'No application, schema or learning-data writes'];
-fs.writeFileSync(`${localDir}/event-chain-${scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });
+fs.writeFileSync(`${localDir}/event-chain-${contention ? 'contention' : scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });

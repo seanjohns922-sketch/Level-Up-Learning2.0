@@ -1,0 +1,248 @@
+{
+  "at": "2026-11-25T02:09:35.316Z",
+  "checks": [
+    "48 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes",
+    "Database sampler covers complete workload interval",
+    "48 snapshots, 17 requests each, all HTTP 200"
+  ],
+  "sampleCount": 257,
+  "rounds": [
+    {
+      "round": 0,
+      "dashboardMs": [
+        1429,
+        1369,
+        1434,
+        1418
+      ],
+      "dbSamples": 26,
+      "peakActive": 10,
+      "maxSampledQueryMs": 399,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 1,
+      "dashboardMs": [
+        1161,
+        1341,
+        1326,
+        1246
+      ],
+      "dbSamples": 26,
+      "peakActive": 10,
+      "maxSampledQueryMs": 229,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 2,
+      "dashboardMs": [
+        673,
+        719,
+        724,
+        710
+      ],
+      "dbSamples": 15,
+      "peakActive": 8,
+      "maxSampledQueryMs": 131,
+      "activeWaitObservations": {
+        "LockManager": 2
+      }
+    },
+    {
+      "round": 3,
+      "dashboardMs": [
+        662,
+        667,
+        675,
+        655
+      ],
+      "dbSamples": 14,
+      "peakActive": 10,
+      "maxSampledQueryMs": 190,
+      "activeWaitObservations": {
+        "LockManager": 2
+      }
+    },
+    {
+      "round": 4,
+      "dashboardMs": [
+        628,
+        636,
+        644,
+        681
+      ],
+      "dbSamples": 13,
+      "peakActive": 10,
+      "maxSampledQueryMs": 146,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 5,
+      "dashboardMs": [
+        699,
+        706,
+        717,
+        642
+      ],
+      "dbSamples": 15,
+      "peakActive": 9,
+      "maxSampledQueryMs": 127,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 6,
+      "dashboardMs": [
+        713,
+        736,
+        726,
+        721
+      ],
+      "dbSamples": 15,
+      "peakActive": 10,
+      "maxSampledQueryMs": 155,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 7,
+      "dashboardMs": [
+        2136,
+        2140,
+        2146,
+        2112
+      ],
+      "dbSamples": 43,
+      "peakActive": 10,
+      "maxSampledQueryMs": 143,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 8,
+      "dashboardMs": [
+        829,
+        1390,
+        935,
+        865
+      ],
+      "dbSamples": 27,
+      "peakActive": 8,
+      "maxSampledQueryMs": 982,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 9,
+      "dashboardMs": [
+        997,
+        840,
+        835,
+        830
+      ],
+      "dbSamples": 19,
+      "peakActive": 10,
+      "maxSampledQueryMs": 627,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 10,
+      "dashboardMs": [
+        887,
+        906,
+        1333,
+        921
+      ],
+      "dbSamples": 26,
+      "peakActive": 9,
+      "maxSampledQueryMs": 964,
+      "activeWaitObservations": {}
+    },
+    {
+      "round": 11,
+      "dashboardMs": [
+        686,
+        713,
+        730,
+        745
+      ],
+      "dbSamples": 15,
+      "peakActive": 10,
+      "maxSampledQueryMs": 129,
+      "activeWaitObservations": {}
+    }
+  ],
+  "caveats": [
+    "Sampling misses transactions shorter than the interval",
+    "Database transaction age excludes waiting for a pool connection",
+    "PostgREST includes non-workload connections; not per-request attribution",
+    "Profiling introduces observer overhead"
+  ],
+  "slowHeaderRequests": [
+    {
+      "round": 7,
+      "teacherIndex": 3,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 626
+    },
+    {
+      "round": 7,
+      "teacherIndex": 3,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 987
+    },
+    {
+      "round": 7,
+      "teacherIndex": 0,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 580
+    },
+    {
+      "round": 7,
+      "teacherIndex": 0,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 727
+    },
+    {
+      "round": 7,
+      "teacherIndex": 1,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 590
+    },
+    {
+      "round": 7,
+      "teacherIndex": 1,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 711
+    },
+    {
+      "round": 7,
+      "teacherIndex": 2,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 577
+    },
+    {
+      "round": 7,
+      "teacherIndex": 2,
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 712
+    },
+    {
+      "round": 8,
+      "teacherIndex": 1,
+      "route": "student_lesson_attempts",
+      "headersMs": 1061
+    },
+    {
+      "round": 9,
+      "teacherIndex": 0,
+      "route": "student_lesson_attempts",
+      "headersMs": 733
+    },
+    {
+      "round": 10,
+      "teacherIndex": 2,
+      "route": "student_lesson_attempts",
+      "headersMs": 1039
+    }
+  ]
+}
