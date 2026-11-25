@@ -1,0 +1,163 @@
+{
+  "at": "2026-11-25T02:12:52.417Z",
+  "checks": [
+    "72 successful authenticated literal/custom/generic head/page plans",
+    "Read-only transactions rolled back; no schema or fixture writes",
+    "Exact production projection, completed filter, student scope, UUID order and first-page upper bound"
+  ],
+  "limitation": "Sequential local authenticated EXPLAIN ANALYZE, not concurrent HTTP, pool waits, browser latency or capacity proof. Plan conditions and fixture IDs are not exported.",
+  "groups": [
+    {
+      "kind": "head",
+      "planMode": "literal",
+      "count": 12,
+      "executionMs": [
+        11.517,
+        13.052,
+        16.208,
+        9.462,
+        11.14,
+        9.974,
+        14.304,
+        9.668,
+        9.324,
+        12.535,
+        10.201,
+        10.072
+      ],
+      "medianMs": 10.671,
+      "indexes": [
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ],
+      "maxRootSharedReads": 0
+    },
+    {
+      "kind": "head",
+      "planMode": "force_custom_plan",
+      "count": 12,
+      "executionMs": [
+        11.159,
+        9.8,
+        76.772,
+        9.491,
+        8.835,
+        10.889,
+        11.178,
+        9.763,
+        9.87,
+        10.338,
+        10.281,
+        10.196
+      ],
+      "medianMs": 10.239,
+      "indexes": [
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ],
+      "maxRootSharedReads": 0
+    },
+    {
+      "kind": "head",
+      "planMode": "force_generic_plan",
+      "count": 12,
+      "executionMs": [
+        11.719,
+        12.896,
+        9.911,
+        9.813,
+        24.141,
+        10.794,
+        16.682,
+        9.769,
+        10.135,
+        9.411,
+        10.331,
+        10.286
+      ],
+      "medianMs": 10.308,
+      "indexes": [
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ],
+      "maxRootSharedReads": 0
+    },
+    {
+      "kind": "page",
+      "planMode": "literal",
+      "count": 12,
+      "executionMs": [
+        17.278,
+        11.353,
+        11.763,
+        14.194,
+        16.225,
+        12.488,
+        63.633,
+        11.136,
+        12.352,
+        12.802,
+        12.238,
+        13.7
+      ],
+      "medianMs": 12.645,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "students_class_id_idx"
+      ],
+      "maxRootSharedReads": 0
+    },
+    {
+      "kind": "page",
+      "planMode": "force_custom_plan",
+      "count": 12,
+      "executionMs": [
+        11.735,
+        11.549,
+        16.086,
+        13.789,
+        17.486,
+        13.136,
+        10.579,
+        10.827,
+        12.167,
+        11.344,
+        12.526,
+        24.161
+      ],
+      "medianMs": 12.346,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "students_class_id_idx"
+      ],
+      "maxRootSharedReads": 0
+    },
+    {
+      "kind": "page",
+      "planMode": "force_generic_plan",
+      "count": 12,
+      "executionMs": [
+        16.442,
+        12.852,
+        13.454,
+        13.845,
+        13.875,
+        12.395,
+        12.978,
+        13.721,
+        12.417,
+        12.237,
+        13.577,
+        21.562
+      ],
+      "medianMs": 13.515,
+      "indexes": [
+        "idx_student_lesson_attempts_student_scope",
+        "student_lesson_attempts_pkey",
+        "students_class_id_idx"
+      ],
+      "maxRootSharedReads": 0
+    }
+  ],
+  "decision": "No index or plan-cache setting change justified. Sequential SQL does not reproduce concurrent API tail delays; PostgREST SQL envelope and session settings are not reproduced."
+}

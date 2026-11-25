@@ -2147,3 +2147,35 @@ Next investigate the longer lesson-history statements under the same authenticat
 scope with read-only query plans, comparing existing indexes and RLS costs before
 proposing any index or reader change. Do not increase the connection pool: the
 previous pool experiment failed, and this trace does not reverse that evidence.
+
+### 25 November: authenticated lesson-history SQL plans
+
+Added `scripts/staging/lesson-history-plan-local.mjs`. This runs SELECT-only
+EXPLAIN ANALYZE inside read-only transactions under four synthetic teachers'
+authenticated role and subject claim. It reproduces the production head and first
+1,000-row page projection, completed filter, student scope, UUID sort and fixed
+upper bound. It compares literal SQL with session-only prepared custom and generic
+plans across three rounds: 72 successful plans. All transactions roll back and
+connections exit; no schema, fixture or persistent setting changes occur.
+
+The initial 24 literal-plan run took about 9–16 ms. The expanded run found:
+
+| Query | Literal range | Custom range | Generic range |
+| --- | ---: | ---: | ---: |
+| Head | 9.3–16.2 ms | 8.8–76.8 ms | 9.4–24.1 ms |
+| First page | 11.1–63.6 ms | 10.6–24.2 ms | 12.2–21.6 ms |
+
+Head plans used the primary-key index; page plans used the existing student-scope
+index, with some generic page plans using the primary key. All used the existing
+students class index for permission-related work. The simple parameterized query
+did not reproduce the roughly one-second concurrent API outliers. These plans do
+not reproduce PostgREST's exact SQL envelope, transaction settings, connection
+pool or concurrent workload. Mode order was fixed within each query, so this is
+plan inspection, not a benchmark establishing one mode as faster.
+
+Do not add an index or change plan-cache configuration on this evidence. Next
+inspect the actual PostgREST query shape locally and compare it under the existing
+read-only workload, retaining redaction of fixture identifiers and credentials.
+Aggregates are in `lesson-history-plans-2026-11-25.json`; full redacted node trees
+remain in the private fixture output. Syntax and diff checks passed. Application
+code remains unchanged; no release build or migration is required.
