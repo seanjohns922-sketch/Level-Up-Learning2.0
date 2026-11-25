@@ -8,15 +8,17 @@ import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { fetchLiveClassEvents } from '../../lib/live-class-events.ts';
 import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
+import { runReads } from './read-concurrency.mjs';
 import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
 const timedApi = process.env.SCALE_TIMED_API === '1';
 assert(!process.env.SCALE_TIMED_API || timedApi);
+const bursts = process.argv.includes('--bursts');
 const contention = process.argv.includes('--contention');
 const scheduling = process.argv.includes('--scheduling');
-const interactions = contention || scheduling || process.argv.includes('--interactions');
-assert(process.argv.slice(2).every(arg => ['--interactions', '--scheduling', '--contention'].includes(arg)));
+const interactions = bursts || contention || scheduling || process.argv.includes('--interactions');
+assert(process.argv.slice(2).every(arg => ['--interactions', '--scheduling', '--contention', '--bursts'].includes(arg)));
 assert(process.argv.slice(2).length <= 1, 'Choose one diagnostic mode');
 const tables = ['student_lesson_attempts', 'student_weekly_quiz_attempts', 'student_realm_assessments'];
 const otherSources = [...tables, 'live_student_activity', 'get_live_class_activity_today'];
@@ -65,7 +67,7 @@ async function read(teacher, mode, round) {
   const start = performance.now();
   const sourceSamples = [];
   const ids = group.students.map(s => s.studentId);
-  const sources = !interactions || mode === 'events' ? [] : scheduling || mode === 'all' ? otherSources : [mode];
+  const sources = !interactions || mode === 'events' ? [] : bursts || scheduling || mode === 'all' ? otherSources : [mode];
   const readSource = async source => {
     const started = performance.now();
     const response = tables.includes(source) ? await fetchLiveClassAttempts(client, source, ids)
@@ -93,7 +95,11 @@ async function read(teacher, mode, round) {
     eventMs = performance.now() - start;
     assert.equal(result.error, null);
   };
-  if (mode === 'events-first') {
+  if (bursts) {
+    // Match the application's source order for every concurrency mode.
+    const tasks = [() => readSource('live_student_activity'), readEvents, ...tables.map(source => () => readSource(source)), () => readSource('get_live_class_activity_today')];
+    await runReads(tasks, mode === 'all' ? 6 : Number(mode.slice(4)));
+  } else if (mode === 'events-first') {
     await readEvents();
     await readCompanions();
   } else if (mode === 'events-last') {
@@ -125,9 +131,9 @@ async function read(teacher, mode, round) {
 report.clientRounds = [];
 const eventLoop = monitorEventLoopDelay({ resolution: 10 });
 eventLoop.enable();
-const modes = contention ? ['all'] : scheduling ? ['all', 'events-first', 'events-last'] : interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
-for (let round = 0; round < (contention ? 12 : scheduling ? 3 : interactions ? 2 : 3); round++) {
-  const order = scheduling ? [...modes.slice(round), ...modes.slice(0, round)] : round % 2 ? [...modes].reverse() : modes;
+const modes = bursts ? ['all', 'cap-2', 'cap-3'] : contention ? ['all'] : scheduling ? ['all', 'events-first', 'events-last'] : interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
+for (let round = 0; round < (bursts ? 6 : contention ? 12 : scheduling ? 3 : interactions ? 2 : 3); round++) {
+  const order = scheduling || bursts ? [...modes.slice(round % modes.length), ...modes.slice(0, round % modes.length)] : round % 2 ? [...modes].reverse() : modes;
   for (const mode of order) {
     eventLoop.reset();
     const utilization = nodePerformance.eventLoopUtilization();
@@ -145,4 +151,4 @@ for (let round = 0; round < (contention ? 12 : scheduling ? 3 : interactions ? 2
 }
 eventLoop.disable();
 report.checks = [`${report.samples.length} complete snapshots; identical ordered rows per teacher`, 'No duplicate or out-of-class rows', 'Production event head and compact-page routes; no fallback; allowed read sources only', 'No application, schema or learning-data writes'];
-fs.writeFileSync(`${localDir}/event-chain-${timedApi ? 'timed-api' : contention ? 'contention' : scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });
+fs.writeFileSync(`${localDir}/event-chain-${bursts ? 'bursts' : timedApi ? 'timed-api' : contention ? 'contention' : scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });

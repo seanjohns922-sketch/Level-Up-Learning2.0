@@ -39,7 +39,9 @@ try:
         time.sleep(.25)
     else: raise RuntimeError('Temporary API did not become ready')
     env=os.environ.copy();env['SCALE_TIMED_API']='1'
-    command=['node','--no-warnings','--experimental-strip-types','--experimental-loader',str(repo/'scripts/typescript-alias-loader.mjs'),str(repo/'scripts/staging/event-chain-profile-local.mjs'),'--contention']
+    profile=os.environ.get('SCALE_READ_PROFILE','--contention')
+    assert profile in ['--contention','--bursts']
+    command=['node','--no-warnings','--experimental-strip-types','--experimental-loader',str(repo/'scripts/typescript-alias-loader.mjs'),str(repo/'scripts/staging/event-chain-profile-local.mjs'),profile]
     def sample():
         started=time.time()*1000
         c=http.client.HTTPConnection('127.0.0.1',56530,timeout=3)

@@ -2304,3 +2304,64 @@ Evidence: `dashboard-pool-waiting-2026-11-25.json`. The temporary API/admin list
 was removed; original container ID/configuration/running state verified unchanged.
 Python syntax and diff checks passed. No application build, migration or production
 change is needed for this diagnostic-only commit.
+
+### 25 November: request-burst limits with pool metrics
+
+Added a local `--bursts` comparison: six rotating rounds of six, two and three
+concurrent source reads per teacher, with the production source order held fixed.
+Four teachers still run concurrently. Every mode uses the same six sources,
+projections, permissions and complete pagination. Limits change scheduling only
+inside the diagnostic runner; application concurrency remains unchanged.
+
+All 72 snapshots passed complete-result parity with 1,224 successful HTTP requests.
+Recorded source intervals also respected the two/three-source caps. Median/p95/max
+full-dashboard times were 398/851/950 ms at six, 318/749/817 ms at two, and
+342/811/1,012 ms at three. Sampled peak pool waiting fell from 20 to 8 and 11
+respectively. Sparse metric samples are not per-request wait durations. The
+initial exploratory run prioritized events differently; its private reports are
+preserved, but these published figures use the corrected identical source order.
+
+This is promising read-only evidence for two concurrent sources, not a production
+recommendation. Previous mixed 3-versus-6 scheduling results were inconclusive.
+The next comparison uses 100 synthetic activity-writing students and four teachers
+on the original API, with concurrency order 6/2/2/6 and 60 seconds per run. No
+assessment or canonical-completion fixtures are inserted. Presence/daily-activity/
+event writes remain journalled and checked independently per run.
+
+The diagnostic read worker now drains already-started work before rejecting a
+failed batch, avoiding overlap with later experiments. A regression test verifies
+that failure blocks queued work and waits for an in-flight sibling. All four
+read-worker tests passed. The same helper is reused by the read-only experiment.
+Read-only evidence is in `dashboard-burst-comparison-2026-11-25.json`.
+
+### 25 November: burst candidate rejected by mixed reverse control
+
+Completed four 60-second local runs with the original API and concurrency 6/2/2/6.
+Each used 100 synthetic students and four teachers. Whole-dashboard p95 was
+1,867 / 1,614 / 1,727 / 1,416 ms respectively. All four latency gates failed.
+The final six-source control was faster than both capped runs: the earlier
+read-only improvement did not establish a reliable mixed-workload gain. Keep the
+production scheduler unchanged and do not raise the tested load on this evidence.
+
+Each run had zero recorded request failures, zero journey failures and all 100
+student journeys verified. Independent journal validation checked unique intent/
+acknowledgement pairs, contiguous event/activity sequences, per-student recorded
+API baseline/readback differences and completion markers. Activity updates and
+events were 200/202/201/201 each (804 of each total); every update matched exactly
+30 added seconds. Extra iterations are permitted by closed-loop timing. Counts
+refer to the same 100 synthetic students across four runs, not 400 distinct users.
+No assessment or canonical completion rows were inserted by these workloads.
+
+Raw logs, reports, journals and HTTP timings are retained in the private local
+`burst-activity-1795577908763` archive. Reproduce verification with
+`verify-burst-activity-local.py` and that archive path from the fixture checkout.
+The verifier reads captured per-run readbacks, not retrospective totals after
+later runs. Sanitized evidence is in `dashboard-burst-activity-2026-11-25.json`.
+
+The diagnostic worker's failure-draining fix remains useful and is retained.
+No app scheduling change is justified; further blind concurrency/pool permutations
+would repeat inconclusive work. A reproducible, resource-controlled baseline and
+explicit workload/arrival accounting remain necessary before tuning further.
+Local preflight, four worker tests, staging configuration QA, attempt-reader QA,
+JavaScript/Python syntax and diff checks passed. No release build or migration is
+required for these local diagnostic changes.

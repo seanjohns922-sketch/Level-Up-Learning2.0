@@ -1,0 +1,160 @@
+{
+  "at": "2026-11-25T03:38:28.763Z",
+  "order": [
+    6,
+    2,
+    2,
+    6
+  ],
+  "rounds": [
+    {
+      "round": 0,
+      "concurrency": 6,
+      "failedOperations": 0,
+      "failures": [],
+      "verifiedStudents": 100,
+      "activityWrites": 200,
+      "events": 200,
+      "gatePassed": false,
+      "p95Ms": {
+        "teacher_login": 137,
+        "student_login_lookup": 833,
+        "get_student_runtime_context_secure": 791,
+        "dashboard_daily_activity": 762,
+        "upsert_live_student_activity_secure": 644,
+        "dashboard_assessments": 1077,
+        "dashboard_live_activity": 611,
+        "get_student_activity_daily_secure": 488,
+        "dashboard_quiz_attempts": 955,
+        "touch_live_student_presence_secure": 335,
+        "upsert_student_activity_daily_secure": 327,
+        "dashboard_lesson_attempts": 1744,
+        "insert_live_activity_event_secure": 257,
+        "dashboard_events_initial": 1866,
+        "dashboard_refresh": 1867,
+        "dashboard_events_incremental": 233,
+        "get_live_student_activity_secure": 225
+      }
+    },
+    {
+      "round": 1,
+      "concurrency": 2,
+      "failedOperations": 0,
+      "failures": [],
+      "verifiedStudents": 100,
+      "activityWrites": 202,
+      "events": 202,
+      "gatePassed": false,
+      "p95Ms": {
+        "teacher_login": 153,
+        "student_login_lookup": 703,
+        "dashboard_live_activity": 355,
+        "get_student_runtime_context_secure": 489,
+        "upsert_live_student_activity_secure": 562,
+        "get_student_activity_daily_secure": 307,
+        "touch_live_student_presence_secure": 328,
+        "upsert_student_activity_daily_secure": 259,
+        "insert_live_activity_event_secure": 214,
+        "dashboard_lesson_attempts": 830,
+        "dashboard_quiz_attempts": 490,
+        "dashboard_assessments": 374,
+        "dashboard_daily_activity": 132,
+        "dashboard_events_initial": 1613,
+        "dashboard_refresh": 1614,
+        "dashboard_events_incremental": 88,
+        "get_live_student_activity_secure": 157
+      }
+    },
+    {
+      "round": 2,
+      "concurrency": 2,
+      "failedOperations": 0,
+      "failures": [],
+      "verifiedStudents": 100,
+      "activityWrites": 201,
+      "events": 201,
+      "gatePassed": false,
+      "p95Ms": {
+        "teacher_login": 129,
+        "student_login_lookup": 512,
+        "get_student_runtime_context_secure": 438,
+        "dashboard_live_activity": 1057,
+        "upsert_live_student_activity_secure": 562,
+        "get_student_activity_daily_secure": 414,
+        "touch_live_student_presence_secure": 493,
+        "upsert_student_activity_daily_secure": 414,
+        "insert_live_activity_event_secure": 296,
+        "dashboard_lesson_attempts": 1502,
+        "dashboard_quiz_attempts": 319,
+        "dashboard_assessments": 434,
+        "dashboard_daily_activity": 28,
+        "dashboard_events_initial": 1720,
+        "dashboard_refresh": 1727,
+        "dashboard_events_incremental": 191,
+        "get_live_student_activity_secure": 205
+      }
+    },
+    {
+      "round": 3,
+      "concurrency": 6,
+      "failedOperations": 0,
+      "failures": [],
+      "verifiedStudents": 100,
+      "activityWrites": 201,
+      "events": 201,
+      "gatePassed": false,
+      "p95Ms": {
+        "teacher_login": 157,
+        "student_login_lookup": 601,
+        "dashboard_live_activity": 992,
+        "get_student_runtime_context_secure": 608,
+        "upsert_live_student_activity_secure": 459,
+        "dashboard_quiz_attempts": 530,
+        "dashboard_daily_activity": 309,
+        "get_student_activity_daily_secure": 352,
+        "dashboard_lesson_attempts": 656,
+        "dashboard_assessments": 1213,
+        "touch_live_student_presence_secure": 330,
+        "upsert_student_activity_daily_secure": 300,
+        "insert_live_activity_event_secure": 261,
+        "dashboard_events_initial": 1414,
+        "dashboard_refresh": 1416,
+        "dashboard_events_incremental": 190,
+        "get_live_student_activity_secure": 156
+      }
+    }
+  ],
+  "limitation": "Local synthetic presence/daily activity/events; no canonical submissions or hosted capacity proof. Histories grow between rounds. Default production concurrency unchanged.",
+  "journalChecks": [
+    {
+      "round": 0,
+      "students": 100,
+      "acknowledgedActivity": 200,
+      "acknowledgedEvents": 200,
+      "unacknowledgedIntents": 0
+    },
+    {
+      "round": 1,
+      "students": 100,
+      "acknowledgedActivity": 202,
+      "acknowledgedEvents": 202,
+      "unacknowledgedIntents": 0
+    },
+    {
+      "round": 2,
+      "students": 100,
+      "acknowledgedActivity": 201,
+      "acknowledgedEvents": 201,
+      "unacknowledgedIntents": 0
+    },
+    {
+      "round": 3,
+      "students": 100,
+      "acknowledgedActivity": 201,
+      "acknowledgedEvents": 201,
+      "unacknowledgedIntents": 0
+    }
+  ],
+  "journalLimitation": "Per-run API baseline/readbacks recorded during each run, not retrospective database deltas after all runs.",
+  "decision": "Do not change production scheduling. Read-only queue reductions did not produce a consistent mixed-workload latency improvement; all four latency gates failed."
+}

@@ -1,0 +1,209 @@
+{
+  "at": "2026-11-25T03:37:24.046Z",
+  "checks": [
+    "72 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes",
+    "72 snapshots; 1224 HTTP successes; all six sources and 17 requests per snapshot",
+    "Measured source intervals respect concurrency caps"
+  ],
+  "modes": [
+    {
+      "mode": "all",
+      "medianMs": 398,
+      "p95Ms": 851,
+      "maxMs": 950,
+      "peakWaiting": 20.0,
+      "poolSamples": 31,
+      "samplesWithWaiting": 31,
+      "rounds": [
+        {
+          "round": 0,
+          "totalMs": [
+            401,
+            391,
+            396,
+            403
+          ]
+        },
+        {
+          "round": 1,
+          "totalMs": [
+            313,
+            302,
+            287,
+            317
+          ]
+        },
+        {
+          "round": 2,
+          "totalMs": [
+            386,
+            523,
+            617,
+            367
+          ]
+        },
+        {
+          "round": 3,
+          "totalMs": [
+            302,
+            309,
+            317,
+            325
+          ]
+        },
+        {
+          "round": 4,
+          "totalMs": [
+            676,
+            609,
+            950,
+            556
+          ]
+        },
+        {
+          "round": 5,
+          "totalMs": [
+            577,
+            647,
+            754,
+            851
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "cap-2",
+      "medianMs": 318,
+      "p95Ms": 749,
+      "maxMs": 817,
+      "peakWaiting": 8.0,
+      "poolSamples": 30,
+      "samplesWithWaiting": 30,
+      "rounds": [
+        {
+          "round": 0,
+          "totalMs": [
+            316,
+            313,
+            319,
+            306
+          ]
+        },
+        {
+          "round": 1,
+          "totalMs": [
+            301,
+            297,
+            308,
+            305
+          ]
+        },
+        {
+          "round": 2,
+          "totalMs": [
+            379,
+            290,
+            305,
+            639
+          ]
+        },
+        {
+          "round": 3,
+          "totalMs": [
+            361,
+            324,
+            592,
+            350
+          ]
+        },
+        {
+          "round": 4,
+          "totalMs": [
+            279,
+            294,
+            568,
+            300
+          ]
+        },
+        {
+          "round": 5,
+          "totalMs": [
+            591,
+            604,
+            749,
+            817
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "cap-3",
+      "medianMs": 342,
+      "p95Ms": 811,
+      "maxMs": 1012,
+      "peakWaiting": 11.0,
+      "poolSamples": 27,
+      "samplesWithWaiting": 27,
+      "rounds": [
+        {
+          "round": 0,
+          "totalMs": [
+            328,
+            319,
+            299,
+            291
+          ]
+        },
+        {
+          "round": 1,
+          "totalMs": [
+            308,
+            314,
+            300,
+            341
+          ]
+        },
+        {
+          "round": 2,
+          "totalMs": [
+            366,
+            298,
+            335,
+            323
+          ]
+        },
+        {
+          "round": 3,
+          "totalMs": [
+            320,
+            351,
+            344,
+            347
+          ]
+        },
+        {
+          "round": 4,
+          "totalMs": [
+            455,
+            565,
+            658,
+            811
+          ]
+        },
+        {
+          "round": 5,
+          "totalMs": [
+            808,
+            661,
+            1012,
+            626
+          ]
+        }
+      ]
+    }
+  ],
+  "limitation": "Four teachers, read-only, fresh direct API. Samples are sparse pool observations, not per-request acquisition time. Same production source order; six rotations. No production change or hosted capacity proof."
+}

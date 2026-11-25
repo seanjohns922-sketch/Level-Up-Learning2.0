@@ -26,7 +26,7 @@ assert.ok(['direct', 'scoped'].includes(attemptMode));
 assert.ok(attemptMode === 'direct' || dashboard, 'Scoped attempt experiment requires dashboard-mixed');
 const scopedAttemptSnapshot = attemptMode === 'scoped' ? (await import('./scoped-attempts-http-local.mjs')).snapshot : null;
 const dashboardConcurrency = Number(process.env.SCALE_DASHBOARD_CONCURRENCY ?? 6);
-assert.ok([3, 6].includes(dashboardConcurrency), 'Dashboard read concurrency must be 3 or 6');
+assert.ok([2, 3, 6].includes(dashboardConcurrency), 'Dashboard read concurrency must be 2, 3 or 6');
 assert.ok(dashboard || dashboardConcurrency === 6, 'Read concurrency experiment requires dashboard-mixed');
 const attemptPageSize = Number(process.env.SCALE_ATTEMPT_PAGE_SIZE ?? (dashboard ? 1000 : 500));
 assert.ok([500, 1000].includes(attemptPageSize), 'Attempt page size must be 500 or 1000');

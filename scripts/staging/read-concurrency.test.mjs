@@ -41,3 +41,21 @@ test('empty reads succeed and invalid concurrency is rejected', async () => {
   assert.deepEqual(await runReads([], 3), []);
   for (const limit of [0, -1, 1.5, NaN]) await assert.rejects(runReads([], limit));
 });
+
+test('failure drains already-started reads before rejecting the batch', async () => {
+  let release;
+  let finished = false;
+  let queued = false;
+  const result = runReads([
+    async () => { throw new Error('failed first'); },
+    async () => { await new Promise(resolve => { release = resolve; }); },
+    async () => { queued = true; },
+  ], 2);
+  const checked = assert.rejects(result, /failed first/).then(() => { finished = true; });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(finished, false);
+  assert.equal(queued, false);
+  release();
+  await checked;
+  assert.equal(finished, true);
+});
