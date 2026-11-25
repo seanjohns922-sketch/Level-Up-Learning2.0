@@ -23,8 +23,8 @@ export function Instances({geometry,material,items,obstacle=false}:{geometry:THR
  return <instancedMesh ref={ref} args={[geometry,material,items.length]} userData={obstacle?{cameraObstacle:true}:undefined}/>;
 }
 
-/** Basalt plates with thin cracks; the glow map lights only some cracks. */
-export function basaltTextures(repeat:[number,number]){
+/** Basalt plates with thin cracks; the glow map lights only some cracks, lava orange or (neutral) white for tinting. */
+export function basaltTextures(repeat:[number,number],neutral=false){
  const size=512,map=new Uint8Array(size*size*4),glow=new Uint8Array(size*size*4);
  const hash=(x:number,y:number)=>{const n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n);};
  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
@@ -33,7 +33,7 @@ export function basaltTextures(repeat:[number,number]){
   const crack=1-THREE.MathUtils.smoothstep(f2-f1,.012,.06),grain=hash(x,y)*14,k=(y*size+x)*4;
   const base=34+cell*18+grain-crack*26;
   map[k]=base+4;map[k+1]=base;map[k+2]=base+2;map[k+3]=255;
-  const hot=crack*(cell>.72?1:cell>.45?.28:.08);glow[k]=255*hot;glow[k+1]=95*hot;glow[k+2]=30*hot;glow[k+3]=255;
+  const hot=crack*(cell>.72?1:cell>.45?.28:.08);glow[k]=255*hot;glow[k+1]=(neutral?255:95)*hot;glow[k+2]=(neutral?255:30)*hot;glow[k+3]=255;
  }
  const make=(d:Uint8Array)=>{const t=new THREE.DataTexture(d,size,size);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(...repeat);t.magFilter=THREE.LinearFilter;t.minFilter=THREE.LinearMipmapLinearFilter;t.generateMipmaps=true;t.colorSpace=THREE.SRGBColorSpace;t.needsUpdate=true;return t;};
  return {map:make(map),glow:make(glow)};

@@ -30,29 +30,51 @@ export function strongholdStory(realm:ExpeditionRealm){
 }
 export const STRONGHOLD_STORY = strongholdStory('number');
 export type StrongholdStory = keyof typeof STRONGHOLD_STORY;
-/** Stronghold layout: portals alternate sides down the hall and the Core chamber follows the final week. */
+/**
+ * Stronghold layout: an open volcanic hall. A raised causeway runs from the entrance plaza to the Core plaza
+ * over a lava lake; each week's portal stands on its own island, joined to the causeway by a short bridge.
+ * Islands alternate sides down the hall.
+ */
 export const STRONGHOLD_PORTAL_SPACING = 14;
-/** How close to a portal its Enter prompt appears: reachable from the path, so students need not leave it. */
-export const STRONGHOLD_PORTAL_REACH = 8;
+/** Half-widths and radii of the walkable stone: causeway, bridges, islands, entrance and Core plazas. */
+export const STRONGHOLD_CAUSEWAY = 3.6, STRONGHOLD_BRIDGE = 1.9, STRONGHOLD_ISLAND = 4.6, STRONGHOLD_ISLAND_X = 11, STRONGHOLD_CORE_PLAZA = 15;
+/** How close to an island its Enter prompt appears: from the near half of the causeway, so students see it as they pass. */
+export const STRONGHOLD_PORTAL_REACH = 10.5;
 export function strongholdLayout(realm:ExpeditionRealm='number'){
   const weeks=LEVEL8_WEEK_COUNTS[realm];
-  const portals=Array.from({length:weeks},(_,i)=>({week:i+1,position:[i%2===0?-9:9,0,-8-i*STRONGHOLD_PORTAL_SPACING] as SummitPoint}));
-  const coreZ=portals[weeks-1].position[2]-24;
-  return {weeks,portals,coreZ,coreId:weeks+1,backZ:coreZ-12,startZ:18};
+  const portals=Array.from({length:weeks},(_,i)=>({week:i+1,position:[i%2===0?-STRONGHOLD_ISLAND_X:STRONGHOLD_ISLAND_X,0,-8-i*STRONGHOLD_PORTAL_SPACING] as SummitPoint}));
+  const coreZ=portals[weeks-1].position[2]-30;
+  return {weeks,portals,coreZ,coreId:weeks+1,backZ:coreZ-STRONGHOLD_CORE_PLAZA-2,startZ:18};
 }
 export const STRONGHOLD_PORTALS = strongholdLayout('number').portals;
+/** Walkable height (0) on the causeway, plazas, bridges and islands; null over the lava. */
 export function strongholdFloor(x:number,z:number,realm:ExpeditionRealm='number'):number|null {
   const layout=strongholdLayout(realm);
-  return Math.abs(x)<12.3 && z>layout.backZ+4 && z<layout.startZ ? 0 : null;
+  if(z>=layout.startZ)return null;
+  if(z>8&&Math.abs(x)<9)return 0;
+  if(Math.hypot(x,z-layout.coreZ)<=STRONGHOLD_CORE_PLAZA)return 0;
+  if(Math.abs(x)<=STRONGHOLD_CAUSEWAY&&z>layout.coreZ)return 0;
+  for(const p of layout.portals){const [px,,pz]=p.position;
+    if(Math.hypot(x-px,z-pz)<=STRONGHOLD_ISLAND)return 0;
+    if(Math.abs(z-pz)<=STRONGHOLD_BRIDGE&&x*px>0&&Math.abs(x)<=Math.abs(px))return 0;}
+  return null;
 }
-/** Spot on the path in front of a week's portal (or the Core chamber), inside its Enter range. Used for fast travel and returning from a week. */
+/** Spot on the causeway beside a week's bridge, facing down the hall (or in front of the Core), inside its Enter range. Used for fast travel and returning from a week. */
 export function strongholdPortalSpot(realm:ExpeditionRealm,target:number):SummitPoint {
   const layout=strongholdLayout(realm),p=layout.portals.find(q=>q.week===target);
-  return p?[p.position[0]*.3,0,p.position[2]+4.5]:[0,0,layout.coreZ+13];
+  return p?[Math.sign(p.position[0])*2.6,0,p.position[2]+4.5]:[0,0,layout.coreZ+13];
 }
 /** The nearest portal's week, the Core chamber's id (weeks + 1), or null. */
 export function strongholdNearest(x:number,z:number,realm:ExpeditionRealm='number'):number|null {
   const layout=strongholdLayout(realm);
   if(Math.hypot(x,z-layout.coreZ-2)<12)return layout.coreId;
   return layout.portals.find(p=>Math.hypot(x-p.position[0],z-p.position[2])<STRONGHOLD_PORTAL_REACH)?.week??null;
+}
+/** Parapet runs along each side of the causeway, broken where a bridge leaves for an island. */
+export function strongholdParapets(realm:ExpeditionRealm='number'){
+  const layout=strongholdLayout(realm),end=layout.coreZ+Math.sqrt(STRONGHOLD_CORE_PLAZA**2-STRONGHOLD_CAUSEWAY**2),gap=STRONGHOLD_BRIDGE+.15;
+  return ([-1,1] as const).flatMap(side=>{const cuts=layout.portals.filter(p=>Math.sign(p.position[0])===side).map(p=>p.position[2]);
+    const runs:{side:-1|1;from:number;to:number}[]=[];let from=8;
+    for(const z of cuts){runs.push({side,from,to:z+gap});from=z-gap;}
+    runs.push({side,from,to:end});return runs;});
 }
