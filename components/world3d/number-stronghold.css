@@ -14,3 +14,5 @@
 .stronghold-preview{display:grid;gap:6px;margin-top:14px;font:800 11px/1.3 system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:#f3cf93}
 .stronghold-preview select{font:600 14px system-ui,sans-serif;letter-spacing:0;text-transform:none;color:#effbf5;background:#0f1a22;border:1px solid #f3cf9366;border-radius:10px;padding:10px;min-height:44px}
 @media(max-width:760px){.stronghold-panel{padding:20px}.stronghold-panel>svg{height:120px}.stronghold-panel p{font-size:15px}}
+.stronghold-facts{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:16px 0 0}
+.stronghold-facts li{padding:7px 12px;border-radius:999px;border:1px solid #c59bff66;background:#2a1640;color:#ead9ff;font:800 12px/1.2 system-ui,sans-serif;letter-spacing:.04em}

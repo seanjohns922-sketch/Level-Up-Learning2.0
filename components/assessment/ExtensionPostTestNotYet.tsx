@@ -10,6 +10,8 @@ import { getRealmDefinition } from "@/lib/realms/realm-registry";
 import type { RealmLessonThemeId } from "@/components/lesson/RealmLessonHome";
 import { PostTestNotYet, postTestNotYetMessage } from "@/components/assessment/PostTestNotYet";
 import type { ExtensionPlanWeek } from "@/lib/extension-plan-weeks";
+import type { ExpeditionRealm } from "@/lib/world3d/expedition-access";
+import { strongholdDemoHref } from "@/lib/world3d/number-stronghold";
 
 /**
  * The result of a Level 7 or 8 post-test, worked out exactly as it is saved
@@ -26,7 +28,7 @@ export function extensionPostTestResult(questions: readonly AssessmentQuestion[]
   });
 }
 
-/** Levels 7 and 8 share the "not yet" post-test screen every other level uses. */
+/** Levels 7 and 8 share the "not yet" post-test screen every other level uses. At Level 8 the seal holds, so Back returns to the stronghold. */
 export function ExtensionPostTestNotYet({
   realm,
   level,
@@ -76,8 +78,8 @@ export function ExtensionPostTestNotYet({
         router.push(level === 7 ? level7LiveHref(realm as Cave7Realm, first.week, first.lesson) : weekHref(first.week));
       }}
       onRetry={onRetry}
-      onBack={() => router.push("/world")}
-      backLabel="Back to my world"
+      onBack={() => router.push(level === 8 ? strongholdDemoHref(realm as ExpeditionRealm) : "/world")}
+      backLabel={level === 8 ? "Back to the stronghold" : "Back to my world"}
     />
   );
 }

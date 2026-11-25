@@ -5,6 +5,7 @@ import {Bloom,EffectComposer,Vignette} from '@react-three/postprocessing';
 import * as THREE from 'three';
 import WorldPlaque from './WorldPlaque';
 import VillainRelief from './VillainRelief';
+import StrongholdSeal from './StrongholdSeal';
 import NumberNexusStrongholdSet from './NumberNexusStrongholdSet';
 import MeasurelandsStrongholdSet from './MeasurelandsStrongholdSet';
 import StarpathStrongholdSet from './StarpathStrongholdSet';
@@ -33,6 +34,8 @@ const STONE_TINT:Record<ExpeditionRealm,{tint:string;floor:string;cracks:string;
 };
 const toneFor=(realm:ExpeditionRealm):Tone=>{const t=STONE_TINT[realm],h={h:0,s:0,l:0};new THREE.Color(t.tint).getHSL(h);
  return c=>{const l={h:0,s:0,l:0};new THREE.Color(c).getHSL(l);return '#'+new THREE.Color().setHSL(h.h,h.s*.55,l.l*1.1).getHexString();};};
+/** How much of the seal still stands: whole before Week 1, a cracked remnant once every week is finished (the battle breaks the rest). */
+export const sealStrength=(finished:number,weeks:number)=>Math.max(.15,1-Math.min(finished,weeks)/weeks*.85);
 export type PortalState='locked'|'current'|'completed';
 
 /** A week's portal at the far side of its island, turned toward the causeway, with its sign on the island beside the bridge. */
@@ -60,7 +63,7 @@ function magicCircleTexture(){
 }
 
 /** The Core chamber: a rune circle, the floating Core, the Fog's seal and its creeping vines. */
-function CoreChamber({recovered,colour,core:coreName,guardian,coreZ:CORE_Z}:{recovered:boolean;colour:string;core:string;guardian:string;coreZ:number}){
+function CoreChamber({recovered,strength,shattering,colour,core:coreName,guardian,coreZ:CORE_Z}:{recovered:boolean;strength:number;shattering:boolean;colour:string;core:string;guardian:string;coreZ:number}){
  const reduced=useReducedMotion();
  const circle=useMemo(()=>magicCircleTexture(),[]),dot=useMemo(()=>softDotTexture(),[]);
  const core=useRef<THREE.Group>(null),rings=useRef<THREE.Group>(null),runes=useRef<THREE.Mesh>(null),vineMat=useRef<THREE.MeshStandardMaterial>(null);
@@ -91,10 +94,12 @@ function CoreChamber({recovered,colour,core:coreName,guardian,coreZ:CORE_Z}:{rec
    <sprite scale={recovered?[9,9,1]:[5,5,1]}><spriteMaterial map={dot} color={new THREE.Color(coreColour).multiplyScalar(recovered?1.4:.8)} transparent opacity={recovered?.75:.45} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false}/></sprite>
   </group>
   <pointLight position={[0,5,CORE_Z+2]} color={recovered?tint(colour,'#ffffff',.4):colour} intensity={recovered?160:45} distance={34} decay={1.6}/>
-  {!recovered&&<>
-   <group ref={rings} position={[0,5.6,CORE_Z]}>{[0,1,2].map(i=><mesh key={i}><torusGeometry args={[3.1+i*.25,.07,6,64]}/><meshBasicMaterial color={new THREE.Color(SEAL).multiplyScalar(2)} toneMapped={false}/></mesh>)}</group>
-   {vines.map((g,i)=><mesh key={i} geometry={g}><meshStandardMaterial ref={i===0?vineMat:undefined} color="#25102f" emissive="#7a2bc4" emissiveIntensity={.6} roughness={.6} flatShading/></mesh>)}
-   {thorns.map((t,i)=><mesh key={i} position={t.p} rotation={t.r}><coneGeometry args={[.09,.45,4]}/><meshStandardMaterial color="#3b1650" emissive="#8a33d6" emissiveIntensity={.5}/></mesh>)}
+  <StrongholdSeal at={[0,5.6,CORE_Z]} strength={strength} shattering={shattering} recovered={recovered} colour={colour}/>
+  {!recovered&&!shattering&&<>
+   {/* The seal's rings and vines thin out as weeks are finished. */}
+   <group ref={rings} position={[0,5.6,CORE_Z]}>{[0,1,2].slice(0,Math.ceil(3*strength)).map(i=><mesh key={i}><torusGeometry args={[3.1+i*.25,.07,6,64]}/><meshBasicMaterial color={new THREE.Color(SEAL).multiplyScalar(2)} toneMapped={false}/></mesh>)}</group>
+   {vines.slice(0,Math.ceil(vines.length*strength)).map((g,i)=><mesh key={i} geometry={g}><meshStandardMaterial ref={i===0?vineMat:undefined} color="#25102f" emissive="#7a2bc4" emissiveIntensity={.6} roughness={.6} flatShading/></mesh>)}
+   {thorns.slice(0,Math.ceil(thorns.length*strength)).map((t,i)=><mesh key={i} position={t.p} rotation={t.r}><coneGeometry args={[.09,.45,4]}/><meshStandardMaterial color="#3b1650" emissive="#8a33d6" emissiveIntensity={.5}/></mesh>)}
    <pointLight position={[0,4,CORE_Z]} color={SEAL} intensity={55} distance={26} decay={1.7}/>
    {Array.from({length:12},(_,i)=>{const a=i*Math.PI/6,r=4+rand(i+500)*4;return <sprite key={i} position={[Math.sin(a)*r,.9+rand(i+501),CORE_Z+Math.cos(a)*r]} scale={[7,3.2,1]}><spriteMaterial map={dot} color="#6b2fa8" transparent opacity={.32} depthWrite={false}/></sprite>;})}
   </>}
@@ -107,7 +112,7 @@ function CoreChamber({recovered,colour,core:coreName,guardian,coreZ:CORE_Z}:{rec
 /** Each realm's own monuments, standing in the lava opposite the islands. */
 const REALM_SET={number:NumberNexusStrongholdSet,measurement:MeasurelandsStrongholdSet,space:StarpathStrongholdSet,statistics:StatisticaStrongholdSet,pattern:PatternPeaksStrongholdSet,chance:ChanceHollowStrongholdSet} satisfies Record<ExpeditionRealm,React.ComponentType<{colour:string;layout:Layout}>>;
 
-export default function RealmStrongholdScene({realm,unlocked,recovered,position}:{realm:ExpeditionRealm;unlocked:number;recovered:boolean;position:React.RefObject<THREE.Vector3>}){
+export default function RealmStrongholdScene({realm,unlocked,recovered,shattering,position}:{realm:ExpeditionRealm;unlocked:number;recovered:boolean;shattering:boolean;position:React.RefObject<THREE.Vector3>}){
  const r=STRONGHOLD_REALMS[realm],colour=r.colour,done=realm==='measurement'?'#fff1cf':DONE_GOLD;
  const layout=useMemo(()=>strongholdLayout(realm),[realm]),tone=useMemo(()=>toneFor(realm),[realm]),look=STONE_TINT[realm],RealmSet=REALM_SET[realm];
  const state=(week:number):PortalState=>week<unlocked?'completed':week===unlocked?'current':'locked';
@@ -127,7 +132,7 @@ export default function RealmStrongholdScene({realm,unlocked,recovered,position}
  <RealmSet colour={colour} layout={layout}/>
  <Embers count={Math.round((layout.startZ-layout.backZ)*2.3)} height={22} colour={recovered?tint(colour,'#ffffff',.5):'#ffa04d'} spawn={emberSpawn}/>
  {layout.portals.map(p=><Portal key={p.week} week={p.week} at={p.position} colour={colour} done={done} final={p.week===layout.weeks} state={state(p.week)}/>)}
- <CoreChamber recovered={recovered} colour={colour} core={r.core} guardian={r.guardian} coreZ={layout.coreZ}/>
+ <CoreChamber recovered={recovered} strength={sealStrength(unlocked-1,layout.weeks)} shattering={shattering} colour={colour} core={r.core} guardian={r.guardian} coreZ={layout.coreZ}/>
  <VillainRelief realm={realm} recovered={recovered} z={layout.coreZ-10.2}/>
  <EffectComposer multisampling={0}>
   <Bloom intensity={.65} luminanceThreshold={.78} luminanceSmoothing={.2} mipmapBlur radius={.65}/>

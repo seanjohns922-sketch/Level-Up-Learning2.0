@@ -19,12 +19,16 @@ export const STRONGHOLD_REALMS: Record<ExpeditionRealm,{name:string;core:string;
   chance:{name:'Chance Hollow',core:'Chance Core',guardian:'the Chaos Jester',deed:'turns every outcome into a trick',colour:'#ff7d9a',glyphs:['½','1/6','P(A)','0.25','50%','0–1','¼','HT','1/52','3/8','0.7','P']},
 };
 export function strongholdDemoHref(realm:ExpeditionRealm){return `/demo-review/volcano/${realm}`;}
+/** The stronghold after a won battle: it opens at the Core and plays the seal shattering. */
+export function strongholdVictoryHref(realm:ExpeditionRealm){return `${strongholdDemoHref(realm)}?victory=1`;}
+/** Heading for a realm's Level 8 post-test, which is the final battle against its guardian. */
+export function strongholdBattleTitle(realm:ExpeditionRealm){const g=STRONGHOLD_REALMS[realm].guardian;return `Final Battle · Break ${g}’s seal`;}
 export function strongholdStory(realm:ExpeditionRealm){
   const r=STRONGHOLD_REALMS[realm];
   return {
     opening:{title:'The Final Battle',text:'The path to the volcano is open. The Fog of Forgetfulness has hidden the six stolen Cores beyond its summit.'},
     entrance:{title:`${r.guardian[0].toUpperCase()}${r.guardian.slice(1)}’s stronghold`,text:`${r.guardian[0].toUpperCase()}${r.guardian.slice(1)} guards the ${r.core} and ${r.deed}. Follow the weekly portals and build the skills to break its seal.`},
-    battle:{title:'The Core chamber',text:`You have reached the ${r.core}. Show what you have learned to break the seal and release it.`},
+    battle:{title:'The Final Battle',text:`${r.guardian[0].toUpperCase()}${r.guardian.slice(1)}’s seal is cracked but still holds the ${r.core}. Every question you answer strikes it. Score 85% or more on the post-test to shatter the seal and set the Core free.`},
     recovery:{title:'The Core shines again',text:`The seal breaks. The ${r.core} is free, pushing the Fog of Forgetfulness back from the summit.`},
   } as const;
 }
