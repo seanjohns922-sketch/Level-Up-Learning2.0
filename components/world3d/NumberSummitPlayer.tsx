@@ -9,13 +9,13 @@ import { summitFloor, type SummitPoint } from '@/lib/world3d/number-summit';
 
 /** How close to a trail's cave gate the Enter prompt appears; covers the spot students return to. */
 const GATE_REACH=10;
-export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn,spawnKey,paused,overview,position,onNearest,onAltitude,floorResolver,nearestResolver}:{move:WorldMoveInput;look:WorldLookInput;unlocked:number;volcanoOpen:boolean;spawn:SummitPoint;spawnKey:number;paused:boolean;overview:boolean;position:MutableRefObject<THREE.Vector3>;onNearest:(index:number|null)=>void;onAltitude:(height:number)=>void;floorResolver?:(x:number,z:number)=>number|null;nearestResolver?:(x:number,z:number)=>number|null}){
- const group=useRef<THREE.Group>(null),keys=useRef(new Set<string>()),moving=useRef(false),sprinting=useRef(false),yaw=useRef(0),pitch=useRef(.04),nearest=useRef<number|null>(null),lastHeight=useRef(-1),snapCamera=useRef(true);
+export default function NumberSummitPlayer({move,look,unlocked,volcanoOpen,spawn,spawnKey,paused,overview,position,onNearest,onAltitude,floorResolver,nearestResolver,restPitch=.04}:{move:WorldMoveInput;look:WorldLookInput;unlocked:number;volcanoOpen:boolean;spawn:SummitPoint;spawnKey:number;paused:boolean;overview:boolean;position:MutableRefObject<THREE.Vector3>;onNearest:(index:number|null)=>void;onAltitude:(height:number)=>void;floorResolver?:(x:number,z:number)=>number|null;nearestResolver?:(x:number,z:number)=>number|null;/** The camera tilt the player starts at; higher looks further up. */restPitch?:number}){
+ const group=useRef<THREE.Group>(null),keys=useRef(new Set<string>()),moving=useRef(false),sprinting=useRef(false),yaw=useRef(0),pitch=useRef(restPitch),nearest=useRef<number|null>(null),lastHeight=useRef(-1),snapCamera=useRef(true);
  const {camera,gl}=useThree();
  const nextMetrics=useRef(0);
  const cameraRay=useRef(new THREE.Raycaster());
  const cameraObstacles=useRef<THREE.Object3D[]>([]),nextObstacleScan=useRef(0);
- useEffect(()=>{const g=group.current;if(g){g.position.set(spawn[0],spawn[1]+.75,spawn[2]);position.current.copy(g.position);}const trail=nearestTrail(spawn[0],spawn[2]);if(trail.distance<6&&trail.progress>.7&&spawn[1]<5){const p=TRAIL_SAMPLES[trail.trail][60];yaw.current=Math.atan2(spawn[0]-p[0],spawn[2]-p[2]);}else yaw.current=0;if(g)g.rotation.y=yaw.current+Math.PI;nearest.current=null;pitch.current=.04;keys.current.clear();snapCamera.current=true;},[spawn,spawnKey,position]);
+ useEffect(()=>{const g=group.current;if(g){g.position.set(spawn[0],spawn[1]+.75,spawn[2]);position.current.copy(g.position);}const trail=nearestTrail(spawn[0],spawn[2]);if(trail.distance<6&&trail.progress>.7&&spawn[1]<5){const p=TRAIL_SAMPLES[trail.trail][60];yaw.current=Math.atan2(spawn[0]-p[0],spawn[2]-p[2]);}else yaw.current=0;if(g)g.rotation.y=yaw.current+Math.PI;nearest.current=null;pitch.current=restPitch;keys.current.clear();snapCamera.current=true;},[spawn,spawnKey,position,restPitch]);
  useEffect(()=>{
   const down=(e:KeyboardEvent)=>{if((e.target as HTMLElement)?.closest('button,input,select,[role="dialog"]'))return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key))e.preventDefault();keys.current.add(e.key.toLowerCase());};
   const up=(e:KeyboardEvent)=>keys.current.delete(e.key.toLowerCase());const clear=()=>keys.current.clear();

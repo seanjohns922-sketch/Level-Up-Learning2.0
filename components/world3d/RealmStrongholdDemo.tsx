@@ -19,6 +19,9 @@ import {STRONGHOLD_REALMS,STRONGHOLD_SUMMIT_RETURN,strongholdFloor,strongholdLay
 import type {ExpeditionRealm} from '@/lib/world3d/expedition-access';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
 
+/** The halls have a lit roof and towering columns, so the camera rests tilted up a little more than on the summit. */
+const STRONGHOLD_CAMERA_TILT=.32;
+
 /** The realm's painted stronghold behind each story card: under the Fog's purple while sealed, bright once the Core is free. */
 function StoryArt({realm,recovery=false,colour,label}:{realm:ExpeditionRealm;recovery?:boolean;colour:string;label:string}){
  return <div className={`stronghold-story-art ${recovery?'is-free':''}`} role="img" aria-label={label} style={{backgroundImage:`url(${level8Background(realm)})`,'--story-glow':colour} as React.CSSProperties}/>;
@@ -69,7 +72,7 @@ export default function RealmStrongholdDemo({realm}:{realm:ExpeditionRealm}){
  const artLabel=story==='recovery'?`The ${info.core} shines as the Fog clears.`:`A glowing ${info.core} trapped inside the Fog’s purple seal.`;
  const battleFacts=['30 questions','Every answer strikes the seal','85% shatters it'];
  return <main className="summit-world stronghold-world" data-world3d-root data-stronghold={`${realm}-demo`} style={{'--stronghold-accent':info.colour} as React.CSSProperties}>
- <Canvas dpr={1} camera={{position:[0,5,18],fov:58,near:.1,far:160}} gl={{antialias:false,powerPreference:'high-performance'}} fallback={<p className="stronghold-fallback">3D stronghold. Use Continue to open the weekly page without walking.</p>}><Suspense fallback={null}><RealmStrongholdScene realm={realm} unlocked={current} recovered={recovered} shattering={shattering} position={position}/><NumberSummitPlayer move={move} look={look} unlocked={1} volcanoOpen={false} spawn={spawn} spawnKey={spawnKey} paused={paused} overview={false} position={position} onNearest={setNearest} onAltitude={()=>{}} floorResolver={(x,z)=>strongholdFloor(x,z,realm)} nearestResolver={(x,z)=>strongholdNearest(x,z,realm)}/></Suspense></Canvas>
+ <Canvas dpr={1} camera={{position:[0,5,18],fov:58,near:.1,far:160}} gl={{antialias:false,powerPreference:'high-performance'}} fallback={<p className="stronghold-fallback">3D stronghold. Use Continue to open the weekly page without walking.</p>}><Suspense fallback={null}><RealmStrongholdScene realm={realm} unlocked={current} recovered={recovered} shattering={shattering} position={position}/><NumberSummitPlayer move={move} look={look} unlocked={1} volcanoOpen={false} spawn={spawn} spawnKey={spawnKey} paused={paused} overview={false} position={position} onNearest={setNearest} onAltitude={()=>{}} floorResolver={(x,z)=>strongholdFloor(x,z,realm)} nearestResolver={(x,z)=>strongholdNearest(x,z,realm)} restPitch={STRONGHOLD_CAMERA_TILT}/></Suspense></Canvas>
  {/* The same world display as the Central Hub, the realm worlds and the Level 7 caves. */}
  <WorldHUD context="realm" realmId={realm} preview
   mission={{eyebrow:'LEVEL 8 · THE FINAL BATTLE',title:`${info.name} stronghold`,detail:recovered?'The Core is free · The Fog is clearing':`${finished} of ${weeks} weeks complete · Break ${info.guardian}’s seal`}}
