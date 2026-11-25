@@ -21,10 +21,18 @@ const props = { selectedClass: { id: 'class-a', name: 'Class A' }, students: [
 const finish = async () => h.act(async () => {
   for (const kind of ['live', 'diagnostic']) pending[kind].splice(0).forEach(resolve => resolve([]));
 });
+const visibility = async value => h.act(async () => {
+  Object.defineProperty(h.document, 'visibilityState', { configurable: true, value });
+  h.document.dispatchEvent(new h.document.defaultView.Event('visibilitychange'));
+});
 try {
   const Panel = h.load('components/teacher/WholeMathsDiagnosticPanel.tsx').default;
+  await visibility('hidden');
   await h.render(Panel, props);
-  await finish(); // Settle StrictMode's initial mount and cleanup probe.
+  assert.deepEqual(counts, { live: 0, diagnostic: 0, tests: 0 }, 'A background mount does not read data');
+  await visibility('visible');
+  assert.deepEqual(counts, { live: 1, diagnostic: 1, tests: 1 }, 'First visibility loads every data source');
+  await finish();
   mock.timers.tick(30000);
   await h.flushTimers();
   const started = { ...counts };
@@ -38,11 +46,23 @@ try {
   assert.equal(counts.tests, started.tests + 1, 'Assessment history follows the diagnostic refresh');
   mock.timers.tick(30000);
   await h.flushTimers();
+  await visibility('hidden');
+  const hidden = { ...counts };
+  await finish();
+  for (let i = 0; i < 3; i++) { mock.timers.tick(30000); await h.flushTimers(); }
+  assert.deepEqual(counts, hidden, 'Hidden tabs skip queued and interval reads');
+  await visibility('visible');
+  assert.equal(counts.live, hidden.live + 1, 'Returning immediately reconciles live progression');
+  assert.equal(counts.diagnostic, hidden.diagnostic + 1, 'Returning immediately reconciles diagnostic results');
+  assert.equal(counts.tests, hidden.tests + 1, 'Returning includes assessment history');
+  await visibility('hidden');
+  await visibility('visible');
+  assert.equal(counts.live, hidden.live + 1, 'Rapid tab changes cannot overlap a running read');
   await h.render(Panel, { selectedClass: null, students: [] });
   const disposed = { ...counts };
   await finish();
   mock.timers.tick(30000);
   await h.flushTimers();
   assert.deepEqual(counts, disposed, 'Class cleanup cancels queued reads from the previous class');
-  console.log('PASS diagnostic refresh overlap, trailing reconciliation, stable roster and class cleanup.');
+  console.log('PASS diagnostic refresh overlap, trailing reconciliation, stable roster, hidden-tab pause, immediate resume and class cleanup.');
 } finally { await h.close(); mock.timers.reset(); }

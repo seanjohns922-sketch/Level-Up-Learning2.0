@@ -254,6 +254,34 @@ function RunSortHeading({ label, sortKey, sort, onSort, first = "desc", align = 
   );
 }
 
+// Each reader keeps one pending refresh; hidden tabs do not start new reads.
+function startDiagnosticPolling(
+  load: (showLoading: boolean) => Promise<void>,
+  onError: (error: unknown) => void,
+) {
+  let initial = true;
+  const refresh = createCoalescedRefresh(async () => {
+    if (document.visibilityState === "hidden") return;
+    const showLoading = initial;
+    initial = false;
+    await load(showLoading);
+  }, onError);
+  const poll = () => {
+    if (document.visibilityState !== "hidden") refresh.request();
+  };
+  const resume = () => {
+    if (document.visibilityState !== "hidden") refresh.request({ immediate: true });
+  };
+  poll();
+  const intervalId = window.setInterval(poll, 30_000);
+  document.addEventListener("visibilitychange", resume);
+  return () => {
+    refresh.dispose();
+    window.clearInterval(intervalId);
+    document.removeEventListener("visibilitychange", resume);
+  };
+}
+
 export default function WholeMathsDiagnosticPanel({
   selectedClass,
   students,
@@ -367,15 +395,10 @@ export default function WholeMathsDiagnosticPanel({
         if (!cancelled) setLiveLoading(false);
       }
     }
-    let initial = true;
-    const refresh = createCoalescedRefresh(async () => {
-      const showLoading = initial;
-      initial = false;
-      await loadLive(showLoading);
-    }, (error) => console.warn("[WholeMathsDiagnostic] Live refresh failed", error));
-    refresh.request();
-    const intervalId = window.setInterval(() => refresh.request(), 30_000);
-    return () => { cancelled = true; refresh.dispose(); window.clearInterval(intervalId); };
+    const stopPolling = startDiagnosticPolling(loadLive, (error) => {
+      console.warn("[WholeMathsDiagnostic] Live refresh failed", error);
+    });
+    return () => { cancelled = true; stopPolling(); };
   }, [selectedClass?.id]);
 
   useEffect(() => {
@@ -421,15 +444,10 @@ export default function WholeMathsDiagnosticPanel({
       }
       setDiagnosticLoading(false);
     }
-    let initial = true;
-    const refresh = createCoalescedRefresh(async () => {
-      const showLoading = initial;
-      initial = false;
-      await loadDiagnostic(showLoading);
-    }, (error) => console.warn("[WholeMathsDiagnostic] Diagnostic refresh failed", error));
-    refresh.request();
-    const intervalId = window.setInterval(() => refresh.request(), 30_000);
-    return () => { cancelled = true; refresh.dispose(); window.clearInterval(intervalId); };
+    const stopPolling = startDiagnosticPolling(loadDiagnostic, (error) => {
+      console.warn("[WholeMathsDiagnostic] Diagnostic refresh failed", error);
+    });
+    return () => { cancelled = true; stopPolling(); };
   }, [selectedClass?.id, studentIdsKey]);
 
   const studentNames = useMemo(
