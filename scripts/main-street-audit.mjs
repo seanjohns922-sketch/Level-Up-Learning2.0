@@ -35,9 +35,9 @@ for (const style of MAIN_STREET_STYLES) {
 assert.ok(MARKETPLACE_CATEGORIES.world.some((category) => category.id === "main_street" && category.label === "Main Street"), "the Marketplace has a Main Street tab");
 assert.equal(premiumHomeLevel("school", new Set([premiumHomeUpgradeKey("school", 2), premiumHomeUpgradeKey("school", 3)])), 3, "level is the highest upgrade owned");
 
-// Every town building is big, so it starts in the planner.
+// Every town building is big, so the camera stands back to show all of it while placing.
 const sized = (style) => itemSize(rows.find((row) => row.item_key === premiumHomeItemKey(style)), itemGroundSize(rows.find((row) => row.item_key === premiumHomeItemKey(style))));
-for (const style of MAIN_STREET_STYLES) assert.equal(sized(style), "big", `${style} opens the planner`);
+for (const style of MAIN_STREET_STYLES) assert.equal(sized(style), "big", `${style} is big`);
 
 const migration = read("supabase/migrations/20261124180000_main_street.sql");
 for (const row of rows) assert.ok(migration.split("\n").some((line) => line.startsWith(`('${row.item_key}'`) && line.includes(`, ${row.price}, `)), `migration row for ${row.item_key}`);
@@ -48,4 +48,4 @@ assert.ok(migration.includes("on conflict (item_key) do nothing") && !/create\s+
 const models = read("components/world3d/premium-homes/PremiumHomeModels.tsx");
 assert.ok(models.includes("...MAIN_STREET_LEVEL_MODELS") && models.includes("MAIN_STREET_MODELS"), "Main Street models are registered");
 assert.ok(/"main_street"[^\]]*\]\.includes\(/.test(read("components/world3d/CentralWorld.tsx")), "owned Main Street buildings appear in My items");
-console.log(`PASS Main Street: ${MAIN_STREET_STYLES.length} buildings x 4 levels, ${rows.length} shop rows match the migration, Main Street tab, planner placing and renderer wiring in place`);
+console.log(`PASS Main Street: ${MAIN_STREET_STYLES.length} buildings x 4 levels, ${rows.length} shop rows match the migration, Main Street tab, big-item placing and renderer wiring in place`);

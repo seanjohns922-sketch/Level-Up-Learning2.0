@@ -8,9 +8,9 @@
   --edit-shadow: 0 10px 30px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
-.worldEditBar, .worldEditHint, .worldEditView, .worldEditArrows, .worldEditTray, .worldEditHold, .worldEditPicked { font-family: var(--font-sans); color: #fff; }
-.worldEditBar button, .worldEditTray button, .worldEditArrows button, .worldEditView button, .worldEditHold button, .worldEditPicked button { font-family: var(--font-display); cursor: pointer; }
-.worldEditBar button:focus-visible, .worldEditTray button:focus-visible, .worldEditArrows button:focus-visible, .worldEditView button:focus-visible, .worldEditHold button:focus-visible, .worldEditPicked button:focus-visible, .worldBuilderReset button:focus-visible {
+.worldEditBar, .worldEditView, .worldEditArrows, .worldEditTray, .worldEditPicked { font-family: var(--font-sans); color: #fff; }
+.worldEditBar button, .worldEditTray button, .worldEditArrows button, .worldEditView button, .worldEditPicked button { font-family: var(--font-display); cursor: pointer; }
+.worldEditBar button:focus-visible, .worldEditTray button:focus-visible, .worldEditArrows button:focus-visible, .worldEditView button:focus-visible, .worldEditPicked button:focus-visible, .worldBuilderReset button:focus-visible {
   outline: 3px solid #f6d36b; outline-offset: 2px;
 }
 
@@ -33,11 +33,6 @@
 }
 .worldEditRound:disabled { opacity: 0.45; cursor: default; }
 .worldEditRound[aria-pressed="true"] { background: #fff; color: #16121f; }
-.worldEditDone {
-  display: flex; align-items: center; gap: 9px; height: 52px; padding: 0 26px; border: 0; border-radius: 999px; color: #fff;
-  font: 900 15px var(--font-display) !important; letter-spacing: 0.05em;
-  background: linear-gradient(135deg, #d86bf7, #8c2eac); box-shadow: 0 10px 24px rgba(140, 46, 172, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
 .worldEditMenuWrap { position: relative; }
 .worldEditMenu {
   position: absolute; right: 0; top: 62px; width: 260px; padding: 8px; border-radius: 18px; background: #fff; color: #16121f;
@@ -52,17 +47,6 @@
 .worldEditMenuState { margin-left: auto; font-size: 12px; font-weight: 800; color: #8a7f99; }
 .worldEditMenu [aria-checked="true"] .worldEditMenuState { color: #8c2eac; }
 .worldEditMenuWarn { color: #b42318 !important; }
-
-/* Hint */
-.worldEditHint {
-  position: absolute; z-index: 39; left: 50%; top: calc(max(14px, env(safe-area-inset-top)) + 64px); transform: translateX(-50%);
-  max-width: calc(100% - 32px); padding: 10px 18px; border-radius: 999px; text-align: center; font-size: 15px; font-weight: 800; pointer-events: none;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
-}
-.worldEditHint[data-tone="ok"] { background: rgba(21, 128, 61, 0.92); border-color: rgba(187, 247, 208, 0.5); }
-.worldEditHint[data-tone="bad"] { background: rgba(185, 28, 28, 0.92); border-color: rgba(254, 202, 202, 0.5); }
-.worldEditHint svg { flex: 0 0 auto; }
 
 /* View: three set angles, turn and zoom */
 .worldEditView {
@@ -106,13 +90,6 @@
 }
 .worldEditTabs button[aria-selected="true"] { background: #fff; color: #16121f; }
 .worldEditTabs em { font-style: normal; padding: 1px 7px; border-radius: 99px; background: var(--edit-violet); color: #fff; font-size: 11px; }
-.worldEditModes { display: flex; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
-.worldEditModes button {
-  display: flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent;
-  color: #e9e6f2; font: 900 13px var(--font-display) !important;
-}
-.worldEditModes button[aria-pressed="true"] { background: var(--edit-violet); color: #fff; }
-.worldEditModes button[data-tone="erase"][aria-pressed="true"] { background: #e5484d; }
 .worldEditTrayToggle { width: 44px; height: 44px; flex: 0 0 auto; display: grid; place-items: center; padding: 0; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: #fff; }
 .worldEditCards {
   display: flex; gap: 10px; margin-top: 12px; overflow-x: auto; overscroll-behavior: contain; touch-action: pan-x; scrollbar-width: thin;
@@ -138,30 +115,8 @@
 }
 .worldEditSearch::placeholder { color: #cfc7dc; }
 
-/* Placing bar: what's in hand, then big Turn / Place / Cancel */
-.worldEditHold {
-  position: absolute; z-index: 38; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); transform: translateX(-50%);
-  width: min(620px, calc(100vw - 32px)); box-sizing: border-box; display: grid; gap: 10px; padding: 12px; border-radius: 24px;
-  background: rgba(20, 18, 28, 0.9); border: 1px solid var(--edit-line); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.32); backdrop-filter: blur(14px);
-}
-.worldEditHoldTop { display: flex; align-items: center; gap: 12px; min-width: 0; }
-.worldEditHoldArt { position: relative; flex: 0 0 52px; height: 52px; border-radius: 12px; overflow: hidden; display: grid; place-items: center; background: #f4f1e6; }
-.worldEditHoldName { display: grid; min-width: 0; }
-.worldEditHoldName b { font: 900 17px var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.worldEditHoldName small { font-size: 13px; font-weight: 700; color: #d4d0dd; }
-.worldEditHoldExtras { margin-left: auto; display: flex; align-items: center; gap: 8px; min-width: 0; overflow-x: auto; scrollbar-width: none; touch-action: pan-x; }
-.worldEditHoldExtras::-webkit-scrollbar { display: none; }
-.worldEditHoldExtras > * { flex: 0 0 auto; }
-.worldEditHoldExtras select { min-height: 44px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.12); color: #fff; font: 700 13px var(--font-sans); }
-.worldEditHoldExtras select option { color: #16121f; }
-.worldEditHoldExtras .worldEditDanger { display: grid; place-items: center; height: 44px; border: 0; border-radius: 999px; color: #fff; }
-.worldEditHoldButtons { display: grid; grid-template-columns: 1fr 1fr 1.7fr 64px; gap: 10px; }
-.worldEditHoldButtons button {
-  display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 64px; border: 0; border-radius: 18px;
-  background: rgba(255, 255, 255, 0.12); color: #fff; font: 800 18px var(--font-display) !important;
-}
-.worldEditHoldButtons .worldEditHoldPlace { background: #22c55e; color: #0b2e16; font-weight: 900 !important; font-size: 22px !important; }
-.worldEditHoldButtons .worldEditHoldPlace:disabled { background: rgba(255, 255, 255, 0.18); color: rgba(255, 255, 255, 0.55); cursor: default; }
+/* The picker ("More"): every category over whichever view is building; the HUD's cards stay out of its way. */
+body:has(.worldPicker) :is(.worldHudActions, .worldHudStartCard) { display: none; }
 
 /* A placed item someone tapped: Move / Turn / Put away beside it */
 .worldEditPicked {
@@ -176,21 +131,6 @@
 .worldEditPicked .worldEditPickedMove { background: var(--edit-violet); }
 .worldEditPicked .worldEditPickedRemove { background: rgba(239, 68, 68, 0.2); color: #fecaca; }
 
-/* Water brush bar, above the tray */
-.worldEditItemBar {
-  position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); max-width: calc(100vw - 32px);
-  display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 999px;
-  background: var(--edit-glass); border: 1px solid var(--edit-line); box-shadow: var(--edit-shadow); backdrop-filter: blur(14px);
-}
-.worldEditItemName { padding: 0 8px 0 10px; font: 900 14px var(--font-display); white-space: nowrap; }
-.worldEditItemBar > button {
-  display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; white-space: nowrap;
-  background: rgba(255, 255, 255, 0.1); color: #fff; font: 900 13px var(--font-display) !important;
-}
-.worldEditItemBar > button[aria-pressed="true"] { background: var(--edit-violet); }
-.worldEditItemBar select { min-height: 44px; padding: 0 12px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.1); color: #fff; font: 700 13px var(--font-sans); }
-.worldEditItemBar select option { color: #16121f; }
-.worldEditDanger { width: 44px; justify-content: center; padding: 0 !important; background: #e5484d !important; }
 .worldEditTints { display: flex; gap: 5px; align-items: center; }
 .worldEditTints button { width: 26px; height: 26px; padding: 0; border-radius: 999px; border: 2px solid rgba(255, 255, 255, 0.35); }
 .worldEditTints button[aria-pressed="true"] { border-color: #fff; box-shadow: 0 0 0 3px rgba(201, 77, 242, 0.6); }
@@ -213,10 +153,8 @@
 @media (max-width: 1100px) {
   .worldEditTrayTop { flex-wrap: wrap; }
   .worldEditTabs { order: 2; flex-basis: 100%; }
-  .worldEditModes { order: 1; }
   .worldEditTrayToggle { order: 1; margin-left: auto; }
   .worldEditSearch { order: 1; flex: 1 1 100px; }
-  .worldEditItemBar { flex-wrap: wrap; justify-content: center; border-radius: 22px; }
 }
 @media (max-width: 700px) {
   .worldEditBar { left: 8px; right: 8px; gap: 6px; }
@@ -224,10 +162,7 @@
   .worldEditSaved { display: none; }
   .worldEditActions { gap: 6px; }
   .worldEditRound { width: 48px; height: 48px; }
-  .worldEditDone { height: 48px; padding: 0 16px; }
-  .worldEditHint { top: calc(max(14px, env(safe-area-inset-top)) + 58px); font-size: 12px; border-radius: 16px; }
   .worldEditTray { left: 8px; right: 8px; bottom: max(8px, env(safe-area-inset-bottom)); padding: 10px; border-radius: 20px; }
-  .worldEditModes button { padding: 0 10px; }
   .worldEditCard { flex-basis: 96px; height: 104px; border-radius: 14px; }
   .worldEditCard b { font-size: 11px; }
   .worldEditArrows { left: 8px; bottom: 250px; }
@@ -241,30 +176,30 @@
   }
   .worldEditViewGrid { grid-template-columns: 1fr; gap: 6px; padding-top: 0; }
   .worldEditViewGrid button { min-height: 44px; }
-  .worldEditHold { width: calc(100vw - 20px); bottom: max(10px, env(safe-area-inset-bottom)); padding: 10px; border-radius: 20px; }
-  .worldEditHoldButtons { grid-template-columns: 1fr 1fr 1.6fr 56px; gap: 8px; }
-  .worldEditHoldButtons button { min-height: 56px; font-size: 16px !important; }
-  .worldEditHoldButtons .worldEditHoldPlace { font-size: 19px !important; }
-  .worldEditHoldName b { font-size: 15px; }
   /* Above the item, clear of the tray */
   .worldEditPicked { width: 170px; transform: translate(-50%, calc(-100% - 36px)); }
-  .worldEditHoldTop { flex-wrap: wrap; row-gap: 8px; }
-  .worldEditHoldName { flex: 1 1 0; }
-  .worldEditHoldExtras { order: 3; flex: 1 1 100%; margin-left: 0; }
   /* One swipeable row for the held item's controls, just above the tray */
-  .worldEditItemBar {
-    left: 0; right: 0; transform: none; max-width: none; flex-wrap: nowrap; justify-content: flex-start;
-    overflow-x: auto; scrollbar-width: none; touch-action: pan-x; border-radius: 20px;
-  }
-  .worldEditItemBar::-webkit-scrollbar { display: none; }
-  .worldEditItemBar > *, .worldEditTints button { flex: 0 0 auto; }
+  .worldEditTints button { flex: 0 0 auto; }
   .worldEditSearch { display: none; }
 }
 @media (max-width: 430px) {
   .worldEditTitle { gap: 6px; padding: 0 6px 0 12px; }
   .worldEditTitle b { font-size: 14px; }
   .worldEditRound { width: 44px; height: 44px; }
-  .worldEditDone { height: 44px; padding: 0 14px; font-size: 13px !important; gap: 6px; }
+}
+
+/* Short landscape screens (phones on their side): the view controls shrink to one slim column. */
+@media (max-height: 520px) {
+  .worldEditView { top: 70px; transform: none; left: 8px; width: 60px; padding: 6px; gap: 6px; border-radius: 16px; }
+  .worldEditViewLabel, .worldEditViewPreset { display: none; }
+  .worldEditViewCycle {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 52px; padding: 0; border: 0; border-radius: 12px;
+    background: var(--edit-violet); color: #fff; font: 800 10px var(--font-display) !important;
+  }
+  .worldEditViewGrid { grid-template-columns: 1fr; gap: 6px; padding-top: 0; }
+  .worldEditViewGrid button { min-height: 40px; }
+  .worldEditTitle { min-height: 44px; }
+  .worldEditSaved { display: none; }
 }
 
 /* Premium homes: level and upgrade in the picked-item menu */

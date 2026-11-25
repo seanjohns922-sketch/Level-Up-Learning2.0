@@ -1,8 +1,8 @@
-// Walk-and-place building: items go on the square in front of the explorer, big
-// things start in the planner, and the hotbar keeps pins, then recent picks, then starters.
+// Building: items go on the square in front of the explorer (or the nearest spot that fits),
+// big things get a further-back camera, and the hotbar keeps pins, then recent picks, then starters.
 import assert from "node:assert/strict";
 import {
-  footCell, frontCell, HOTBAR_SLOTS, HOTBAR_STARTERS, hotbarSlots, hotbarTool, hotbarToolOf, itemSize,
+  footCell, frontCell, HOTBAR_SLOTS, HOTBAR_STARTERS, hotbarSlots, hotbarTool, hotbarToolOf, itemSize, nearestFit,
   rememberHotbarEntry, standBehind, togglePin,
 } from "../lib/world3d/walk-build.ts";
 import { CENTRAL_WORLD_STARTER_SCENERY } from "../lib/world3d/central-world-editor-catalog.ts";
@@ -31,7 +31,7 @@ for (const size of [[1, 1], [3, 2], [9, 9]]) {
 }
 assert.deepEqual(footCell(3.1, -4.9, CELL), { gridX: 2, gridZ: -2 });
 
-// Small scenery walks; the Tower's defences (bar the laser fence) and anything over 3 × 3 plan.
+// Small scenery is small; the Tower's defences (bar the laser fence) and anything over 3 × 3 are big.
 const scenery = (key) => CENTRAL_WORLD_STARTER_SCENERY.find((item) => item.metadata.worldAssetKey === key);
 const sizeOf = (item) => itemSize(item, itemGroundSize(item));
 for (const key of ["lamp_post", "fence", "bench", "tree", "gum_tree", "koala", "boulder", "defence_laser_fence"]) assert.equal(sizeOf(scenery(key)), "small", key);
@@ -79,5 +79,18 @@ for (const key of ["lamp_post", "bench", "campfire", "log", "tree", "pond", "def
     assert.deepEqual([x, z], [mid("gridX"), mid("gridZ")], `${key} at ${rotation}°`);
   }
 }
+
+// The nearest spot that fits: itself if free, else the closest free square (strictly by distance), else null.
+const blocked = new Set(["0:0", "1:0", "-1:0", "0:1", "0:-1"]);
+const free = (cell) => !blocked.has(`${cell.gridX}:${cell.gridZ}`);
+assert.deepEqual(nearestFit({ gridX: 5, gridZ: 5 }, free, 3), { gridX: 5, gridZ: 5 });
+const near = nearestFit({ gridX: 0, gridZ: 0 }, free, 3);
+assert.equal(Math.hypot(near.gridX, near.gridZ), Math.SQRT2, "a diagonal neighbour beats two squares straight");
+// A whole ring blocked: the next ring out, never further than it needs to go.
+const ring = (cell) => Math.max(Math.abs(cell.gridX), Math.abs(cell.gridZ)) >= 2;
+const out = nearestFit({ gridX: 0, gridZ: 0 }, ring, 4);
+assert.equal(Math.hypot(out.gridX, out.gridZ), 2);
+assert.equal(nearestFit({ gridX: 0, gridZ: 0 }, () => false, 4), null);
+assert.equal(nearestFit({ gridX: 0, gridZ: 0 }, ring, 1), null, "never looks past its reach");
 
 console.log("walk-build: all checks passed");

@@ -975,7 +975,8 @@ function BuildModeGrid({ cursor, cells: across, ring, reservedCell }: { cursor: 
   return (
     <group position={[x, 0.115, z]}>
       <gridHelper args={[size, cells, "#eafff3", "#67d5b5"]} />
-      {reservedCell ? <ReservedCellsOverlay cursor={cursor} cells={cells} reservedCell={reservedCell} /> : null}
+      {/* With something in hand its own footprint shows green or red, so the blocked squares around stay plain. */}
+      {reservedCell && ring ? <ReservedCellsOverlay cursor={cursor} cells={cells} reservedCell={reservedCell} /> : null}
       {ring ? <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]}><ringGeometry args={[0.72, 0.94, 32]} /><meshBasicMaterial color="#ffffff" transparent opacity={0.95} depthWrite={false} /></mesh> : null}
     </group>
   );

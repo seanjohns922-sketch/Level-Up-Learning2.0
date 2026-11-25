@@ -39,7 +39,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Map as MapIcon, Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Eraser, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Undo2, Users, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Users, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -69,8 +69,8 @@ import { rexLevelFrom } from "@/lib/rex";
 import { resolveWorldJourney } from "@/lib/world3d/world-journey";
 import { resolveTowerRealmEntry } from "@/lib/world3d/tower-realm-entry";
 import type { CanonicalRealmId } from "@/lib/realms/realm-registry";
-import { WalkBuildBar, type WalkBuildMode, type WalkBuildSlot } from "@/components/world3d/WalkBuildBar";
-import { footCell, frontCell, HOTBAR_STARTERS, hotbarSlots, hotbarTool, hotbarToolOf, itemSize, readHotbar, readPlaceViews, rememberHotbarEntry, standBehind, togglePin, writeHotbar, writePlaceViews, type HotbarEntry, type PlaceView } from "@/lib/world3d/walk-build";
+import { WalkBuildBar, type WalkBuildHint, type WalkBuildMode, type WalkBuildSlot } from "@/components/world3d/WalkBuildBar";
+import { footCell, frontCell, HOTBAR_STARTERS, hotbarSlots, hotbarTool, hotbarToolOf, itemSize, nearestFit, readHotbar, rememberHotbarEntry, standBehind, togglePin, writeHotbar, type HotbarEntry } from "@/lib/world3d/walk-build";
 import {
   EMPTY_WORLD_MOVE_INPUT,
   EMPTY_WORLD_LOOK_INPUT,
@@ -176,6 +176,10 @@ type TrayTab = "owned" | PaletteTab;
 const WALK_BUILD_CAMERA_PITCH = -0.6;
 /** How many squares from the explorer a tap can build. */
 const WALK_TAP_REACH = 5;
+/** How far (in squares) a held item looks for a spot that fits: on foot (by its size), planning, and on Place. */
+const walkFitReach = (size: [number, number]) => 3 + Math.ceil(Math.max(size[0], size[1]) / 2);
+const PLAN_FIT_REACH = 12;
+const SLIDE_REACH = 3;
 /** Where the camera aims while building on foot (lower than usual, so the explorer sits higher on screen). */
 const WALK_BUILD_CAMERA_TARGET = 0.6;
 /** How much faster the avatar rolls on skate pieces. */
@@ -376,7 +380,7 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 /** A placed item the builder tapped: outlined, with its menu floating beside it. */
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
-function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt, poseRef, mates, matePoses }: { poseRef: React.MutableRefObject<ExplorerPose>; mates: readonly WorldMate[]; matePoses: React.RefObject<Map<string, ExplorerPose>>; waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, walkFar, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt, poseRef, mates, matePoses }: { poseRef: React.MutableRefObject<ExplorerPose>; mates: readonly WorldMate[]; matePoses: React.RefObject<Map<string, ExplorerPose>>; waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; walkFar: boolean; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -541,7 +545,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
         ]}
         onNearestTargetId={handleNearestTarget}
         initialPitch={-0.1}
-        cameraDistance={walking && walkGridCells > 10 ? 20 : 13}
+        cameraDistance={walking && walkFar ? 20 : 13}
         // Building on foot: the camera looks down more and frames the explorer higher (clear of the
         // build buttons), and the explorer fades so the square in front of them always shows.
         cameraMaxPitch={walking ? WALK_BUILD_CAMERA_PITCH : undefined}
@@ -953,30 +957,27 @@ export default function CentralWorld() {
     setResolvingChange(false);
   }
   const [editorOpen, setEditorOpen] = useState(false);
-  // Walk-and-place building: carry an item and it goes on the square in front of
-  // the explorer. Planning from above (Edit World) opens on top and returns here.
+  // Building: carry an item and it goes in front of the explorer, or plan from above (the same
+  // bar and buttons). Planning opens from the builder and Walk comes back.
   const [walkBuild, setWalkBuild] = useState(false);
   const walking = walkBuild && !editorOpen;
   const [brushOn, setBrushOn] = useState(false);
   const [hotbar, setHotbar] = useState(() => readHotbar(placementScope));
-  const [placeViews, setPlaceViews] = useState(() => readPlaceViews(placementScope));
   // Where the camera looks: held items sit ahead of the explorer that way, so they
   // stay put when the explorer turns to walk sideways.
   const aimRef = useRef(Math.PI);
-  // "More" opens the planner's tray to choose something to carry.
-  const pickForWalk = useRef(false);
+  // "More" opens the picker: every category, over whichever view is building.
+  const [pickerOpen, setPickerOpen] = useState(false);
   // The item just put down lands with a bounce.
   const [justPlacedId, setJustPlacedId] = useState<string | null>(null);
   // Where it went: while walking, the next one in hand stays hidden until the explorer moves on.
   const [lastPlacedCell, setLastPlacedCell] = useState<{ gridX: number; gridZ: number } | null>(null);
   const resetDialog = useRef<HTMLDialogElement>(null);
   const resetCancel = useRef<HTMLButtonElement>(null);
-  const [trayOpen, setTrayOpen] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
   // Arrow buttons are an option for learners who prefer them to gestures.
   const [arrowControls, setArrowControls] = useState(() => { try { return localStorage.getItem(ARROW_CONTROLS_KEY) === "1"; } catch { return false; } });
   const touchFirst = useMemo(() => window.matchMedia("(pointer: coarse)").matches, []);
-  const undoKeyLabel = useMemo(() => (/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘Z" : "Ctrl Z"), []);
   const canvasWrapRef = useRef<HTMLDivElement>(null);
   const [librarySection, setLibrarySection] = useState<"build" | "owned">("build");
   const [editTool, setEditTool] = useState<WorldEditTool>("move");
@@ -1290,14 +1291,17 @@ export default function CentralWorld() {
   const buildProblem = buildItem && buildPlacement ? centralWorldPlacementProblem(buildPlacement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules) : null;
   const buildValid = Boolean(buildItem && buildPlacement) && buildProblem === null;
   const buildPreview = buildItem && buildPlacement ? { placement: buildPlacement, item: buildItem, valid: buildValid } : null;
-  const restingOnPlaced = walking && Boolean(buildPlacement && lastPlacedCell && buildPlacement.gridX === lastPlacedCell.gridX && buildPlacement.gridZ === lastPlacedCell.gridZ);
+  // Fences and walls are laid square by square (on foot: Place at each step; planning: drag a line).
+  const heldLaysLine = Boolean(buildItem && CONNECTED_BOUNDARY_KEYS.has(String(buildItem.metadata.worldAssetKey)));
+  // Just laid a piece of line: the next one waits until the explorer steps on (other items move to the next spot that fits).
+  const restingOnPlaced = walking && heldLaysLine && Boolean(buildPlacement && lastPlacedCell && buildPlacement.gridX === lastPlacedCell.gridX && buildPlacement.gridZ === lastPlacedCell.gridZ);
   const heldItemKey = selectedInventoryItemKey ?? selectedSceneryItemKey;
   const isGroundTool = !heldItemKey && (editTool === "path" || editTool === "road" || editTool === "stone" || editTool === "water" || (editTool === "track" && raceLevel > 0));
   const isEraseTool = !heldItemKey && editTool === "erase";
   const isMoveTool = !heldItemKey && editTool === "move";
   // Fences and walls are laid in a line under the finger; everything else is
   // moved into place and then placed with the Place button.
-  const laysLine = Boolean(buildPreview && editorOpen && CONNECTED_BOUNDARY_KEYS.has(String(buildPreview.item.metadata.worldAssetKey)));
+  const laysLine = editorOpen && heldLaysLine;
   const paintMode = editorOpen && (isGroundTool || isEraseTool || laysLine);
   // A placed item the builder tapped with Move, waiting for Move, Turn or Put away.
   const [selectedPlacementId, setSelectedPlacementId] = useState<string | null>(null);
@@ -1373,13 +1377,7 @@ export default function CentralWorld() {
           setSelectedInventoryItemKey(requestedBuildItemKey);
           setBuildPlacement(nextBuildPlacement);
           setEditCursor(cell);
-          if (readPlaceViews(placementScope)[itemSize(requestedItem, size)] === "plan") {
-            setLibrarySection("owned");
-            setCameraFocus(cell);
-            setEditorOpen(true);
-          } else {
-            setWalkBuild(true);
-          }
+          setWalkBuild(true);
           const [standX, standZ] = standBehind(cell.gridX, cell.gridZ, size, buildGrid.cellSize);
           setSpawnTarget([standX, 0.75, standZ]);
           setSpawnYaw(0);
@@ -1477,51 +1475,18 @@ export default function CentralWorld() {
     setEditHistory(current=>[...current,{placements:placedCustomisations,tiles:groundTiles}].slice(-30));
   }
 
-  function openWorldEditor() {
-    // Centre the fixed build camera and the first item on wherever the avatar
-    // is standing, so you build right where you are.
-    const cell = buildGrid.cellSize;
-    const cursor = {
-      gridX: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.x / cell), buildGrid.minX, buildGrid.maxX),
-      gridZ: THREE.MathUtils.clamp(Math.round(avatarPosRef.current.z / cell), buildGrid.minZ, buildGrid.maxZ),
-    };
-    setCameraFocus(cursor);
-    setEditCursor(cursor);
-    setEditTool("move");
-    setSelectedInventoryItemKey(null);
-    setSelectedSceneryItemKey(null);
-    setBuildPlacement(null);
-    setSelectedPlacementId(null);
-    setBuildView("normal");
-    setMenuOpen(false);
-    setTrayOpen(true);
-    if (ownedWorldItems.length) setLibrarySection("owned");
-    setEditorOpen(true);
-    // Leave the avatar where it was standing — only the build camera moves.
-    void speak("Edit World. Choose something from the tray and it appears in the middle. Drag the ground to move it, then press Place. Tap something you have placed to move, turn or put it away.", undefined, "manual", { rate: 0.9 });
-  }
-
   function closeWorldEditor() {
-    pickForWalk.current = false;
     setStrokeActive(false);
     setMenuOpen(false);
     setEditorOpen(false);
+    setPickerOpen(false);
     setBuildPlacement(null);
     setSelectedPlacementId(null);
   }
   // Visiting: when the owner switches you back to LOOK (or the visit ends), building stops.
   useEffect(() => { stopBuilding.current = () => { stopWalkBuild(); closeWorldEditor(); }; });
 
-  // ---- Walk-and-place building ----
-  const viewFor = (item: EconomyItem): PlaceView => placeViews[itemSize(item, itemGroundSize(item))];
-  // Kids can switch any item between walking and planning; the hub remembers it for that size of thing.
-  function rememberView(item: EconomyItem, view: PlaceView) {
-    const size = itemSize(item, itemGroundSize(item));
-    if (placeViews[size] === view) return;
-    const next = { ...placeViews, [size]: view };
-    setPlaceViews(next);
-    writePlaceViews(placementScope, next);
-  }
+  // ---- Building: on foot, or planning from above, with the same bar ----
   function rememberPick(entry: HotbarEntry) {
     const next = rememberHotbarEntry(hotbar, entry);
     setHotbar(next);
@@ -1534,19 +1499,11 @@ export default function CentralWorld() {
     writeHotbar(placementScope, next);
     void speak(next.pins.includes(entry) ? "Added to your favourites." : "Taken out of your favourites.", undefined, "manual", { rate: 0.9 });
   }
-  // A fresh pick in the planner stays there, unless "More" was choosing something to carry.
-  function pickView(item: EconomyItem): PlaceView {
-    if (!editorOpen) return "walk";
-    if (!pickForWalk.current) return "plan";
-    pickForWalk.current = false;
-    const view = viewFor(item);
-    if (view === "walk") setEditorOpen(false);
-    return view;
-  }
-  function speakWalkPick(item: EconomyItem) {
-    void speak(CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey))
-      ? `${item.name}. Press Place at each step and it joins up as you walk.`
-      : `${item.name}. Walk to where it should go, then press Place.`, undefined, "manual", { rate: 0.9 });
+  function speakPick(item: EconomyItem) {
+    const line = CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey));
+    void speak(editorOpen
+      ? line ? `${item.name}. Drag along the ground to build a line.` : `${item.name}. Drag the ground to move it, then press Place.`
+      : line ? `${item.name}. Press Place at each step and it joins up as you walk.` : `${item.name}. Walk to where it should go, then press Place.`, undefined, "manual", { rate: 0.9 });
   }
   function stopBrush() {
     if (!brushOn) return;
@@ -1556,6 +1513,14 @@ export default function CentralWorld() {
   const avatarCell = () => footCell(avatarPosRef.current.x, avatarPosRef.current.z, buildGrid.cellSize);
   const facingCell = (size: [number, number]) => frontCell(avatarPosRef.current.x, avatarPosRef.current.z, aimRef.current, size, buildGrid.cellSize);
 
+  // Where a held item can go: the nearest spot that fits, so it shows green instead of making kids hunt.
+  const fitsAt = (placement: CentralWorldPlacement, item: EconomyItem, others: CentralWorldPlacement[]) =>
+    centralWorldPlacementProblem(placement, item, others, itemsById, groundTiles, buildRules) === null;
+  function fitNear(placement: CentralWorldPlacement, item: EconomyItem, reach: number, others = placementsWithoutBuildItem): CentralWorldPlacement | null {
+    const cell = nearestFit(placement, (at) => fitsAt({ ...placement, ...at }, item, others), reach);
+    return cell ? { ...placement, ...cell } : null;
+  }
+
   function startWalkBuild() {
     setSelectedPlacementId(null);
     setBuildNotice(null);
@@ -1564,7 +1529,7 @@ export default function CentralWorld() {
   }
   function stopWalkBuild() {
     stopBrush();
-    pickForWalk.current = false;
+    setPickerOpen(false);
     setWalkBuild(false);
     setBuildPlacement(null);
     setSelectedInventoryItemKey(null);
@@ -1572,57 +1537,65 @@ export default function CentralWorld() {
     setEditTool("move");
     if (requestedBuildItemKey) router.replace(preview ? "/world?teacher_preview=1" : "/world");
   }
-  // The planner opens on the held item (or the explorer) and Done comes back to walking.
-  function openPlanner(at: { gridX: number; gridZ: number }) {
+  function finishBuilding() {
+    stopWalkBuild();
+    closeWorldEditor();
+  }
+  // Plan from above: the view opens on the held item (or the explorer); Walk comes back.
+  function planFromWalk() {
     stopBrush();
+    const at = buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : avatarCell();
     setCameraFocus(at);
     setEditCursor(at);
     setSelectedPlacementId(null);
     setBuildView("normal");
     setMenuOpen(false);
-    setTrayOpen(true);
     setEditorOpen(true);
-  }
-  function planFromWalk() {
-    if (buildItem && buildPlacement) rememberView(buildItem, "plan");
-    openPlanner(buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : avatarCell());
-    void speak("Plan view. Drag the ground to move around. Press Walk to carry it again.", undefined, "manual", { rate: 0.9 });
-  }
-  function openMore() {
-    if (heldItemKey || isGroundTool || isEraseTool) chooseEditTool("move", true);
-    pickForWalk.current = true;
-    openPlanner(avatarCell());
-    void speak("Choose something to carry.", undefined, "manual", { rate: 0.9 });
+    void speak("Plan view. Drag the ground to look around. Tap something you've built to move or turn it. Press Walk to build on foot again.", undefined, "manual", { rate: 0.9 });
   }
   // Back to walking with whatever is in hand, standing just behind it.
   function walkFromPlanner() {
-    pickForWalk.current = false;
     setStrokeActive(false);
     setMenuOpen(false);
     setSelectedPlacementId(null);
     setEditorOpen(false);
     setWalkBuild(true);
     if (!buildPlacement || !buildItem) return;
-    rememberView(buildItem, "walk");
     const [x, z] = standBehind(buildPlacement.gridX, buildPlacement.gridZ, itemGroundSize(buildItem, buildPlacement.rotation), buildGrid.cellSize);
     if (!hubV2 || hubCanStand(x, z)) teleport([x, CENTRAL_WORLD_CONFIG.spawnPoint[1], z], 0);
-    speakWalkPick(buildItem);
+    speakPick(buildItem);
+  }
+  function openPicker() {
+    stopBrush();
+    setPickerOpen(true);
+    void speak("Choose something to build.", undefined, "manual", { rate: 0.9 });
+  }
+  /** Something chosen in the picker goes in hand and the picker closes. */
+  function pickFromPicker(choose: () => void) {
+    setPickerOpen(false);
+    choose();
   }
   function holdItem(item: EconomyItem) {
     buildSounds.pick();
-    const at = facingCell(itemGroundSize(item));
-    const view = viewFor(item);
-    if (view === "plan") openPlanner(at);
-    if (sceneryByKey.has(item.item_key)) chooseSceneryItem(item, at, view);
-    else chooseInventoryItem(item, at, view);
+    const size = itemGroundSize(item);
+    const start = editorOpen ? focusCell() : facingCell(size);
+    // Start where it fits (lines start right there, since they're laid square by square).
+    const draft: CentralWorldPlacement = { placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...start, rotation: 0 };
+    const fitted = CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey)) ? null : fitNear(draft, item, editorOpen ? PLAN_FIT_REACH : walkFitReach(size), placedCustomisations);
+    const at = fitted ? { gridX: fitted.gridX, gridZ: fitted.gridZ } : start;
+    if (sceneryByKey.has(item.item_key)) chooseSceneryItem(item, at);
+    else chooseInventoryItem(item, at);
+  }
+  function holdBrush(tool: WorldEditTool) {
+    chooseEditTool(tool, true);
+    setEditCursor(editorOpen ? focusCell() : avatarCell());
+    void speak(editorOpen ? `${EDIT_TOOL_NAMES[tool]}. Tap or drag the ground to paint it.` : `${EDIT_TOOL_NAMES[tool]} brush. Press Paint, then walk to lay it.`, undefined, "manual", { rate: 0.9 });
   }
   function pickHotbar(entry: HotbarEntry) {
     const tool = hotbarToolOf(entry);
     if (tool) {
       if (!heldItemKey && editTool === tool) { chooseEditTool("move", true); return; }
-      chooseEditTool(tool, true);
-      setEditCursor(avatarCell());
-      void speak(`${EDIT_TOOL_NAMES[tool]} brush. Press Paint, then walk to lay it.`, undefined, "manual", { rate: 0.9 });
+      holdBrush(tool);
       return;
     }
     // Tapping what you hold puts it down.
@@ -1639,11 +1612,22 @@ export default function CentralWorld() {
     applyGroundAt(cell.gridX, cell.gridZ);
     void speak(`Painting ${EDIT_TOOL_NAMES[editTool].toLowerCase()}. Walk to lay it.`, undefined, "manual", { rate: 0.9 });
   }
-  function toggleWalkErase() {
+  function toggleErase() {
     if (isEraseTool) { chooseEditTool("move", true); return; }
     chooseEditTool("erase", true);
+    if (editorOpen) { void speak("Eraser. Tap something to remove it.", undefined, "manual", { rate: 0.9 }); return; }
     setEditCursor(facingCell([1, 1]));
     void speak("Eraser. Face something and press Remove.", undefined, "manual", { rate: 0.9 });
+  }
+  /** Place: right where it is if it fits, else on the nearest spot close by that does. */
+  function placeOrSlide(placement: CentralWorldPlacement | null = buildPlacement) {
+    if (!placement || !buildItem) return;
+    const problem = centralWorldPlacementProblem(placement, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules);
+    if (!problem) { commitPlacement(placement); return; }
+    const near = heldLaysLine ? null : fitNear(placement, buildItem, SLIDE_REACH);
+    if (near) { commitPlacement(near); return; }
+    buildSounds.blocked();
+    void speak(PLACEMENT_PROBLEM_TEXT[problem], undefined, "manual", { rate: 0.9 });
   }
   // Tapping the ground near the explorer builds right there: places what's held, paints, or erases.
   function walkTap(gridX: number, gridZ: number) {
@@ -1652,23 +1636,16 @@ export default function CentralWorld() {
       if (buildPlacement || isGroundTool || isEraseTool) { buildSounds.blocked(); void speak("Walk closer to build there.", undefined, "manual", { rate: 0.9 }); }
       return;
     }
-    if (buildPlacement && buildItem) {
-      const candidate = { ...buildPlacement, gridX, gridZ };
-      const problem = centralWorldPlacementProblem(candidate, buildItem, placementsWithoutBuildItem, itemsById, groundTiles, buildRules);
-      if (problem) { buildSounds.blocked(); void speak(PLACEMENT_PROBLEM_TEXT[problem], undefined, "manual", { rate: 0.9 }); return; }
-      commitPlacement(candidate);
-      return;
-    }
+    if (buildPlacement && buildItem) { placeOrSlide({ ...buildPlacement, gridX, gridZ }); return; }
     if (isGroundTool) { applyGroundAt(gridX, gridZ); buildSounds.place(); return; }
     if (isEraseTool) applyGroundAt(gridX, gridZ, true);
   }
   function walkMain() {
     if (buildPlacement && buildItem) {
-      if (restingOnPlaced) return;
-      if (buildValid) confirmBuildPlacement();
-      else if (buildProblem) { buildSounds.blocked(); void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 }); }
+      if (!restingOnPlaced) placeOrSlide();
       return;
     }
+    if (editorOpen) return;
     if (isGroundTool) { toggleBrush(); return; }
     if (isEraseTool && (eraseTarget || eraseTile)) applyGroundAt(editCursor.gridX, editCursor.gridZ, true);
   }
@@ -1684,7 +1661,6 @@ export default function CentralWorld() {
     if (isGroundBrush(tool)) {
       rememberPick(hotbarTool(tool));
       // "More" was choosing a brush to carry: back to walking with it.
-      if (editorOpen && pickForWalk.current) { pickForWalk.current = false; setEditorOpen(false); quiet = true; }
     }
     setBuildPlacement(null);
     if (quiet) return;
@@ -1702,8 +1678,7 @@ export default function CentralWorld() {
     );
   }
 
-  function chooseSceneryItem(item: EconomyItem, at = focusCell(), view?: PlaceView) {
-    const placeView = view ?? pickView(item);
+  function chooseSceneryItem(item: EconomyItem, at: { gridX: number; gridZ: number }) {
     stopBrush();
     rememberPick(item.item_key);
     setSelectedInventoryItemKey(null);
@@ -1714,18 +1689,14 @@ export default function CentralWorld() {
     setBuildNotice(null);
     setBuildPlacement({ placementId: newWorldPlacementId(item.item_key), itemId: item.item_key, ...at, rotation: 0 });
     liftViewForPlacing();
-    if (placeView === "walk") { speakWalkPick(item); return; }
-    void speak(CONNECTED_BOUNDARY_KEYS.has(String(item.metadata.worldAssetKey))
-      ? `${item.name} selected. Drag along the ground to build a line. Use two fingers to move around.`
-      : `${item.name} selected. Drag the ground to move it, then press Place. It stays in your hand so you can place more.`, undefined, "manual", { rate: 0.9 });
+    speakPick(item);
   }
 
   function setHeldTint(tint: string | undefined) {
     setBuildPlacement((current) => (current ? { ...current, tint } : current));
   }
 
-  function chooseInventoryItem(item: EconomyItem, at = focusCell(), view?: PlaceView) {
-    const placeView = view ?? pickView(item);
+  function chooseInventoryItem(item: EconomyItem, at: { gridX: number; gridZ: number }) {
     stopBrush();
     rememberPick(item.item_key);
     setSelectedSceneryItemKey(null);
@@ -1737,8 +1708,8 @@ export default function CentralWorld() {
     // An item already in the world is picked up where it stands; bring the view to it.
     moveFocus({ gridX: held.gridX, gridZ: held.gridZ });
     liftViewForPlacing();
-    if (placeView === "walk") { speakWalkPick(item); return; }
-    void speak(isTrainAsset(item.metadata.worldAssetKey) ? `${item.name} selected. Move it onto an empty railway track, then press Place. The train follows the track direction.` : `${item.name} selected. Drag the ground to move it, then press Place. Turn it first if you need to.`, undefined, "manual", { rate: 0.9 });
+    if (isTrainAsset(item.metadata.worldAssetKey)) void speak(`${item.name}. Move it onto an empty railway track, then press Place. The train follows the track direction.`, undefined, "manual", { rate: 0.9 });
+    else speakPick(item);
   }
 
   // The placed item under a tap. Big trees overlap their neighbours, so the one
@@ -1844,10 +1815,6 @@ export default function CentralWorld() {
     void speak(`${buildItem.name} put away.`, undefined, "manual", { rate: 0.9 });
   }
 
-  function confirmBuildPlacement() {
-    if (buildPlacement && buildValid) commitPlacement(buildPlacement);
-  }
-
   /** Puts the held item down at `placement` (already checked to fit). */
   function commitPlacement(placement: CentralWorldPlacement) {
     if (!buildItem) return;
@@ -1862,9 +1829,13 @@ export default function CentralWorld() {
     void speak(`${buildItem.name} added.`, undefined, "manual", { rate: 0.9 });
     // A Marketplace "place it" link is used up once its item is down.
     if (placement.itemId === requestedBuildItemKey) router.replace(preview ? "/world?teacher_preview=1" : "/world");
-    // Free scenery stays in hand for the next one; an owned item is placed once.
+    // Free scenery stays in hand for the next one (on the next spot that fits; on foot the walk tick
+    // finds it, planning moves the view there); an owned item is placed once.
     if (selectedSceneryItemKey) {
-      setBuildPlacement({ ...placement, placementId: newWorldPlacementId(placement.itemId) });
+      const following = { ...placement, placementId: newWorldPlacementId(placement.itemId) };
+      const nextSpot = editorOpen ? fitNear(following, buildItem, SLIDE_REACH, next) : null;
+      setBuildPlacement(nextSpot ?? following);
+      if (nextSpot) moveFocus({ gridX: nextSpot.gridX, gridZ: nextSpot.gridZ });
     } else {
       setBuildPlacement(null); setSelectedInventoryItemKey(null); setSelectedSceneryItemKey(null); setEditTool("move");
     }
@@ -1962,8 +1933,7 @@ export default function CentralWorld() {
   function tapBuildCell(gridX: number, gridZ: number) {
     if (buildPlacement && buildItem) {
       if (!placementOccupiesCell(buildPlacement, buildItem, gridX, gridZ)) { moveFocus({ gridX, gridZ }); return; }
-      if (buildValid) confirmBuildPlacement();
-      else if (buildProblem) { buildSounds.blocked(); void speak(PLACEMENT_PROBLEM_TEXT[buildProblem], undefined, "manual", { rate: 0.9 }); }
+      placeOrSlide();
       return;
     }
     if (editorOpen && isMoveTool) selectPlacedAt(gridX, gridZ);
@@ -2052,15 +2022,24 @@ export default function CentralWorld() {
   // While walking, the held item rides on the square in front of the explorer and
   // the brush paints the square under their feet.
   const walkTick = useRef(() => {});
+  const walkFit = useRef<{ key: string; placements: CentralWorldPlacement[] | null; tiles: CentralWorldGroundTile[] | null }>({ key: "", placements: null, tiles: null });
   const walkKeys = useRef<(event: KeyboardEvent) => void>(() => {});
   useEffect(() => {
     walkTick.current = () => {
       const { x, z } = avatarPosRef.current;
       if (buildItem && buildPlacement) {
-        const next = frontCell(x, z, aimRef.current, itemGroundSize(buildItem, buildPlacement.rotation), buildGrid.cellSize);
+        const size = itemGroundSize(buildItem, buildPlacement.rotation);
+        const front = frontCell(x, z, aimRef.current, size, buildGrid.cellSize);
         // Moving on from the square just built on brings the next one back into view.
-        if (lastPlacedCell && (next.gridX !== lastPlacedCell.gridX || next.gridZ !== lastPlacedCell.gridZ)) setLastPlacedCell(null);
-        setBuildPlacement((held) => (held && (next.gridX !== held.gridX || next.gridZ !== held.gridZ) ? { ...held, ...next } : held));
+        if (lastPlacedCell && (front.gridX !== lastPlacedCell.gridX || front.gridZ !== lastPlacedCell.gridZ)) setLastPlacedCell(null);
+        // Look for a spot only when something changed: the square ahead, the item, its turn, or the world.
+        const key = `${buildItem.item_key}:${buildPlacement.rotation}:${front.gridX}:${front.gridZ}`;
+        const seen = walkFit.current;
+        if (seen.key === key && seen.placements === placedCustomisations && seen.tiles === groundTiles) return;
+        walkFit.current = { key, placements: placedCustomisations, tiles: groundTiles };
+        // Lines are laid square by square, so they stay on the square ahead; everything else sits where it fits.
+        const next = heldLaysLine ? front : fitNear({ ...buildPlacement, ...front }, buildItem, walkFitReach(size)) ?? front;
+        setBuildPlacement((held) => (held && (next.gridX !== held.gridX || next.gridZ !== held.gridZ) ? { ...held, gridX: next.gridX, gridZ: next.gridZ } : held));
         return;
       }
       if (!isGroundTool && !isEraseTool) return;
@@ -2080,7 +2059,7 @@ export default function CentralWorld() {
       const run: Record<string, () => void> = {
         e: walkMain, enter: walkMain,
         r: () => { if (buildPlacement) rotateHeld(); },
-        x: toggleWalkErase,
+        x: toggleErase,
         p: planFromWalk,
         escape: () => (heldItemKey || isGroundTool || isEraseTool ? chooseEditTool("move", true) : stopWalkBuild()),
       };
@@ -2152,7 +2131,7 @@ export default function CentralWorld() {
   }
 
   return (
-    <main data-world3d-root data-world-library-open={editorOpen && trayOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
+    <main data-world3d-root data-world-library-open={pickerOpen ? "true" : "false"} style={{ position: "relative", width: "100vw", height: "100dvh", overflow: "hidden", overscrollBehavior: "none", touchAction: "none", WebkitUserSelect: "none", background: "#69afe4" }}>
       <div ref={canvasWrapRef} style={{ position: "absolute", inset: 0 }}>
       <Canvas style={{ touchAction: "none" }} camera={{ position: [0, 7, 29], fov: 60 }} dpr={quality === "low" ? 1 : quality === "medium" ? [1, 1.25] : [1, 1.5]} gl={{ antialias: quality !== "low", powerPreference: "high-performance", toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.06 }} shadows={quality !== "low" ? "soft" : false}>
         <PremiumHomeWorldContext.Provider value={homeWorld}>
@@ -2170,7 +2149,7 @@ export default function CentralWorld() {
               <button type="button" className="worldEditPickedRemove" onClick={() => putAwayPlaced(selectedPlacement, selectedItem)}><Trash2 size={20} aria-hidden="true" />Put away</button>
             </> : null}
           </div>
-        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} poseRef={poseRef} mates={worldMates} matePoses={together.poses} />
+        ) } : null} onStrokeState={setStrokeActive} homePlacement={homePlacement} quality={quality} moveInput={editorOpen ? EMPTY_WORLD_MOVE_INPUT : moveInput} lookInput={editorOpen ? EMPTY_WORLD_LOOK_INPUT : lookInput} spawnTarget={spawnTarget} spawnNonce={spawnNonce} spawnYaw={spawnYaw} placedCustomisations={placementsWithoutBuildItem} groundTiles={groundTiles} itemsById={itemsById} buildPreview={restingOnPlaced ? null : buildPreview} groundPreview={groundPreview} editing={editorOpen} buildZoom={buildZoom} paintMode={paintMode} surfaceHandlers={surfaceHandlers} gestureRef={gestureRef} onEnterTower={enterTower} onEnterHome={enterMyHome} onActiveTarget={setActiveTargetId} onToggleDrawbridge={toggleDrawbridge} cameraFocus={cameraFocus} cameraYaw={buildOrbit.yaw} cameraPitch={buildOrbit.pitch} avatarPosRef={avatarPosRef} hubV2={hubV2} homeAnchors={homeAnchors} buildRules={buildRules} raceItems={raceItems} raceStarts={raceStarts} race={race} raceHud={raceHud} onBestLap={saveRaceBest} kart={kart} racePaused={garageOpen} courts={courts} shot={shot} onShotDone={finishShot} walking={walking} walkCursor={walking && buildPlacement ? { gridX: buildPlacement.gridX, gridZ: buildPlacement.gridZ } : null} walkGridCells={buildItem && buildPlacement ? Math.max(6, ...itemGroundSize(buildItem, buildPlacement.rotation).map((side) => side + 4)) : 6} walkFar={Boolean(buildItem && buildPlacement && itemSize(buildItem, itemGroundSize(buildItem)) === "big")} eraseTarget={eraseTarget && eraseItem ? { placement: eraseTarget, item: eraseItem } : null} aimRef={aimRef} justPlacedId={justPlacedId} onWalkTap={walkTap} carports={carports} drive={drive} carHud={carHud} carPose={carPose} rexPhase={race || drive || boat ? "away" : rex.phase} waterAreas={waterAreas} boat={boat} boatWaterAt={findBoatWater} poseRef={poseRef} mates={worldMates} matePoses={together.poses} />
         </CarWorldContext.Provider>
         </BasketballScoreContext.Provider>
         </RaceKitWorldContext.Provider>
@@ -2185,24 +2164,22 @@ export default function CentralWorld() {
       {!visiting && host.knocks[0] ? <KnockToast guest={host.knocks[0]} buildingEnabled={host.buildingEnabled} busy={hostBusy} onAnswer={(answer) => answerDoor(host.knocks[0], answer)} /> : null}
       {!visiting && host.visitors.length && !editorOpen ? <VisitorsCard visitors={host.visitors} buildingEnabled={host.buildingEnabled} busy={hostBusy} onSetBuild={(guest, canBuild) => hostAct(() => setVisitBuild(studentId, preview, guest.visitId, canBuild))} onSendHome={(guest) => hostAct(() => endVisit(studentId, preview, guest.visitId))} /> : null}
       {visitOver ? <VisitOverCard message={visitOver} onGoHome={goHome} /> : null}
-      {friendRequest && !friendsOpen && !battlesOpen && !battleInvite && !visiting && !host.knocks.length ? <FriendRequestToast friend={friendRequest} busy={answeringRequest} onYes={() => answerRequest(friendRequest, true)} onLater={() => setDismissedRequests((list) => [...list, friendRequest.friendshipId])} /> : null}
+      {friendRequest && !friendsOpen && !battlesOpen && !battleInvite && !visiting && !host.knocks.length && !walkBuild ? <FriendRequestToast friend={friendRequest} busy={answeringRequest} onYes={() => answerRequest(friendRequest, true)} onLater={() => setDismissedRequests((list) => [...list, friendRequest.friendshipId])} /> : null}
       {battlesOpen && !visiting ? <BattlesPanel studentId={student?.studentId ?? null} demo={preview} friends={friendsList} online={onlineFriends} start={battlesOpen} onPlay={startBattle} onClose={() => setBattlesOpen(null)} /> : null}
-      {battleInvite && !battlesOpen && !visiting && !host.knocks.length ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({}); }} onDismiss={() => setBattleInvite(null)} /> : null}
+      {battleInvite && !battlesOpen && !visiting && !host.knocks.length && !walkBuild ? <BattleInviteToast invite={battleInvite} onOpen={() => { setBattleInvite(null); setBattlesOpen({}); }} onDismiss={() => setBattleInvite(null)} /> : null}
       {!visiting && visitorChanges[0] && !host.visitors.length && !host.knocks.length && !editorOpen && !race && !drive && !boat ? <VisitorChangesCard change={visitorChanges[0]} busy={resolvingChange} onKeep={() => void resolveChange(false)} onUndo={() => void resolveChange(true)} /> : null}
       {!editorOpen && !race && !drive && !boat && hubV2 && !visiting ? <RexHud rex={rex} level={rexLevelFrom(lessonRoute, student?.yearLevel)} onChooseRealm={enterRealmForRex} /> : null}
-      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" hideStreakReminder={visiting} primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
+      {!editorOpen && !race && !drive && !boat ? <WorldHUD context="central" preview={preview} accent="#efbd61" hideStreakReminder={visiting || walkBuild} primaryAction={walkBuild || !canBuildHere ? undefined : { label: "BUILD", icon: "edit", onClick: startWalkBuild }} contextAction={hasAvailableAction && !walkBuild ? (activeTargetId === CENTRAL_WORLD_ANCHORS.myHomeEntrance ? { label: "ENTER MY HOME", icon: "home", onClick: runActiveAction } : nearRaceStart ? { label: "RACE", icon: "flag", onClick: runActiveAction } : nearCourt ? { label: nearCourt.kind === "basketball" ? "SHOOT" : SPORT_ACTION[nearCourt.kind], icon: "ball", onClick: runActiveAction } : nearCarport ? { label: "DRIVE", icon: "car", onClick: runActiveAction } : activeTargetId === CENTRAL_WORLD_ANCHORS.towerMainEntrance ? { label: "ENTER TOWER", icon: "door", onClick: runActiveAction } : { label: "BOAT", icon: "car", onClick: runActiveAction }) : undefined} navActions={[
         { key: "home", label: "Home", icon: <Home size={15} />, onClick: () => teleport(homeAnchors.exit, homeAnchors.rotationY) },
         { key: "tower", label: "Tower", icon: <Castle size={15} />, onClick: () => teleport(CENTRAL_WORLD_CONFIG.towerPlaza) },
         ...(hubV2 ? [{ key: "night", label: night ? "Day" : "Night", icon: night ? <Sun size={15} /> : <Moon size={15} />, onClick: toggleNight }] : []),
-        // Edit World: plan the whole world from above.
-        ...(walkBuild || !canBuildHere ? [] : [{ key: "plan", label: "Plan", icon: <MapIcon size={15} />, onClick: openWorldEditor }]),
         // Friends: visit their worlds and choose who can help build yours (not while visiting).
         ...(visiting || !hubV2 ? [] : [{ key: "friends", label: "Friends", icon: <Users size={15} />, onClick: () => setFriendsOpen(true) }]),
         // Battles: challenge a friend, then into the Battle Arena.
         ...(visiting || !hubV2 ? [] : [{ key: "battles", label: "Battles", icon: <Swords size={15} />, onClick: () => { setFriendsOpen(false); setBattlesOpen({}); } }]),
       ]} /> : null}
 
-      {!editorOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive || boat)} />{race || drive || boat ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
+      {!editorOpen && !pickerOpen ? <><WorldJoystick input={moveInput} onChange={setMoveInput} driving={Boolean(race || drive || boat)} />{race || drive || boat ? null : <WorldLookJoystick onChange={setLookInput} />}</> : null}
       {drive ? <CarHudPanel hud={carHud} name={CAR_SPECS[drive.style].name} lights={drive.lights} canSwap={ownedCars(ownedItemKeys).length > 1}
         onHorn={carSounds.horn}
         onLights={() => setDrive((current) => current ? { ...current, lights: !current.lights } : current)}
@@ -2215,89 +2192,181 @@ export default function CentralWorld() {
         onExit={exitBoat} /> : null}
       {race && !garageOpen ? <RaceHud hud={raceHud} onRestart={() => startRace(race.start)} onGarage={openGarage} onExit={exitRace} /> : null}
       {garageOpen ? <KartGarage style={kart.style} parts={kart.parts} owned={ownedItemKeys} finishedRealms={finishedRealms} xp={xpBalance} busy={garageBusy} message={garageMessage} actions={garageActions} onClose={closeGarage} /> : null}
-      {walking && !race && !garageOpen ? (
-        <WalkBuildBar
-          slots={walkSlots}
-          active={heldItemKey ?? (isGroundTool && isGroundBrush(editTool) ? hotbarTool(editTool) : null)}
-          pinned={new Set(hotbar.pins)}
-          mode={buildPreview ? "item" : isGroundTool ? "brush" : isEraseTool ? "erase" : "none" satisfies WalkBuildMode}
-          heldName={buildItem?.name ?? null}
-          valid={buildPreview ? buildValid && !restingOnPlaced : Boolean(eraseItem || eraseTile)}
-          brushOn={brushOn}
-          hint={buildPreview && buildItem
+      {walkBuild && !race && !garageOpen && !pickerOpen ? (() => {
+        const isHome = buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY;
+        const tintable = buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey) || isRealmBuilding(buildItem?.metadata.worldAssetKey));
+        const styled = buildPreview && isVillageBuilding(buildItem?.metadata.worldAssetKey) && buildItem?.metadata.worldAssetKey !== "village_apartments";
+        const canPutAway = Boolean(buildPreview && selectedInventoryItemKey && !isHome);
+        const waterBrush = isGroundTool && editTool === "water";
+        // Colour, style, put away, or the water brush size: a row over the build buttons.
+        const extras = tintable || styled || canPutAway || waterBrush ? (
+          <>
+            {waterBrush ? ([[1, "1 square"], [3, "River"], [5, "Lake"]] as const).map(([width, label]) => <button key={width} type="button" className="walkBuildChip" aria-pressed={waterBrushWidth === width} onClick={() => { setWaterBrushWidth(width); void speak(width === 1 ? "One square of water." : `${label} brush.`, undefined, "manual", { rate: .9 }); }}>{label}</button>) : null}
+            {tintable ? (
+              <div className="worldEditTints" aria-label="Recolour item">
+                <button type="button" onClick={() => setHeldTint(undefined)} aria-pressed={!buildPlacement?.tint} aria-label="Default colour" title="Default colour" className="worldEditTintDefault" />
+                {SCENERY_TINTS.map((c) => <button key={c} type="button" onClick={() => setHeldTint(c)} aria-pressed={buildPlacement?.tint === c} aria-label={`Paint colour ${c}`} style={{ background: c }} />)}
+              </div>
+            ) : null}
+            {styled ? (
+              <select aria-label="Building style" value={villageStyle(buildPlacement?.buildingStyle)} onChange={(event) => {
+                const style = villageStyle(event.target.value);
+                setBuildPlacement((current) => current ? { ...current, buildingStyle: style } : current);
+                void speak(VILLAGE_STYLES[style], undefined, "manual", { rate: 0.9 });
+              }}>
+                {Object.entries(VILLAGE_STYLES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+              </select>
+            ) : null}
+            {canPutAway ? <button type="button" className="walkBuildChip walkBuildChipDanger" onClick={deleteHeldPlacement} aria-label="Put it away" title="Put it away (Delete)"><Trash2 size={16} />Put away</button> : null}
+          </>
+        ) : null;
+        const tap = touchFirst ? "tap" : "click";
+        const hint: WalkBuildHint = buildNotice
+          ? { text: buildNotice, tone: "bad" }
+          : buildPreview && buildItem
             ? restingOnPlaced
               ? { text: `${buildItem.name} placed · walk on to place another`, tone: "ok" }
               : buildProblem
-              ? { text: PLACEMENT_PROBLEM_TEXT[buildProblem], tone: "bad" }
-              : { text: CONNECTED_BOUNDARY_KEYS.has(String(buildItem.metadata.worldAssetKey)) ? `${buildItem.name} · Place at each step and it joins up` : `${buildItem.name} · ${touchFirst ? "tap Place or a nearby square" : "press Place or click a nearby square"}`, tone: "ok" }
+                ? { text: PLACEMENT_PROBLEM_TEXT[buildProblem], tone: "bad" }
+                : heldLaysLine
+                  ? { text: editorOpen ? `${buildItem.name} · drag along the ground to build a line` : `${buildItem.name} · Place at each step and it joins up`, tone: "ok" }
+                  : { text: editorOpen ? `${buildItem.name} fits · press Place, or drag the ground to move it` : `${buildItem.name} fits · press Place or ${tap} a nearby square`, tone: "ok" }
             : isGroundTool
-              ? { text: brushOn ? `Painting ${EDIT_TOOL_NAMES[editTool].toLowerCase()} as you walk` : `${EDIT_TOOL_NAMES[editTool]} brush · press Paint, then walk`, tone: brushOn ? "ok" : "info" }
+              ? editorOpen ? { text: `${EDIT_TOOL_NAMES[editTool]} · ${tap} or drag the ground to paint`, tone: "info" }
+                : { text: brushOn ? `Painting ${EDIT_TOOL_NAMES[editTool].toLowerCase()} as you walk` : `${EDIT_TOOL_NAMES[editTool]} brush · press Paint, then walk`, tone: brushOn ? "ok" : "info" }
               : isEraseTool
-                ? eraseItem ? { text: `Facing ${eraseItem.name} · press Remove`, tone: "bad" } : eraseTile ? { text: `Facing ${EDIT_TOOL_NAMES[eraseTile.tileType].toLowerCase()} · press Remove`, tone: "bad" } : { text: "Face something to remove it", tone: "info" }
-                : { text: "Pick something from the bar, then walk to where it goes", tone: "info" }}
-          canUndo={editHistory.length > 0}
-          onPick={pickHotbar}
-          onPin={pinEntry}
-          onMore={openMore}
-          onPlace={walkMain}
-          onTurn={rotateHeld}
-          onErase={toggleWalkErase}
-          onPlan={planFromWalk}
-          onUndo={undoWorldEdit}
-          onDone={stopWalkBuild}
-        />
-      ) : null}
-      {editorOpen ? (() => {
+                ? editorOpen ? { text: `Eraser · ${tap} something to remove it`, tone: "bad" }
+                  : eraseItem ? { text: `Facing ${eraseItem.name} · press Remove`, tone: "bad" } : eraseTile ? { text: `Facing ${EDIT_TOOL_NAMES[eraseTile.tileType].toLowerCase()} · press Remove`, tone: "bad" } : { text: "Face something to remove it", tone: "info" }
+                : selectedPlacement
+                  ? { text: `${selectedItem?.name ?? "Item"} · move it, turn it or put it away`, tone: "info" }
+                  : editorOpen
+                    ? { text: `Pick something from the bar · ${tap} something you've built to move it`, tone: "info" }
+                    : { text: "Pick something from the bar, then walk to where it goes", tone: "info" };
+        return (
+          <WalkBuildBar
+            planning={editorOpen}
+            slots={walkSlots}
+            active={heldItemKey ?? (isGroundTool && isGroundBrush(editTool) ? hotbarTool(editTool) : null)}
+            pinned={new Set(hotbar.pins)}
+            mode={buildPreview ? "item" : isGroundTool ? "brush" : isEraseTool ? "erase" : "none" satisfies WalkBuildMode}
+            heldName={buildItem?.name ?? null}
+            valid={buildPreview ? !restingOnPlaced : Boolean(eraseItem || eraseTile)}
+            brushOn={brushOn}
+            hint={hint}
+            extras={extras}
+            canUndo={editHistory.length > 0}
+            onPick={pickHotbar}
+            onPin={pinEntry}
+            onMore={openPicker}
+            onPlace={walkMain}
+            onTurn={rotateHeld}
+            onErase={toggleErase}
+            onPlan={editorOpen ? walkFromPlanner : planFromWalk}
+            onUndo={undoWorldEdit}
+            onDone={finishBuilding}
+          />
+        );
+      })() : null}
+      {pickerOpen ? (() => {
         const trayTab: TrayTab = librarySection === "owned" ? "owned" : paletteTab;
         const query = scenerySearch.trim().toLowerCase();
         // Build kit tabs list only the pieces the learner's kit level has unlocked.
         const tabKit = paletteTab === "skate" ? { kit: SKATE_KIT, level: skateLevel } : paletteTab === "race" ? { kit: RACE_KIT, level: raceLevel } : null;
         const sceneryInTab = paletteTab === "ground" ? [] : CENTRAL_WORLD_STARTER_SCENERY.filter((item) => item.metadata.worldAssetKey !== "rail_train" && item.metadata.worldSceneryGroup === paletteTab && item.name.toLowerCase().includes(query) && (tabKit === null || Number(item.metadata.kitPieceLevel) <= tabKit.level));
-        const holding = Boolean(heldItemKey);
-        const placing = holding || isGroundTool;
-        const isHome = buildPlacement?.itemId === CENTRAL_WORLD_HOME_KEY;
-        const tintable = buildPreview && (buildItem?.metadata.marketplaceCategory === "world_basic" || isVillageBuilding(buildItem?.metadata.worldAssetKey) || isRealmBuilding(buildItem?.metadata.worldAssetKey));
-        const styled = buildPreview && isVillageBuilding(buildItem?.metadata.worldAssetKey) && buildItem?.metadata.worldAssetKey !== "village_apartments";
         const chooseTab = (tab: TrayTab) => {
-          setTrayOpen(true);
           setScenerySearch("");
           if (tab === "owned") { setLibrarySection("owned"); return; }
           setLibrarySection("build");
           setPaletteTab(tab);
         };
-        const startPlacing = () => {
-          if (placing) return;
-          if (trayTab === "owned") { if (ownedWorldItems[0]) chooseInventoryItem(ownedWorldItems[0]); }
-          else if (trayTab === "ground") chooseEditTool("path");
-          else if (sceneryInTab[0]) chooseSceneryItem(sceneryInTab[0]);
-        };
-        const repeatPlacing = Boolean(selectedSceneryItemKey);
-        const hint = buildNotice
-          ?? (buildPreview
-            ? buildProblem
-              ? PLACEMENT_PROBLEM_TEXT[buildProblem]
-              : laysLine
-                ? touchFirst ? "Drag along the ground to build a line · Two fingers to move around" : "Click or drag to build a line"
-                : touchFirst ? "Fits here · Press Place, or drag the ground to move it" : "Fits here · Click to place · R to turn · Esc to stop"
-            : isGroundTool
-              ? touchFirst ? "Tap or drag the ground to paint · Two fingers to move around" : "Click or drag to paint · Right-drag to turn the view"
-              : isEraseTool
-                ? touchFirst ? "Tap an item or tile to remove it" : "Click an item or tile to remove it"
-                : selectedPlacement
-                  ? `${selectedItem?.name ?? "Item"} picked · What do you want to do?`
-                  : touchFirst ? "Choose from the tray · Tap an item to change it · Drag to move around · Two fingers to zoom, turn and tilt" : "Pick from the tray · Click an item to change it · Drag to move around · Scroll to zoom · Q / E to turn");
-        const hintTone = buildNotice || buildProblem ? "bad" : buildPreview ? "ok" : "info";
+        return (
+          <section className="worldEditTray worldPicker" data-open="true" aria-label="Choose something to build">
+            <div className="worldEditTrayTop">
+              <div className="worldEditTabs" role="tablist" aria-label="Build categories">
+                {TRAY_TABS.map(({ key, label }) => (
+                  <button key={key} type="button" role="tab" aria-selected={trayTab === key} onClick={() => chooseTab(key)}>
+                    {label}{key === "owned" ? <em>{ownedWorldItems.length}</em> : null}
+                  </button>
+                ))}
+              </div>
+              {trayTab !== "owned" && trayTab !== "ground" ? (
+                <input className="worldEditSearch" aria-label="Search scenery" placeholder="Search…" value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} />
+              ) : null}
+              <button type="button" className="worldEditTrayToggle" aria-label="Close the picker" onClick={() => setPickerOpen(false)}><X size={20} /></button>
+            </div>
+            <div className="worldEditCards" key={trayTab} aria-label={trayTab === "owned" ? "Owned world inventory" : "Available building items"}>
+              {trayTab === "owned" ? <>
+                {ownedWorldItems.map((item) => {
+                  const image = inventoryImage(item);
+                  return (
+                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdItem(item))} aria-pressed={selectedInventoryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
+                      <span className="worldEditArt">{image ? <Image src={image} alt="" fill sizes="140px" style={{ objectFit: "cover" }} /> : <PackageOpen size={36} />}</span>
+                      <b>{item.name}</b>
+                    </button>
+                  );
+                })}
+                {!ownedWorldItems.length ? <p className="worldEditEmpty">Buildings and places you unlock in the Marketplace appear here.</p> : null}
+                <button type="button" className="worldEditCard worldEditShop" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")}>
+                  <span className="worldEditArt"><ShoppingBag size={34} /></span><b>Get more</b>
+                </button>
+              </> : trayTab === "ground" ? GROUND_TOOLS.map(([tool, label]) => (
+                <button key={tool} type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush(tool))} aria-pressed={!heldItemKey && editTool === tool}>
+                  <span className="worldEditArt"><GroundSwatch tool={tool} /></span><b>{label}</b>
+                </button>
+              )) : <>
+                {tabKit ? <KitTrayHeader kit={tabKit.kit} level={tabKit.level} next={nextBuildKitUpgrade(tabKit.kit, ownedItemKeys)} upgrading={upgradingHome} onUpgrade={() => upgradeKit(tabKit.kit)} /> : null}
+                {paletteTab === "fortress" ? (
+                  // The Tower Shield has no placement: it goes round the Tower once unlocked, and upgrades here.
+                  <div className="worldEditKit" role="status">
+                    <b>{PREMIUM_HOME_SPECS.tower_shield.name}</b>
+                    {homeWorld.towerShield
+                      ? <PremiumHomeUpgradeRows assetKey={PREMIUM_HOME_SPECS.tower_shield.assetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={upgradeHome} />
+                      : <span>Unlock it in the Marketplace (Protect the Tower) for a giant energy shield over the Tower. Trip wires, drones, guard dogs and sentry bots are there too.</span>}
+                  </div>
+                ) : null}
+                {paletteTab === "race" && raceLevel ? (
+                  <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush("track"))} aria-pressed={!heldItemKey && editTool === "track"}>
+                    <span className="worldEditArt"><GroundSwatch tool="track" /></span><b>Paint tarmac</b>
+                  </button>
+                ) : null}
+                {paletteTab === "race" && raceLevel ? (
+                  // The kart garage also opens from the race screen; this makes it easy to find.
+                  <button type="button" className="worldEditCard" onClick={() => { finishBuilding(); openGarage(); }}>
+                    <span className="worldEditArt"><Wrench size={36} color="#3fd0ff" aria-hidden="true" /></span><b>Kart garage</b>
+                  </button>
+                ) : null}
+                {sceneryInTab.map((item) => {
+                  const art = freeBuildRender(String(item.metadata.worldAssetKey));
+                  const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
+                  return (
+                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdItem(item))} aria-pressed={selectedSceneryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
+                      <span className="worldEditArt worldEditArtFree">{art ? <Image src={art} alt="" fill sizes="140px" style={{ objectFit: "contain" }} /> : <Icon size={36} color={item.accent} />}</span>
+                      <b>{item.name}</b>
+                    </button>
+                  );
+                })}
+                {paletteTab === "rocks_water" ? (
+                  <button type="button" className="worldEditCard" onClick={() => pickFromPicker(() => holdBrush("water"))}>
+                    <span className="worldEditArt"><GroundSwatch tool="water" /></span><b>Paint water</b>
+                  </button>
+                ) : null}
+                {!sceneryInTab.length && !(tabKit && !tabKit.level) ? <p className="worldEditEmpty" role="status">No matching items.</p> : null}
+              </>}
+            </div>
+          </section>
+        );
+      })() : null}
+      {editorOpen ? (() => {
         const currentView = activeBuildView(buildOrbit.pitch);
         return (
         <>
-        <header className="worldEditBar" aria-label="World builder toolbar">
+        <header className="worldEditBar" aria-label="Plan view">
           <div className="worldEditTitle">
-            <b>EDIT WORLD</b>
+            <b>PLAN</b>
             <span className="worldEditSaved"><Check size={15} aria-hidden="true" />{preview ? "Preview · this browser only" : "Saved to your account"}</span>
-            <WorldVoiceButton compact label="Read edit world instructions" text="Choose something from the tray at the bottom and it appears in the middle. Drag the ground to move it, then press Place. Green squares mean it fits; red means find another spot. Tap something you have placed to move it, turn it or put it away. Pinch to zoom, twist two fingers to turn, and slide two fingers to look up or down. The View buttons jump to Close, Normal or Bird's-eye. Undo brings back your last change. Your world saves by itself." />
+            <WorldVoiceButton compact label="Read plan view instructions" text="Plan view shows your world from above. Pick something from the bar and it goes on the nearest spot where it fits. Drag the ground to move it, then press Place. Tap something you have built to move it, turn it or put it away. Pinch to zoom, twist two fingers to turn, and slide two fingers to look up or down. Walk takes you back to building on foot. Your world saves by itself." />
           </div>
           <div className="worldEditActions">
-            <button type="button" className="worldEditRound" onClick={undoWorldEdit} disabled={!editHistory.length} aria-label="Undo last world edit" title={`Undo (${undoKeyLabel})`}><Undo2 size={22} /></button>
             <div className="worldEditMenuWrap">
               <button type="button" className="worldEditRound" aria-label="More options" aria-haspopup="menu" aria-expanded={menuOpen} aria-pressed={menuOpen} onClick={() => setMenuOpen((open) => !open)}><MoreHorizontal size={22} /></button>
               {menuOpen ? (
@@ -2313,10 +2382,8 @@ export default function CentralWorld() {
                 </div>
               ) : null}
             </div>
-            <button type="button" className="worldEditDone" onClick={closeWorldEditor}><Check size={18} />DONE</button>
           </div>
         </header>
-        <div className="worldEditHint" role="status" data-tone={hintTone}>{hintTone === "ok" ? <Check size={16} aria-hidden="true" /> : hintTone === "bad" ? <X size={16} aria-hidden="true" /> : null}{hint}</div>
 
         <div className="worldEditView" role="group" aria-label="View">
           <span className="worldEditViewLabel">VIEW</span>
@@ -2354,127 +2421,6 @@ export default function CentralWorld() {
             </div>
           </div>
         ) : null}
-
-        {buildPreview ? (
-          <section className="worldEditHold" aria-label={`Placing ${buildPreview.item.name}`}>
-            <div className="worldEditHoldTop">
-              <span className="worldEditHoldArt" aria-hidden="true"><HeldItemArt item={buildPreview.item} /></span>
-              <span className="worldEditHoldName"><b>{buildPreview.item.name}</b><small>{laysLine ? "Builds in a line" : repeatPlacing ? "Place as many as you like" : touchFirst ? "Drag the ground to move it" : "Click where it should go"}</small></span>
-              {tintable || styled || (selectedInventoryItemKey && !isHome) ? <span className="worldEditHoldExtras">
-                {tintable ? (
-                  <div className="worldEditTints" aria-label="Recolour item">
-                    <button type="button" onClick={() => setHeldTint(undefined)} aria-pressed={!buildPlacement?.tint} aria-label="Default colour" title="Default colour" className="worldEditTintDefault" />
-                    {SCENERY_TINTS.map((c) => <button key={c} type="button" onClick={() => setHeldTint(c)} aria-pressed={buildPlacement?.tint === c} aria-label={`Paint colour ${c}`} style={{ background: c }} />)}
-                  </div>
-                ) : null}
-                {styled ? (
-                  <select aria-label="Building style" value={villageStyle(buildPlacement?.buildingStyle)} onChange={(event) => {
-                    const style = villageStyle(event.target.value);
-                    setBuildPlacement((current) => current ? { ...current, buildingStyle: style } : current);
-                    void speak(VILLAGE_STYLES[style], undefined, "manual", { rate: 0.9 });
-                  }}>
-                    {Object.entries(VILLAGE_STYLES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
-                  </select>
-                ) : null}
-                {selectedInventoryItemKey && !isHome ? <button type="button" className="worldEditDanger" onClick={deleteHeldPlacement} aria-label="Put it away" title="Put it away (Delete)"><Trash2 size={18} /></button> : null}
-              </span> : null}
-            </div>
-            <div className="worldEditHoldButtons">
-              <button type="button" onClick={rotateHeld} aria-label="Turn item 90 degrees" title="Turn (R)"><RotateCw size={22} />Turn</button>
-              <button type="button" onClick={walkFromPlanner} aria-label="Carry it and walk" title="Walk with it"><PersonStanding size={22} />Walk</button>
-              <button type="button" className="worldEditHoldPlace" disabled={!buildValid} onClick={confirmBuildPlacement}><Check size={26} strokeWidth={3} />Place</button>
-              <button type="button" className="worldEditHoldCancel" onClick={() => chooseEditTool("move")} aria-label={repeatPlacing || laysLine ? "Stop placing" : "Cancel"} title={repeatPlacing || laysLine ? "Stop placing (Esc)" : "Cancel (Esc)"}><X size={24} /></button>
-            </div>
-          </section>
-        ) : null}
-
-        <section className="worldEditTray" data-open={trayOpen ? "true" : "false"} hidden={Boolean(buildPreview)} aria-label="Edit world controls">
-          {isGroundTool && editTool === "water" ? (
-            <div className="worldEditItemBar" aria-label="Water brush">
-              <b className="worldEditItemName">Water brush</b>
-              {([[1, "1 square"], [3, "River"], [5, "Lake"]] as const).map(([width, label]) => <button key={width} type="button" aria-pressed={waterBrushWidth === width} onClick={() => { setWaterBrushWidth(width); void speak(width === 1 ? "One square. Tap to place water, or drag to join squares." : `${label} brush selected. Drag to paint a wider area.`, undefined, "manual", { rate: .9 }); }}>{label}</button>)}
-            </div>
-          ) : null}
-          <div className="worldEditTrayTop">
-            <div className="worldEditTabs" role="tablist" aria-label="Build categories">
-              {TRAY_TABS.map(({ key, label }) => (
-                <button key={key} type="button" role="tab" aria-selected={trayTab === key} onClick={() => chooseTab(key)}>
-                  {label}{key === "owned" ? <em>{ownedWorldItems.length}</em> : null}
-                </button>
-              ))}
-            </div>
-            {trayOpen && trayTab !== "owned" && trayTab !== "ground" ? (
-              <input className="worldEditSearch" aria-label="Search scenery" placeholder="Search…" value={scenerySearch} onChange={(event) => setScenerySearch(event.target.value)} />
-            ) : null}
-            <div className="worldEditModes" role="group" aria-label="Build tool">
-              <button type="button" aria-pressed={placing} onClick={startPlacing}><Plus size={16} />Place</button>
-              <button type="button" aria-pressed={isMoveTool} onClick={() => chooseEditTool("move")} title="Move (M)"><Hand size={16} />Move<kbd>M</kbd></button>
-              <button type="button" aria-pressed={isEraseTool} data-tone="erase" onClick={() => chooseEditTool("erase")} title="Erase (X)"><Eraser size={16} />Erase<kbd>X</kbd></button>
-            </div>
-            <button type="button" className="worldEditTrayToggle" aria-expanded={trayOpen} aria-label={trayOpen ? "Hide the item tray" : "Show the item tray"} onClick={() => setTrayOpen((open) => !open)}>{trayOpen ? <ChevronDown size={20} /> : <ChevronUp size={20} />}</button>
-          </div>
-          {trayOpen ? (
-            <div className="worldEditCards" key={trayTab} aria-label={trayTab === "owned" ? "Owned world inventory" : "Available building items"}>
-              {trayTab === "owned" ? <>
-                {ownedWorldItems.map((item) => {
-                  const image = inventoryImage(item);
-                  return (
-                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => chooseInventoryItem(item)} aria-pressed={selectedInventoryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
-                      <span className="worldEditArt">{image ? <Image src={image} alt="" fill sizes="140px" style={{ objectFit: "cover" }} /> : <PackageOpen size={36} />}</span>
-                      <b>{item.name}</b>
-                    </button>
-                  );
-                })}
-                {!ownedWorldItems.length ? <p className="worldEditEmpty">Buildings and places you unlock in the Marketplace appear here.</p> : null}
-                <button type="button" className="worldEditCard worldEditShop" onClick={() => router.push(preview ? "/marketplace?teacher_preview=1" : "/marketplace")}>
-                  <span className="worldEditArt"><ShoppingBag size={34} /></span><b>Get more</b>
-                </button>
-              </> : trayTab === "ground" ? GROUND_TOOLS.map(([tool, label]) => (
-                <button key={tool} type="button" className="worldEditCard" onClick={() => chooseEditTool(tool)} aria-pressed={!heldItemKey && editTool === tool}>
-                  <span className="worldEditArt"><GroundSwatch tool={tool} /></span><b>{label}</b>
-                </button>
-              )) : <>
-                {tabKit ? <KitTrayHeader kit={tabKit.kit} level={tabKit.level} next={nextBuildKitUpgrade(tabKit.kit, ownedItemKeys)} upgrading={upgradingHome} onUpgrade={() => upgradeKit(tabKit.kit)} /> : null}
-                {paletteTab === "fortress" ? (
-                  // The Tower Shield has no placement: it goes round the Tower once unlocked, and upgrades here.
-                  <div className="worldEditKit" role="status">
-                    <b>{PREMIUM_HOME_SPECS.tower_shield.name}</b>
-                    {homeWorld.towerShield
-                      ? <PremiumHomeUpgradeRows assetKey={PREMIUM_HOME_SPECS.tower_shield.assetKey} ownedItemKeys={ownedItemKeys} upgrading={upgradingHome} onUpgrade={upgradeHome} />
-                      : <span>Unlock it in the Marketplace (Protect the Tower) for a giant energy shield over the Tower. Trip wires, drones, guard dogs and sentry bots are there too.</span>}
-                  </div>
-                ) : null}
-                {paletteTab === "race" && raceLevel ? (
-                  <button type="button" className="worldEditCard" onClick={() => chooseEditTool("track")} aria-pressed={!heldItemKey && editTool === "track"}>
-                    <span className="worldEditArt"><GroundSwatch tool="track" /></span><b>Paint tarmac</b>
-                  </button>
-                ) : null}
-                {paletteTab === "race" && raceLevel ? (
-                  // The kart garage also opens from the race screen; this makes it easy to find.
-                  <button type="button" className="worldEditCard" onClick={() => { closeWorldEditor(); openGarage(); }}>
-                    <span className="worldEditArt"><Wrench size={36} color="#3fd0ff" aria-hidden="true" /></span><b>Kart garage</b>
-                  </button>
-                ) : null}
-                {sceneryInTab.map((item) => {
-                  const art = freeBuildRender(String(item.metadata.worldAssetKey));
-                  const Icon = SCENERY_ICON[String(item.metadata.worldAssetKey)] ?? Sprout;
-                  return (
-                    <button key={item.item_key} type="button" className="worldEditCard" onClick={() => chooseSceneryItem(item)} aria-pressed={selectedSceneryItemKey === item.item_key} aria-label={`Place ${item.name}`}>
-                      <span className="worldEditArt worldEditArtFree">{art ? <Image src={art} alt="" fill sizes="140px" style={{ objectFit: "contain" }} /> : <Icon size={36} color={item.accent} />}</span>
-                      <b>{item.name}</b>
-                    </button>
-                  );
-                })}
-                {paletteTab === "rocks_water" ? (
-                  <button type="button" className="worldEditCard" onClick={() => { setPaletteTab("ground"); chooseEditTool("water"); }}>
-                    <span className="worldEditArt"><GroundSwatch tool="water" /></span><b>Paint water</b>
-                  </button>
-                ) : null}
-                {!sceneryInTab.length && !(tabKit && !tabKit.level) ? <p className="worldEditEmpty" role="status">No matching items.</p> : null}
-              </>}
-            </div>
-          ) : null}
-        </section>
 
         <dialog ref={resetDialog} className="worldBuilderReset" aria-labelledby="world-reset-title" aria-describedby="world-reset-description">
           <h2 id="world-reset-title">A fresh space to build?</h2>

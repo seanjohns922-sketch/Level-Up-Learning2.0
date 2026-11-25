@@ -1,6 +1,5 @@
-// Walk-and-place building: the explorer carries an item and it goes down on the
-// square in front of them, Minecraft-style. Big things start in the bird's-eye
-// planner instead; kids can switch either way and the hub remembers their choice.
+// Building: the explorer carries an item and it goes down in front of them, Minecraft-style,
+// or kids plan from above. Either way the held item sits on the nearest spot where it fits.
 import type { EconomyItem } from "@/lib/economy";
 import { CENTRAL_WORLD_HOME_KEY, type CentralWorldGroundType } from "./central-world-layout";
 import { PREMIUM_HOME_SPECS, premiumHomeStyle } from "./premium-homes";
@@ -8,14 +7,13 @@ import { isRealmBuilding } from "./realm-building-collections";
 import { isTrainAsset } from "./train-catalogue";
 import { isVillageBuilding } from "./village-buildings";
 
-export type PlaceView = "walk" | "plan";
 export type ItemSize = "small" | "big";
 
 /** Anything wider than this many squares counts as big. */
 export const SMALL_ITEM_MAX_SQUARES = 3;
 const BIG_CATEGORIES = new Set(["buildings", "pools_play", "special", "defence", "trains", "home"]);
 
-/** Homes, rides, courts, defences, buildings and trains, and anything over 3 × 3 squares. */
+/** Homes, rides, courts, defences, buildings and trains, and anything over 3 × 3 squares (the camera stands further back). */
 export function itemSize(item: EconomyItem, gridSize: [number, number]): ItemSize {
   const assetKey = item.metadata.worldAssetKey;
   if (item.item_key === CENTRAL_WORLD_HOME_KEY || BIG_CATEGORIES.has(String(item.metadata.marketplaceCategory))) return "big";
@@ -27,23 +25,6 @@ export function itemSize(item: EconomyItem, gridSize: [number, number]): ItemSiz
   const homeOrRide = premium !== null && !PREMIUM_HOME_SPECS[premium].free && ["buildings", "pools_play"].includes(PREMIUM_HOME_SPECS[premium].marketplaceCategory);
   if (isVillageBuilding(assetKey) || isRealmBuilding(assetKey) || homeOrRide || isTrainAsset(assetKey)) return "big";
   return Math.max(gridSize[0], gridSize[1]) > SMALL_ITEM_MAX_SQUARES ? "big" : "small";
-}
-
-export const DEFAULT_PLACE_VIEWS: Readonly<Record<ItemSize, PlaceView>> = { small: "walk", big: "plan" };
-const VIEW_KEY = "lul:central-world:place-view:v1";
-
-export function readPlaceViews(scope: string): Record<ItemSize, PlaceView> {
-  try {
-    const saved = JSON.parse(localStorage.getItem(`${VIEW_KEY}:${scope}`) ?? "{}") as Partial<Record<ItemSize, unknown>>;
-    const view = (size: ItemSize): PlaceView => (saved[size] === "walk" || saved[size] === "plan" ? saved[size] : DEFAULT_PLACE_VIEWS[size]);
-    return { small: view("small"), big: view("big") };
-  } catch {
-    return { ...DEFAULT_PLACE_VIEWS };
-  }
-}
-
-export function writePlaceViews(scope: string, views: Record<ItemSize, PlaceView>) {
-  try { localStorage.setItem(`${VIEW_KEY}:${scope}`, JSON.stringify(views)); } catch { /* the choice just isn't remembered */ }
 }
 
 /** The eight ways a held item can sit from the explorer: straight ahead, behind, either side, or diagonal. */
@@ -65,6 +46,33 @@ export function frontCell(x: number, z: number, aim: number, gridSize: [number, 
   const [stepX, stepZ] = snappedStep(aim);
   const steps = stepsOut(gridSize);
   return { gridX: foot.gridX + stepX * steps, gridZ: foot.gridZ + stepZ * steps };
+}
+
+type Cell = { gridX: number; gridZ: number };
+
+/** Steps out from a square within a radius, nearest first, cached per reach. */
+const offsetsByReach = new Map<number, ReadonlyArray<readonly [number, number]>>();
+function offsetsWithin(reach: number) {
+  let offsets = offsetsByReach.get(reach);
+  if (!offsets) {
+    const all: Array<readonly [number, number]> = [];
+    for (let dx = -reach; dx <= reach; dx += 1) for (let dz = -reach; dz <= reach; dz += 1) if (Math.hypot(dx, dz) <= reach) all.push([dx, dz]);
+    offsets = all.sort((a, b) => Math.hypot(...a) - Math.hypot(...b));
+    offsetsByReach.set(reach, offsets);
+  }
+  return offsets;
+}
+
+/**
+ * The closest square to `start` (itself first) where `fits` says the item can go, at most `reach`
+ * squares away. Null if nothing in reach fits.
+ */
+export function nearestFit(start: Cell, fits: (cell: Cell) => boolean, reach: number): Cell | null {
+  for (const [dx, dz] of offsetsWithin(reach)) {
+    const cell = { gridX: start.gridX + dx, gridZ: start.gridZ + dz };
+    if (fits(cell)) return cell;
+  }
+  return null;
 }
 
 export function footCell(x: number, z: number, cellSize: number) {

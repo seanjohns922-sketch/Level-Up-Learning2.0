@@ -35,10 +35,10 @@ for (const style of CITY_LIFE_STYLES) {
 assert.ok(MARKETPLACE_CATEGORIES.world.some((category) => category.id === "city_life" && category.label === "City Life"), "the Marketplace has a City Life tab");
 assert.equal(premiumHomeLevel("bus_stop", new Set([premiumHomeUpgradeKey("bus_stop", 2), premiumHomeUpgradeKey("bus_stop", 3)])), 3, "level is the highest upgrade owned");
 
-// The small places are placed on foot; the big ones start in the planner.
+// The small places sit close; for the big ones the camera stands back to show all of it.
 const sized = (style) => itemSize(rows.find((row) => row.item_key === premiumHomeItemKey(style)), itemGroundSize(rows.find((row) => row.item_key === premiumHomeItemKey(style))));
-for (const style of ["park_bbq", "cubby_house", "outdoor_setting", "vending_kiosk"]) assert.equal(sized(style), "small", `${style} is walked into place`);
-for (const style of ["playground", "cricket_nets", "bus_stop", "food_truck"]) assert.equal(sized(style), "big", `${style} opens the planner`);
+for (const style of ["park_bbq", "cubby_house", "outdoor_setting", "vending_kiosk"]) assert.equal(sized(style), "small", `${style} is small`);
+for (const style of ["playground", "cricket_nets", "bus_stop", "food_truck"]) assert.equal(sized(style), "big", `${style} is big`);
 
 const migration = read("supabase/migrations/20261124090000_city_life.sql");
 for (const row of rows) assert.ok(migration.split("\n").some((line) => line.startsWith(`('${row.item_key}'`) && line.includes(`, ${row.price}, `)), `migration row for ${row.item_key}`);
@@ -49,4 +49,4 @@ assert.ok(migration.includes("on conflict (item_key) do nothing") && !/create\s+
 const models = read("components/world3d/premium-homes/PremiumHomeModels.tsx");
 assert.ok(models.includes("...CITY_LIFE_LEVEL_MODELS") && models.includes("CITY_LIFE_MODELS"), "City Life models are registered");
 assert.ok(/"city_life"[^\]]*\]\.includes\(/.test(read("components/world3d/CentralWorld.tsx")), "owned City Life items appear in My items");
-console.log(`PASS City Life: ${CITY_LIFE_STYLES.length} places x 4 levels, ${rows.length} shop rows match the migration, City Life tab, placing view by size and renderer wiring in place`);
+console.log(`PASS City Life: ${CITY_LIFE_STYLES.length} places x 4 levels, ${rows.length} shop rows match the migration, City Life tab, placing camera by size and renderer wiring in place`);

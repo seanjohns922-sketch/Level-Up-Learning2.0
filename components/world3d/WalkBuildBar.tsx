@@ -1,17 +1,20 @@
 "use client";
-// Walk-and-place building: a hotbar of recent and pinned items, and the buttons
-// to place, turn, erase or switch to the bird's-eye planner.
-import { Check, Eraser, Map as MapIcon, PaintRoller, Plus, RotateCw, Star, Undo2, X } from "lucide-react";
+// The builder's one bar, on foot and planning from above: a hotbar of favourites and recent
+// picks, More (every category), and the buttons to place, turn, erase, switch view and undo.
+import { Check, Eraser, Hand, Map as MapIcon, PaintRoller, PersonStanding, Plus, RotateCw, Star, Undo2, X } from "lucide-react";
 import type { ReactNode } from "react";
 import { WorldVoiceButton } from "./WorldVoiceButton";
 
 export type WalkBuildSlot = { entry: string; name: string; art: ReactNode };
 export type WalkBuildMode = "none" | "item" | "brush" | "erase";
+export type WalkBuildHint = { text: string; tone: "ok" | "bad" | "info" };
 
 export function WalkBuildBar({
-  slots, active, pinned, mode, heldName, valid, brushOn, hint, canUndo,
+  planning, slots, active, pinned, mode, heldName, valid, brushOn, hint, extras, canUndo,
   onPick, onPin, onMore, onPlace, onTurn, onErase, onPlan, onUndo, onDone,
 }: {
+  /** Planning from above: painting and erasing are done by tapping the ground, and Plan becomes Walk. */
+  planning: boolean;
   slots: WalkBuildSlot[];
   active: string | null;
   pinned: ReadonlySet<string>;
@@ -19,7 +22,9 @@ export function WalkBuildBar({
   heldName: string | null;
   valid: boolean;
   brushOn: boolean;
-  hint: { text: string; tone: "ok" | "bad" | "info" };
+  hint: WalkBuildHint;
+  /** Choices for what's in hand (colour, style, put away, brush size), over the buttons. */
+  extras?: ReactNode;
   canUndo: boolean;
   onPick: (entry: string) => void;
   onPin: (entry: string) => void;
@@ -31,16 +36,24 @@ export function WalkBuildBar({
   onUndo: () => void;
   onDone: () => void;
 }) {
-  const main = mode === "brush"
-    ? { label: brushOn ? "Stop painting" : "Paint", icon: <PaintRoller size={24} />, on: brushOn, disabled: false }
-    : mode === "erase"
-      ? { label: "Remove", icon: <Eraser size={24} />, on: false, disabled: !valid }
-      : { label: "Place", icon: <Check size={26} strokeWidth={3} />, on: false, disabled: mode !== "item" || !valid };
+  const main = planning && mode === "brush"
+    ? { label: "Drag to paint", icon: <PaintRoller size={24} />, on: false, disabled: true }
+    : planning && mode === "erase"
+      ? { label: "Tap to remove", icon: <Eraser size={24} />, on: false, disabled: true }
+      : planning && mode === "none"
+        ? { label: "Tap to move", icon: <Hand size={24} />, on: false, disabled: true }
+        : mode === "brush"
+          ? { label: brushOn ? "Stop painting" : "Paint", icon: <PaintRoller size={24} />, on: brushOn, disabled: false }
+          : mode === "erase"
+            ? { label: "Remove", icon: <Eraser size={24} />, on: false, disabled: !valid }
+            : { label: "Place", icon: <Check size={26} strokeWidth={3} />, on: false, disabled: mode !== "item" || !valid };
   return (
-    <div className="walkBuild" data-mode={mode}>
+    <div className="walkBuild" data-mode={mode} data-planning={planning ? "true" : "false"}>
       <div className="walkBuildHint" role="status" data-tone={hint.tone}>
         <span>{hint.text}</span>
-        <WorldVoiceButton compact label="Read building help" text={`${hint.text}. Pick something from the bar at the bottom, walk to where it should go, then press Place. Turn spins it. Plan shows your world from above.`} />
+        <WorldVoiceButton compact label="Read building help" text={planning
+          ? `${hint.text}. Pick something from the bar at the bottom or press More. It goes on the nearest spot where it fits. Drag the ground to move it, then press Place. Tap something you have built to move it. Walk takes you back to building on foot.`
+          : `${hint.text}. Pick something from the bar at the bottom or press More. It goes on the nearest spot in front of you where it fits. Press Place, or tap a nearby square. Turn spins it. Plan shows your world from above.`} />
         <button type="button" className="walkBuildDone" onClick={onDone} aria-label="Stop building"><X size={18} />Done</button>
       </div>
 
@@ -64,11 +77,14 @@ export function WalkBuildBar({
       </div>
 
       <div className="walkBuildTools" aria-label={heldName ? `Building with ${heldName}` : "Build tools"}>
+        {extras ? <div className="walkBuildExtras">{extras}</div> : null}
         <button type="button" className="walkBuildMain" data-on={main.on ? "true" : "false"} disabled={main.disabled} onClick={onPlace}>{main.icon}{main.label}<kbd>E</kbd></button>
         <div className="walkBuildRow">
           <button type="button" onClick={onTurn} disabled={mode !== "item"} aria-label="Turn it" title="Turn (R)"><RotateCw size={19} />Turn</button>
-          <button type="button" onClick={onErase} aria-pressed={mode === "erase"} data-tone="erase" aria-label="Erase what you face" title="Erase (X)"><Eraser size={19} />Erase</button>
-          <button type="button" onClick={onPlan} aria-label="Plan from above" title="Plan from above (P)"><MapIcon size={19} />Plan</button>
+          <button type="button" onClick={onErase} aria-pressed={mode === "erase"} data-tone="erase" aria-label={planning ? "Erase: tap what to remove" : "Erase what you face"} title="Erase (X)"><Eraser size={19} />Erase</button>
+          {planning
+            ? <button type="button" onClick={onPlan} aria-label="Walk: build on foot" title="Walk"><PersonStanding size={19} />Walk</button>
+            : <button type="button" onClick={onPlan} aria-label="Plan from above" title="Plan from above (P)"><MapIcon size={19} />Plan</button>}
           <button type="button" onClick={onUndo} disabled={!canUndo} aria-label="Undo" title="Undo"><Undo2 size={19} />Undo</button>
         </div>
       </div>
@@ -82,13 +98,13 @@ export function WalkBuildBar({
         .walkBuildHint[data-tone="ok"]{border-color:#4ade80}.walkBuildHint[data-tone="bad"]{border-color:#fb7185}
         .walkBuildHint span{min-width:0}
         .walkBuildDone{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-weight:900!important;font-size:13px!important;white-space:nowrap}
-        .walkBuildBar{--slot:60px;--slot-h:66px;position:absolute;left:0;right:0;margin-inline:auto;width:fit-content;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));display:grid;grid-template-columns:repeat(8,var(--slot));gap:6px;padding:7px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(18,22,30,.84);pointer-events:auto;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+        .walkBuildBar{--slot:62px;--slot-h:70px;position:absolute;left:0;right:0;margin-inline:auto;width:fit-content;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));display:grid;grid-template-columns:repeat(8,var(--slot));gap:6px;padding:7px;border-radius:18px;border:1px solid rgba(255,255,255,.15);background:rgba(18,22,30,.84);pointer-events:auto;box-shadow:0 12px 30px rgba(0,0,0,.3)}
         .walkBuildSlotWrap{position:relative}
         .walkBuildSlot{position:relative;width:var(--slot);height:var(--slot-h);display:grid;justify-items:center;align-content:center;gap:1px;padding:3px;border-radius:12px;border:3px solid transparent;background:rgba(255,255,255,.08);color:#fff}
         .walkBuildSlot[aria-pressed="true"]{background:#7c3aed;border-color:#c4b5fd}
-        .walkBuildSlot b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;font-weight:850}
+        .walkBuildSlot b{max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:9.5px;font-weight:850;line-height:1.05;text-align:center;word-break:break-word}
         .walkBuildSlot kbd{position:absolute;left:5px;top:3px}
-        .walkBuildArt{position:relative;width:calc(var(--slot) - 16px);height:calc(var(--slot-h) - 26px);display:grid;place-items:center;overflow:hidden;border-radius:8px}
+        .walkBuildArt{position:relative;width:calc(var(--slot) - 18px);height:calc(var(--slot-h) - 32px);display:grid;place-items:center;overflow:hidden;border-radius:8px}
         .walkBuildStar{position:absolute;right:-5px;top:-7px;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;border:2px solid #fcd34d;background:#1e1b2e;color:#fcd34d}
         .walkBuildStar[aria-pressed="true"]{background:#fcd34d;color:#78350f}
         .walkBuildFavourite{position:absolute;right:4px;top:4px;color:#fcd34d;pointer-events:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
@@ -98,6 +114,15 @@ export function WalkBuildBar({
         .walkBuildMain:disabled{background:#64748b;opacity:.8;cursor:default}
         .walkBuild[data-mode="erase"] .walkBuildMain:not(:disabled){background:#e5484d}
         .walkBuildMain[data-on="true"]{background:#f59e0b}
+        .walkBuildExtras{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px;min-width:0;pointer-events:auto}
+        .walkBuildExtras select{min-height:40px;padding:0 10px;border-radius:999px;border:0;background:rgba(18,22,30,.86);color:#fff;font:700 13px var(--font-sans,system-ui)}
+        .walkBuildExtras select option{color:#16121f}
+        .walkBuildExtras .worldEditTints{flex-wrap:wrap;justify-content:center;max-width:100%;padding:6px;border-radius:16px;background:rgba(18,22,30,.86)}
+        .walkBuildChip{display:inline-flex;align-items:center;gap:5px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:rgba(18,22,30,.86);color:#fff;font-size:12px!important;font-weight:900!important}
+        .walkBuildChip[aria-pressed="true"]{background:#7c3aed;border-color:#c4b5fd}
+        .walkBuildChipDanger{background:rgba(229,72,77,.9)}
+        .walkBuild[data-planning="true"] .walkBuildMain:disabled{background:rgba(18,22,30,.86);opacity:1;font-size:16px!important;color:#e2e8f0}
+        .walkBuild[data-planning="true"] .walkBuildHint{top:max(84px,calc(env(safe-area-inset-top) + 76px))}
         .walkBuildRow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
         .walkBuildRow button{display:grid;justify-items:center;gap:2px;min-height:52px;padding:6px 0;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(18,22,30,.86);color:#fff;font-size:11px!important;font-weight:850!important}
         .walkBuildRow button:disabled{opacity:.45;cursor:default}
@@ -111,6 +136,10 @@ export function WalkBuildBar({
           .walkBuildTools{bottom:max(156px,calc(env(safe-area-inset-bottom) + 150px));width:220px}
           .walkBuildSlot b,.walkBuildSlot kbd{display:none}.walkBuildArt{width:28px;height:28px}.walkBuildMain{min-height:50px;font-size:17px!important}.walkBuildRow button{min-height:44px}
           .walkBuildHint{top:max(58px,calc(env(safe-area-inset-top) + 50px));font-size:13px}
+          .walkBuildExtras{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;justify-content:flex-start}
+          .walkBuildExtras .worldEditTints{display:none}
+          .walkBuildExtras>*{flex:0 0 auto}
+          .walkBuild[data-planning="true"] .walkBuildHint{top:max(66px,calc(env(safe-area-inset-top) + 58px))}
         }
         @media (max-width:560px){
           .walkBuildHint{font-size:13px;padding-left:12px}
