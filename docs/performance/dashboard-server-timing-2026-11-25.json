@@ -1,0 +1,105 @@
+{
+  "at": "2026-11-25T03:06:39.332Z",
+  "checks": [
+    "48 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes"
+  ],
+  "requests": 816,
+  "snapshotRangeMs": [
+    333,
+    792
+  ],
+  "stages": {
+    "jwt": {
+      "samples": 816,
+      "medianMs": 0.0,
+      "p95Ms": 0.2,
+      "maxMs": 13.9
+    },
+    "parse": {
+      "samples": 816,
+      "medianMs": 0.4,
+      "p95Ms": 3.6,
+      "maxMs": 18
+    },
+    "plan": {
+      "samples": 816,
+      "medianMs": 0.0,
+      "p95Ms": 0.2,
+      "maxMs": 9.8
+    },
+    "response": {
+      "samples": 816,
+      "medianMs": 0.0,
+      "p95Ms": 0,
+      "maxMs": 0.1
+    },
+    "transaction": {
+      "samples": 816,
+      "medianMs": 37.25,
+      "p95Ms": 96.8,
+      "maxMs": 666
+    }
+  },
+  "slowestRequests": [
+    {
+      "route": "get_live_class_compact_event_page_secure",
+      "headersMs": 292.97875,
+      "serverTiming": {
+        "jwt": 0,
+        "parse": 0.2,
+        "plan": 0,
+        "transaction": 279.1,
+        "response": 0
+      }
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 547.0931660000006,
+      "serverTiming": {
+        "jwt": 0,
+        "parse": 1,
+        "plan": 0.1,
+        "transaction": 543.8,
+        "response": 0
+      }
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 555.8821660000003,
+      "serverTiming": {
+        "jwt": 0,
+        "parse": 0.8,
+        "plan": 0,
+        "transaction": 550,
+        "response": 0
+      }
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 578.8811249999999,
+      "serverTiming": {
+        "jwt": 0,
+        "parse": 0.7,
+        "plan": 0,
+        "transaction": 570.1,
+        "response": 0
+      }
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 669.4437499999995,
+      "serverTiming": {
+        "jwt": 0.1,
+        "parse": 0.8,
+        "plan": 0,
+        "transaction": 666,
+        "response": 0
+      }
+    }
+  ],
+  "cleanup": "Temporary copy removed; original container ID, running state and configuration verified unchanged",
+  "limitation": "Fresh same-image API on direct loopback port; no gateway, no student writes, existing API left running. Different pool/cache state and route prevent claiming speedup. Transaction stage does not isolate acquisition."
+}

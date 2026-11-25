@@ -2237,3 +2237,39 @@ Aggregates are in `dashboard-client-gateway-2026-11-25.json`; the current milest
 and staged acceptance gates are clarified at the top of `SCALE_READINESS.md`.
 Syntax and diff checks passed. These diagnostics do not require an app build,
 migration or deployment and do not establish hosted capacity.
+
+### 25 November: official API request-stage timing
+
+Added `timed-api-profile-local.py`, which launches a temporary copy of the exact
+local official PostgREST image with `PGRST_SERVER_TIMING_ENABLED=true` and a
+loopback-only port. It reuses authentication/schema settings without printing
+credentials, leaves the existing API untouched, runs read-only synthetic queries,
+and removes the copy in `finally`. Original container ID, configuration and running
+state are verified afterward. Pool/runtime settings are not tuned.
+
+The first launch failed because port 56524 belongs to the local mail service;
+the temporary container was removed and the original verified unchanged. Retried
+on 56529 successfully. The 48 complete snapshots made 816 successful requests and
+preserved ordered event and companion results. Every request supplied all five
+Server-Timing stages. The slowest request took 669 ms with 666 ms attributed to
+`transaction`; the next two took 579/556 ms with 570/550 ms in that stage.
+Transaction median/p95/max were 37.25/96.8/666 ms. Parsing p95 was 3.6 ms; the
+other non-transaction stages were small in this run.
+
+Stage meanings follow the installed v14 API and
+[PostgREST v14 observability documentation](https://docs.postgrest.org/en/v14/references/observability.html).
+The `plan` stage is API SQL generation, not PostgreSQL planner execution.
+`transaction` does not separately identify connection acquisition, query execution
+or transaction overhead. Do not describe it as pure SQL execution time.
+
+This is a fresh API instance accessed directly, bypassing Kong, with a different
+pool/cache lifetime. The original API remains running against the same local DB.
+It is not a controlled gateway comparison, a speedup claim or a 10,000-user test.
+Next correlate transaction-stage timing with connection acquisition/usage using
+supported metrics, before considering any pool/runtime change. Previous failed
+pool expansion evidence still applies.
+
+Full request timings remain private; sanitized aggregates are in
+`dashboard-server-timing-2026-11-25.json`. JavaScript and Python syntax and diff
+checks passed. No production application, schema or permissions changed; no
+migration or release build is required.

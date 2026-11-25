@@ -11,6 +11,8 @@ import { fetchLiveClassAttempts } from '../../lib/live-class-attempts.ts';
 import { localConfig, localDir } from './local-config.mjs';
 
 const config = localConfig();
+const timedApi = process.env.SCALE_TIMED_API === '1';
+assert(!process.env.SCALE_TIMED_API || timedApi);
 const contention = process.argv.includes('--contention');
 const scheduling = process.argv.includes('--scheduling');
 const interactions = contention || scheduling || process.argv.includes('--interactions');
@@ -38,13 +40,16 @@ for (const [teacherIndex, group] of groups.entries()) {
       if (!isAuth && !url.pathname.includes('/rpc/')) assert.equal(init?.method ?? 'GET', 'GET');
       const startedEpochMs = Date.now();
       const start = performance.now();
-      const response = await fetch(input, { ...init, signal: AbortSignal.timeout(30000) });
+      const target = timedApi && !isAuth ? `http://127.0.0.1:56529${url.pathname.replace(/^\/rest\/v1/, '')}${url.search}` : input;
+      const response = await fetch(target, { ...init, signal: AbortSignal.timeout(30000) });
       if (!isAuth) {
         const timing = name => {
           const value = response.headers.get(name);
           return value !== null && Number.isFinite(Number(value)) ? Number(value) : null;
         };
-        requests.push({ route, startedEpochMs, status: response.status, headersMs: performance.now() - start, upstreamMs: timing('x-kong-upstream-latency'), proxyMs: timing('x-kong-proxy-latency') });
+        const serverTiming = Object.fromEntries([...(response.headers.get('server-timing') ?? '').matchAll(/([a-z_]+);dur=([0-9.]+)/g)].map(m => [m[1], Number(m[2])]));
+        if (timedApi) assert(Object.keys(serverTiming).length > 0, 'Timing headers required');
+        requests.push({ serverTiming, route, startedEpochMs, status: response.status, headersMs: performance.now() - start, upstreamMs: timing('x-kong-upstream-latency'), proxyMs: timing('x-kong-proxy-latency') });
       }
       return response;
     } },
@@ -140,4 +145,4 @@ for (let round = 0; round < (contention ? 12 : scheduling ? 3 : interactions ? 2
 }
 eventLoop.disable();
 report.checks = [`${report.samples.length} complete snapshots; identical ordered rows per teacher`, 'No duplicate or out-of-class rows', 'Production event head and compact-page routes; no fallback; allowed read sources only', 'No application, schema or learning-data writes'];
-fs.writeFileSync(`${localDir}/event-chain-${contention ? 'contention' : scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });
+fs.writeFileSync(`${localDir}/event-chain-${timedApi ? 'timed-api' : contention ? 'contention' : scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });
