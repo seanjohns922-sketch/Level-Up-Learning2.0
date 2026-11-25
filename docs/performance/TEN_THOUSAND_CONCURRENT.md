@@ -2273,3 +2273,34 @@ Full request timings remain private; sanitized aggregates are in
 `dashboard-server-timing-2026-11-25.json`. JavaScript and Python syntax and diff
 checks passed. No production application, schema or permissions changed; no
 migration or release build is required.
+
+### 25 November: supported pool-waiting metrics
+
+Extended the temporary API runner with its supported admin metrics listener,
+bound only to localhost:56530. It samples pool maximum, waiting requests, available
+connections and timeouts about every 100 ms during the existing read-only test.
+The child workload is drained or terminated before temporary-container cleanup.
+No original API configuration, pool size or schema is changed.
+
+All 48 full snapshots retained identical data; 816 HTTP requests succeeded.
+The sampler captured 76 observations, 66 within the workload interval; boundary
+samples covered the complete run. Pool maximum was 10. Waiting requests were
+present in 65 of the 66 workload samples, peaking at 22. Available connections
+ranged from zero to nine, and pool timeouts remained zero. Full dashboard reads
+ranged from 439–861 ms in this fresh direct-API run. The slowest individual
+request took 692 ms with 687 ms in the transaction stage.
+
+This is direct evidence of queued acquisition requests in this local experiment.
+It does not measure how long each request waited or prove that all transaction
+time is acquisition. The metric is defined in
+[PostgREST v14 pool observability](https://docs.postgrest.org/en/v14/references/observability.html).
+Fresh process/cache state, direct routing, monitoring overhead and absence of
+student writes prevent extrapolation to hosted capacity or a performance win.
+Do not increase the pool: previous official-runtime expansion failed. Next test
+reducing concurrent request bursts with complete-result and whole-dashboard latency
+checks, retaining the earlier inconclusive scheduling comparisons as controls.
+
+Evidence: `dashboard-pool-waiting-2026-11-25.json`. The temporary API/admin listener
+was removed; original container ID/configuration/running state verified unchanged.
+Python syntax and diff checks passed. No application build, migration or production
+change is needed for this diagnostic-only commit.

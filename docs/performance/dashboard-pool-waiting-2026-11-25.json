@@ -1,0 +1,684 @@
+{
+  "at": "2026-11-25T03:22:16.527Z",
+  "checks": [
+    "48 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes"
+  ],
+  "httpRequests": 816,
+  "totalMetricSamples": 76,
+  "workloadMetricSamples": 66,
+  "samplesWithWaiting": 65,
+  "peakWaiting": 22.0,
+  "poolMaximum": 10,
+  "timeoutDelta": 0.0,
+  "dashboardRangeMs": [
+    439,
+    861
+  ],
+  "metrics": [
+    {
+      "startedEpochMs": 1795576937146.7122,
+      "finishedEpochMs": 1795576937148.551,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 0.0,
+        "pgrst_db_pool_available": 1.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937253.2952,
+      "finishedEpochMs": 1795576937268.908,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 17.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937370.121,
+      "finishedEpochMs": 1795576937376.5042,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 12.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937477.49,
+      "finishedEpochMs": 1795576937489.0798,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937594.125,
+      "finishedEpochMs": 1795576937597.0317,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937698.3691,
+      "finishedEpochMs": 1795576937702.9177,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 2.0,
+        "pgrst_db_pool_available": 8.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937804.864,
+      "finishedEpochMs": 1795576937806.9902,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576937918.196,
+      "finishedEpochMs": 1795576937984.8462,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 13.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938086.3281,
+      "finishedEpochMs": 1795576938108.5962,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938213.679,
+      "finishedEpochMs": 1795576938218.6409,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938323.147,
+      "finishedEpochMs": 1795576938325.403,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938428.009,
+      "finishedEpochMs": 1795576938430.473,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 2.0,
+        "pgrst_db_pool_available": 8.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938536.5132,
+      "finishedEpochMs": 1795576938556.9082,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 11.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938659.594,
+      "finishedEpochMs": 1795576938685.507,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938788.2083,
+      "finishedEpochMs": 1795576938790.901,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576938896.53,
+      "finishedEpochMs": 1795576938936.864,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939038.83,
+      "finishedEpochMs": 1795576939040.838,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 2.0,
+        "pgrst_db_pool_available": 8.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939146.9062,
+      "finishedEpochMs": 1795576939157.597,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 10.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939262.678,
+      "finishedEpochMs": 1795576939296.653,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 5.0,
+        "pgrst_db_pool_available": 5.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939397.4102,
+      "finishedEpochMs": 1795576939402.6829,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939507.738,
+      "finishedEpochMs": 1795576939511.625,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939617.644,
+      "finishedEpochMs": 1795576939648.692,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939754.2168,
+      "finishedEpochMs": 1795576939795.135,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 11.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576939897.614,
+      "finishedEpochMs": 1795576939907.284,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940007.8599,
+      "finishedEpochMs": 1795576940015.706,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940122.407,
+      "finishedEpochMs": 1795576940135.266,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 22.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940241.141,
+      "finishedEpochMs": 1795576940243.188,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 14.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940351.1528,
+      "finishedEpochMs": 1795576940360.679,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940465.167,
+      "finishedEpochMs": 1795576940469.363,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940574.262,
+      "finishedEpochMs": 1795576940576.751,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940682.1648,
+      "finishedEpochMs": 1795576940691.797,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 20.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940793.262,
+      "finishedEpochMs": 1795576940799.02,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 14.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576940903.303,
+      "finishedEpochMs": 1795576940921.027,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 5.0,
+        "pgrst_db_pool_available": 5.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941026.081,
+      "finishedEpochMs": 1795576941029.443,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941130.295,
+      "finishedEpochMs": 1795576941133.098,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941235.081,
+      "finishedEpochMs": 1795576941275.3699,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 11.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941379.421,
+      "finishedEpochMs": 1795576941392.576,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 8.0,
+        "pgrst_db_pool_available": 2.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941493.132,
+      "finishedEpochMs": 1795576941495.204,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941595.787,
+      "finishedEpochMs": 1795576941598.853,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941704.192,
+      "finishedEpochMs": 1795576941756.626,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 6.0,
+        "pgrst_db_pool_available": 4.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941856.775,
+      "finishedEpochMs": 1795576941862.7751,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 7.0,
+        "pgrst_db_pool_available": 3.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576941963.426,
+      "finishedEpochMs": 1795576941967.509,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 5.0,
+        "pgrst_db_pool_available": 5.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942067.6968,
+      "finishedEpochMs": 1795576942072.142,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942174.5657,
+      "finishedEpochMs": 1795576942176.6418,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 3.0,
+        "pgrst_db_pool_available": 7.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942280.327,
+      "finishedEpochMs": 1795576942286.2708,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942391.388,
+      "finishedEpochMs": 1795576942418.7542,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 15.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942518.959,
+      "finishedEpochMs": 1795576942527.1978,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 10.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942632.4712,
+      "finishedEpochMs": 1795576942641.176,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 10.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942746.081,
+      "finishedEpochMs": 1795576942750.8018,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 6.0,
+        "pgrst_db_pool_available": 4.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942854.848,
+      "finishedEpochMs": 1795576942861.5051,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 6.0,
+        "pgrst_db_pool_available": 4.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576942965.441,
+      "finishedEpochMs": 1795576942967.7273,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943070.14,
+      "finishedEpochMs": 1795576943072.0088,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943172.514,
+      "finishedEpochMs": 1795576943174.52,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943279.5798,
+      "finishedEpochMs": 1795576943293.174,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 14.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943404.182,
+      "finishedEpochMs": 1795576943452.801,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943557.93,
+      "finishedEpochMs": 1795576943560.2651,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943665.416,
+      "finishedEpochMs": 1795576943670.8228,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943775.4,
+      "finishedEpochMs": 1795576943777.2778,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576943883.088,
+      "finishedEpochMs": 1795576943902.635,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 11.0,
+        "pgrst_db_pool_available": 0.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944005.801,
+      "finishedEpochMs": 1795576944031.6091,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 8.0,
+        "pgrst_db_pool_available": 2.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944136.706,
+      "finishedEpochMs": 1795576944150.166,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 5.0,
+        "pgrst_db_pool_available": 5.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944250.471,
+      "finishedEpochMs": 1795576944255.836,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 4.0,
+        "pgrst_db_pool_available": 6.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944358.335,
+      "finishedEpochMs": 1795576944361.654,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 2.0,
+        "pgrst_db_pool_available": 8.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944463.5142,
+      "finishedEpochMs": 1795576944466.397,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944571.447,
+      "finishedEpochMs": 1795576944573.5933,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    },
+    {
+      "startedEpochMs": 1795576944674.666,
+      "finishedEpochMs": 1795576944684.644,
+      "values": {
+        "pgrst_db_pool_max": 10.0,
+        "pgrst_db_pool_waiting": 1.0,
+        "pgrst_db_pool_available": 9.0,
+        "pgrst_db_pool_timeouts_total": 0.0
+      }
+    }
+  ],
+  "cleanup": "Temporary API removed; original identity/configuration/running state verified unchanged",
+  "limitation": "Sampled waiting counts, not acquisition durations or exact per-request attribution. Fresh direct API, no student writes, no hosted capacity claim."
+}
