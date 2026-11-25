@@ -3,6 +3,35 @@
 Status: initial code inspection and dashboard evidence, not capacity certification.
 No production load test, database migration or hosting upgrade was performed.
 
+## Current checkpoint — 25 November 2026
+
+The sections below preserve earlier observations; they are not current capacity
+certification. The target remains **10,000 simultaneously active students plus
+teacher traffic**, tested in isolated hosted staging before any capacity claim.
+
+- Current local correctness evidence: repeated complete dashboard reads agree;
+  the latest 48 snapshots made 816 successful HTTP requests. This is read-only
+  evidence, not canonical-save or 10,000-user evidence.
+- Current performance gate: **not passed**. The latest four-teacher local read
+  test ranged from 1.07 to 4.49 seconds per dashboard snapshot.
+- Direct and reconstructed API-shaped SQL plans are fast in isolation. Gateway
+  timings place the largest observed delays upstream; exact pool acquisition,
+  concurrent DB execution and host scheduling remain unresolved.
+- Next milestone: identify and verify a concrete upstream improvement under an
+  unchanged realistic workload. Avoid more index/scheduling changes without evidence.
+- Hosted gate: production-equivalent destination/resources, isolated synthetic
+  fixtures, cost and approved test limits are still required. No paid setup or
+  production load testing has been performed by this diagnostic work.
+- Ramp remains 25 → 100 → 500 → 1,000 → 2,500 → 5,000 → 10,000 students, with a
+  teacher per 25 students. Advance only after correctness, latency, realtime and
+  resource-headroom gates below pass. Report offered and achieved traffic rates
+  so closed-loop slowdowns cannot masquerade as successful capacity.
+- Canonical submission/retry coverage, long soak, realistic browser/device testing
+  and recovery tests remain required; successful read-only checks do not replace them.
+
+Detailed current evidence: [acceptance work](TEN_THOUSAND_CONCURRENT.md) and
+[client/gateway timings](dashboard-client-gateway-2026-11-25.json).
+
 ## Observed baseline
 
 - Vercel project `level-up-learning-app` is on Pro. Its production Functions view

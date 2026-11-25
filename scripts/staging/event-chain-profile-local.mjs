@@ -3,6 +3,7 @@
 // from the fixture checkout. Use --interactions for sources or --scheduling for order.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { monitorEventLoopDelay, performance as nodePerformance } from 'node:perf_hooks';
 import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 import { fetchLiveClassEvents } from '../../lib/live-class-events.ts';
@@ -38,7 +39,13 @@ for (const [teacherIndex, group] of groups.entries()) {
       const startedEpochMs = Date.now();
       const start = performance.now();
       const response = await fetch(input, { ...init, signal: AbortSignal.timeout(30000) });
-      if (!isAuth) requests.push({ route, startedEpochMs, status: response.status, headersMs: performance.now() - start });
+      if (!isAuth) {
+        const timing = name => {
+          const value = response.headers.get(name);
+          return value !== null && Number.isFinite(Number(value)) ? Number(value) : null;
+        };
+        requests.push({ route, startedEpochMs, status: response.status, headersMs: performance.now() - start, upstreamMs: timing('x-kong-upstream-latency'), proxyMs: timing('x-kong-proxy-latency') });
+      }
       return response;
     } },
   });
@@ -110,16 +117,27 @@ async function read(teacher, mode, round) {
   console.log(JSON.stringify({ teacherIndex, mode, round, rows: sample.rows, requests: requests.length, totalMs: Math.round(totalMs), eventMs: Math.round(eventMs) }));
 }
 // Alternate order to expose warm-up/order sensitivity. Drain reads on failure.
+report.clientRounds = [];
+const eventLoop = monitorEventLoopDelay({ resolution: 10 });
+eventLoop.enable();
 const modes = contention ? ['all'] : scheduling ? ['all', 'events-first', 'events-last'] : interactions ? ['events', ...otherSources, 'all'] : ['sequential', 'concurrent'];
 for (let round = 0; round < (contention ? 12 : scheduling ? 3 : interactions ? 2 : 3); round++) {
   const order = scheduling ? [...modes.slice(round), ...modes.slice(0, round)] : round % 2 ? [...modes].reverse() : modes;
   for (const mode of order) {
+    eventLoop.reset();
+    const utilization = nodePerformance.eventLoopUtilization();
+    const cpu = process.cpuUsage();
+    const burstStart = performance.now();
     if (mode === 'sequential') for (const teacher of teachers) await read(teacher, mode, round);
     else {
       const outcomes = await Promise.allSettled(teachers.map(t => read(t, mode, round)));
       for (const outcome of outcomes) if (outcome.status === 'rejected') throw outcome.reason;
     }
+    const elapsedMs = performance.now() - burstStart;
+    const usedCpu = process.cpuUsage(cpu);
+    report.clientRounds.push({ round, mode, elapsedMs, eventLoopP99Ms: eventLoop.percentile(99) / 1e6, eventLoopMaxMs: eventLoop.max / 1e6, utilization: nodePerformance.eventLoopUtilization(utilization).utilization, processCpuMs: (usedCpu.user + usedCpu.system) / 1000 });
   }
 }
+eventLoop.disable();
 report.checks = [`${report.samples.length} complete snapshots; identical ordered rows per teacher`, 'No duplicate or out-of-class rows', 'Production event head and compact-page routes; no fallback; allowed read sources only', 'No application, schema or learning-data writes'];
 fs.writeFileSync(`${localDir}/event-chain-${contention ? 'contention' : scheduling ? 'scheduling' : interactions ? 'interactions' : 'profile'}-result.json`, JSON.stringify(report, null, 2) + '\n', { mode: 0o600 });

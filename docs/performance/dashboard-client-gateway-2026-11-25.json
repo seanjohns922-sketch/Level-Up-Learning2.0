@@ -1,0 +1,158 @@
+{
+  "at": "2026-11-25T02:55:00.287Z",
+  "checks": [
+    "48 complete snapshots; identical ordered rows per teacher",
+    "No duplicate or out-of-class rows",
+    "Production event head and compact-page routes; no fallback; allowed read sources only",
+    "No application, schema or learning-data writes"
+  ],
+  "clientRounds": [
+    {
+      "round": 0,
+      "mode": "all",
+      "elapsedMs": 2823.7127920000003,
+      "eventLoopP99Ms": 28.999679,
+      "eventLoopMaxMs": 149.815295,
+      "utilization": 0.2716530427003656,
+      "processCpuMs": 371.766
+    },
+    {
+      "round": 1,
+      "mode": "all",
+      "elapsedMs": 1762.1004169999997,
+      "eventLoopP99Ms": 40.337407,
+      "eventLoopMaxMs": 47.185919,
+      "utilization": 0.2954586537359006,
+      "processCpuMs": 247.791
+    },
+    {
+      "round": 2,
+      "mode": "all",
+      "elapsedMs": 1759.6743750000005,
+      "eventLoopP99Ms": 41.746431,
+      "eventLoopMaxMs": 52.068351,
+      "utilization": 0.3205670421173499,
+      "processCpuMs": 286.179
+    },
+    {
+      "round": 3,
+      "mode": "all",
+      "elapsedMs": 1530.9246670000011,
+      "eventLoopP99Ms": 20.561919,
+      "eventLoopMaxMs": 23.461887,
+      "utilization": 0.3375178044229155,
+      "processCpuMs": 291.039
+    },
+    {
+      "round": 4,
+      "mode": "all",
+      "elapsedMs": 1142.0857090000009,
+      "eventLoopP99Ms": 22.609919,
+      "eventLoopMaxMs": 35.717119,
+      "utilization": 0.34983997166635783,
+      "processCpuMs": 250.262
+    },
+    {
+      "round": 5,
+      "mode": "all",
+      "elapsedMs": 2579.527833,
+      "eventLoopP99Ms": 35.815423,
+      "eventLoopMaxMs": 251.396095,
+      "utilization": 0.4150400298674796,
+      "processCpuMs": 279.435
+    },
+    {
+      "round": 6,
+      "mode": "all",
+      "elapsedMs": 3073.727665999999,
+      "eventLoopP99Ms": 29.360127,
+      "eventLoopMaxMs": 410.779647,
+      "utilization": 0.39291623084664734,
+      "processCpuMs": 308.511
+    },
+    {
+      "round": 7,
+      "mode": "all",
+      "elapsedMs": 1833.0062499999985,
+      "eventLoopP99Ms": 26.673151,
+      "eventLoopMaxMs": 32.309247,
+      "utilization": 0.35310944329867405,
+      "processCpuMs": 300.897
+    },
+    {
+      "round": 8,
+      "mode": "all",
+      "elapsedMs": 1764.0949580000015,
+      "eventLoopP99Ms": 23.166975,
+      "eventLoopMaxMs": 25.067519,
+      "utilization": 0.3509946449633517,
+      "processCpuMs": 270.069
+    },
+    {
+      "round": 9,
+      "mode": "all",
+      "elapsedMs": 1504.8812079999989,
+      "eventLoopP99Ms": 22.069247,
+      "eventLoopMaxMs": 22.593535,
+      "utilization": 0.336678167933283,
+      "processCpuMs": 245.896
+    },
+    {
+      "round": 10,
+      "mode": "all",
+      "elapsedMs": 4498.605291,
+      "eventLoopP99Ms": 34.439167,
+      "eventLoopMaxMs": 56.197119,
+      "utilization": 0.17913541274474004,
+      "processCpuMs": 272.381
+    },
+    {
+      "round": 11,
+      "mode": "all",
+      "elapsedMs": 3849.6262499999975,
+      "eventLoopP99Ms": 20.316159,
+      "eventLoopMaxMs": 30.621695,
+      "utilization": 0.19989964420761505,
+      "processCpuMs": 263.399
+    }
+  ],
+  "requestCount": 816,
+  "slowestRequests": [
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 2127.982833,
+      "upstreamMs": 2118,
+      "proxyMs": 1
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 2496.077042000001,
+      "upstreamMs": 2479,
+      "proxyMs": 1
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 2637.7674579999984,
+      "upstreamMs": 2625,
+      "proxyMs": 1
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 2780.221916999999,
+      "upstreamMs": 2767,
+      "proxyMs": 0
+    },
+    {
+      "route": "student_lesson_attempts",
+      "headersMs": 3840.618499999997,
+      "upstreamMs": 3834,
+      "proxyMs": 1
+    }
+  ],
+  "dashboardRangeMs": [
+    1070.0923750000002,
+    4488.999583000001
+  ],
+  "limitation": "Gateway upstream includes API, pool, DB and network time; not an acquisition measurement. Client loop metrics are not whole-host CPU metrics. Repeated four-teacher reads only; no student writes or hosted capacity proof.",
+  "latencyGatePassed": false
+}

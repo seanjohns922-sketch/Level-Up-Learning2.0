@@ -2209,3 +2209,31 @@ on API/connection acquisition and host scheduling under repeated unchanged reads
 with low-overhead timing rather than another speculative SQL rewrite. Aggregates
 are in `lesson-history-api-shape-2026-11-25.json`. No migration or deployment is
 required; production behaviour remains unchanged.
+
+### 25 November: client and gateway timing checkpoint
+
+The unchanged read profiler now records available Kong upstream/proxy latency
+headers and per-burst Node event-loop delay, utilization and process CPU time.
+The existing local API has no published admin diagnostics port; no configuration
+was changed to expose one. This run did not use the database sampler.
+
+All 48 snapshots preserved complete results: 816 HTTP requests, all successful,
+all with upstream timings. Dashboard snapshots ranged from 1,070 to 4,489 ms,
+failing the existing latency target. The five slowest individual requests were
+lesson-history reads: 2,128–3,841 ms header wait versus 2,118–3,834 ms upstream wait,
+with 0–1 ms reported gateway proxy time. In the longest two bursts the client's
+maximum event-loop delays were 56 and 31 ms, versus burst durations of 4,499 and
+3,850 ms. Other rounds did have client stalls up to 411 ms; do not generalize that
+the client contributes nothing.
+
+This points the largest measured delays upstream of the gateway, without
+separating API scheduling, connection acquisition, database execution and network.
+Node process CPU/utilization is not whole-host CPU saturation evidence. No precise
+pool-acquisition metric was available in this run, and no gain is claimed. Keep
+production settings unchanged; next obtain upstream queue/execution attribution
+with supported local diagnostics before changing pool settings or SQL.
+
+Aggregates are in `dashboard-client-gateway-2026-11-25.json`; the current milestone
+and staged acceptance gates are clarified at the top of `SCALE_READINESS.md`.
+Syntax and diff checks passed. These diagnostics do not require an app build,
+migration or deployment and do not establish hosted capacity.
