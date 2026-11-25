@@ -333,7 +333,7 @@ export default function LessonReflection({
           </div>
 
           <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
-        {levelNumber === 7 && realmId && <div className="mt-5 flex justify-center"><Level7JourneyLinks realm={realmId} week={week}/></div>}
+        {typeof levelNumber === "number" && levelNumber >= 7 && realmId && <div className="mt-5 flex justify-center"><Level7JourneyLinks level={levelNumber} realm={realmId} week={week}/></div>}
 
           {copy?.reflectionPrompt ? (
             <div className="mt-6">
@@ -397,7 +397,7 @@ export default function LessonReflection({
         <div className="mt-1 text-sm" style={{ color: optionTextColor }}>{lessonTitle}</div>
 
         <StatChips xp={xp} chain={bestChain} accuracy={accuracy} {...statChipProps} />
-        {levelNumber === 7 && realmId && <div className="mt-5 flex justify-center"><Level7JourneyLinks realm={realmId} week={week}/></div>}
+        {typeof levelNumber === "number" && levelNumber >= 7 && realmId && <div className="mt-5 flex justify-center"><Level7JourneyLinks level={levelNumber} realm={realmId} week={week}/></div>}
 
         <div className="mt-7 text-base font-bold text-white">
           How confident do you feel now?

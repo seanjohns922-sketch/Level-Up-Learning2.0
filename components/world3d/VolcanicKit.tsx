@@ -4,6 +4,7 @@ import {useFrame} from '@react-three/fiber';
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
+import WorldPlaque from './WorldPlaque';
 
 // Shared volcanic pieces for the Level 8 volcano, summit and strongholds.
 export const rand=(i:number)=>{const n=Math.sin(i*12.9898+78.233)*43758.5453;return n-Math.floor(n);};
@@ -172,5 +173,22 @@ export function StoneArch({colour,open,seed=0,brightness=1.6,rim}:{colour:string
     <mesh rotation={[0,0,Math.PI/6]}><ringGeometry args={[.55,.62,3]}/><meshBasicMaterial color={rimColour} toneMapped={false}/></mesh>
    </group>)}
   </>}
+ </group>;
+}
+
+/** Gold used everywhere a finished week is shown: doorway, sign and crystal. */
+export const DONE_GOLD='#ffd36a';
+/** A slowly turning crystal over a finished week's sign: the student's progress, visible from the path. */
+function RestoredCrystal({colour}:{colour:string}){
+ const reduced=useReducedMotion(),ref=useRef<THREE.Mesh>(null);
+ useFrame(({clock})=>{if(ref.current&&!reduced.current)ref.current.rotation.y=clock.elapsedTime*.8;});
+ return <group position={[0,4.75,0]}><mesh ref={ref} scale={[.32,.62,.32]}><octahedronGeometry args={[1,0]}/><meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={2} flatShading/></mesh><pointLight color={colour} intensity={12} distance={9} decay={1.6}/></group>;
+}
+/** Eye-level sign on a post beside the path, facing students as they walk in. Finished weeks carry a restored crystal. */
+export function WeekSign({at,title,subtitle,colour,restored=false}:{at:SummitPoint;title:string;subtitle:string;colour:string;restored?:boolean}){
+ return <group position={at}>
+  <mesh position={[0,1.2,0]}><boxGeometry args={[.14,2.4,.14]}/><meshStandardMaterial color="#3b3a44" roughness={.8}/></mesh>
+  <WorldPlaque at={[0,2.85,0]} title={title} subtitle={subtitle} width={3.2} colour={colour}/>
+  {restored&&<RestoredCrystal colour={DONE_GOLD}/>}
  </group>;
 }

@@ -4,7 +4,7 @@ import {useFrame} from '@react-three/fiber';
 import {Bloom,EffectComposer,Vignette} from '@react-three/postprocessing';
 import * as THREE from 'three';
 import WorldPlaque from './WorldPlaque';
-import {Brazier,Instances,StoneArch,addCrystalCluster,basaltTextures,crystalGeometry,rand,softDotTexture,useReducedMotion,type InstanceItem} from './VolcanicKit';
+import {Brazier,DONE_GOLD,Instances,StoneArch,WeekSign,addCrystalCluster,basaltTextures,crystalGeometry,rand,softDotTexture,useReducedMotion,type InstanceItem} from './VolcanicKit';
 import {getRealmTheme} from '@/lib/useRealmTheme';
 import {cave7WeekCount} from '@/lib/cave7-config';
 import {cavernDarkness,cavernDoor} from '@/lib/world3d/shattered-realms';
@@ -99,13 +99,6 @@ function CaptiveCore({realm,colour}:{realm:ExpeditionRealm;colour:string}){
 
 type DoorState='loading'|'locked'|'open'|'current'|'done';
 const DOOR_LABEL:Record<DoorState,string>={loading:'',locked:'LOCKED',open:'ENTER WEEK',current:'CONTINUE HERE',done:'COMPLETE ✓'};
-const DONE_GOLD='#ffd36a';
-/** A slowly turning crystal on a finished week's sign: the student's progress, visible from the path. */
-function RestoredCrystal({colour}:{colour:string}){
- const reduced=useReducedMotion(),ref=useRef<THREE.Mesh>(null);
- useFrame(({clock})=>{if(ref.current&&!reduced.current)ref.current.rotation.y=clock.elapsedTime*.8;});
- return <group position={[0,4.75,0]}><mesh ref={ref} scale={[.32,.62,.32]}><octahedronGeometry args={[1,0]}/><meshStandardMaterial color={colour} emissive={colour} emissiveIntensity={2} flatShading/></mesh><pointLight color={colour} intensity={12} distance={9} decay={1.6}/></group>;
-}
 function Doorway({week,state,colour}:{week:number;state:DoorState;colour:string}){
  const p=cavernDoor(week),side=week%2===1?-1:1,lit=state==='done'?DONE_GOLD:state==='locked'||state==='loading'?'#a8a8ad':colour;
  return <>
@@ -114,12 +107,7 @@ function Doorway({week,state,colour}:{week:number;state:DoorState;colour:string}
    {state==='current'&&<Brazier at={[-3.3,0,1.3]} colour={colour} scale={.8}/>}
    {state==='current'&&<Brazier at={[3.3,0,1.3]} colour={colour} scale={.8}/>}
   </group>
-  {/* Eye-level sign between the path and the doorway, facing the student as they walk in. */}
-  <group position={[side*3.9,0,p[2]+2.2]}>
-   <mesh position={[0,1.2,0]}><boxGeometry args={[.14,2.4,.14]}/><meshStandardMaterial color="#3b3a44" roughness={.8}/></mesh>
-   <WorldPlaque at={[0,2.85,0]} title={`WEEK ${week}`} subtitle={DOOR_LABEL[state]} width={3.2} colour={lit}/>
-   {state==='done'&&<RestoredCrystal colour={DONE_GOLD}/>}
-  </group>
+  <WeekSign at={[side*3.9,0,p[2]+2.2]} title={`WEEK ${week}`} subtitle={DOOR_LABEL[state]} colour={lit} restored={state==='done'}/>
  </>;
 }
 

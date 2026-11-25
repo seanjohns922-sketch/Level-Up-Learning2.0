@@ -600,7 +600,7 @@ function ProgramPage() {
       : "/number-nexus";
 
   function goBackToMap() {
-    if(isLevel8){router.push(`/demo-review/volcano/${realmId}`);return;}
+    if(isLevel8){router.push(`/demo-review/volcano/${realmId}?week=${weekNum}`);return;}
     if(isExpeditionWeek){const realm=cavernRealm(realmId);if(realm)router.push(liveLevel7?studentCavernHref(realm,weekNum):cavernHref(realm,weekNum));return;}
     const world3DReturnPath = getWorld3DReturnPathForWeek({
       realmId,

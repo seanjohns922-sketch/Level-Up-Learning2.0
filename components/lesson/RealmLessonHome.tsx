@@ -492,7 +492,7 @@ export function RealmLessonHome({
           <Link href="/world" className={TOP_BAR_PILL} aria-label="Home to the central hub">
             <Home className="h-5 w-5" /> Hub
           </Link>
-          {levelNumber === 7 && <Level7JourneyLinks realm={realm} week={week} showHub={false} />}
+          {levelNumber >= 7 && <Level7JourneyLinks level={levelNumber} realm={realm} week={week} showHub={false} />}
         </div>
         <div className="flex items-center gap-3">
           <div

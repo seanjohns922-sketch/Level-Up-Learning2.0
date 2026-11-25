@@ -32,6 +32,8 @@ export const STRONGHOLD_STORY = strongholdStory('number');
 export type StrongholdStory = keyof typeof STRONGHOLD_STORY;
 /** Stronghold layout: portals alternate sides down the hall and the Core chamber follows the final week. */
 export const STRONGHOLD_PORTAL_SPACING = 14;
+/** How close to a portal its Enter prompt appears: reachable from the path, so students need not leave it. */
+export const STRONGHOLD_PORTAL_REACH = 8;
 export function strongholdLayout(realm:ExpeditionRealm='number'){
   const weeks=LEVEL8_WEEK_COUNTS[realm];
   const portals=Array.from({length:weeks},(_,i)=>({week:i+1,position:[i%2===0?-9:9,0,-8-i*STRONGHOLD_PORTAL_SPACING] as SummitPoint}));
@@ -43,9 +45,14 @@ export function strongholdFloor(x:number,z:number,realm:ExpeditionRealm='number'
   const layout=strongholdLayout(realm);
   return Math.abs(x)<12.3 && z>layout.backZ+4 && z<layout.startZ ? 0 : null;
 }
+/** Spot on the path in front of a week's portal (or the Core chamber), inside its Enter range. Used for fast travel and returning from a week. */
+export function strongholdPortalSpot(realm:ExpeditionRealm,target:number):SummitPoint {
+  const layout=strongholdLayout(realm),p=layout.portals.find(q=>q.week===target);
+  return p?[p.position[0]*.3,0,p.position[2]+4.5]:[0,0,layout.coreZ+13];
+}
 /** The nearest portal's week, the Core chamber's id (weeks + 1), or null. */
 export function strongholdNearest(x:number,z:number,realm:ExpeditionRealm='number'):number|null {
   const layout=strongholdLayout(realm);
   if(Math.hypot(x,z-layout.coreZ-2)<12)return layout.coreId;
-  return layout.portals.find(p=>Math.hypot(x-p.position[0],z-p.position[2])<5)?.week??null;
+  return layout.portals.find(p=>Math.hypot(x-p.position[0],z-p.position[2])<STRONGHOLD_PORTAL_REACH)?.week??null;
 }

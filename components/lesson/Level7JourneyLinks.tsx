@@ -18,7 +18,7 @@ export default function Level7JourneyLinks({realm,week=1,demo,showCave=true,show
  const style=linkStyle??{background:theme.cardSurface,color:theme.accentTextSoft,borderColor:theme.borderRing};
  const className=`inline-flex items-center justify-center gap-2 ${linkClassName??'min-h-11 rounded-lg border px-3 py-2 text-sm font-bold hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2'}`;
  return <nav aria-label={`Level ${level} journey`} className="flex flex-wrap items-center gap-2">
-  {showCave&&<Link href={level===8?`/demo-review/volcano/${realm}`:isDemo?cavernHref(realm,week):studentCavernHref(realm,week)} style={style} className={className}><Mountain size={16} aria-hidden="true"/>{level===8?"Back to stronghold":"Back to cave"}</Link>}
+  {showCave&&<Link href={level===8?`/demo-review/volcano/${realm}?week=${week}`:isDemo?cavernHref(realm,week):studentCavernHref(realm,week)} style={style} className={className}><Mountain size={16} aria-hidden="true"/>{level===8?"Back to stronghold":"Back to cave"}</Link>}
   {showHub&&<Link href="/world" style={style} className={className}><Home size={14} aria-hidden="true"/>Central hub</Link>}
   {isDemo&&<Link href="/demo-review" style={style} className={className}><LayoutGrid size={14} aria-hidden="true"/>Demo review</Link>}
  </nav>;

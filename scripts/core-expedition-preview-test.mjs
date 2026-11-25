@@ -38,7 +38,7 @@ assert.equal(VOLCANO_DOORS.length,6);
 for(const [x,y,z] of VOLCANO_DOORS)assert.equal(summitFloor(x,z,1,true,y),70);
 console.log('PASS six Level 7 approaches, sealed/open pass, complete volcano ascent, uniform realm routes, six strongholds, protected crater');
 
-const {LEVEL8_WEEK_COUNTS,strongholdLayout,strongholdFloor,strongholdNearest,strongholdDemoHref,NUMBER_STRONGHOLD_DEMO}=load('number-stronghold');
+const {LEVEL8_WEEK_COUNTS,strongholdLayout,strongholdFloor,strongholdNearest,strongholdPortalSpot,strongholdDemoHref,NUMBER_STRONGHOLD_DEMO}=load('number-stronghold');
 for(const [realm,weeks] of Object.entries(LEVEL8_WEEK_COUNTS)){
  const layout=strongholdLayout(realm);
  assert.equal(layout.portals.length,weeks,`${realm}: one portal per Level 8 week`);
@@ -46,8 +46,12 @@ for(const [realm,weeks] of Object.entries(LEVEL8_WEEK_COUNTS)){
   const [x,,z]=p.position;
   assert.equal(strongholdFloor(x,z+4,realm),0,`${realm}: portal approach must be walkable`);
   assert.equal(strongholdNearest(x,z+4,realm),p.week,`${realm}: week shortcut must land inside interaction range`);
+  const [sx,,sz]=strongholdPortalSpot(realm,p.week);
+  assert.equal(strongholdFloor(sx,sz,realm),0,`${realm}: return spot must be on the floor`);
+  assert.equal(strongholdNearest(sx,sz,realm),p.week,`${realm}: return spot must show that week's Enter prompt`);
  }
  for(let z=10;z>=layout.coreZ;z--)assert.equal(strongholdFloor(0,z,realm),0,`${realm}: Core chamber path must stay connected`);
+ assert.equal(strongholdNearest(...strongholdPortalSpot(realm,layout.coreId).filter((_,i)=>i!==1),realm),layout.coreId,`${realm}: Core chamber return spot is in range`);
  assert.equal(strongholdNearest(0,layout.coreZ+8,realm),layout.coreId,`${realm}: Core chamber shortcut is reachable`);
  assert.equal(strongholdFloor(16,-30,realm),null,`${realm}: walls block player movement`);
  assert.equal(strongholdFloor(0,layout.backZ,realm),null,`${realm}: back wall blocks player movement`);

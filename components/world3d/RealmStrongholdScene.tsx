@@ -5,7 +5,7 @@ import {Bloom,EffectComposer,Vignette} from '@react-three/postprocessing';
 import * as THREE from 'three';
 import WorldPlaque from './WorldPlaque';
 import VillainRelief from './VillainRelief';
-import {Embers,Instances,LavaMaterial,StoneArch,basaltTextures,crystalGeometry,rand,softDotTexture,useReducedMotion} from './VolcanicKit';
+import {DONE_GOLD,Embers,Instances,LavaMaterial,StoneArch,WeekSign,basaltTextures,crystalGeometry,rand,softDotTexture,useReducedMotion} from './VolcanicKit';
 import {STRONGHOLD_REALMS,strongholdLayout} from '@/lib/world3d/number-stronghold';
 import type {ExpeditionRealm} from '@/lib/world3d/expedition-access';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
@@ -13,7 +13,7 @@ import type {SummitPoint} from '@/lib/world3d/number-summit';
 // Volcanic interior shared by the six Level 8 strongholds: basalt halls lit by lava channels and
 // crystals in the realm's colour, realm details along the walls, and the Fog's purple seal around
 // the Core. Repeated parts are instanced.
-const GOLD='#ffcf72',EMBER='#ff7a32',SEAL='#a463ff';
+const EMBER='#ff7a32',SEAL='#a463ff';
 type Layout=ReturnType<typeof strongholdLayout>;
 /** 0 at the entrance, 1 at the Core: the hall darkens and the lava builds in three stages. */
 const depthAt=(layout:Layout,z:number)=>Math.max(0,Math.min(1,(layout.startZ-z)/(layout.startZ-layout.coreZ)));
@@ -99,12 +99,14 @@ function Crystals({recovered,colour,layout}:{recovered:boolean;colour:string;lay
 }
 
 function Portal({week,at,state,colour,done,final}:{week:number;at:SummitPoint;state:PortalState;colour:string;done:string;final:boolean}){
- const label=state==='completed'?'COMPLETED · REVISIT ANY TIME':state==='current'?(final?'FINAL WEEK · THEN THE CORE':'CONTINUE HERE'):`LOCKED · PASS WEEK ${week-1}’S QUIZ`;
- return <group position={at} rotation={[0,-Math.sign(at[0])*.45,0]}>
-  <StoneArch colour={state==='completed'?done:colour} open={state!=='locked'} seed={week} brightness={state==='completed'?1.15:1.6} rim={state==='locked'?'#c4502e':undefined}/>
-  {state==='current'&&<pointLight position={[0,3,2.2]} color={colour} intensity={30} distance={13} decay={1.6}/>}
-  <WorldPlaque at={[0,10.1,.3]} title={final?`WEEK ${week} · FINAL`:`WEEK ${week}`} subtitle={label} width={6.4} colour={state==='completed'?done:state==='current'?colour:'#a4706a'}/>
- </group>;
+ const side=Math.sign(at[0]),label=state==='completed'?'COMPLETE ✓':state==='current'?(final?'FINAL WEEK':'CONTINUE HERE'):'LOCKED';
+ return <>
+  <group position={at} rotation={[0,-side*.45,0]}>
+   <StoneArch colour={state==='completed'?done:colour} open={state!=='locked'} seed={week} brightness={state==='completed'?1.15:1.6} rim={state==='locked'?'#c4502e':undefined}/>
+   {state==='current'&&<pointLight position={[0,3,2.2]} color={colour} intensity={30} distance={13} decay={1.6}/>}
+  </group>
+  <WeekSign at={[side*5.2,0,at[2]+3.4]} title={final?`WEEK ${week} · FINAL`:`WEEK ${week}`} subtitle={label} colour={state==='completed'?done:state==='current'?colour:'#a4706a'} restored={state==='completed'}/>
+ </>;
 }
 
 const SHAFT_VERTEX=`varying float vY;varying float vFacing;void main(){vY=uv.y;vec4 mv=modelViewMatrix*vec4(position,1.);vec3 n=normalize(normalMatrix*normal);vFacing=abs(dot(n,normalize(-mv.xyz)));gl_Position=projectionMatrix*mv;}`;
@@ -158,7 +160,7 @@ function CoreChamber({recovered,colour,core:coreName,guardian,coreZ:CORE_Z}:{rec
   </>}
   {recovered&&<mesh position={[0,11,CORE_Z]}><cylinderGeometry args={[1.6,4.2,22,40,1,true]}/><shaderMaterial transparent depthWrite={false} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} toneMapped={false} vertexShader={SHAFT_VERTEX} fragmentShader={SHAFT_FRAGMENT}/></mesh>}
   <mesh position={[0,9,CORE_Z-11]}><torusGeometry args={[9,1.1,5,16,Math.PI]}/><meshStandardMaterial color="#3a3233" roughness={.9} flatShading/></mesh>
-  <WorldPlaque at={[0,17.6,CORE_Z-5]} title={recovered?`${coreName.toUpperCase()} RESTORED`:'THE CORE CHAMBER'} subtitle={recovered?'THE FOG IS CLEARING':`${guardian.toUpperCase()}’S SEAL`} width={10} colour={recovered?colour:'#c59bff'}/>
+  <WorldPlaque at={[0,10.4,CORE_Z-5.5]} title={recovered?`${coreName.toUpperCase()} RESTORED`:'THE CORE CHAMBER'} subtitle={recovered?'THE FOG IS CLEARING':`${guardian.toUpperCase()}’S SEAL`} width={10} colour={recovered?colour:'#c59bff'}/>
  </group>;
 }
 
@@ -233,7 +235,7 @@ function Mist({layout}:{layout:Layout}){
 }
 
 export default function RealmStrongholdScene({realm,unlocked,recovered,position}:{realm:ExpeditionRealm;unlocked:number;recovered:boolean;position:React.RefObject<THREE.Vector3>}){
- const r=STRONGHOLD_REALMS[realm],colour=r.colour,done=realm==='measurement'?'#fff1cf':GOLD;
+ const r=STRONGHOLD_REALMS[realm],colour=r.colour,done=realm==='measurement'?'#fff1cf':DONE_GOLD;
  const layout=useMemo(()=>strongholdLayout(realm),[realm]);
  const emberSpawn=useMemo(()=>(i:number):SummitPoint=>{const side=i%2?1:-1;return [side*(12.6+rand(i+300)*2)+(rand(i+305)>.8?-side*rand(i+306)*10:0),0,layout.startZ-rand(i+302)*(layout.startZ-layout.backZ)];},[layout]);
  const fogColour=recovered?'#0c1615':'#140b0b',fog=useRef<THREE.Fog>(null),ambient=useRef<THREE.AmbientLight>(null);
