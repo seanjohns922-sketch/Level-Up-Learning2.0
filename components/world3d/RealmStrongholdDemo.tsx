@@ -1,5 +1,5 @@
 'use client';
-import {level8DemoHref} from '@/lib/level8-routes';
+import {level8Background,level8DemoHref} from '@/lib/level8-routes';
 import {Suspense,useEffect,useRef,useState} from 'react';
 import {Canvas} from '@react-three/fiber';
 import * as THREE from 'three';
@@ -19,19 +19,10 @@ import {STRONGHOLD_REALMS,STRONGHOLD_SUMMIT_RETURN,strongholdFloor,strongholdLay
 import type {ExpeditionRealm} from '@/lib/world3d/expedition-access';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
 
-function StoryArt({recovery=false,colour,label}:{recovery?:boolean;colour:string;label:string}){const light=new THREE.Color(colour).lerp(new THREE.Color('#ffffff'),.6).getStyle();return <svg viewBox="0 0 400 180" role="img" aria-label={label}>
- <defs><radialGradient id="sa-glow" cx="50%" cy="48%" r="45%"><stop offset="0" stopColor={recovery?light:colour} stopOpacity=".75"/><stop offset="1" stopColor={colour} stopOpacity="0"/></radialGradient><linearGradient id="sa-lava" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#ff8a3d" stopOpacity="0"/><stop offset="1" stopColor="#ff6a2a" stopOpacity=".55"/></linearGradient></defs>
- <rect width="400" height="180" fill={recovery?'#10201f':'#160d10'}/><rect y="110" width="400" height="70" fill="url(#sa-lava)" opacity={recovery?.35:1}/>
- <path d="M0 0h400v18l-14 26-10-22-16 34-12-30-18 20-14-28-20 40-12-34-16 24-14-30-22 36-10-26-18 30-14-34-16 28-12-22-20 38-14-30-18 26-16-34-14 22-12-30-18 40-14-28-16 22L0 30Z" fill="#0a0708"/>
- <path d="M0 180V96l30-12 22 20 18-30 26 18 6 88Zm400 0V90l-28-10-20 22-22-26-24 20-6 84Z" fill="#231a1b"/>
- <ellipse cx="200" cy="162" rx="92" ry="12" fill={recovery?'#24312f':'#2a1a33'}/>
- <circle cx="200" cy="88" r="80" fill="url(#sa-glow)"/>
- {recovery&&<g stroke={light} strokeWidth="3" strokeLinecap="round" opacity=".9"><path d="m138 40-16-16m124 16 16-16M112 92H86m202 0h26M200 14V2M150 140l-14 12m114-12 14 12"/></g>}
- <path d="m200 26 34 60-34 66-34-66Z" fill={recovery?light:colour}/><path d="m200 26v126l-34-66Z" fill={recovery?'#ffffff':light}/>
- {!recovery&&<><g fill="none" stroke="#a463ff" strokeWidth="3" opacity=".85"><ellipse cx="200" cy="88" rx="74" ry="24" transform="rotate(-22 200 88)"/><ellipse cx="200" cy="88" rx="74" ry="24" transform="rotate(38 200 88)"/></g>
- <g fill="none" stroke="#5b2490" strokeWidth="7" strokeLinecap="round"><path d="M110 168c20-34 50-20 62-54s-6-38 14-56"/><path d="M292 168c-20-30-56-16-64-52s10-40-12-58"/><path d="M160 172c8-26 30-30 34-46"/></g>
- <g fill="#e48bff"><ellipse cx="184" cy="12" rx="7" ry="3.5" transform="rotate(10 184 12)"/><ellipse cx="216" cy="12" rx="7" ry="3.5" transform="rotate(-10 216 12)"/></g></>}
-</svg>;}
+/** The realm's painted stronghold behind each story card: under the Fog's purple while sealed, bright once the Core is free. */
+function StoryArt({realm,recovery=false,colour,label}:{realm:ExpeditionRealm;recovery?:boolean;colour:string;label:string}){
+ return <div className={`stronghold-story-art ${recovery?'is-free':''}`} role="img" aria-label={label} style={{backgroundImage:`url(${level8Background(realm)})`,'--story-glow':colour} as React.CSSProperties}/>;
+}
 
 /** True when the student arrives straight from winning the final battle (`?victory=1`). */
 function wonBattle(){try{return new URLSearchParams(window.location.search).get('victory')==='1';}catch{return false;}}
@@ -100,7 +91,7 @@ export default function RealmStrongholdDemo({realm}:{realm:ExpeditionRealm}){
   </section>
  </div>}
  {(story||panel==='help')&&<div className="stronghold-backdrop" onClick={e=>{if(e.target===e.currentTarget)close();}}><section ref={dialog} className="stronghold-panel" role="dialog" aria-modal="true" aria-labelledby="stronghold-panel-title">
- {storyPanel?<><StoryArt recovery={story==='recovery'} colour={info.colour} label={artLabel}/><small>THE FOG OF FORGETFULNESS</small><h2 id="stronghold-panel-title">{storyPanel.title}</h2><p>{storyPanel.text}</p><ReadAloudBtn text={`${storyPanel.title}. ${storyPanel.text} ${artLabel} ${story==='battle'?battleFacts.join('. '):''}`}/>{story==='battle'&&<ul className="stronghold-facts">{battleFacts.map(f=><li key={f}>{f}</li>)}</ul>}
+ {storyPanel?<><StoryArt realm={realm} recovery={story==='recovery'} colour={info.colour} label={artLabel}/><small>THE FOG OF FORGETFULNESS</small><h2 id="stronghold-panel-title">{storyPanel.title}</h2><p>{storyPanel.text}</p><ReadAloudBtn text={`${storyPanel.title}. ${storyPanel.text} ${artLabel} ${story==='battle'?battleFacts.join('. '):''}`}/>{story==='battle'&&<ul className="stronghold-facts">{battleFacts.map(f=><li key={f}>{f}</li>)}</ul>}
   <div className="stronghold-actions">{story==='battle'?<><Link href={level8DemoHref(realm,weeks,'posttest')}>Begin the battle</Link><button onClick={recover}>Preview the victory</button><button onClick={close}>Not yet</button></>:<button onClick={close}>Continue →</button>}</div></>
  :<><small>{info.name.toUpperCase()} STRONGHOLD</small><h2 id="stronghold-panel-title">Explore the stronghold</h2><p>WASD or arrow keys: walk. Drag: look around. Shift: run. Touch: use the two joysticks. E: enter a nearby week.</p><p>Week 1 is by the entrance. Finished weeks glow gold. {Guardian} guards the {info.core} for the Fog of Forgetfulness, and each finished week brings you closer to breaking its seal.</p><ReadAloudBtn text={`Use WASD or arrow keys to walk, drag to look, Shift to run, or the touch joysticks. Press E near a week portal. Finished weeks glow gold. ${Guardian} guards the ${info.core} for the Fog of Forgetfulness.`}/><div className="stronghold-actions"><button onClick={close}>Back to the stronghold</button><button onClick={()=>{setPanel(null);setStory('opening');}}>Replay the volcano opening</button></div></>}
  </section></div>}

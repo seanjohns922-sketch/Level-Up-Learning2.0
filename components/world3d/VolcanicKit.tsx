@@ -90,12 +90,13 @@ void main(){
  #include <fog_fragment>
 }`;
 /** Animated molten lava. Use as a mesh's material; uv.y runs along the flow and uv.x across it. */
-export function LavaMaterial({scale=[1,1],flow=.05,edge=0,bright=1.2,side=THREE.FrontSide}:{scale?:[number,number];flow?:number;edge?:number;bright?:number;side?:THREE.Side}){
+/** Flowing lava. `fog` off keeps distant lava (roof veins, far falls) glowing through the hall's haze, as a light source should. */
+export function LavaMaterial({scale=[1,1],flow=.05,edge=0,bright=1.2,side=THREE.FrontSide,fog=true}:{scale?:[number,number];flow?:number;edge?:number;bright?:number;side?:THREE.Side;fog?:boolean}){
  const reduced=useReducedMotion(),material=useRef<THREE.ShaderMaterial>(null);
  const [sx,sy]=scale;
  const uniforms=useMemo(()=>THREE.UniformsUtils.merge([THREE.UniformsLib.fog,{uTime:{value:0},uScale:{value:new THREE.Vector2(sx,sy)},uFlow:{value:flow},uEdge:{value:edge},uBright:{value:bright}}]),[sx,sy,flow,edge,bright]);
  useFrame((_,delta)=>{const u=material.current?.uniforms;if(u&&!reduced.current)u.uTime.value+=Math.min(delta,.05);});
- return <shaderMaterial ref={material} attach="material" vertexShader={LAVA_VERTEX} fragmentShader={LAVA_FRAGMENT} uniforms={uniforms} fog toneMapped={false} side={side}/>;
+ return <shaderMaterial ref={material} attach="material" vertexShader={LAVA_VERTEX} fragmentShader={LAVA_FRAGMENT} uniforms={uniforms} fog={fog} toneMapped={false} side={side}/>;
 }
 
 /** Six-sided crystal with a pointed tip, standing on its base. */

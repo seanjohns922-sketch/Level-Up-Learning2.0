@@ -13,7 +13,7 @@ import StatisticaStrongholdSet from './StatisticaStrongholdSet';
 import PatternPeaksStrongholdSet from './PatternPeaksStrongholdSet';
 import ChanceHollowStrongholdSet from './ChanceHollowStrongholdSet';
 import {Brazier,DONE_GOLD,Embers,StoneArch,WeekSign,rand,softDotTexture,useReducedMotion} from './VolcanicKit';
-import {Colonnade,FarWalls,HallCrystals,HallLights,LavaLake,Stonework,type Tone} from './StrongholdHall';
+import {CavernRoof,Colonnade,EntranceGate,FarWalls,HallCrystals,HallLights,LavaLake,Stonework,type Tone} from './StrongholdHall';
 import {STRONGHOLD_BRIDGE,STRONGHOLD_REALMS,strongholdLayout} from '@/lib/world3d/number-stronghold';
 import type {ExpeditionRealm} from '@/lib/world3d/expedition-access';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
@@ -34,8 +34,9 @@ const STONE_TINT:Record<ExpeditionRealm,{tint:string;floor:string;cracks:string;
 };
 const toneFor=(realm:ExpeditionRealm):Tone=>{const t=STONE_TINT[realm],h={h:0,s:0,l:0};new THREE.Color(t.tint).getHSL(h);
  return c=>{const l={h:0,s:0,l:0};new THREE.Color(c).getHSL(l);return '#'+new THREE.Color().setHSL(h.h,h.s*.55,l.l*1.1).getHexString();};};
-/** How much of the seal still stands: whole before Week 1, a cracked remnant once every week is finished (the battle breaks the rest). */
-export const sealStrength=(finished:number,weeks:number)=>Math.max(.15,1-Math.min(finished,weeks)/weeks*.85);
+/** How much of the seal still stands: whole before Week 1, a cracked remnant once every week is finished (the battle breaks the rest).
+ *  It breaks fastest early on, so the first weeks visibly open it. */
+export const sealStrength=(finished:number,weeks:number)=>Math.max(.15,1-Math.sqrt(Math.min(finished,weeks)/weeks)*.85);
 export type PortalState='locked'|'current'|'completed';
 
 /** A week's portal at the far side of its island, turned toward the causeway, with its sign on the island beside the bridge. */
@@ -120,12 +121,14 @@ export default function RealmStrongholdScene({realm,unlocked,recovered,shatterin
  const emberSpawn=useMemo(()=>(i:number):SummitPoint=>{const side=i%2?1:-1;return [side*(5+rand(i+300)*28),-1.2,layout.startZ-rand(i+302)*(layout.startZ-layout.backZ)];},[layout]);
  const fogColour=recovered?'#0c1615':'#1a0c0a';
  return <>
- <color attach="background" args={[fogColour]}/><fog attach="fog" args={[fogColour,30,recovered?260:220]}/>
+ <color attach="background" args={[fogColour]}/><fog attach="fog" args={[fogColour,34,recovered?280:240]}/>
  <ambientLight intensity={.26} color="#b9c6d6"/><hemisphereLight args={['#2a3550','#c2481a',.6]}/>
  <directionalLight position={[6,40,10]} intensity={.35} color="#9fc9d4"/>
  <LavaLake layout={layout}/>
  <Stonework realm={realm} layout={layout} colour={colour} tone={tone} floor={look.floor} cracks={look.cracks} islands={islands}/>
  <Colonnade layout={layout} colour={colour} tone={tone}/>
+ <CavernRoof layout={layout} tone={tone} beam={recovered?colour:'#a463ff'}/>
+ <EntranceGate colour={colour} tone={tone} name={r.name}/>
  <FarWalls layout={layout} tone={tone}/>
  <HallCrystals layout={layout} colour={colour} recovered={recovered}/>
  <HallLights position={position} colour={colour} hall={look.hall} recovered={recovered}/>

@@ -7,14 +7,15 @@ import {useEffect,useMemo,useRef} from 'react';
 import {useFrame} from '@react-three/fiber';
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {Instances,LavaMaterial,basaltTextures,crystalGeometry,rand,softDotTexture,useReducedMotion,type InstanceItem} from './VolcanicKit';
+import WorldPlaque from './WorldPlaque';
+import {Brazier,Instances,LavaMaterial,basaltTextures,crystalGeometry,rand,softDotTexture,useReducedMotion,type InstanceItem} from './VolcanicKit';
 import {STRONGHOLD_BRIDGE,STRONGHOLD_CAUSEWAY,STRONGHOLD_CORE_PLAZA,STRONGHOLD_ISLAND,strongholdLayout,strongholdParapets} from '@/lib/world3d/number-stronghold';
 import type {ExpeditionRealm} from '@/lib/world3d/expedition-access';
 import type {SummitPoint} from '@/lib/world3d/number-summit';
 
 type Layout=ReturnType<typeof strongholdLayout>;
 export type Tone=(c:string)=>string;
-const DEPTH=2.6,LAKE_Y=-1.7,WALL_X=36,COLUMN_X=9.4,PARAPET_H=1.15;
+const DEPTH=2.6,LAKE_Y=-1.7,WALL_X=36,COLUMN_X=18,PARAPET_H=1.15,ROOF_Y=27;
 const tint=(colour:string,toward:string,amount:number)=>'#'+new THREE.Color(colour).lerp(new THREE.Color(toward),amount).getHexString();
 const toned=<T extends {c:string}>(items:T[],tone:Tone)=>items.map(i=>({...i,c:tone(i.c)}));
 
@@ -68,16 +69,16 @@ export function Stonework({realm,layout,colour,tone,floor,cracks,islands}:{realm
  </>;
 }
 
-/** Pairs of obsidian columns rising out of the lava every other gap between portals, each pair joined by an arch over the causeway. */
+/** Pairs of great obsidian columns standing in the lava beyond the islands, every other gap between portals, each pair joined by an arch spanning the hall below the roof. */
 export function Colonnade({layout,colour,tone}:{layout:Layout;colour:string;tone:Tone}){
- const column=useMemo(()=>new THREE.CylinderGeometry(1.05,1.4,36,6),[]),band=useMemo(()=>new THREE.CylinderGeometry(1.22,1.22,.32,6),[]);
- const arch=useMemo(()=>new THREE.TorusGeometry(COLUMN_X,.75,5,20,Math.PI),[]);
+ const column=useMemo(()=>new THREE.CylinderGeometry(1.6,2.1,ROOF_Y+4,6),[]),band=useMemo(()=>new THREE.CylinderGeometry(1.8,1.8,.4,6),[]);
+ const arch=useMemo(()=>new THREE.TorusGeometry(COLUMN_X,1.2,5,28,Math.PI),[]);
  const stone=useMemo(()=>new THREE.MeshStandardMaterial({roughness:.4,metalness:.25,flatShading:true}),[]);
  const glow=useMemo(()=>new THREE.MeshBasicMaterial({color:new THREE.Color(colour).multiplyScalar(1.4),toneMapped:false}),[colour]);
  const {columns,bands,arches}=useMemo(()=>{const columns:InstanceItem[]=[],bands:InstanceItem[]=[],arches:InstanceItem[]=[];
   layout.portals.slice(0,-1).forEach((p,i)=>{if(i%2)return;const z=p.position[2]-STRONGHOLD_ISLAND-2.4;
-   for(const side of [-1,1]){columns.push({p:[side*COLUMN_X,16,z],s:[1,1,1],c:tone('#26232a')});for(const y of [4.5,10.5])bands.push({p:[side*COLUMN_X,y,z],s:[1,1,1],c:'#ffffff'});}
-   arches.push({p:[0,19,z],s:[1,1,1],c:tone('#2f2a30')});});
+   for(const side of [-1,1]){columns.push({p:[side*COLUMN_X,ROOF_Y/2-2,z],s:[1,1,1],c:tone('#26232a')});for(const y of [5,12,19])bands.push({p:[side*COLUMN_X,y,z],s:[1,1,1],c:'#ffffff'});}
+   arches.push({p:[0,ROOF_Y-COLUMN_X-1.5,z],s:[1,1,1],c:tone('#2f2a30')});});
   return {columns,bands,arches};},[layout,tone]);
  useEffect(()=>()=>{column.dispose();band.dispose();arch.dispose();stone.dispose();glow.dispose();},[column,band,arch,stone,glow]);
  return <>
@@ -137,5 +138,48 @@ export function HallLights({position,colour,hall,recovered}:{position:React.RefO
   {[-1,1].map(side=><pointLight key={side} position={[side*8,-.4,-6]} color={hall} intensity={70} distance={34} decay={1.5}/>)}
   <pointLight position={[0,-.4,-30]} color={hall} intensity={60} distance={40} decay={1.5}/>
   <pointLight position={[0,11,-12]} color={colour} intensity={recovered?80:48} distance={42} decay={1.6}/>
+ </group>;
+}
+
+/** The cavern roof: a vault of stalactites lit from below by the lava, with glowing fissures, and a vent of light above the Core where its beam escapes. */
+export function CavernRoof({layout,tone,beam}:{layout:Layout;tone:Tone;beam:string}){
+ const length=layout.startZ-layout.backZ+40,mid=(layout.startZ+layout.backZ)/2;
+ const cone=useMemo(()=>new THREE.ConeGeometry(1,1,6).rotateX(Math.PI),[]),material=useMemo(()=>new THREE.MeshStandardMaterial({roughness:.9,flatShading:true}),[]);
+ const {map,glow}=useMemo(()=>basaltTextures([10,Math.round(length/10)]),[length]),dot=useMemo(()=>softDotTexture(),[]);
+ const spikes=useMemo(()=>{const out:InstanceItem[]=[];let i=4000;
+  for(let z=layout.startZ+16;z>layout.backZ-16;z-=3.2)for(let n=0;n<9;n++){i++;const x=(rand(i)-.5)*WALL_X*2.1,len=3+rand(i+1)*(Math.abs(x)>WALL_X*.7?16:9),r=.8+rand(i+2)*1.6;
+   if(Math.hypot(x,z-layout.coreZ)<9)continue;out.push({p:[x,ROOF_Y-len/2,z+(rand(i+3)-.5)*2.4],s:[r,len,r],r:[0,rand(i+4)*3,0],c:rand(i+5)>.6?'#3a2f30':'#2a2325'});}
+  return toned(out,tone);},[layout,tone]);
+ // Magma veins running across the roof, bright enough to read from anywhere on the causeway.
+ const veins=useMemo(()=>{const out:{p:SummitPoint;length:number;width:number;turn:number}[]=[];
+  for(let z=layout.startZ-6,k=0;z>layout.backZ;z-=26,k++){const x=(rand(k+40)-.5)*44,turn=(rand(k+41)-.5)*1.4;
+   out.push({p:[x,ROOF_Y-.2,z],length:26+rand(k+42)*18,width:1.3+rand(k+43)*1.4,turn});}
+  return out;},[layout]);
+ useEffect(()=>()=>{cone.dispose();material.dispose();map.dispose();glow.dispose();dot.dispose();},[cone,material,map,glow,dot]);
+ return <>
+  <mesh position={[0,ROOF_Y+.5,mid]} rotation={[Math.PI/2,0,0]}><planeGeometry args={[WALL_X*2+12,length]}/><meshStandardMaterial color={tone('#4a3c3a')} map={map} emissiveMap={glow} emissive="#ffffff" emissiveIntensity={1.9} roughness={1} side={THREE.DoubleSide} fog={false}/></mesh>
+  <Instances geometry={cone} material={material} items={spikes}/>
+  {veins.map((v,i)=><mesh key={i} position={v.p} rotation={[Math.PI/2,0,v.turn]}><planeGeometry args={[v.width,v.length]}/><LavaMaterial scale={[1,v.length/6]} flow={.08} edge={.85} bright={1.45} side={THREE.DoubleSide} fog={false}/></mesh>)}
+  {/* The vent above the Core: a ring of light where the beam leaves the stronghold. */}
+  <sprite position={[0,ROOF_Y-1,layout.coreZ]} scale={[22,22,1]}><spriteMaterial map={dot} color={beam} transparent opacity={.8} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false} fog={false}/></sprite>
+ </>;
+}
+
+/** The stronghold's gate at the head of the causeway: twin towers, an arch with the stronghold's name, and braziers in the realm's colour. */
+export function EntranceGate({colour,tone,name}:{colour:string;tone:Tone;name:string}){
+ const stone=useMemo(()=>new THREE.MeshStandardMaterial({color:tone('#332c30'),roughness:.55,metalness:.2,flatShading:true}),[tone]);
+ const trim=useMemo(()=>new THREE.MeshBasicMaterial({color:new THREE.Color(colour).multiplyScalar(1.4),toneMapped:false}),[colour]);
+ useEffect(()=>()=>{stone.dispose();trim.dispose();},[stone,trim]);
+ const z=6.5,x=STRONGHOLD_CAUSEWAY+2.2;
+ return <group>
+  {[-1,1].map(side=><group key={side} position={[side*x,0,z]}>
+   <mesh material={stone} position={[0,8,0]} userData={{cameraObstacle:true}}><boxGeometry args={[3.4,16,3.4]}/></mesh>
+   <mesh material={stone} position={[0,16.9,0]}><coneGeometry args={[2.6,3.6,4]}/></mesh>
+   {[3,8,13].map(y=><mesh key={y} material={trim} position={[-side*1.71,y,0]}><boxGeometry args={[.06,2.2,1.2]}/></mesh>)}
+   <Brazier at={[-side*.2,0,2.6]} colour={colour} scale={1.1} light/>
+  </group>)}
+  <mesh material={stone} position={[0,12.2,z]}><torusGeometry args={[x,1,5,24,Math.PI]}/></mesh>
+  <mesh material={trim} position={[0,12.2,z+1.02]}><torusGeometry args={[x-.9,.07,4,48,Math.PI]}/></mesh>
+  <WorldPlaque at={[0,12.2+x-1.4,z+1.1]} title={`${name.toUpperCase()} STRONGHOLD`} subtitle="LEVEL 8 · THE FINAL BATTLE" width={7.4} colour={colour}/>
  </group>;
 }

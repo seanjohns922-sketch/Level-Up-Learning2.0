@@ -33,12 +33,14 @@ void main(){
  gl_FragColor=vec4(c,(.32+crack*.68)*vFade);
 }`;
 
-/** Separate every face of a subdivided icosahedron into its own shard, with its centre, barycentric corners and a seed. */
+/** Separate every face of a subdivided icosahedron into its own shard, with its centre, barycentric corners and a seed (low seeds break first). */
 function shardGeometry(){
  const source=new THREE.IcosahedronGeometry(SHELL_RADIUS,1).toNonIndexed(),pos=source.getAttribute('position');
  const centre:number[]=[],bary:number[]=[],seed:number[]=[];
  for(let f=0;f<pos.count/3;f++){
-  const cx=(pos.getX(f*3)+pos.getX(f*3+1)+pos.getX(f*3+2))/3,cy=(pos.getY(f*3)+pos.getY(f*3+1)+pos.getY(f*3+2))/3,cz=(pos.getZ(f*3)+pos.getZ(f*3+1)+pos.getZ(f*3+2))/3,s=rand(f+700);
+  const cx=(pos.getX(f*3)+pos.getX(f*3+1)+pos.getX(f*3+2))/3,cy=(pos.getY(f*3)+pos.getY(f*3+1)+pos.getY(f*3+2))/3,cz=(pos.getZ(f*3)+pos.getZ(f*3+1)+pos.getZ(f*3+2))/3;
+  // Shards facing the causeway (+z) break first, so a growing hole opens toward the student; a little noise keeps the edge ragged.
+  const s=.72*(.5-.5*cz/Math.hypot(cx,cy,cz))+.28*rand(f+700);
   for(let k=0;k<3;k++){centre.push(cx,cy,cz);bary.push(k===0?1:0,k===1?1:0,k===2?1:0);seed.push(s);}
  }
  source.setAttribute('aCentre',new THREE.Float32BufferAttribute(centre,3));source.setAttribute('aBary',new THREE.Float32BufferAttribute(bary,3));source.setAttribute('aSeed',new THREE.Float32BufferAttribute(seed,1));
@@ -53,12 +55,11 @@ export default function StrongholdSeal({at,strength,shattering,recovered,colour}
  const reduced=useReducedMotion(),geometry=useMemo(()=>shardGeometry(),[]),dot=useMemo(()=>softDotTexture(),[]);
  // Strength and the shatter progress are written every frame, so the uniforms are created once.
  const uniforms=useMemo(()=>({uShatter:{value:0},uStrength:{value:1},uTime:{value:0},uColour:{value:new THREE.Color(SEAL)},uCrack:{value:new THREE.Color('#e6c8ff')}}),[]);
- const material=useRef<THREE.ShaderMaterial>(null),group=useRef<THREE.Group>(null),flash=useRef<THREE.Sprite>(null),light=useRef<THREE.PointLight>(null),started=useRef<number|null>(null);
+ const material=useRef<THREE.ShaderMaterial>(null),flash=useRef<THREE.Sprite>(null),light=useRef<THREE.PointLight>(null),started=useRef<number|null>(null);
  useEffect(()=>()=>{geometry.dispose();dot.dispose();},[geometry,dot]);
  useEffect(()=>{if(!shattering)started.current=null;},[shattering]);
  useFrame(({clock})=>{
   const t=clock.elapsedTime,u=material.current?.uniforms;if(!u)return;u.uTime.value=reduced.current?0:t;u.uStrength.value=strength;
-  if(group.current&&!reduced.current)group.current.rotation.y=t*.12;
   let s=0;if(shattering){started.current??=t;s=Math.min(1,(t-started.current)/(reduced.current?.4:SHATTER_SECONDS));}
   u.uShatter.value=s;
   // A white-hot flash in the realm's colour at the moment the seal gives way.
@@ -68,7 +69,7 @@ export default function StrongholdSeal({at,strength,shattering,recovered,colour}
  });
  if(recovered&&!shattering)return null;
  return <group position={at}>
-  <group ref={group}><mesh geometry={geometry}><shaderMaterial ref={material} uniforms={uniforms} vertexShader={VERTEX} fragmentShader={FRAGMENT} transparent depthWrite={false} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} toneMapped={false}/></mesh></group>
+  <mesh geometry={geometry}><shaderMaterial ref={material} uniforms={uniforms} vertexShader={VERTEX} fragmentShader={FRAGMENT} transparent depthWrite={false} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} toneMapped={false}/></mesh>
   <sprite ref={flash} visible={false}><spriteMaterial map={dot} color={new THREE.Color(colour).lerp(new THREE.Color('#ffffff'),.5)} transparent opacity={0} depthWrite={false} blending={THREE.AdditiveBlending} toneMapped={false}/></sprite>
   <pointLight ref={light} color={colour} intensity={0} distance={60} decay={1.4}/>
  </group>;
