@@ -133,7 +133,7 @@ export function SignBoard({ pos, w, h = 0.8, colour, night, children }: { pos: V
 export function Pavement({ w, d, z = 0, color = CONCRETE }: { w: number; d: number; z?: number; color?: string }) {
   return <Block size={[w, 0.08, d]} pos={[0, 0.04, z]} color={color} r={0.02} rough={0.95} />;
 }
-function FlagPole({ pos, h = 6, colour = "#1f6fd6" }: { pos: V3; h?: number; colour?: string }) {
+export function FlagPole({ pos, h = 6, colour = "#1f6fd6" }: { pos: V3; h?: number; colour?: string }) {
   return (
     <group position={pos}>
       <mesh position={[0, h / 2, 0]}><cylinderGeometry args={[0.05, 0.06, h, 10]} /><Mat color="#e6e6e6" metal={0.5} /></mesh>
@@ -160,7 +160,7 @@ export function Planter({ pos }: { pos: V3 }) {
 }
 
 /* ───────── Corner Shop (5 × 4 squares) ───────── */
-function Crate({ pos, colour }: { pos: V3; colour: string }) {
+export function Crate({ pos, colour }: { pos: V3; colour: string }) {
   return <group position={pos}><Block size={[0.6, 0.3, 0.45]} pos={[0, 0.15, 0]} color={TIMBER} r={0.03} />{[-0.15, 0, 0.15].map((x) => <Ball key={x} pos={[x, 0.36, 0]} r={0.09} color={colour} />)}</group>;
 }
 function CornerShop({ level, night }: Props) {
