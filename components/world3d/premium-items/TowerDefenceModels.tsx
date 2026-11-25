@@ -17,7 +17,7 @@ export const ExplorerPositionContext = createContext<MutableRefObject<{ x: numbe
 type Nearby = { x: number; z: number; dist: number; near: boolean; entered: boolean };
 const scratch = new Vector3();
 /** Where the explorer is in this group's own space, refreshed every frame, and whether they're within `radius` metres. */
-function useExplorer(radius: number) {
+export function useExplorer(radius: number) {
   const explorer = useContext(ExplorerPositionContext);
   const group = useRef<Group>(null);
   const state = useRef<Nearby>({ x: 0, z: 0, dist: Infinity, near: false, entered: false });

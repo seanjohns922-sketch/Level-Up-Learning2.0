@@ -220,5 +220,21 @@
   {"key":"sport_soccer","name":"Soccer Pitch","native":[14.00001,1.239949,18],"size":[14.00001,1.239949,18],"footprint":[28,18]},
   {"key":"sport_footy","name":"Footy Goals","native":[12.00001,3.850005,10],"size":[12.00001,3.850005,10],"footprint":[20,16]},
   {"key":"sport_netball","name":"Netball Court","native":[7.00001,3.075005,7],"size":[7.00001,3.075005,7],"footprint":[24,14]},
-  {"key":"water_swimming_lake","name":"Swimming Lake","native":[16.825,8.5,10.700001],"size":[16.825,8.5,10.700001],"footprint":[20,14]}
+  {"key":"water_swimming_lake","name":"Swimming Lake","native":[16.825,8.5,10.700001],"size":[16.825,8.5,10.700001],"footprint":[20,14]},
+  {"key":"city_servo","name":"Servo","native":[13.8,4.82,11.8],"size":[13.8,4.82,11.8],"footprint":[14,12]},
+  {"key":"city_car_wash","name":"Car Wash","native":[11.8,2.28,7.8],"size":[11.8,2.28,7.8],"footprint":[12,8]},
+  {"key":"city_pizza_shop","name":"Pizza Shop","native":[11.8,4.28,9.8],"size":[11.8,4.28,9.8],"footprint":[12,10]},
+  {"key":"city_supermarket","name":"Supermarket","native":[17.8,4.88,13.8],"size":[17.8,4.88,13.8],"footprint":[18,14]},
+  {"key":"city_police_station","name":"Police Station","native":[11.8,4.28,9.8],"size":[11.8,4.28,9.8],"footprint":[12,10]},
+  {"key":"city_hospital","name":"Hospital","native":[15.8,4.48,11.8],"size":[15.8,4.48,11.8],"footprint":[16,12]},
+  {"key":"city_vet_pet_shop","name":"Vet & Pet Shop","native":[9.8,4.28,7.8],"size":[9.8,4.28,7.8],"footprint":[10,8]},
+  {"key":"city_dog_park","name":"Dog Park","native":[11.8,1.098,11.8],"size":[11.8,1.098,11.8],"footprint":[12,12]},
+  {"key":"street_traffic_lights","name":"Traffic Lights","native":[0.7,3.525,0.77],"size":[0.7,3.525,0.77],"footprint":[2,2]},
+  {"key":"street_zebra_crossing","name":"Zebra Crossing","native":[4.996,0.02,3.2],"size":[4.996,0.02,3.2],"footprint":[6,4]},
+  {"key":"street_wheelie_bins","name":"Wheelie Bins","native":[0.64,1.115,0.78],"size":[0.64,1.115,0.78],"footprint":[4,2]},
+  {"key":"street_bike_rack","name":"Bike Rack","native":[3.6,0.815,1.6],"size":[3.6,0.815,1.6],"footprint":[4,2]},
+  {"key":"street_hills_hoist","name":"Hills Hoist","native":[3.338,2.457,3.338],"size":[3.338,2.457,3.338],"footprint":[4,4]},
+  {"key":"street_water_tank","name":"Water Tank","native":[1.8,1.97,1.8],"size":[1.8,1.97,1.8],"footprint":[4,4]},
+  {"key":"street_shade_sail","name":"Shade Sail","native":[5.7,3,5.7],"size":[5.7,3,5.7],"footprint":[6,6]},
+  {"key":"street_driveway_hoop","name":"Driveway Hoop","native":[1.8,3.15,3.8],"size":[1.8,3.15,3.8],"footprint":[2,4]}
 ]

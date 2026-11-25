@@ -2,13 +2,15 @@
 // The sixteen premium home models: four styles, four levels each.
 import { Sparkles } from "@react-three/drei";
 import type { ReactElement } from "react";
-import { CITY_LIFE_STYLES, DEFENCE_STYLES, MAIN_STREET_STYLES, SPORTS_STYLES, WATER_STYLES, EVERYDAY_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
+import { CITY_LIFE_STYLES, CITY_PLACES_STYLES, STREET_STYLES, DEFENCE_STYLES, MAIN_STREET_STYLES, SPORTS_STYLES, WATER_STYLES, EVERYDAY_STYLES, PREMIUM_HOME_SPECS, type PremiumHomeLevel, type PremiumHomeStyle } from "@/lib/world3d/premium-homes";
 import { FAIR_RIDE_MODELS } from "@/components/world3d/premium-items/FairRide";
 import { TRAMPOLINE_MODELS } from "@/components/world3d/premium-items/TrampolineModels";
 import { DEFENCE_MODELS, type TechLevel } from "@/components/world3d/premium-items/TowerDefenceModels";
 import { BasketballCourt } from "@/components/world3d/premium-items/BasketballCourt";
 import { EVERYDAY_MODELS } from "@/components/world3d/premium-items/EverydayItems";
 import { CITY_LIFE_MODELS } from "@/components/world3d/premium-items/CityLifeItems";
+import { CITY_PLACES_MODELS } from "@/components/world3d/premium-items/CityPlacesItems";
+import { STREET_MODELS } from "@/components/world3d/premium-items/StreetItems";
 import { MAIN_STREET_MODELS } from "@/components/world3d/premium-items/MainStreetItems";
 import { SPORTS_MODELS } from "@/components/world3d/premium-items/SportsItems";
 import { WATER_MODELS } from "@/components/world3d/premium-items/WaterItems";
@@ -312,6 +314,8 @@ function byLevelAndNight(Model: (p: { level: PremiumHomeLevel; night: boolean })
 }
 const EVERYDAY_LEVEL_MODELS = Object.fromEntries(EVERYDAY_STYLES.map((style) => [style, byLevelAndNight(EVERYDAY_MODELS[style])])) as Record<(typeof EVERYDAY_STYLES)[number], LevelModels>;
 const CITY_LIFE_LEVEL_MODELS = Object.fromEntries(CITY_LIFE_STYLES.map((style) => [style, byLevelAndNight(CITY_LIFE_MODELS[style])])) as Record<(typeof CITY_LIFE_STYLES)[number], LevelModels>;
+const CITY_PLACES_LEVEL_MODELS = Object.fromEntries(CITY_PLACES_STYLES.map((style) => [style, byLevelAndNight(CITY_PLACES_MODELS[style])])) as Record<(typeof CITY_PLACES_STYLES)[number], LevelModels>;
+const STREET_LEVEL_MODELS = Object.fromEntries(STREET_STYLES.map((style) => [style, byLevelAndNight(STREET_MODELS[style])])) as Record<(typeof STREET_STYLES)[number], LevelModels>;
 const MAIN_STREET_LEVEL_MODELS = Object.fromEntries(MAIN_STREET_STYLES.map((style) => [style, byLevelAndNight(MAIN_STREET_MODELS[style])])) as Record<(typeof MAIN_STREET_STYLES)[number], LevelModels>;
 const SPORTS_LEVEL_MODELS = Object.fromEntries(SPORTS_STYLES.map((style) => [style, byLevelAndNight(SPORTS_MODELS[style])])) as Record<(typeof SPORTS_STYLES)[number], LevelModels>;
 const WATER_LEVEL_MODELS = Object.fromEntries(WATER_STYLES.map((style) => [style, byLevelAndNight(WATER_MODELS[style])])) as Record<(typeof WATER_STYLES)[number], LevelModels>;
@@ -334,6 +338,8 @@ const MODELS: Record<PremiumHomeStyle, LevelModels> = {
   ...MAIN_STREET_LEVEL_MODELS,
   ...SPORTS_LEVEL_MODELS,
   ...WATER_LEVEL_MODELS,
+  ...CITY_PLACES_LEVEL_MODELS,
+  ...STREET_LEVEL_MODELS,
 };
 /** World metres: decks, paths and slides sit in front, so each style shifts back to centre on its plot. */
 const STYLE_DEPTH_OFFSET: Partial<Record<PremiumHomeStyle, number>> = { cottage: -1.63, modern: -0.94, treehouse: -1.44, apartment: -0.75 };

@@ -14,9 +14,9 @@ type V3 = [number, number, number];
 const BRICK = "#b5553c", BRICK_DARK = "#8e3f2c", RENDER = "#f3ede1", SANDSTONE = "#e2c99a", CONCRETE = "#cfccc4", SLATE = "#3d4654", GLASS = "#bfe4ff";
 const TIMBER = "#c98a52", TIMBER_DARK = "#8f5a2e", FIRE_RED = "#d8282b", NEON_PINK = "#ff4fd8", NEON_CYAN = "#3fe6ff";
 
-/* ───────── Shared building parts ───────── */
+/* ───────── Shared building parts (City Life set 2 reuses them) ───────── */
 /** A row of windows on a wall facing +z: glass that glows warm at night, with white frames. */
-function Windows({ x0, x1, y, z, n, w = 1.1, h = 1.3, night, frame = "#fffaf0" }: { x0: number; x1: number; y: number; z: number; n: number; w?: number; h?: number; night: boolean; frame?: string }) {
+export function Windows({ x0, x1, y, z, n, w = 1.1, h = 1.3, night, frame = "#fffaf0" }: { x0: number; x1: number; y: number; z: number; n: number; w?: number; h?: number; night: boolean; frame?: string }) {
   return (
     <group>
       {Array.from({ length: n }, (_, i) => {
@@ -32,7 +32,7 @@ function Windows({ x0, x1, y, z, n, w = 1.1, h = 1.3, night, frame = "#fffaf0" }
     </group>
   );
 }
-function Door({ x = 0, z, w = 1.3, h = 2.6, color = TIMBER_DARK, glass = false, night }: { x?: number; z: number; w?: number; h?: number; color?: string; glass?: boolean; night: boolean }) {
+export function Door({ x = 0, z, w = 1.3, h = 2.6, color = TIMBER_DARK, glass = false, night }: { x?: number; z: number; w?: number; h?: number; color?: string; glass?: boolean; night: boolean }) {
   return (
     <group position={[x, h / 2, z]}>
       <Block size={[w + 0.2, h + 0.15, 0.06]} pos={[0, 0.05, 0]} color="#fffaf0" r={0.03} />
@@ -42,7 +42,7 @@ function Door({ x = 0, z, w = 1.3, h = 2.6, color = TIMBER_DARK, glass = false, 
   );
 }
 /** A striped shop awning sloping out over the footpath. */
-function Awning({ w, y, z, colours = [C.red, "#fff6e6"] }: { w: number; y: number; z: number; colours?: string[] }) {
+export function Awning({ w, y, z, colours = [C.red, "#fff6e6"] }: { w: number; y: number; z: number; colours?: string[] }) {
   const n = Math.max(4, Math.round(w / 0.5));
   return (
     <group position={[0, y, z + 0.55]} rotation={[0.42, 0, 0]}>
@@ -52,7 +52,7 @@ function Awning({ w, y, z, colours = [C.red, "#fff6e6"] }: { w: number; y: numbe
   );
 }
 /** A flat roof with a parapet round its edge. */
-function FlatRoof({ w, d, y, at = [0, 0], color = SLATE, trim = "#fffaf0" }: { w: number; d: number; y: number; at?: [number, number]; color?: string; trim?: string }) {
+export function FlatRoof({ w, d, y, at = [0, 0], color = SLATE, trim = "#fffaf0" }: { w: number; d: number; y: number; at?: [number, number]; color?: string; trim?: string }) {
   return (
     <group position={[at[0], y, at[1]]}>
       <Block size={[w, 0.2, d]} pos={[0, 0.1, 0]} color={color} r={0.03} />
@@ -86,7 +86,7 @@ function gableShape(d: number, rise: number) {
 }
 /** A big see-through shop window: real glass in front of a lit room (warm after dark), with
  * whatever's inside drawn by the caller between the glass and the back wall. */
-function GlassFront({ w, h, y, z, depth = 1.2, night, frame = SLATE, children }: { w: number; h: number; y: number; z: number; depth?: number; night: boolean; frame?: string; children?: ReactNode }) {
+export function GlassFront({ w, h, y, z, depth = 1.2, night, frame = SLATE, children }: { w: number; h: number; y: number; z: number; depth?: number; night: boolean; frame?: string; children?: ReactNode }) {
   return (
     <group position={[0, y, z]}>
       {/* The bay's sides and top, so it reads as a glass room stepping out from the building. */}
@@ -100,7 +100,7 @@ function GlassFront({ w, h, y, z, depth = 1.2, night, frame = SLATE, children }:
   );
 }
 /** Shop shelves seen through the window: rows of colourful goods. */
-function Shelves({ w, rows = 3, h = 2.2, z }: { w: number; rows?: number; h?: number; z: number }) {
+export function Shelves({ w, rows = 3, h = 2.2, z }: { w: number; rows?: number; h?: number; z: number }) {
   return (
     <group position={[0, 0, z]}>
       {Array.from({ length: rows }, (_, r) => <group key={r} position={[0, -h / 2 + 0.4 + (r * (h - 0.6)) / Math.max(1, rows - 1), 0]}>
@@ -112,7 +112,7 @@ function Shelves({ w, rows = 3, h = 2.2, z }: { w: number; rows?: number; h?: nu
 }
 
 /** A box building with walls of one colour, sitting on a plinth. */
-function Block3({ w, h, d, pos = [0, 0, 0], color, plinth = "#a7a39a" }: { w: number; h: number; d: number; pos?: V3; color: string; plinth?: string }) {
+export function Block3({ w, h, d, pos = [0, 0, 0], color, plinth = "#a7a39a" }: { w: number; h: number; d: number; pos?: V3; color: string; plinth?: string }) {
   return (
     <group position={pos}>
       <Block size={[w + 0.12, 0.3, d + 0.12]} pos={[0, 0.15, 0]} color={plinth} r={0.03} />
@@ -121,7 +121,7 @@ function Block3({ w, h, d, pos = [0, 0, 0], color, plinth = "#a7a39a" }: { w: nu
   );
 }
 /** A glowing sign panel with a little picture on it (no lettering). */
-function SignBoard({ pos, w, h = 0.8, colour, night, children }: { pos: V3; w: number; h?: number; colour: string; night: boolean; children?: ReactNode }) {
+export function SignBoard({ pos, w, h = 0.8, colour, night, children }: { pos: V3; w: number; h?: number; colour: string; night: boolean; children?: ReactNode }) {
   return (
     <group position={pos}>
       <Block size={[w, h, 0.14]} pos={[0, 0, 0]} color={colour} r={0.08} />
@@ -130,7 +130,7 @@ function SignBoard({ pos, w, h = 0.8, colour, night, children }: { pos: V3; w: n
     </group>
   );
 }
-function Pavement({ w, d, z = 0, color = CONCRETE }: { w: number; d: number; z?: number; color?: string }) {
+export function Pavement({ w, d, z = 0, color = CONCRETE }: { w: number; d: number; z?: number; color?: string }) {
   return <Block size={[w, 0.08, d]} pos={[0, 0.04, z]} color={color} r={0.02} rough={0.95} />;
 }
 function FlagPole({ pos, h = 6, colour = "#1f6fd6" }: { pos: V3; h?: number; colour?: string }) {
@@ -152,10 +152,10 @@ function Clock({ pos, r = 0.7, night, rot = 0 }: { pos: V3; r?: number; night: b
     </group>
   );
 }
-function Tree({ pos, s = 1 }: { pos: V3; s?: number }) {
+export function Tree({ pos, s = 1 }: { pos: V3; s?: number }) {
   return <group position={pos} scale={s}><mesh position={[0, 0.9, 0]}><cylinderGeometry args={[0.12, 0.16, 1.8, 10]} /><Mat color="#7a5230" /></mesh><Ball pos={[0, 2.2, 0]} r={0.9} color="#4fa64a" /><Ball pos={[0.4, 2.6, 0.2]} r={0.6} color="#5cb855" /></group>;
 }
-function Planter({ pos }: { pos: V3 }) {
+export function Planter({ pos }: { pos: V3 }) {
   return <group position={pos}><Block size={[0.8, 0.5, 0.5]} pos={[0, 0.25, 0]} color="#8b8f97" r={0.05} />{[-0.2, 0.05, 0.25].map((x) => <Ball key={x} pos={[x, 0.6, 0]} r={0.16} color={x > 0 ? C.pink : "#ffcc33"} />)}</group>;
 }
 
@@ -224,7 +224,7 @@ function CornerShop({ level, night }: Props) {
     </group>
   );
 }
-function Trolley({ pos }: { pos: V3 }) {
+export function Trolley({ pos }: { pos: V3 }) {
   return <group position={pos}><Block size={[0.5, 0.45, 0.75]} pos={[0, 0.65, 0]} color="#c9ced6" r={0.03} metal={0.6} /><Block size={[0.5, 0.05, 0.05]} pos={[0, 0.95, -0.4]} color="#e5484d" r={0.02} />{[[-0.2, -0.3], [0.2, -0.3], [-0.2, 0.3], [0.2, 0.3]].map(([x, z], i) => <Ball key={i} pos={[x, 0.08, z]} r={0.06} color="#1f2328" />)}</group>;
 }
 
@@ -559,7 +559,7 @@ function School({ level, night }: Props) {
 
 /* ───────── Fire Station (6 × 5 squares) ───────── */
 /** Red and blue lights that flash in turn. */
-function Beacons({ pos, w = 1.2, on = true }: { pos: V3; w?: number; on?: boolean }) {
+export function Beacons({ pos, w = 1.2, on = true }: { pos: V3; w?: number; on?: boolean }) {
   const red = useRef<Mesh>(null), blue = useRef<Mesh>(null);
   useFrame(({ clock }) => {
     if (!on) return;

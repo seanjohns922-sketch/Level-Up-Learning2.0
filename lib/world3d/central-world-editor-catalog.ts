@@ -3,7 +3,7 @@ import { SKATE_PIECES } from "./skate-kit";
 import { RACE_PIECES } from "./race-kit";
 import type { EconomyItem } from "@/lib/economy";
 
-export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress" | "skate" | "race";
+export type WorldSceneryGroup = "trees_plants" | "rocks_water" | "furniture_fun" | "animals" | "fortress" | "street" | "skate" | "race";
 
 function starter(
   item_key: string,
@@ -124,6 +124,15 @@ export const CENTRAL_WORLD_STARTER_SCENERY: EconomyItem[] = [
   starter("central_world_starter_stone_wall", "Garden Stone Wall", "stone_wall", "#929581", "furniture_fun", "1x1", 1),
   starter("central_world_starter_wood_gate", "Timber Gate", "wood_gate", "#94704b", "furniture_fun", "1x1", 1),
   ...FREE_WORLD_ADDITIONS.map(item => starter("central_world_starter_"+item.key,item.name,item.key,"#899b72",item.group,item.grid)),
+  // Street pieces: Level 1 is free; upgrades cost XP (models in premium-items/StreetItems.tsx).
+  starter("central_world_starter_street_traffic_lights", "Traffic Lights", "street_traffic_lights", "#36e07a", "street", "1x1", 1),
+  starter("central_world_starter_street_zebra_crossing", "Zebra Crossing", "street_zebra_crossing", "#f7f7f7", "street", "3x2", 1),
+  starter("central_world_starter_street_wheelie_bins", "Wheelie Bins", "street_wheelie_bins", "#d8282b", "street", "2x1", 1),
+  starter("central_world_starter_street_bike_rack", "Bike Rack", "street_bike_rack", "#4c8dff", "street", "2x1", 1),
+  starter("central_world_starter_street_hills_hoist", "Hills Hoist", "street_hills_hoist", "#9aa4af", "street", "2x2", 1),
+  starter("central_world_starter_street_water_tank", "Water Tank", "street_water_tank", "#6f8f6a", "street", "2x2", 1),
+  starter("central_world_starter_street_shade_sail", "Shade Sail", "street_shade_sail", "#ff7a1a", "street", "3x3", 1),
+  starter("central_world_starter_street_driveway_hoop", "Driveway Hoop", "street_driveway_hoop", "#ff7a1a", "street", "1x2", 1),
   // Build kit pieces: free to place once the learner's kit level reaches the piece's level.
   ...SKATE_PIECES.map(piece => kitPiece(starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#ff4fd8", "skate", piece.gridSize), piece.level)),
   ...RACE_PIECES.map(piece => kitPiece(starter("central_world_starter_"+piece.assetKey, piece.name, piece.assetKey, "#3fd0ff", "race", piece.gridSize), piece.level)),

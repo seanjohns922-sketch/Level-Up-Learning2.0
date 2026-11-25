@@ -39,7 +39,7 @@ import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as THREE from "three";
 import { Environment, Html, Lightformer, PerformanceMonitor } from "@react-three/drei";
-import { Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Star, Sun, TreeDeciduous, TreePalm, TreePine, Trash2, Umbrella, Users, Waves, X, type LucideIcon } from "lucide-react";
+import { Anchor, Swords, ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Bike, Wrench, Bird, BrickWall, Castle, Check, Cherry, ChevronDown, ChevronUp, Minus, Moon, MoreHorizontal, Move, PersonStanding, Plus, ScanEye, RotateCcw, DoorOpen, Droplets, Feather, Fence, Flag, Flame, Flower2, Gem, Grid2x2, Hand, Hexagon, Home, Lamp, Landmark, Leaf, Logs, Mailbox, Mountain, PackageOpen, PartyPopper, PawPrint, Rabbit, Route, RotateCw, Shell, Shield, ShoppingBag, Shrub, Signpost, Sofa, Sprout, Star, Sun, TreeDeciduous, TreePalm, TreePine, TrafficCone, Trash2, Umbrella, Users, Waves, X, type LucideIcon } from "lucide-react";
 import { TAP_TRAVEL_PX, useBuildGestures, type BuildGestureState } from "@/components/world3d/useBuildGestures";
 import { freeBuildRender } from "@/lib/world3d/free-build-renders";
 import { BuildFootprint, CentralWorldEnvironment } from "@/components/world3d/CentralWorldEnvironment";
@@ -167,6 +167,7 @@ const PALETTE_TABS: Array<{ key: PaletteTab; label: string; Icon: LucideIcon }> 
   { key: "rocks_water", label: "Rocks", Icon: Mountain },
   { key: "furniture_fun", label: "Décor", Icon: Lamp },
   { key: "animals", label: "Animals", Icon: PawPrint },
+  { key: "street", label: "Street", Icon: TrafficCone },
   { key: "fortress", label: "Defence", Icon: Shield },
   { key: "skate", label: "Skate", Icon: Bike },
   { key: "race", label: "Race", Icon: Flag },
@@ -381,6 +382,13 @@ function BuildModeSurface({ grid, active, paint, continuous, onStrokeState, gest
 type BuildSelection = { placement: CentralWorldPlacement; item: EconomyItem; menu: React.ReactNode };
 
 function CentralWorldScene({ night, selection, onStrokeState, homePlacement, quality, moveInput, lookInput, spawnTarget, spawnNonce, spawnYaw, placedCustomisations, groundTiles, itemsById, buildPreview, groundPreview, editing, buildZoom, paintMode, surfaceHandlers, gestureRef, onEnterTower, onEnterHome, onActiveTarget, onToggleDrawbridge, cameraFocus, cameraYaw, cameraPitch, avatarPosRef, hubV2 = false, homeAnchors, buildRules, raceItems, raceStarts, race, raceHud, onBestLap, kart, racePaused, courts, shot, onShotDone, walking, walkCursor, walkGridCells, walkFar, eraseTarget, aimRef, justPlacedId, onWalkTap, carports, drive, carHud, carPose, rexPhase, waterAreas, boat, boatWaterAt, poseRef, mates, matePoses }: { poseRef: React.MutableRefObject<ExplorerPose>; mates: readonly WorldMate[]; matePoses: React.RefObject<Map<string, ExplorerPose>>; waterAreas: WaterAreas; boat: BoatRide | null; boatWaterAt: (x: number, z: number) => number | null; rexPhase: RexPhase; carports: CarportTarget[]; drive: DriveSession | null; carHud: React.MutableRefObject<CarHud>; carPose: React.MutableRefObject<CarPose>; onWalkTap: (gridX: number, gridZ: number) => void; justPlacedId: string | null; walking: boolean; walkCursor: { gridX: number; gridZ: number } | null; walkGridCells: number; walkFar: boolean; eraseTarget: { placement: CentralWorldPlacement; item: EconomyItem } | null; aimRef: React.MutableRefObject<number>; courts: CourtTarget[]; shot: ShotInFlight | null; onShotDone: (shot: Shot | SportShot) => void; kart: { style: KartStyle; parts: KartParts }; racePaused: boolean; raceItems: PlacedRaceItem[]; raceStarts: RaceStartTarget[]; race: RaceSession | null; raceHud: React.MutableRefObject<RaceHudState>; onBestLap: (seconds: number) => void; night: boolean; selection: BuildSelection | null; hubV2?: boolean; buildRules: CentralWorldBuildRules; homeAnchors: ReturnType<typeof getCentralWorldHomeAnchors>; onStrokeState:(active:boolean)=>void; homePlacement: CentralWorldPlacement; quality: CentralWorldQuality; moveInput: WorldMoveInput; lookInput: WorldLookInput; spawnTarget: [number, number, number] | null; spawnNonce: number; spawnYaw: number; placedCustomisations: CentralWorldPlacement[]; groundTiles: CentralWorldGroundTile[]; itemsById: Map<string, EconomyItem>; buildPreview: { placement: CentralWorldPlacement; item: EconomyItem; valid: boolean } | null; groundPreview: { tile: CentralWorldGroundTile; valid: boolean; cells?: {gridX:number;gridZ:number;valid:boolean}[] } | null; editing: boolean; buildZoom: number; paintMode: boolean; surfaceHandlers: BuildSurfaceHandlers; gestureRef: React.RefObject<BuildGestureState>; onEnterTower: () => void; onEnterHome: () => void; onActiveTarget: (id: string | null) => void; onToggleDrawbridge: (placementId: string) => void; cameraFocus: { gridX: number; gridZ: number }; cameraYaw: number; cameraPitch: number; avatarPosRef: React.MutableRefObject<{ x: number; z: number }> }) {
+  // Where placed items react to: the explorer on foot, or their car or boat while driving (the car wash, the servo).
+  const reactorRef = useRef({ x: 0, z: 0 });
+  useFrame(() => {
+    const from = drive || boat ? carPose.current : avatarPosRef.current;
+    reactorRef.current.x = from.x;
+    reactorRef.current.z = from.z;
+  });
   const [activeTargetId, setActiveTargetId] = useState<string | null>(null);
   // The camera can rest between cells while panning; the build grid snaps to one.
   const focusX = Math.round(cameraFocus.gridX), focusZ = Math.round(cameraFocus.gridZ);
@@ -456,7 +464,7 @@ function CentralWorldScene({ night, selection, onStrokeState, homePlacement, qua
   const frozen = editing || (Boolean(buildPreview) && !walking);
   const roaming = !frozen && !racing;
   return (
-    <ExplorerPositionContext.Provider value={avatarPosRef}>
+    <ExplorerPositionContext.Provider value={reactorRef}>
       {hubV2 ? <>
         <HubSkyLights night={night} quality={quality} avatarPosRef={avatarPosRef} />
         <HubNightGlow night={night} animate={quality !== "low"} avatarPosRef={avatarPosRef} />

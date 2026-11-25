@@ -10,13 +10,17 @@ export const DEFENCE_STYLES = ["laser_fence", "laser_gate", "scanner", "trip_wir
 export const EVERYDAY_STYLES = ["lamp_post", "bench", "fence", "mailbox", "campfire"] as const;
 /** City Life: everyday places, unlocked with XP. */
 export const CITY_LIFE_STYLES = ["playground", "cricket_nets", "park_bbq", "cubby_house", "outdoor_setting", "bus_stop", "food_truck", "vending_kiosk"] as const;
+/** City Life, set 2: bigger places to save up for, unlocked with XP (same City Life tab). */
+export const CITY_PLACES_STYLES = ["servo", "car_wash", "pizza_shop", "supermarket", "police_station", "hospital", "vet_pet_shop", "dog_park"] as const;
+/** Street pieces: free at Level 1 in the build picker's Street tab, upgraded with XP. */
+export const STREET_STYLES = ["traffic_lights", "zebra_crossing", "wheelie_bins", "bike_rack", "hills_hoist", "water_tank", "shade_sail", "driveway_hoop"] as const;
 /** Main Street: the town's buildings, unlocked with XP. */
 export const MAIN_STREET_STYLES = ["corner_shop", "cafe", "library", "town_hall", "school", "fire_station"] as const;
 /** Sports: playable courts and goals, unlocked with XP (the basketball court lives in the same tab). */
 export const SPORTS_STYLES = ["tennis", "soccer", "footy", "netball"] as const;
 /** Water: a lake explorers swim in, unlocked with XP. */
 export const WATER_STYLES = ["swimming_lake"] as const;
-export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES, ...SPORTS_STYLES, ...WATER_STYLES] as const;
+export const PREMIUM_HOME_STYLES = ["cottage", "modern", "treehouse", "apartment", "fair", "trampoline", "basketball", ...DEFENCE_STYLES, ...EVERYDAY_STYLES, ...CITY_LIFE_STYLES, ...MAIN_STREET_STYLES, ...SPORTS_STYLES, ...WATER_STYLES, ...CITY_PLACES_STYLES, ...STREET_STYLES] as const;
 export type PremiumHomeStyle = (typeof PREMIUM_HOME_STYLES)[number];
 export type PremiumHomeLevel = 1 | 2 | 3 | 4;
 export const PREMIUM_HOME_MAX_LEVEL: PremiumHomeLevel = 4;
@@ -53,6 +57,10 @@ const EVERYDAY = { marketplaceCategory: "buildings", upgradePrefix: "central_wor
 const CITY = { marketplaceCategory: "city_life", upgradePrefix: "central_world_city_upgrade_", metres: true } as const;
 const CITY_SMALL_PRICES = [200, 200, 400, 800] as const;
 const CITY_BIG_PRICES = [350, 350, 700, 1400] as const;
+const CITY_SHOP_PRICES = [400, 400, 800, 1600] as const;
+const CITY_CIVIC_PRICES = [500, 500, 1000, 2000] as const;
+const STREET = { marketplaceCategory: "buildings", upgradePrefix: "central_world_street_upgrade_", metres: true, free: true } as const;
+const STREET_PRICES = [0, 100, 200, 400] as const;
 const MAIN = { marketplaceCategory: "main_street", upgradePrefix: "central_world_main_upgrade_", metres: true } as const;
 const MAIN_SHOP_PRICES = [400, 400, 800, 1600] as const;
 const MAIN_CIVIC_PRICES = [500, 500, 1000, 2000] as const;
@@ -422,6 +430,200 @@ export const PREMIUM_HOME_SPECS: Record<PremiumHomeStyle, StyleSpec> = {
     assetKey: "city_vending_kiosk",
     height: 3.8,
     ...CITY,
+  },
+  // City Life set 2 models live in components/world3d/premium-items/CityPlacesItems.tsx.
+  servo: {
+    name: "Servo",
+    description: "A petrol station whose pumps light up when you pull in, up to EV chargers and a glowing price pylon.",
+    levels: ["Two Pumps", "Servo Shop", "Car Wash Bay", "EV Chargers"],
+    prices: CITY_SHOP_PRICES,
+    gridSize: "7x6",
+    accent: "#e5484d",
+    icon: "fuel",
+    assetKey: "city_servo",
+    height: 7,
+    ...CITY,
+  },
+  car_wash: {
+    name: "Car Wash",
+    description: "A hose bay that grows into a neon tunnel whose brushes whirl and bubble when you go through.",
+    levels: ["Hose Bay", "Brush Tunnel", "Rainbow Foam", "Neon Tunnel"],
+    prices: CITY_BIG_PRICES,
+    gridSize: "6x4",
+    accent: "#3aa0ff",
+    icon: "droplets",
+    assetKey: "city_car_wash",
+    height: 5,
+    ...CITY,
+  },
+  pizza_shop: {
+    name: "Pizza Shop",
+    description: "A takeaway with a glowing wood-fire oven, up to a delivery scooter and a giant pizza slice on the roof.",
+    levels: ["Takeaway", "Pizzeria", "Delivery Scooter", "Rooftop Slice"],
+    prices: CITY_SHOP_PRICES,
+    gridSize: "6x5",
+    accent: "#2f8f4a",
+    icon: "pizza",
+    assetKey: "city_pizza_shop",
+    height: 7.6,
+    ...CITY,
+  },
+  supermarket: {
+    name: "Supermarket",
+    description: "A mini mart up to a big supermarket with a car park; the doors slide open as you walk up.",
+    levels: ["Mini Mart", "Supermarket", "Car Park", "Solar Supermarket"],
+    prices: CITY_SHOP_PRICES,
+    gridSize: "9x7",
+    accent: "#e5484d",
+    icon: "shopping-cart",
+    assetKey: "city_supermarket",
+    height: 6,
+    ...CITY,
+  },
+  police_station: {
+    name: "Police Station",
+    description: "A station with a blue lamp, up to a lookout tower, a rooftop helipad and patrol cars with flashing lights.",
+    levels: ["Station", "Patrol Car", "Lookout Tower", "Helipad"],
+    prices: CITY_CIVIC_PRICES,
+    gridSize: "6x5",
+    accent: "#1f4fa8",
+    icon: "shield",
+    assetKey: "city_police_station",
+    height: 9.6,
+    ...CITY,
+  },
+  hospital: {
+    name: "Hospital",
+    description: "A friendly clinic that grows into a big hospital where a rescue helicopter lands on the roof.",
+    levels: ["Clinic", "Ambulance Bay", "Hospital Wing", "Roof Helipad"],
+    prices: CITY_CIVIC_PRICES,
+    gridSize: "8x6",
+    accent: "#1aa39a",
+    icon: "hospital",
+    assetKey: "city_hospital",
+    height: 11,
+    ...CITY,
+  },
+  vet_pet_shop: {
+    name: "Vet & Pet Shop",
+    description: "Puppies tumbling in the window, up to a play yard where a puppy trots over to you.",
+    levels: ["Pet Shop", "Vet", "Play Yard", "Pet Hotel"],
+    prices: CITY_SHOP_PRICES,
+    gridSize: "5x4",
+    accent: "#ff9f45",
+    icon: "paw-print",
+    assetKey: "city_vet_pet_shop",
+    height: 6.6,
+    ...CITY,
+  },
+  dog_park: {
+    name: "Dog Park",
+    description: "A fenced park where dogs run laps and leap the jumps, up to a splash pad and a dog café.",
+    levels: ["Fenced Park", "Agility Jumps", "Splash Pad", "Dog Café"],
+    prices: CITY_BIG_PRICES,
+    gridSize: "6x6",
+    accent: "#7ac943",
+    icon: "dog",
+    assetKey: "city_dog_park",
+    height: 3.8,
+    ...CITY,
+  },
+  // Street models live in components/world3d/premium-items/StreetItems.tsx.
+  traffic_lights: {
+    name: "Traffic Lights",
+    description: "Red, amber, green on a loop; they turn green as you come up. Up to smart lights with a countdown.",
+    levels: ["Single Pole", "Crossing Button", "Twin Heads", "Smart Lights"],
+    prices: STREET_PRICES,
+    gridSize: "1x1",
+    accent: "#36e07a",
+    icon: "traffic-cone",
+    assetKey: "street_traffic_lights",
+    height: 4.4,
+    ...STREET,
+  },
+  zebra_crossing: {
+    name: "Zebra Crossing",
+    description: "Stripes across a road that light up as you cross, up to flashing poles and a raised, lit crossing.",
+    levels: ["Stripes", "Crossing Poles", "Flashing Lights", "Raised & Lit"],
+    prices: STREET_PRICES,
+    gridSize: "3x2",
+    accent: "#f7f7f7",
+    icon: "footprints",
+    assetKey: "street_zebra_crossing",
+    height: 2.8,
+    ...STREET,
+  },
+  wheelie_bins: {
+    name: "Wheelie Bins",
+    description: "Red, yellow and green lids whose lids flip open when you bump them, up to a recycling station.",
+    levels: ["One Bin", "All Three", "Bin Bay", "Recycling Station"],
+    prices: STREET_PRICES,
+    gridSize: "2x1",
+    accent: "#d8282b",
+    icon: "trash-2",
+    assetKey: "street_wheelie_bins",
+    height: 2,
+    ...STREET,
+  },
+  bike_rack: {
+    name: "Bike Rack",
+    description: "A rack that fills with bright bikes, up to a covered dock with glowing scooters.",
+    levels: ["Rack", "Bikes", "Covered Rack", "Scooter Dock"],
+    prices: STREET_PRICES,
+    gridSize: "2x1",
+    accent: "#4c8dff",
+    icon: "bike",
+    assetKey: "street_bike_rack",
+    height: 2.6,
+    ...STREET,
+  },
+  hills_hoist: {
+    name: "Hills Hoist",
+    description: "The classic backyard clothesline: run into it and it spins. Up to beach towels and fairy lights.",
+    levels: ["Bare Hoist", "Washing", "Beach Towels", "Fairy Lights"],
+    prices: STREET_PRICES,
+    gridSize: "2x2",
+    accent: "#9aa4af",
+    icon: "shirt",
+    assetKey: "street_hills_hoist",
+    height: 2.6,
+    ...STREET,
+  },
+  water_tank: {
+    name: "Water Tank",
+    description: "A corrugated rainwater tank, up to twin tanks with a pump, a solar panel and a veggie garden.",
+    levels: ["Small Tank", "Big Tank", "Two Tanks & Pump", "Solar & Garden"],
+    prices: STREET_PRICES,
+    gridSize: "2x2",
+    accent: "#6f8f6a",
+    icon: "droplet",
+    assetKey: "street_water_tank",
+    height: 3,
+    ...STREET,
+  },
+  shade_sail: {
+    name: "Shade Sail",
+    description: "Bright sails on poles over a seat, up to a big three-sail canopy lit up at night.",
+    levels: ["One Sail", "Two Sails", "Big Canopy", "Lit Canopy"],
+    prices: STREET_PRICES,
+    gridSize: "3x3",
+    accent: "#ff7a1a",
+    icon: "tent",
+    assetKey: "street_shade_sail",
+    height: 4,
+    ...STREET,
+  },
+  driveway_hoop: {
+    name: "Driveway Hoop",
+    description: "A basketball ring on a pole for out the front, up to a net, lights and a score clock.",
+    levels: ["Pole & Ring", "Backboard", "Net & Lights", "Score Clock"],
+    prices: STREET_PRICES,
+    gridSize: "1x2",
+    accent: "#ff7a1a",
+    icon: "dribbble",
+    assetKey: "street_driveway_hoop",
+    height: 4.6,
+    ...STREET,
   },
   // Main Street models live in components/world3d/premium-items/MainStreetItems.tsx.
   corner_shop: {
