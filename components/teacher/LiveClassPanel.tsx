@@ -982,7 +982,11 @@ export default function LiveClassPanel({
   const [activeOnly, setActiveOnly] = useState(false);
   const [sort, setSort] = useState<LiveSort>(null);
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
-  const [selectedStudentEvents, setSelectedStudentEvents] = useState<LiveStudentEventRow[]>([]);
+  const [selectedStudentEvents, setSelectedStudentEvents] = useState<{
+    classId: string;
+    studentId: string;
+    rows: LiveStudentEventRow[];
+  } | null>(null);
   const studentIdsKey = students.map((student) => student.id).sort().join(",");
 
   // Scoped to this mounted class; never persisted or shared between dashboards.
@@ -1217,6 +1221,7 @@ export default function LiveClassPanel({
     }
 
     async function loadStudentEvents() {
+      if (cancelled || document.visibilityState === "hidden") return;
       const { data, error } = await fetchLiveClassEvents(supabase, {
         classId: selectedClassId!,
         studentIds: [selectedStudentId!],
@@ -1227,15 +1232,31 @@ export default function LiveClassPanel({
         console.warn("[LiveClassPanel] Failed to load student timeline", error);
       }
       if (!cancelled) {
-        setSelectedStudentEvents((data ?? []) as LiveStudentEventRow[]);
+        setSelectedStudentEvents({
+          classId: selectedClassId!,
+          studentId: selectedStudentId!,
+          rows: (data ?? []) as LiveStudentEventRow[],
+        });
       }
     }
 
-    void loadStudentEvents();
-    const intervalId = setInterval(loadStudentEvents, 30000);
+    const refresh = createCoalescedRefresh(loadStudentEvents, (error) => {
+      console.warn("[LiveClassPanel] Student timeline refresh failed", error);
+    });
+    const poll = () => {
+      if (document.visibilityState !== "hidden") refresh.request();
+    };
+    const resume = () => {
+      if (document.visibilityState !== "hidden") refresh.request({ immediate: true });
+    };
+    poll();
+    const intervalId = setInterval(poll, 30000);
+    document.addEventListener("visibilitychange", resume);
     return () => {
       cancelled = true;
+      refresh.dispose();
       clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", resume);
     };
   }, [active, selectedClass?.id, selectedStudentId]);
 
@@ -1504,7 +1525,8 @@ export default function LiveClassPanel({
         open={isDrawerOpen}
         onClose={() => setSelectedStudentId(null)}
         student={selectedStudent}
-        events={isDrawerOpen ? selectedStudentEvents : []}
+        events={isDrawerOpen && selectedStudentEvents?.classId === selectedClass?.id
+          && selectedStudentEvents?.studentId === selectedStudentId ? selectedStudentEvents.rows : []}
       />
     </>
   );
