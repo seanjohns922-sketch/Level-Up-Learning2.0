@@ -89,12 +89,15 @@ export function ProceduralStudentAvatar({ avatar, movingRef, sprintingRef }: Ava
         {!realmOutfit(avatar.top)&&!adventureOutfit(avatar.top)&&<><mesh position={[0, 0.43, -0.215]}><boxGeometry args={[0.5, 0.52, 0.08]} /><meshStandardMaterial color={topTrim} roughness={0.64} /></mesh>
         <mesh position={[0, 0.52, 0.215]}><boxGeometry args={[0.12, 0.54, 0.045]} /><meshStandardMaterial color={topTrim} emissive={topTrim} emissiveIntensity={0.16} /></mesh></>}
         {[-1, 1].map((side) => (
-          <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.52, 0.75, 0]}>
+          <group key={`arm-${side}`} ref={side === -1 ? leftArmRef : rightArmRef} position={[side * 0.47, 0.72, 0]}>
             <mesh position={[0, -0.38, 0]}><capsuleGeometry args={[.12,.5,6,12]} /><meshStandardMaterial color={top} roughness={0.68} /></mesh>
             <mesh position={[0, -0.85, 0]}><sphereGeometry args={[.105,16,12]} /><meshStandardMaterial color={skin} roughness={0.78} /></mesh>
             {side===1&&<group position={[0,-.85,avatar.held==="patternox_codemaster_gauntlet"?0:.08]} rotation={avatar.held==="patternox_codemaster_gauntlet"?[0,0,0]:[.25,0,-.17]}><ExplorerCharacterGear held={avatar.held} colour={avatar.heldColor||undefined}/></group>}
           </group>
         ))}
+        {/* Rounded shoulders join the arms to the body, and a short neck carries the head. */}
+        {[-1, 1].map((side) => <mesh key={`shoulder-${side}`} position={[side * 0.4, 0.66, 0]} scale={[1, .78, .78]}><sphereGeometry args={[.13,20,14]} /><meshStandardMaterial color={top} roughness={0.68} /></mesh>)}
+        <mesh position={[0, 0.9, 0]}><cylinderGeometry args={[.11,.13,.14,16]} /><meshStandardMaterial color={skin} roughness={0.85} /></mesh>
         {avatar.bottom==="skirt"||avatar.top==="dress"?<mesh position={[0,-.05,0]}><cylinderGeometry args={[.33,.48,.4,24]}/><meshStandardMaterial color={avatar.top==="dress"?top:pants}/></mesh>:null}
         <RealmOutfitDetails top={avatar.top}/><AdventureOutfitDetails top={avatar.top}/>
         <ExplorerBodyAccessories o={avatar} movingRef={movingRef}/>
