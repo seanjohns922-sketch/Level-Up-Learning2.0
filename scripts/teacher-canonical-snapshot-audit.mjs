@@ -265,7 +265,7 @@ assert.equal(supportEvidence.needsSupport, "Area");
 
 // Every educator surface must consume the canonical realm selector/snapshot.
 const sourceContracts = [
-  ["Dashboard", "app/teacher/dashboard/page.tsx", /selectCanonicalTeacherProgressRow/],
+  ["Dashboard", "app/teacher/dashboard/page.tsx", /<StrandStudentsPanel[\s\S]*?progress=\{progress(?: as any)?\}/],
   ["Students tab", "components/teacher/StrandStudentsPanel.tsx", /buildTeacherStudentSnapshot/],
   ["Student Insights", "app/teacher/student-insights/page.tsx", /buildTeacherStudentSnapshot/],
   ["Live Class", "components/teacher/LiveClassPanel.tsx", /selectCanonicalTeacherProgressRow/],
@@ -277,15 +277,16 @@ for (const [label, relativePath, pattern] of sourceContracts) {
 }
 
 const dashboardSource = fs.readFileSync(path.join(root, "app/teacher/dashboard/page.tsx"), "utf8");
+const studentsSource = fs.readFileSync(path.join(root, "components/teacher/StrandStudentsPanel.tsx"), "utf8");
 assert.match(
-  dashboardSource,
-  /selectCanonicalTeacherProgressRow\(student\.id, analyticsRealmId, progress\)/,
-  "Expanded student view must stay scoped to the selected analytics realm",
+  studentsSource,
+  /buildTeacherStudentSnapshot\(\{\s*studentId: s\.id,\s*realmId: selectedRealmId,\s*progressRows: progress,/,
+  "Rendered student details must use the selected realm's canonical snapshot",
 );
 assert.doesNotMatch(
   dashboardSource,
   /getStudentProgress\(student\.id/,
-  "Expanded student view must not use the legacy cross-realm selector",
+  "Dashboard must not use the legacy cross-realm selector",
 );
 
 const insightsSource = fs.readFileSync(path.join(root, "app/teacher/student-insights/page.tsx"), "utf8");

@@ -1,8 +1,7 @@
 "use client";
 
-import { getProgramWeekCount } from "@/lib/program-weeks";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, Check, X, KeyRound, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Printer, Lock, LockOpen, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
+import { ArrowLeft, X, Brain, Building2, ChevronDown, ClipboardList, Copy, Download, Printer, SquareCheck, UserPlus, Users, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
@@ -15,21 +14,16 @@ import { classScopeFilter, schoolAdminSchoolIds } from "@/lib/teacher-class-scop
 import WholeMathsDiagnosticPanel from "@/components/teacher/WholeMathsDiagnosticPanel";
 import { fetchRealmCompatProgressForClass } from "@/lib/realm-progress-compat";
 import {
-  BRAIN_BREAK_FREQUENCIES,
   BRAIN_BREAK_FREQUENCY_LABEL,
   isBrainBreakFrequency,
   type BrainBreakFrequency,
 } from "@/lib/brain-break-settings";
-import { formatAccuracy } from "@/lib/learning-score";
 import {
-  getRealmDefinition,
   LIVE_REALM_IDS,
-  type LiveRealmId,
 } from "@/lib/realms/realm-registry";
 import { getSchoolLogo } from "@/lib/school-logos";
-import { classLoginCardsHtml, singleLoginCardHtml } from "@/lib/documents/login-cards";
+import { classLoginCardsHtml } from "@/lib/documents/login-cards";
 import { assetUrl, openDocumentWindow, writeDocument } from "@/lib/documents/reliq-document";
-import { getRealmWeekNumbers, selectCanonicalTeacherProgressRow } from "@/lib/teacher/teacher-student-snapshot";
 import { normalizeClassCurriculumYear } from "@/lib/class-curriculum-year";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 
@@ -104,150 +98,6 @@ function TeacherDashboardSkeleton() {
 
 const YEAR_LEVELS = ["Prep", "Year 1", "Year 2", "Year 3", "Year 4", "Year 5", "Year 6", "Year 7", "Year 8"];
 
-/* ── helpers ───────────────────────────────────────── */
-type JsonObject = Record<string, unknown>;
-
-function parseCompletedLessons(raw: unknown): string[] {
-  if (Array.isArray(raw)) return raw as string[];
-  if (typeof raw === "string") try { return JSON.parse(raw); } catch { return []; }
-  return [];
-}
-
-function parseQuizScores(raw: unknown): Record<string, JsonObject> {
-  if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, JsonObject>;
-  if (typeof raw === "string") {
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-        ? (parsed as Record<string, JsonObject>)
-        : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-type LessonAttemptSummary = {
-  completedAt?: string | null;
-  questionsAnswered?: number | null;
-  correctAnswers?: number | null;
-  correctCount?: number | null;
-  totalQuestions?: number | null;
-};
-
-type LessonAttemptRecord = {
-  latestSummary?: LessonAttemptSummary | null;
-  attempts?: LessonAttemptSummary[] | null;
-};
-
-function parseLessonAttempts(raw: unknown): Record<string, LessonAttemptRecord> {
-  if (raw && typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, LessonAttemptRecord>;
-  if (typeof raw === "string") {
-    try {
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" && !Array.isArray(parsed)
-        ? (parsed as Record<string, LessonAttemptRecord>)
-        : {};
-    } catch {
-      return {};
-    }
-  }
-  return {};
-}
-
-function weekCompletionCount(completedIds: string[], week: number): number {
-  // lesson ids like "y1-w3-l1", "y1-w3-l2", "y1-w3-l3"
-  const prefix = `-w${week}-`;
-  return completedIds.filter((id) => id.includes(prefix)).length;
-}
-
-/* ── QR section for expanded student panel ─── */
-function StudentQRSection({ student, classCode, className2, schoolName, schoolLogo, onRegenerate }: {
-  student: StudentRow;
-  classCode: string;
-  className2: string;
-  schoolName: string | null;
-  schoolLogo: { src: string; alt: string } | null;
-  onRegenerate: (token: string) => void;
-}) {
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [regenerating, setRegenerating] = useState(false);
-  const token = student.qr_token ?? "";
-
-  useEffect(() => {
-    if (!token) return;
-    const url = `${window.location.origin}/student?token=${token}`;
-    import("qrcode").then((QRCode) => {
-      QRCode.toDataURL(url, { width: 180, margin: 1 }).then((dataUrl: string) => {
-        setQrDataUrl(dataUrl);
-      });
-    });
-  }, [token]);
-
-  async function handleRegenerate() {
-    setRegenerating(true);
-    const { data, error } = await supabase.rpc("regenerate_student_qr", { student_uuid: student.id });
-    if (data && !error) {
-      onRegenerate(data);
-    }
-    setRegenerating(false);
-  }
-
-  function handlePrint() {
-    if (!qrDataUrl) return;
-    const printWindow = openDocumentWindow();
-    if (!printWindow) return;
-    writeDocument(printWindow, singleLoginCardHtml({
-      schoolName,
-      schoolLogo: schoolLogo ? { src: assetUrl(schoolLogo.src, window.location.origin), alt: schoolLogo.alt } : null,
-      className: className2,
-      classCode,
-      websiteHost: window.location.host,
-      qrSrc: qrDataUrl,
-      student: { name: student.display_name, username: student.username ?? student.display_name, password: student.pin ?? null },
-    }));
-  }
-
-  return (
-    <div className="grid gap-3">
-      <div className="flex justify-between items-center">
-        <span className="text-gray-500 text-sm">PIN</span>
-        <span className="font-mono font-bold text-lg text-gray-900">{student.pin ?? "—"}</span>
-      </div>
-      {qrDataUrl ? (
-        <div className="flex justify-center">
-          <img src={qrDataUrl} alt="Student QR Code" className="w-32 h-32 rounded-lg" />
-        </div>
-      ) : token ? (
-        <p className="text-xs text-gray-400 text-center">Generating QR…</p>
-      ) : (
-        <p className="text-xs text-gray-400 text-center">No QR token</p>
-      )}
-      <div className="flex gap-2 justify-center">
-        <button
-          onClick={handleRegenerate}
-          disabled={regenerating}
-          className="text-xs px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 font-bold hover:bg-blue-100 transition disabled:opacity-50"
-        >
-          {regenerating ? "Regenerating…" : "Regenerate QR"}
-        </button>
-        <button
-          onClick={handlePrint}
-          disabled={!qrDataUrl}
-          className="text-xs px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition disabled:opacity-50 inline-flex items-center gap-1"
-        >
-          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
-            <rect x="6" y="14" width="12" height="8" />
-          </svg>
-          Print Card
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ── component ─────────────────────────────────────── */
 // Brain breaks run from least to most in the Manage class menu.
 const BRAIN_BREAK_MENU_ORDER = ["minimal", "normal", "frequent"] as const;
@@ -282,10 +132,8 @@ export default function TeacherDashboardPage() {
   const [progressLoadError, setProgressLoadError] = useState<string | null>(null);
   const [liveRows, setLiveRows] = useState<LiveStudentActivityRow[]>([]);
   const [progressLoading, setProgressLoading] = useState(true);
-  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
   const [activeYear, setActiveYear] = useState("Year 1");
   const [activeTab, setActiveTab] = useState<"live" | "students" | "diagnostic" | "curriculum">("live");
-  const [analyticsRealmId, setAnalyticsRealmId] = useState<LiveRealmId>(LIVE_REALM_IDS[0] ?? "number");
   const [showPlacements, setShowPlacements] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -516,7 +364,6 @@ export default function TeacherDashboardPage() {
     setSelectedClassId(classId);
     setStudents([]);
     setActiveYear(normalizeClassCurriculumYear(cls?.year_level));
-    setExpandedStudent(null);
     loadClassData(classId, false);
   }
 
@@ -613,296 +460,13 @@ export default function TeacherDashboardPage() {
     }
   }
 
-  async function handleResetPin(student: StudentRow) {
-    // One-click random passcode (avoids collisions within the class).
-    const existing = new Set(
-      students
-        .filter((s) => s.class_id === student.class_id && s.id !== student.id)
-        .map((s) => s.pin)
-        .filter((value): value is string => Boolean(value))
-    );
-    let newPin = "";
-    do {
-      newPin = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
-    } while (existing.has(newPin));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await supabase.from("students").update({ pin: newPin } as any).eq("id", student.id);
-    setStudents((prev) =>
-      prev.map((s) => (s.id === student.id ? { ...s, pin: newPin } : s))
-    );
-    setPinToast(`New passcode for ${student.display_name}: ${newPin}`);
-    window.setTimeout(() => setPinToast(null), 2600);
-  }
-
-  // Brain-break frequency: class default + per-student override (null = inherit).
+  // Class-wide brain-break frequency.
   async function setClassBrainBreak(value: BrainBreakFrequency) {
     if (!selectedClassId) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await supabase.from("classes").update({ brain_break_frequency: value } as any).eq("id", selectedClassId);
     setClasses((prev) => prev.map((c) => (c.id === selectedClassId ? { ...c, brain_break_frequency: value } : c)));
   }
-  async function setStudentBrainBreak(student: StudentRow, value: BrainBreakFrequency | null) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await supabase.from("students").update({ brain_break_frequency: value } as any).eq("id", student.id);
-    setStudents((prev) => prev.map((s) => (s.id === student.id ? { ...s, brain_break_frequency: value } : s)));
-  }
-
-  /* ── segment bar for a student's level ─── */
-  function renderWeekBar(prog: ProgressRow | undefined) {
-    const realmDefinition = getRealmDefinition(analyticsRealmId);
-    const realmWeeks = getRealmWeekNumbers(analyticsRealmId, prog?.year);
-    const lessonsPerWeek = realmDefinition.lessonsPerWeek;
-    if (!prog || lessonsPerWeek == null || realmWeeks.length === 0) {
-      return <span className="text-xs font-semibold text-slate-400">Progress unavailable</span>;
-    }
-    const completedIds = prog ? parseCompletedLessons(prog.completed_lesson_ids) : [];
-    const currentWeek = prog.week;
-    const totalLessons = realmWeeks.reduce(
-      (sum, week) => sum + Math.min(lessonsPerWeek, weekCompletionCount(completedIds, week)),
-      0,
-    );
-    const overallPct = Math.round((totalLessons / (realmWeeks.length * lessonsPerWeek)) * 100);
-
-    return (
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-[3px] flex-1">
-          {realmWeeks.map((w) => {
-            const lessonsCompleted = weekCompletionCount(completedIds, w);
-            const isComplete = lessonsCompleted >= lessonsPerWeek;
-            const isCurrent = w === currentWeek && !isComplete;
-
-            let bg = "bg-slate-200/70"; // locked
-            if (isComplete) bg = "bg-teal-500";
-            else if (isCurrent) {
-              if (lessonsCompleted === 0) bg = "bg-amber-300";
-              else if (lessonsCompleted === 1) bg = "bg-amber-400";
-              else bg = "bg-amber-500";
-            }
-
-            return (
-              <div
-                key={w}
-                className={`h-2 flex-1 rounded-full ${bg} transition-colors relative`}
-                title={`Week ${w}: ${isComplete ? "Complete" : isCurrent ? `${lessonsCompleted}/${lessonsPerWeek} lessons` : "Locked"}`}
-              >
-                {isCurrent && (
-                  <div className="absolute -inset-y-1 inset-x-0 rounded-full ring-2 ring-amber-500/60" />
-                )}
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex items-center gap-2 min-w-[88px] justify-end">
-          <span className="tabular-nums text-xs font-bold text-slate-700">{overallPct}%</span>
-        </div>
-      </div>
-    );
-  }
-
-  /* ── expanded student detail panel ─── */
-  function renderExpandedPanel(student: StudentRow) {
-    if (progressLoadError) {
-      return (
-        <div className="border-t border-gray-100 bg-gray-50 px-6 py-5 text-sm font-semibold text-slate-500">
-          Progress unavailable for {getRealmDefinition(analyticsRealmId).name}.
-        </div>
-      );
-    }
-
-    const prog = selectCanonicalTeacherProgressRow(student.id, analyticsRealmId, progress);
-    if (!prog || prog.week == null) {
-      return (
-        <div className="border-t border-gray-100 bg-gray-50 px-6 py-5 text-sm font-semibold text-slate-500">
-          Not placed in {getRealmDefinition(analyticsRealmId).name}.
-        </div>
-      );
-    }
-    const completedIds = prog ? parseCompletedLessons(prog.completed_lesson_ids) : [];
-    const currentWeek = prog.week;
-    const realmDefinition = getRealmDefinition(analyticsRealmId);
-    const lessonsPerWeek = realmDefinition.lessonsPerWeek ?? 0;
-
-    const lessonsThisWeek = weekCompletionCount(completedIds, currentWeek);
-    const l1 = lessonsThisWeek >= 1;
-    const l2 = lessonsThisWeek >= 2;
-    const l3 = lessonsThisWeek >= Math.min(3, lessonsPerWeek);
-    const quizUnlocked = lessonsThisWeek >= lessonsPerWeek;
-    const pretestScore = prog?.pretest_score;
-
-    return (
-      <div
-        className="bg-gray-50 border-t border-gray-100 px-6 py-4 grid md:grid-cols-3 gap-6"
-        style={{ animation: "fadeIn 0.2s ease" }}
-      >
-        {/* Current Status */}
-        <div>
-          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Current Status</h4>
-          <div className="grid gap-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-500">Level</span>
-              <span className="font-bold text-gray-900">{prog.year}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Week</span>
-              <span className="font-bold text-gray-900">{currentWeek} / {realmDefinition.totalWeeks == null ? "—" : getProgramWeekCount(analyticsRealmId, prog.year)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">Pre-test</span>
-              <span className={`font-bold ${pretestScore != null ? "text-gray-900" : "text-gray-400"}`}>
-                {pretestScore != null ? `${pretestScore}%` : "Not completed"}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500">PIN</span>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-gray-900">{student.pin ?? "—"}</span>
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleResetPin(student); }}
-                  className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-bold hover:bg-amber-200 transition"
-                >
-                  Reset
-                </button>
-              </div>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-500">Brain breaks</span>
-              <select
-                value={isBrainBreakFrequency(student.brain_break_frequency) ? student.brain_break_frequency : ""}
-                onClick={(e) => e.stopPropagation()}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  void setStudentBrainBreak(student, isBrainBreakFrequency(v) ? v : null);
-                }}
-                className="rounded-full border border-gray-200 bg-white px-2 py-1 text-xs font-bold text-gray-900"
-              >
-                <option value="">Class default</option>
-                {BRAIN_BREAK_FREQUENCIES.map((f) => (
-                  <option key={f} value={f}>{BRAIN_BREAK_FREQUENCY_LABEL[f]}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Lesson pills */}
-          <div className="flex gap-2 mt-4">
-            {[
-              { label: "L1", done: l1 },
-              { label: "L2", done: l2 },
-              { label: "L3", done: l3 },
-            ].map(({ label, done }) => (
-              <span
-                key={label}
-                className={[
-                  "px-3 py-1 rounded-full text-xs font-bold",
-                  done ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-400",
-                ].join(" ")}
-              >
-                <span className="inline-flex items-center gap-1">{label} {done ? <Check className="h-3 w-3" /> : <Lock className="h-3 w-3" />}</span>
-              </span>
-            ))}
-            <span
-              className={[
-                "px-3 py-1 rounded-full text-xs font-bold",
-                quizUnlocked ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-400",
-              ].join(" ")}
-            >
-              <span className="inline-flex items-center gap-1">Quiz {quizUnlocked ? <LockOpen className="h-3 w-3" /> : <Lock className="h-3 w-3" />}</span>
-            </span>
-          </div>
-
-        </div>
-
-        {/* Login Details - QR + PIN */}
-        <div>
-          <h4 className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider mb-3"><KeyRound className="h-3.5 w-3.5" /> Login Details</h4>
-          <StudentQRSection student={student} classCode={selectedClass?.class_code ?? ""} className2={selectedClass?.name ?? ""} schoolName={schoolName} schoolLogo={schoolLogo} onRegenerate={(newToken) => {
-            setStudents((prev) => prev.map((s) => s.id === student.id ? { ...s, qr_token: newToken } : s));
-          }} />
-        </div>
-
-        {/* Quiz History */}
-        <div>
-          <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Quiz History</h4>
-          {(() => {
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            const qs: Record<string, any> = (prog?.quiz_scores && typeof prog.quiz_scores === "object") ? prog.quiz_scores as any : {};
-            const weekKeys = Object.keys(qs).map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
-
-            if (weekKeys.length === 0) {
-              return <p className="text-gray-400 text-xs">No quiz attempts yet.</p>;
-            }
-
-            return (
-              <div className="grid gap-1.5 text-sm max-h-48 overflow-y-auto">
-                {(() => {
-                  const allAttempts = weekKeys.flatMap((w) => {
-                    const wd = qs[String(w)];
-                    return wd?.attempts ?? [];
-                  });
-                  if (allAttempts.length === 0) return null;
-                  const passedCount = allAttempts.filter((a: any) => a.passed).length;
-                  const passRate = Math.round((passedCount / allAttempts.length) * 100);
-                  return (
-                    <div className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-900">
-                      Quiz pass rate: {passedCount}/{allAttempts.length} ({passRate}%)
-                    </div>
-                  );
-                })()}
-                {weekKeys.map((w) => {
-                  const wd = qs[String(w)];
-                  const attempts: any[] = wd?.attempts ?? [];
-
-                  return (
-                    <div key={w}>
-                      <div className="text-xs font-bold text-gray-500 mt-1 mb-0.5">Week {w}</div>
-                      {attempts.length > 0 ? (
-                        attempts.map((a: any, i: number) => (
-                          <div key={i} className="py-1.5 px-3 rounded-lg bg-white mb-0.5">
-                            <div className="flex items-center justify-between">
-                              <span className="text-gray-600 text-xs">
-                                Attempt {i + 1} — {a.score}/{a.total} ({formatAccuracy(a.score, a.total, `${a.percent}%`)})
-                              </span>
-                              <span className={["inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-full", a.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
-                                {a.passed ? <><Check className="h-3 w-3" /> Pass</> : <><X className="h-3 w-3" /> Fail</>}
-                              </span>
-                            </div>
-                            <div className="mt-1 text-[11px] text-gray-500">
-                              Pass rate: {a.passRate ?? a.percent ?? 0}%
-                            </div>
-                            {Array.isArray(a.lessonBreakdown) && a.lessonBreakdown.length > 0 ? (
-                              <div className="mt-1 grid gap-1">
-                                {a.lessonBreakdown.map((item: any) => (
-                                  <div key={item.lessonNumber} className="text-[11px] text-gray-500">
-                                    Lesson {item.lessonNumber}: {item.correct}/{item.total} (
-                                    {formatAccuracy(item.correct, item.total, `${item.percent}%`)})
-                                  </div>
-                                ))}
-                              </div>
-                            ) : null}
-                          </div>
-                        ))
-                      ) : (
-                        <div className="flex items-center justify-between py-1.5 px-3 rounded-lg bg-white">
-                          <span className="text-gray-600">
-                            Score: {wd?.score}/{wd?.total} ({formatAccuracy(wd?.score, wd?.total, `${wd?.percent}%`)})
-                          </span>
-                          <span className={["inline-flex items-center gap-1 font-bold text-xs px-2 py-0.5 rounded-full", wd?.passed ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600"].join(" ")}>
-                            {wd?.passed ? <><Check className="h-3 w-3" /> Pass</> : <><X className="h-3 w-3" /> Fail</>}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            );
-            /* eslint-enable @typescript-eslint/no-explicit-any */
-          })()}
-        </div>
-      </div>
-    );
-  }
-
   if (loading) {
     return <TeacherDashboardSkeleton />;
   }
@@ -1279,7 +843,6 @@ export default function TeacherDashboardPage() {
                 progress={progress as any}
                 liveRows={liveRows as any}
                 progressLoading={progressLoading}
-                onRealmChange={setAnalyticsRealmId}
                 onProgressChanged={() => selectedClassId ? loadClassData(selectedClassId, false) : undefined}
                 progressAvailable={!progressLoading && !progressLoadError}
                 report={{ className: selectedClass?.name ?? null, schoolName, schoolLogo }}
