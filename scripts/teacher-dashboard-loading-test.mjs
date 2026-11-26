@@ -95,3 +95,62 @@ const panel = fs.readFileSync('components/teacher/StrandStudentsPanel.tsx', 'utf
 assert(panel.includes('Loading student progress…'));
 assert(panel.indexOf('{progressLoading ? (') < panel.indexOf('studentRows.map('), 'loading must replace false unplaced rows');
 console.log('PASS: independent progress, no event-history read, deduplicated polling, stale-class/edit responses, empty classes, errors and honest loading state.');
+
+// Execute the actual focus/visibility and polling effects with controlled browser
+// events. The loader tests above separately cover shared in-flight work.
+const refreshEffects = [];
+function findRefreshEffects(node) {
+  if (ts.isCallExpression(node) && node.expression.getText(ast) === 'useEffect') {
+    const callback = node.arguments[0];
+    const text = callback?.getText(ast) ?? '';
+    if (text.includes('function handleFocus()') || text.includes('const currentClassId = selectedClassRef.current')) {
+      refreshEffects.push(text);
+    }
+  }
+  ts.forEachChild(node, findRefreshEffects);
+}
+findRefreshEffects(ast);
+assert.equal(refreshEffects.length, 2, 'Both dashboard refresh effects are exercised');
+{
+  const events = new Map(), timers = new Map(), requests = [];
+  let timerId = 0;
+  const selectedClassRef = { current: 'a' };
+  const target = prefix => ({
+    addEventListener(type, handler) { events.set(`${prefix}:${type}`, handler); },
+    removeEventListener(type, handler) {
+      assert.equal(events.get(`${prefix}:${type}`), handler);
+      events.delete(`${prefix}:${type}`);
+    },
+  });
+  const document = { ...target('document'), visibilityState: 'hidden' };
+  const window = { ...target('window'),
+    setInterval(handler, delay) { assert.equal(delay, 30000); timers.set(++timerId, handler); return timerId; },
+    clearInterval(id) { timers.delete(id); },
+  };
+  const env = { document, window, selectedClassRef, loadClassData: (id, background) => requests.push({ id, background }) };
+  const cleanups = refreshEffects.map(effect => {
+    const code = ts.transpileModule(`const effect = ${effect};`, { compilerOptions: { target: ts.ScriptTarget.ES2022 } }).outputText;
+    return new Function(...Object.keys(env), `${code}\nreturn effect();`)(...Object.values(env));
+  });
+  const poll = () => timers.forEach(handler => handler());
+  poll();
+  events.get('window:focus')();
+  events.get('document:visibilitychange')();
+  assert.equal(requests.length, 0, 'Hidden tabs do not poll or refresh on focus');
+  document.visibilityState = 'visible';
+  events.get('document:visibilitychange')();
+  assert.deepEqual(requests, [{ id: 'a', background: true }], 'Visibility alone reconciles current class');
+  poll();
+  assert.equal(requests.length, 2, 'Visible polling remains enabled');
+  selectedClassRef.current = 'b';
+  events.get('window:focus')();
+  assert.deepEqual(requests.at(-1), { id: 'b', background: true }, 'Stable listener reads the newly selected class');
+  selectedClassRef.current = null;
+  poll();
+  events.get('document:visibilitychange')();
+  assert.equal(requests.length, 3, 'No selection produces no reads');
+  cleanups.forEach(cleanup => cleanup());
+  assert.equal(events.size, 0, 'All browser listeners are removed');
+  assert.equal(timers.size, 0, 'Poll timer is removed');
+}
+console.log('PASS dashboard hidden-tab pause, return refresh, current class selection and listener cleanup.');

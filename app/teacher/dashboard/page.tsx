@@ -337,14 +337,19 @@ export default function TeacherDashboardPage() {
     loadClasses(authUser.id, requestedClassId, requestedSchoolId);
   }, [authLoading, authUser]);
 
-  // Re-fetch students when tab gains focus — uses ref to avoid dep on selectedClassId
+  // Reconcile on return; the ref always selects the current class.
   useEffect(() => {
     function handleFocus() {
+      if (document.visibilityState === "hidden") return;
       const cid = selectedClassRef.current;
       if (cid) loadClassData(cid, true);
     }
     window.addEventListener("focus", handleFocus);
-    return () => window.removeEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
   }, []); // stable — no deps needed thanks to ref
 
   // Poll class progress so the student roster stays in sync with live lesson activity.
@@ -353,6 +358,7 @@ export default function TeacherDashboardPage() {
     if (!cid) return;
 
     const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "hidden") return;
       const currentClassId = selectedClassRef.current;
       if (currentClassId) {
         void loadClassData(currentClassId, true);
