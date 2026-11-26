@@ -257,7 +257,7 @@ export default function CurriculumExplorer({
   }
 
   function handleDownloadCsv() {
-    if(yearLabel === "Year 7" && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(genreId))){const a=document.createElement("a");a.href=`/curriculum/${genreId==="algebra"?"pattern":genreId==="probability"?"chance":genreId}-level7-scope-and-sequence.csv`;a.download=`reliq-${genreId}-level-7-scope-and-sequence.csv`;a.click();return;}
+    if((yearLabel === "Year 7" || yearLabel === "Year 8") && (["number","measurement","space","pattern","statistics","chance","algebra","probability"].includes(genreId))){const level=yearLabel === "Year 8" ? 8 : 7,a=document.createElement("a");a.href=`/curriculum/${genreId==="algebra"?"pattern":genreId==="probability"?"chance":genreId}-level${level}-scope-and-sequence.csv`;a.download=`reliq-${genreId}-level-${level}-scope-and-sequence.csv`;a.click();return;}
     const rows: string[] = [
       ["Week", "Topic", "Lesson", "Title", "Focus", "Curriculum Codes", ...(activeFramework === "aus" ? [] : [`${FRAMEWORKS[activeFramework].label} Codes`])].join(","),
     ];

@@ -6,10 +6,12 @@ import { reliqRealmColor } from "@/components/brand/ReliqRealmLogo";
 import ReliqAdultLogo from "@/components/brand/ReliqAdultLogo";
 import { LEVEL_CATALOG as BASE_LEVEL_CATALOG } from "@/lib/level-catalog";
 import { LEVEL7_LIVE } from "@/lib/level7-release";
+import { LEVEL8_LIVE } from "@/lib/level8-release";
 import { cave7Realm } from "@/lib/cave7-config";
 
-// Once Level 7 is live, teachers can also place students at Level 7 in its six realms.
-const LEVEL_CATALOG = LEVEL7_LIVE ? [...BASE_LEVEL_CATALOG, { ...BASE_LEVEL_CATALOG[BASE_LEVEL_CATALOG.length - 1], id: "Year 7", label: "Level 7" }] : BASE_LEVEL_CATALOG;
+// Once Levels 7 and 8 are live, teachers can also place students at those levels in their six realms.
+const UPPER_LEVELS = [...(LEVEL7_LIVE ? [{ id: "Year 7", label: "Level 7" }] : []), ...(LEVEL8_LIVE ? [{ id: "Year 8", label: "Level 8" }] : [])];
+const LEVEL_CATALOG = [...BASE_LEVEL_CATALOG, ...UPPER_LEVELS.map((level) => ({ ...BASE_LEVEL_CATALOG[BASE_LEVEL_CATALOG.length - 1], ...level }))];
 import { getLiveRealmDefinitions, isFirstLevelPretestEnabled, isRealmFirstLevel } from "@/lib/realms/realm-registry";
 import {
   fetchRealmCompatProgressForClass,
@@ -45,7 +47,7 @@ const PLACEMENT_REALMS = getLiveRealmDefinitions()
   .map((realm) => ({
     id: realm.realmId,
     label: `${realm.name} (${realm.strand})`,
-    levelLabels: LEVEL7_LIVE && cave7Realm(realm.realmId) ? [...realm.levelLabels, "Year 7"] : realm.levelLabels,
+    levelLabels: cave7Realm(realm.realmId) ? [...realm.levelLabels, ...UPPER_LEVELS.map((level) => level.id)] : realm.levelLabels,
     active: true,
   }));
 const ACTIVE_REALM_IDS = PLACEMENT_REALMS.filter((r) => r.active).map((r) => r.id);

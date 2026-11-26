@@ -6,6 +6,8 @@ import type { ExpeditionRealm } from './expedition-access';
 // Demo navigation; curriculum lengths come from the shared Year 8 configuration.
 export const NUMBER_STRONGHOLD_DEMO = '/demo-review/volcano/number';
 export const STRONGHOLD_SUMMIT_RETURN = '/demo-review/number-adventure/3d?summit=1';
+/** A real student's way back from a stronghold to the volcano summit. */
+export const STRONGHOLD_LIVE_SUMMIT = '/world/expedition?summit=1';
 /**
  * Per-realm stronghold settings. Guardian names are drafts awaiting story approval; each guardian
  * serves the Fog of Forgetfulness, whose purple seal holds every Core.
@@ -19,8 +21,6 @@ export const STRONGHOLD_REALMS: Record<ExpeditionRealm,{name:string;core:string;
   chance:{name:'Chance Hollow',core:'Chance Core',guardian:'the Chaos Jester',deed:'turns every outcome into a trick',colour:'#ff7d9a',glyphs:['½','1/6','P(A)','0.25','50%','0–1','¼','HT','1/52','3/8','0.7','P']},
 };
 export function strongholdDemoHref(realm:ExpeditionRealm){return `/demo-review/volcano/${realm}`;}
-/** The stronghold after a won battle: it opens at the Core and plays the seal shattering. */
-export function strongholdVictoryHref(realm:ExpeditionRealm){return `${strongholdDemoHref(realm)}?victory=1`;}
 /** Heading for a realm's Level 8 post-test, which is the final battle against its guardian. */
 export function strongholdBattleTitle(realm:ExpeditionRealm){const g=STRONGHOLD_REALMS[realm].guardian;return `Final Battle · Break ${g}’s seal`;}
 export function strongholdStory(realm:ExpeditionRealm){

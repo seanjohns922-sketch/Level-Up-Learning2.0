@@ -163,7 +163,9 @@ export default function StarpathVoyageQuiz({
   const demoMode=useDemoPreviewMode();
   const reviewOnly=useSearchParams().get("review")==="1";
   const cave7=quiz.level==="Year 7";
-  const level8Review=quiz.level==="Year 8";
+  const level8=quiz.level==="Year 8";
+  // Demo review of Levels 7 and 8 never saves to a student's record; live students' quizzes save as in Years 1–6.
+  const expeditionDemo=(cave7||level8)&&demoMode;
   const theme = REALM_QUIZ_THEMES[realm];
   const isStatistica = realm === "statistics";
   const isPattern = realm === "pattern";
@@ -173,7 +175,7 @@ export default function StarpathVoyageQuiz({
   const realmTitle = realm === "number" ? "Number Nexus Quiz" : realm === "measurement" ? "Measurelands Quiz" : isStatistica ? "Statistica Data Quiz" : isPattern ? "Pattern Peaks Quiz" : isChance ? "Chance Hollow Quiz" : "Starpath Voyage Quiz";
   const levelNumber = quiz.level === "Prep" ? 0 : Number(quiz.level.replace(/\D/g, "")) || 0;
   const answersAreEditable = true;
-  const storageKey = `${realm}-weekly-quiz:${level8Review?"level8-v2":cave7?"v6":"v2"}:${level8Review?"demo":getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
+  const storageKey = `${realm}-weekly-quiz:${level8?"level8-v2":cave7?"v6":"v2"}:${level8&&demoMode?"demo":getActiveStudentIdentity().studentId ?? "demo"}:${quiz.level}:${quiz.week}`;
 
   const [phase, setPhase] = useState<QuizPhase>("home");
   const quizXp = useBankedXp("quiz");
@@ -341,7 +343,7 @@ export default function StarpathVoyageQuiz({
     setSaving(true);
     const score = Object.values(answers).filter(Boolean).length;
     const finalPercent = total > 0 ? Math.round((score / total) * 100) : 0;
-    const studentId = level8Review || (cave7 && demoMode) ? null : getActiveStudentIdentity().studentId;
+    const studentId = expeditionDemo ? null : getActiveStudentIdentity().studentId;
     const completedAt = new Date().toISOString();
     const replaySources: ReplayQuestionSource[] = orderedTasks.map((quizTask, questionIndex) => {
       const lessonIndex = Math.min(2, Math.floor(questionIndex / 5));

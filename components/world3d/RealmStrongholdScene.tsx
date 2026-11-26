@@ -113,11 +113,12 @@ function CoreChamber({recovered,strength,shattering,colour,core:coreName,guardia
 /** Each realm's own monuments, standing in the lava opposite the islands. */
 const REALM_SET={number:NumberNexusStrongholdSet,measurement:MeasurelandsStrongholdSet,space:StarpathStrongholdSet,statistics:StatisticaStrongholdSet,pattern:PatternPeaksStrongholdSet,chance:ChanceHollowStrongholdSet} satisfies Record<ExpeditionRealm,React.ComponentType<{colour:string;layout:Layout}>>;
 
-export default function RealmStrongholdScene({realm,unlocked,recovered,shattering,position}:{realm:ExpeditionRealm;unlocked:number;recovered:boolean;shattering:boolean;position:React.RefObject<THREE.Vector3>}){
+/** weekStates: each week's portal (index 0 is Week 1). finished: how many weeks are done, which weakens the seal. */
+export default function RealmStrongholdScene({realm,weekStates,finished,recovered,shattering,position}:{realm:ExpeditionRealm;weekStates:PortalState[];finished:number;recovered:boolean;shattering:boolean;position:React.RefObject<THREE.Vector3>}){
  const r=STRONGHOLD_REALMS[realm],colour=r.colour,done=realm==='measurement'?'#fff1cf':DONE_GOLD;
  const layout=useMemo(()=>strongholdLayout(realm),[realm]),tone=useMemo(()=>toneFor(realm),[realm]),look=STONE_TINT[realm],RealmSet=REALM_SET[realm];
- const state=(week:number):PortalState=>week<unlocked?'completed':week===unlocked?'current':'locked';
- const islands=useMemo(()=>layout.portals.map(p=>{const s=p.week<unlocked?'completed':p.week===unlocked?'current':'locked';return {at:p.position,rim:new THREE.Color(s==='completed'?done:s==='current'?colour:'#8a3a2a').multiplyScalar(s==='locked'?.9:1.6).getStyle()};}),[layout,unlocked,done,colour]);
+ const state=(week:number):PortalState=>weekStates[week-1]??'locked';
+ const islands=useMemo(()=>layout.portals.map(p=>{const s=weekStates[p.week-1]??'locked';return {at:p.position,rim:new THREE.Color(s==='completed'?done:s==='current'?colour:'#8a3a2a').multiplyScalar(s==='locked'?.9:1.6).getStyle()};}),[layout,weekStates,done,colour]);
  const emberSpawn=useMemo(()=>(i:number):SummitPoint=>{const side=i%2?1:-1;return [side*(5+rand(i+300)*28),-1.2,layout.startZ-rand(i+302)*(layout.startZ-layout.backZ)];},[layout]);
  const fogColour=recovered?'#0c1615':'#1a0c0a';
  return <>
@@ -135,7 +136,7 @@ export default function RealmStrongholdScene({realm,unlocked,recovered,shatterin
  <RealmSet colour={colour} layout={layout}/>
  <Embers count={Math.round((layout.startZ-layout.backZ)*2.3)} height={22} colour={recovered?tint(colour,'#ffffff',.5):'#ffa04d'} spawn={emberSpawn}/>
  {layout.portals.map(p=><Portal key={p.week} week={p.week} at={p.position} colour={colour} done={done} final={p.week===layout.weeks} state={state(p.week)}/>)}
- <CoreChamber recovered={recovered} strength={sealStrength(unlocked-1,layout.weeks)} shattering={shattering} colour={colour} core={r.core} guardian={r.guardian} coreZ={layout.coreZ}/>
+ <CoreChamber recovered={recovered} strength={sealStrength(finished,layout.weeks)} shattering={shattering} colour={colour} core={r.core} guardian={r.guardian} coreZ={layout.coreZ}/>
  <VillainRelief realm={realm} recovered={recovered} z={layout.coreZ-10.2}/>
  <EffectComposer multisampling={0}>
   <Bloom intensity={.65} luminanceThreshold={.78} luminanceSmoothing={.2} mipmapBlur radius={.65}/>

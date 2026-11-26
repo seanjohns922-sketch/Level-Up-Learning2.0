@@ -1,6 +1,8 @@
 "use client";
 
 import { getRealmDefinition, type CanonicalRealmId } from "@/lib/realms/realm-registry";
+import { LEVEL8_LIVE, level8StrongholdHref } from "@/lib/level8-release";
+import { isLevel8Realm } from "@/lib/level8-config";
 
 const RETURN_CONTEXT_KEY = "lul:world3d:return-context:v2";
 const RETURN_CONTEXT_MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -91,8 +93,9 @@ function rememberedRealmHome(realmId: CanonicalRealmId, level: string) {
   return home.href;
 }
 
-/** A realm's 3D world for a level. Levels 7 and 8 live in the 3D Expedition. */
+/** A realm's 3D world for a level. Levels 7 and 8 live in the 3D Expedition; a Level 8 student goes to their stronghold. */
 export function realm3DWorldHref(realmId: CanonicalRealmId, level: string | null | undefined, preview = false) {
+  if (level === "Year 8" && !preview && LEVEL8_LIVE && isLevel8Realm(realmId)) return level8StrongholdHref(realmId);
   const params = new URLSearchParams();
   let pathname = `/world/${getRealmDefinition(realmId).slug}`;
   if (level === "Year 7" || level === "Year 8") {

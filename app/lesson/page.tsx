@@ -119,6 +119,7 @@ import { LEVEL8_CONTENT_REVISION } from "@/data/activities/level8/shared";
 import { generateLevel8Question } from "@/data/activities/level8/questions";
 import { isLevel8Realm, type Level8Realm } from "@/lib/level8-config";
 import { level8DemoHref } from "@/lib/level8-routes";
+import { LEVEL8_LIVE, level8LiveHref } from "@/lib/level8-release";
 import Cave7SkillGuide from "@/components/lesson/cave7/Cave7SkillGuide";
 import {generateCave7Question} from "@/data/activities/cave7/questions";
 import Space7SkillGuide from "@/components/lesson/Space7SkillGuide";
@@ -137,7 +138,11 @@ import { LEVEL7_LIVE, level7LiveHref } from "@/lib/level7-release";
 
 function LessonRouteGate() {
  const q=useSearchParams(),pathname=usePathname();
- if(normalizeStudentYearLabel(q.get('year')??'')==='Year 8' && !pathname.startsWith('/demo-review/volcano/')) return <main className="p-20">Level 8 lessons are being reviewed. Return to your stronghold.</main>;
+ if(normalizeStudentYearLabel(q.get('year')??'')==='Year 8') {
+  // Live Level 8: real students use the normal lesson page; it checks their placement and week access.
+  if(LEVEL8_LIVE&&isLevel8Realm(q.get('realm_id')??'number')&&pathname==='/lesson')return <LessonPage/>;
+  if(!pathname.startsWith('/demo-review/volcano/'))return <main className="p-20">Level 8 lessons are available in demo review only.</main>;
+ }
  if(normalizeStudentYearLabel(q.get('year')??'')==='Year 7') {
   const realm=q.get('realm_id')??'number';
   // Live Level 7: real students use the normal lesson page; it checks their placement and week access.
@@ -309,7 +314,7 @@ function LessonPage() {
   const isMeasurement = realmId === "measurement";
   const lessonRealmId = realmId;
   // Level 7 lessons return to the demo week page in review, or the student's week page when live.
-  const level7WeekHome = isLevel8 ? level8DemoHref(realmId as Level8Realm,week,"week") : isCave7 && !previewMode ? level7LiveHref(lessonRealmId as Cave7Realm, week, "week") : cavernWeekHref(lessonRealmId, week);
+  const level7WeekHome = isLevel8 ? (previewMode ? level8DemoHref(realmId as Level8Realm,week,"week") : level8LiveHref(realmId as Level8Realm,week,"week")) : isCave7 && !previewMode ? level7LiveHref(lessonRealmId as Cave7Realm, week, "week") : cavernWeekHref(lessonRealmId, week);
   const lessonStrand = newCaveRealm === "pattern" ? "Algebra" : newCaveRealm === "statistics" ? "Statistics" : newCaveRealm === "chance" ? "Probability" : isSpace7 ? "Space" : isMeasurement ? "Measurement" : "Number";
   const lessonCompletionActivityKey = buildLessonCompletionActivityKey({
     realmId: lessonRealmId,
@@ -535,7 +540,7 @@ function LessonPage() {
       if(params.get("review")!=="1")markLessonComplete(year,week,lessonNumber,lessonRealmId);
       clearLessonResume(effectiveLessonId);
       clearLessonSession(lessonCompletionActivityKey);
-      router.push(cavernWeekHref(lessonRealmId,week));
+      router.push(level7WeekHome);
       return;
     }
     if (lessonFinalizedRef.current) {

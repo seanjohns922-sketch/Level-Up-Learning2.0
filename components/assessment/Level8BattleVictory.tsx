@@ -6,7 +6,8 @@ import ReadAloudBtn from "@/components/ReadAloudBtn";
 import type { AssessmentResultProfile } from "@/data/assessments/analysis";
 import { getRealmTheme } from "@/lib/useRealmTheme";
 import type { ExpeditionRealm } from "@/lib/world3d/expedition-access";
-import { STRONGHOLD_REALMS, strongholdVictoryHref } from "@/lib/world3d/number-stronghold";
+import { STRONGHOLD_REALMS } from "@/lib/world3d/number-stronghold";
+import { level8StrongholdHref } from "@/lib/level8-release";
 
 export default function Level8BattleVictory({ realm, result }: { realm: ExpeditionRealm; result: AssessmentResultProfile }) {
   const theme = getRealmTheme(realm), info = STRONGHOLD_REALMS[realm];
@@ -21,7 +22,7 @@ export default function Level8BattleVictory({ realm, result }: { realm: Expediti
         <p className="mx-auto my-5 max-w-md text-lg" style={{ color: theme.accentTextSoft }}>{detail}</p>
         <div className="flex justify-center"><ReadAloudBtn text={`${title} ${detail} Return to your stronghold to watch the Core break free.`} /></div>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link href={strongholdVictoryHref(realm)} className="rounded-xl px-5 py-3 font-black text-slate-950" style={{ background: theme.ctaGradientCss }}>Watch the Core break free</Link>
+          <Link href={level8StrongholdHref(realm, { victory: true })} className="rounded-xl px-5 py-3 font-black text-slate-950" style={{ background: theme.ctaGradientCss }}>Watch the Core break free</Link>
           <Link href="/world" className="rounded-xl border px-5 py-3 font-bold" style={{ borderColor: theme.borderRing }}>Back to my world</Link>
         </div>
       </div>

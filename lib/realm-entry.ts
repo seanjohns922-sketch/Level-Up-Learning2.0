@@ -1,6 +1,8 @@
 import { isPlacementComplete, type ProgressRealmScope, type StudentProgress } from "@/data/progress";
 import { realmEntryLevel } from "@/lib/realm-unlock";
 import { LEVEL7_LIVE } from "@/lib/level7-release";
+import { LEVEL8_LIVE, level8StrongholdHref } from "@/lib/level8-release";
+import { isLevel8Realm } from "@/lib/level8-config";
 import { getStarpathLevelForYear, type StarpathLevelDefinition } from "@/lib/starpath-levels";
 import { buildStarpathWorldHref, STARPATH_REALM_ID } from "@/lib/starpath-routes";
 import {
@@ -50,10 +52,11 @@ export function resolveRealmEntryRoute(args: {
 
   const year = args.progress?.year?.trim() || args.fallbackYear.trim() || "Year 1";
   if (LEVEL7_LIVE && (year === "Year 7" || year === "Year 8")) {
-    if (year === "Year 8") return "/world/expedition/coming-soon";
+    if (year === "Year 8" && !LEVEL8_LIVE) return "/world/expedition/coming-soon";
     if (!isPlacementComplete(args.progress)) {
       return `/pretest?year=${encodeURIComponent(year)}&realm_id=${args.realmId}`;
     }
+    if (year === "Year 8" && isLevel8Realm(args.realmId)) return level8StrongholdHref(args.realmId);
     return `/world/expedition?realm=${args.realmId}`;
   }
   if (args.realmId === STARPATH_REALM_ID) {

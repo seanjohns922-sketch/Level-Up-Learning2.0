@@ -344,18 +344,19 @@ for (const requiredDatabaseGuard of [
     `Canonical activity sequence migration ${activitySequence.filename} is missing ${requiredDatabaseGuard}.`,
   );
 }
+// A full pre-test pathway assigns every week of the level's own programme length.
 assert(
-  assessmentCompletion.body.includes("when p_realm_id = 'statistics' then '[1,2,3,4,5,6]'::jsonb"),
-  `Statistica full pre-test pathways in ${assessmentCompletion.filename} must contain exactly six weeks.`,
+  assessmentCompletion.body.includes("from generate_series(1, public.realm_program_week_count(p_realm_id, p_working_level)) week"),
+  `Full pre-test pathways in ${assessmentCompletion.filename} must assign every week of the level's programme.`,
 );
-assert(
-  assessmentCompletion.body.includes("when p_realm_id = 'pattern' then '[1,2,3,4,5,6,7,8]'::jsonb"),
-  `Pattern Peaks full pre-test pathways in ${assessmentCompletion.filename} must contain exactly eight weeks.`,
-);
-assert(
-  assessmentCompletion.body.includes("when p_realm_id = 'chance' then '[1,2,3,4,5,6]'::jsonb"),
-  `Chance Hollow full pre-test pathways in ${assessmentCompletion.filename} must contain exactly six weeks.`,
-);
+const weekCounts = latestMigrationContaining("create or replace function public.realm_program_week_count(");
+for (const [lengths, label] of [
+  ["when p_realm_id in ('measurement','space','pattern') then 8", "Measurelands, Starpath and Pattern Peaks: eight weeks at Ground–6"],
+  ["when p_realm_id in ('statistics','chance') then 6", "Statistica and Chance Hollow: six weeks at Ground–6"],
+  ["when p_working_level='Year 8' then", "Level 8 has its own programme lengths"],
+] as const) {
+  assert(weekCounts.body.includes(lengths), `${label} in ${weekCounts.filename}.`);
+}
 assert(
   assessmentCompletion.body.includes("public.realm_program_key(effective_progress->>'next_working_level', p_realm_id)"),
   `Assessment advancement in ${assessmentCompletion.filename} must preserve the realm-specific program key.`,

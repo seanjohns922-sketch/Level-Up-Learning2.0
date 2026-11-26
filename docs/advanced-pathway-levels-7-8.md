@@ -89,14 +89,20 @@ implemented and audited.
 ## Starting-level choices (Sean, 14 October 2026)
 
 When Level 8 is finished and released, **teachers and parents can both choose a
-starting level up to Level 8** in every realm. Until then:
+starting level up to Level 8** in every realm.
 
-- Teachers can choose up to Level 7 (`teacher_change_starting_level`, migration
-  20261007100000).
-- Parents can choose up to Level 7 (`parent_change_home_starting_level`,
-  migration 20261014150000).
+## Level 8 release (Sean, 26 November 2026)
 
-The Level 8 release must therefore include a reviewed migration that adds
-`Year 8` to both functions' allowed levels, and the matching option lists in
-`components/teacher/PlacementManager.tsx` and `components/parent/ParentPortal.tsx`
-(`yearLevels`). Insights already show Level 7 and Level 8 (commit ae06edd5).
+Level 8 is live wherever Level 7 is (`lib/level8-release.ts`: `LEVEL8_LIVE` follows
+`NEXT_PUBLIC_LEVEL7_LIVE`; `NEXT_PUBLIC_LEVEL8_LIVE=false` returns it to demo review).
+Migration `20261128120000_level8_live.sql` gives Year 8 its own server-side programme
+lengths, lets its final week finish on lessons, adds `Year 8` to teacher and parent
+starting levels, lets the Whole-Maths diagnostic place up to Level 8, and makes a
+pre-test under 50% assign every week of the level's own programme.
+
+Students reach their stronghold (`/world/expedition/{realm}/stronghold`) by passing
+that realm's Level 7 post-test at 85% or by a Level 8 placement. Lessons, weekly
+quizzes (`/level8/quiz`), week pages and the pre- and post-tests use the same
+canonical programme as Level 7 (`lib/expedition-assessment-progress.ts`). Passing the
+Level 8 post-test (the final battle) or pre-test at 85% frees the realm's Core.
+`scripts/level8-release-test.mjs` checks the release contract.

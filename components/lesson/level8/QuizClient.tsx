@@ -3,7 +3,10 @@ import { useCallback } from "react";
 import StarpathVoyageQuiz from "@/components/starpath/StarpathVoyageQuiz";
 import { LEVEL8_PROGRAMS } from "@/data/activities/level8/program";
 import { level8Quiz } from "@/data/activities/level8/questions";
+import { usePathname } from "next/navigation";
+import Number7AccessGate from "@/components/lesson/Number7AccessGate";
 import { level8DemoHref } from "@/lib/level8-routes";
+import { level8LiveHref } from "@/lib/level8-release";
 import type { Level8Realm } from "@/lib/level8-config";
 import type { PracticeTask } from "@/data/activities/year1/practice-task";
 export default function QuizClient({
@@ -28,8 +31,12 @@ export default function QuizClient({
     [realm, week],
   );
   const w = LEVEL8_PROGRAMS[realm][week - 1];
-  return (
+  // Live students take the quiz from /level8/quiz and return to their own week page; demo review returns to the demo week page.
+  const live = usePathname().startsWith("/level8/");
+  const weekHome = (target: number) => live ? level8LiveHref(realm, target, "week") : level8DemoHref(realm, target, "week");
+  const quiz = (
     <StarpathVoyageQuiz
+      key={`${realm}-${week}`}
       realm={realm}
       buildTasks={buildTasks}
       quiz={{
@@ -50,9 +57,10 @@ export default function QuizClient({
           string[],
           string[],
         ],
-        weekHref: level8DemoHref(realm, week, "week"),
-        nextWeekHref: level8DemoHref(realm, week + 1, "week"),
+        weekHref: weekHome(week),
+        nextWeekHref: weekHome(week + 1),
       }}
     />
   );
+  return live ? <Number7AccessGate realm={realm} week={week} lesson="quiz" level={8}>{quiz}</Number7AccessGate> : quiz;
 }

@@ -17,9 +17,7 @@ import {isAssessmentAnswerCorrect} from '@/data/assessments/analysis';
 import {buildAssessmentQuestionSnapshots} from '@/lib/assessment-replay';
 import {ACTIVE_STUDENT_KEY} from '@/data/progress';
 import {isDemoPreviewMode} from '@/lib/demo-mode';
-import {loadLevel7Assessment,saveLevel7Assessment} from '@/lib/level7-assessment-progress';
-import {supabase} from '@/lib/supabase';
-import {restoreStudentStateFromServer} from '@/lib/student-progress-sync';
+import {loadExpeditionAssessment,saveExpeditionAssessment} from '@/lib/expedition-assessment-progress';
 
 const draftKey=(id:string,form:string,level:7|8)=>level===7?`statistics-extension-v3:${id}:${form}`:`statistics-extension-v3:${id}:8:${form}`;
 type Draft={answers:Record<string,string>;index:number;completionId:string;startedAt:string};
@@ -33,15 +31,7 @@ export default function StatisticsExtensionAssessment({form,level=7}:{form:'pret
   const id=localStorage.getItem(ACTIVE_STUDENT_KEY);
   if(isDemoPreviewMode()){router.replace(`/demo-review/statistica-level${level}?form=${form}`);return;}
   if(!id){router.replace('/login');return;}
-  if(level===7)await loadLevel7Assessment(id,'statistics',form);
-  else{
-  const restored=await restoreStudentStateFromServer(id,'statistics');
-  if(!['Year 6','Year 7','Year 8'].includes(restored.progress?.year??''))throw new Error('Extension assessments are available from Level 6 Statistics.');
-  if(form==='posttest'){
-   const {data,error}=await supabase.rpc('get_student_realm_assessments_secure',{p_student_id:id,p_realm_id:'statistics',p_working_level:year});
-   if(error)throw error;if(!data?.some((a:{assessment_type:string})=>a.assessment_type==='pretest'))throw new Error('Complete this level’s pre-test before its post-test.');
-  }
-  }
+  await loadExpeditionAssessment(level,id,'statistics',form);
   let saved:Draft|null=null;try{saved=JSON.parse(localStorage.getItem(draftKey(id,form,level))??'null');}catch{/* Start a fresh draft if browser storage is invalid. */}
   const valid=saved&&typeof saved.answers==='object'&&saved.answers!==null&&typeof saved.completionId==='string'&&typeof saved.startedAt==='string'&&Number.isInteger(saved.index)&&saved.index>=0&&saved.index<30;
   if(!cancelled){setStudentId(id);setDraft(valid?saved:{answers:{},index:0,completionId:crypto.randomUUID(),startedAt:new Date().toISOString()});}
@@ -53,10 +43,7 @@ export default function StatisticsExtensionAssessment({form,level=7}:{form:'pret
   const completedAt=new Date().toISOString();
   const snapshots=buildAssessmentQuestionSnapshots(questions,q=>next.answers[q.id],(q,a)=>isAssessmentAnswerCorrect({...q,correctAnswer:String(q.correctAnswer)},String(a)),completedAt);
   try{
-   if(level===7)await saveLevel7Assessment(studentId,'statistics',form,next.completionId,questions,next.answers,snapshots,next.startedAt,completedAt);
-   else{
-   const {error}=await supabase.rpc('complete_statistics_extension_assessment',{p_student_id:studentId,p_assessment_type:form,p_completion_key:next.completionId,p_attempt:{working_level:year,correct_count:snapshots.filter(q=>q.correct).length,total_questions:questions.length,question_results:snapshots,placement_result:{replay_metadata:{started_at:next.startedAt,completed_at:completedAt}}}});
-   if(error)throw error;}
+   await saveExpeditionAssessment(level,studentId,'statistics',form,next.completionId,questions,next.answers,snapshots,next.startedAt,completedAt);
    if(key)localStorage.removeItem(key);setDone(true);
   }catch(e){setError(e instanceof Error?e.message:'Your answers could not be saved. Please retry.');}finally{setSaving(false);}
  }

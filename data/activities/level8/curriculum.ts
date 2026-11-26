@@ -97,7 +97,7 @@ export function level8ScopeCsv(realm?:Level8Realm){
  const rows:(string|number)[][]=[['Realm','Level','Week','Week focus','Lesson','Lesson focus','Curriculum codes','Planned visual or interaction','Week assessment','Status']];
  for(const [id,weeks] of Object.entries(LEVEL8_CURRICULUM)){
   if(realm&&id!==realm)continue;
-  for(const w of weeks)w.lessons.forEach((l,i)=>rows.push([id,8,w.week,w.title,i+1,l.title,l.codes.join('; '),w.visual,w.assessment==='posttest'?'Post-test (85%)':'15-question quiz (80%)','Authoring plan; lessons not released']));
+  for(const w of weeks)w.lessons.forEach((l,i)=>rows.push([id,8,w.week,w.title,i+1,l.title,l.codes.join('; '),w.visual,w.assessment==='posttest'?'Post-test (85%)':'15-question quiz (80%)','Released']));
  }
  return '\uFEFF'+rows.map(row=>row.map(cell).join(',')).join('\r\n');
 }

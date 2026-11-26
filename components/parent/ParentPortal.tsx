@@ -1,5 +1,6 @@
 "use client";
 
+import { LEVEL8_LIVE } from "@/lib/level8-release";
 import { FullscreenToggle } from "@/components/FullscreenToggle";
 import Link from "next/link";
 import { homeAccessCardsHtml } from "@/lib/documents/login-cards";
@@ -752,9 +753,8 @@ function SelectLevel({ label, value, onChange, hideLabel = false, levels = yearL
 // Every live realm a Home learner can be placed in, with the levels that realm
 // actually teaches. Home gets the full service: the three-realm list this form
 // used to carry was simply the set of realms that existed in August 2026.
-// Starting levels above the school years. Level 7 is live; Level 8 is added
-// when it is released (docs/advanced-pathway-levels-7-8.md).
-const HOME_EXTRA_STARTING_LEVELS = ["Year 7"] as const;
+// Starting levels above the school years: Levels 7 and 8 (docs/advanced-pathway-levels-7-8.md).
+const HOME_EXTRA_STARTING_LEVELS = LEVEL8_LIVE ? ["Year 7", "Year 8"] as const : ["Year 7"] as const;
 
 function homeRealmOptions() {
   return getLiveRealmDefinitions().map((realm) => ({

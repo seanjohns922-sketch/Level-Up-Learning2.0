@@ -13,15 +13,15 @@ for (const page of ["app/pretest/page.tsx", "app/posttest/page.tsx"]) {
   check(`${page} saves question results`, /buildAssessmentQuestionSnapshots\(/.test(source) && /question_results:\s*questionResults/.test(source));
 }
 
-check("Level 7 pre- and post-tests save question results", /question_results:\s*snapshots/.test(read("lib/level7-assessment-progress.ts")));
+check("Level 7 and 8 pre- and post-tests save question results", /question_results:\s*snapshots/.test(read("lib/expedition-assessment-progress.ts")));
 
 const realms = ["Number", "Measurement", "Space", "Statistics", "Pattern", "Chance"];
 for (const realm of realms) {
   const source = read(`components/assessment/${realm}ExtensionAssessment.tsx`);
-  check(`${realm} Level 7/8 tests save question results`, /buildAssessmentQuestionSnapshots\(/.test(source) && /question_results:\s*snapshots/.test(source) && /saveLevel7Assessment\(/.test(source));
+  check(`${realm} Level 7/8 tests save question results`, /buildAssessmentQuestionSnapshots\(/.test(source) && /saveExpeditionAssessment\(level,studentId,'[a-z]+',form,next\.completionId,questions,next\.answers,snapshots,/.test(source));
 }
 
-// The Level 8 completion functions must store what they are sent.
+// The older Level 8 evidence functions (still callable) must store what they are sent.
 const migrations = fs.readdirSync("supabase/migrations").filter((file) => file.endsWith(".sql")).sort();
 for (const realm of ["number", "measurement", "space", "statistics", "pattern", "chance"]) {
   const name = `complete_${realm}_extension_assessment`;

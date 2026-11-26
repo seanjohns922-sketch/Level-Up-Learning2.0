@@ -6,12 +6,12 @@ import { analyzeAssessmentResult, type AssessmentResultProfile } from "@/data/as
 import { ASSESSMENT_THRESHOLDS } from "@/lib/assessment-rules";
 import type { Cave7Realm } from "@/lib/cave7-config";
 import { level7LiveHref } from "@/lib/level7-release";
+import { level8LiveHref, level8StrongholdHref } from "@/lib/level8-release";
+import type { Level8Realm } from "@/lib/level8-config";
 import { getRealmDefinition } from "@/lib/realms/realm-registry";
 import type { RealmLessonThemeId } from "@/components/lesson/RealmLessonHome";
 import { PostTestNotYet, postTestNotYetMessage } from "@/components/assessment/PostTestNotYet";
 import type { ExtensionPlanWeek } from "@/lib/extension-plan-weeks";
-import type { ExpeditionRealm } from "@/lib/world3d/expedition-access";
-import { strongholdDemoHref } from "@/lib/world3d/number-stronghold";
 
 /**
  * The result of a Level 7 or 8 post-test, worked out exactly as it is saved
@@ -46,8 +46,10 @@ export function ExtensionPostTestNotYet({
   const year = `Year ${level}`;
   const realmName = getRealmDefinition(realm).name;
   const planWeeks = plan.map((item) => ({ week: item.week, skill: item.topic || undefined }));
-  const weekHref = (week: number) =>
-    level === 7 ? level7LiveHref(realm as Cave7Realm, week, "week") : `/program?year=${encodeURIComponent(year)}&realm_id=${realm}&week=${week}&legacy=1`;
+  // The student's own Level 7 or Level 8 week and lesson pages.
+  const activityHref = (week: number, activity: number | "week") =>
+    level === 7 ? level7LiveHref(realm as Cave7Realm, week, activity) : level8LiveHref(realm as Level8Realm, week, activity);
+  const weekHref = (week: number) => activityHref(week, "week");
   const message = postTestNotYetMessage(result.score, result.total, result.percentage);
   const speech = [
     `${message.title}. ${message.sub}`,
@@ -75,10 +77,10 @@ export function ExtensionPostTestNotYet({
       onPractise={() => {
         const first = plan[0];
         if (!first) return router.push(weekHref(1));
-        router.push(level === 7 ? level7LiveHref(realm as Cave7Realm, first.week, first.lesson) : weekHref(first.week));
+        router.push(activityHref(first.week, first.lesson));
       }}
       onRetry={onRetry}
-      onBack={() => router.push(level === 8 ? strongholdDemoHref(realm as ExpeditionRealm) : "/world")}
+      onBack={() => router.push(level === 8 ? level8StrongholdHref(realm as Level8Realm) : "/world")}
       backLabel={level === 8 ? "Back to the stronghold" : "Back to my world"}
     />
   );

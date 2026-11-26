@@ -1,7 +1,7 @@
 import { getStarpathLevelForYear } from "@/lib/starpath-levels";
 import { buildStarpathLessonHref } from "@/lib/starpath-routes";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
-import { isLiveLevel7, level7LiveHref } from "@/lib/level7-release";
+import { liveExpeditionHref } from "@/lib/expedition-release";
 
 export type StudentRealmId = LiveRealmId;
 
@@ -64,8 +64,8 @@ export function buildLessonRoute(input: {
   realmId?: string;
 }): string {
   const normalizedYear = normalizeStudentYearLabel(input.yearLabel);
-  const level7Realm = input.realmId ?? "number";
-  if (isLiveLevel7(normalizedYear, level7Realm)) return level7LiveHref(level7Realm, input.week, input.lessonNumber);
+  const expeditionRoute = liveExpeditionHref(normalizedYear, input.realmId ?? "number", input.week, input.lessonNumber);
+  if (expeditionRoute) return expeditionRoute;
   if (input.realmId === "space") {
     const level = getStarpathLevelForYear(normalizedYear as Parameters<typeof getStarpathLevelForYear>[0]);
     return buildStarpathLessonHref(

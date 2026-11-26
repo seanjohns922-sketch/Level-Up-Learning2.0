@@ -27,8 +27,13 @@ assert.match(
 );
 assert.match(
   source,
-  /levelLabels: LEVEL7_LIVE && cave7Realm\(realm\.realmId\) \? \[\.\.\.realm\.levelLabels, "Year 7"\] : realm\.levelLabels/,
-  "Placement choices must preserve supported realm levels and add Level 7 only for released cavern realms.",
+  /levelLabels: cave7Realm\(realm\.realmId\) \? \[\.\.\.realm\.levelLabels, \.\.\.UPPER_LEVELS\.map\(\(level\) => level\.id\)\] : realm\.levelLabels/,
+  "Placement choices must preserve supported realm levels and add Levels 7 and 8 only for released expedition realms.",
+);
+assert.match(
+  source,
+  /const UPPER_LEVELS = \[\.\.\.\(LEVEL7_LIVE \? \[\{ id: "Year 7", label: "Level 7" \}\] : \[\]\), \.\.\.\(LEVEL8_LIVE \? \[\{ id: "Year 8", label: "Level 8" \}\] : \[\]\)\]/,
+  "Levels 7 and 8 are offered only while each is released.",
 );
 assert.match(
   source,

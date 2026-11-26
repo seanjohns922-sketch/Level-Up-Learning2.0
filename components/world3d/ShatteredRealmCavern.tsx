@@ -1,5 +1,6 @@
 'use client';
 import {level7LiveHref} from '@/lib/level7-release';
+import {LEVEL8_LIVE,level8StrongholdHref} from '@/lib/level8-release';
 import {getActiveStudentIdentity} from '@/lib/studentIdentity';
 import {restoreStudentStateFromServer} from '@/lib/student-progress-sync';
 import {readProgress} from '@/data/progress';
@@ -33,7 +34,7 @@ export default function ShatteredRealmCavern({realm,week,live=false}:{realm:Expe
  const [ready,setReady]=useState(!live),[finished,setFinished]=useState<number[]>(()=>live?[]:finishedWeeks(readProgramStore(),realm));
  useEffect(()=>{if(!live)return;let active=true;const id=getActiveStudentIdentity().studentId;if(!id)return;
   restoreStudentStateFromServer(id,realm).then(()=>{if(!active)return;const p=readProgress(realm),store=readProgramStore();
-   if(p?.year!=='Year 7'||!p.placementComplete){router.replace(p?.year==='Year 8'?'/world/expedition/coming-soon':`/pretest?year=Year%207&realm_id=${realm}`);return;}
+   if(p?.year!=='Year 7'||!p.placementComplete){router.replace(p?.year==='Year 8'?(LEVEL8_LIVE?level8StrongholdHref(realm):'/world/expedition/coming-soon'):`/pretest?year=Year%207&realm_id=${realm}`);return;}
    setPlayable(getPlayableWeeks(store,'Year 7',p?.requiredWeeks,p?.optionalWeeks,realm,p?.teacherAdvancedWeeks,p?.assignedWeek));
    setLiveCurrent(cavernWeek(getRecommendedAssignedWeek(store,'Year 7',p?.assignedWeek,p?.requiredWeeks,realm,p?.teacherAdvancedWeeks),realm));
    setFinished(finishedWeeks(store,realm));setReady(true);

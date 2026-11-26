@@ -7,7 +7,7 @@ import {
   type ProgramProgressStore,
 } from "@/lib/program-progress";
 import { getLastProgramWeek } from "@/lib/program-weeks";
-import { isLiveLevel7, level7LiveHref } from "@/lib/level7-release";
+import { liveExpeditionHref } from "@/lib/expedition-release";
 import type { LiveRealmId } from "@/lib/realms/realm-registry";
 
 export type CanonicalNextActivity = {
@@ -75,7 +75,7 @@ export function resolveCanonicalNextActivity(input: {
   return {
     type: "quiz",
     label: `Week ${week} Quiz`,
-    route: isLiveLevel7(year, realmId) ? level7LiveHref(realmId, week, "quiz") : `/session?year=${encodeURIComponent(year)}&week=${week}&type=quiz&n=1${realmQuery(realmId)}`,
+    route: liveExpeditionHref(year, realmId, week, "quiz") ?? `/session?year=${encodeURIComponent(year)}&week=${week}&type=quiz&n=1${realmQuery(realmId)}`,
     week,
   };
 }

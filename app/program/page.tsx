@@ -57,6 +57,7 @@ import { number7ActivityHref, number7WeekUnlocked } from "@/lib/number7-demo";
 import { LEVEL8_PROGRAMS } from "@/data/activities/level8/program";
 import { isLevel8Realm, type Level8Realm } from "@/lib/level8-config";
 import { level8DemoHref } from "@/lib/level8-routes";
+import { LEVEL8_LIVE, level8LessonId, level8LiveHref, level8StrongholdHref } from "@/lib/level8-release";
 import { LEVEL7_LIVE, level7LiveHref, level7LessonId } from "@/lib/level7-release";
 import CavernWeekBackground from "@/components/world3d/CavernWeekBackground";
 import ReadAloudBtn from "@/components/ReadAloudBtn";
@@ -165,7 +166,8 @@ function ProgramPage() {
   // Demo Review session may bypass it.
   const previewMode = teacherPreview || demoPreviewMode;
   // A real student on a live Level 7 week page (not demo or teacher review).
-  const liveLevel7 = LEVEL7_LIVE && !previewMode && isNumber7 && pathname === "/program";
+  const liveLevel7 = LEVEL7_LIVE && !previewMode && isNumber7 && !isLevel8 && pathname === "/program";
+  const liveLevel8 = LEVEL8_LIVE && !previewMode && isLevel8 && pathname === "/program";
   const canonicalRealmId = realmId as LiveRealmId;
 
   const [store, setStore] = useState<ProgramProgressStore>(() =>
@@ -344,7 +346,7 @@ function ProgramPage() {
 
   const prevProgress = getWeekProgress(store, year, Math.max(1, weekNum - 1), realmId);
   const weekUnlocked =
-    unrestrictedMode ? true : isLevel8 ? true : isNumber7 && !liveLevel7 ? number7WeekUnlocked(store,weekNum,realmId) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1, year);
+    unrestrictedMode ? true : isLevel8 && !liveLevel8 ? true : isNumber7 && !isLevel8 && !liveLevel7 ? number7WeekUnlocked(store,weekNum,realmId) : hasAssignedWeekAccess ? weekIsPlayable : weekNum === 1 ? true : isWeekCompleteForRealm(prevProgress, realmId, weekNum - 1, year);
 
   const lastAllowedWeek = useMemo(() => {
     if (unrestrictedMode || hasAssignedWeekAccess) return lastWeek;
@@ -442,7 +444,14 @@ function ProgramPage() {
       }
     }
 
-    if(isLevel8){router.push(level8DemoHref(realmId as Level8Realm,weekNum,item.type === "lesson" ? item.n : item.type === "posttest" ? "posttest" : "quiz"));return;}
+    if(isLevel8){
+      const realm=realmId as Level8Realm,activity=item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz';
+      if(liveLevel8){
+        if(typeof activity==='number')preserveWorld3DReturnContextForLesson({realmId,level:year,week:weekNum,lessonNumber:activity,lessonId:level8LessonId(realm,weekNum,activity)});
+        else if(activity==='quiz')preserveWorld3DReturnContextForQuiz({realmId,level:year,week:weekNum});
+      }
+      router.push(liveLevel8?level8LiveHref(realm,weekNum,activity):level8DemoHref(realm,weekNum,activity));return;
+    }
     if(isNumber7){
       const activity=item.type==='lesson'?item.n:item.type==='posttest'?'posttest':'quiz';
       if(liveLevel7){
@@ -537,7 +546,11 @@ function ProgramPage() {
 
   function goToWeek(targetWeek: number) {
     const clamped = Math.max(1, Math.min(lastWeek, targetWeek));
-    if (isLevel8) { router.push(level8DemoHref(realmId as Level8Realm,clamped,"week")); return; }
+    if (isLevel8) {
+      if (liveLevel8 && !playableWeeks.includes(clamped)) return;
+      router.push(liveLevel8 ? level8LiveHref(realmId as Level8Realm, clamped, "week") : level8DemoHref(realmId as Level8Realm, clamped, "week"));
+      return;
+    }
     if (isExpeditionWeek) {
       const realm = cavernRealm(realmId);
       if (!realm) return;
@@ -600,7 +613,7 @@ function ProgramPage() {
       : "/number-nexus";
 
   function goBackToMap() {
-    if(isLevel8){router.push(`/demo-review/volcano/${realmId}?week=${weekNum}`);return;}
+    if(isLevel8){router.push(liveLevel8?level8StrongholdHref(realmId as Level8Realm,{week:weekNum}):`/demo-review/volcano/${realmId}?week=${weekNum}`);return;}
     if(isExpeditionWeek){const realm=cavernRealm(realmId);if(realm)router.push(liveLevel7?studentCavernHref(realm,weekNum):cavernHref(realm,weekNum));return;}
     const world3DReturnPath = getWorld3DReturnPathForWeek({
       realmId,
@@ -610,7 +623,7 @@ function ProgramPage() {
     router.push(world3DReturnPath ?? realmHomeRoute);
   }
 
-  if (isLevel8 && !pathname.startsWith("/demo-review/volcano/")) return <main className="p-20">Level 8 is being reviewed.</main>;
+  if (isLevel8 && !liveLevel8 && !pathname.startsWith("/demo-review/volcano/")) return <main className="p-20">Level 8 is being reviewed.</main>;
   if (!isLevel8 && !liveLevel7 && (isExpeditionWeek || (year === "Year 7" && cave7Realm(realmId))) && (!previewMode || !isExpeditionWeek || !pathname.startsWith("/demo-review/shattered-realms/"))) return <main className="min-h-screen grid place-items-center bg-slate-950 text-white"><a href="/login">Sign in to demo mode to review the Level 7 journey.</a></main>;
 
   if (canonicalStatus !== "ready") {
@@ -686,8 +699,8 @@ function ProgramPage() {
             <span>{isNumber7 ? `Level ${isLevel8?8:7} demo · All ${lastWeek} weeks, lessons and quizzes are unlocked for review. Student progression still requires 80%.` : "Level 7 preview · Lessons are coming soon. Exploring does not change student progress."}</span>
             <ReadAloudBtn text={isNumber7 ? `Level ${isLevel8?8:7} demo. All ${lastWeek} weeks, lessons and quizzes are unlocked for review. Student progression still requires eighty percent.` : "Level 7 preview. Lessons are coming soon. Exploring does not change student progress."}/>
           </>}
-          {isLevel8 && <a href={`/demo-review/level8-curriculum?realm=${realmId}`} className="shrink-0 underline">Scope and sequence · download CSV</a>}
-          {!isLevel8 && isNumber7 && <a href={`/curriculum/${realmId}-level7-scope-and-sequence.csv`} download={`reliq-${realmId}-level-7-scope-and-sequence.csv`} className="shrink-0 underline">Download scope and sequence</a>}
+          {isLevel8 && previewMode && <a href={`/demo-review/level8-curriculum?realm=${realmId}`} className="shrink-0 underline">Scope and sequence · download CSV</a>}
+          {isNumber7 && !(isLevel8 && previewMode) && <a href={`/curriculum/${realmId}-level${isLevel8 ? 8 : 7}-scope-and-sequence.csv`} download={`reliq-${realmId}-level-${isLevel8 ? 8 : 7}-scope-and-sequence.csv`} className="shrink-0 underline">Download scope and sequence</a>}
         </div>
       )}
       {/* Demo Level 7 changes scenery only; all weekly UI below is shared. */}
