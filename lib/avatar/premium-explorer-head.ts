@@ -12,11 +12,12 @@ export function createPremiumExplorerHead(scene: THREE.Object3D, avatar: Require
   root.position.set(0, .8, 0);
   const materials = new Map<THREE.Material, THREE.MeshStandardMaterial>();
   const palette: Record<string, string> = {
-    Skin: avatar.skin, 'Ear blush': avatar.skinShade, Smile: avatar.hairShade,
+    Skin: avatar.skin, 'Ear blush': avatar.skinShade,
     Hair: avatar.hair, 'Hair highlight': avatar.hair,
   };
   root.updateMatrixWorld(true);
   const rootInverse = root.matrixWorld.clone().invert();
+  let smile: THREE.Mesh | undefined;
   root.traverse(node => {
     if (!(node instanceof THREE.Mesh)) return;
     node.castShadow = true;
@@ -35,8 +36,65 @@ export function createPremiumExplorerHead(scene: THREE.Object3D, avatar: Require
     const material = node.material as THREE.MeshStandardMaterial;
     if (material.name === 'Skin') material.roughness = Math.max(material.roughness, .88);
     if (material.name === 'Ear blush') softenBlush(node, material, rootInverse, avatar);
+    if (material.name === 'Smile') smile = node;
   });
-  return { root, dispose: () => materials.forEach(material => material.dispose()) };
+  const mouth = smile ? addOpenSmile(root, smile, rootInverse) : undefined;
+  return { root, dispose: () => { materials.forEach(material => material.dispose()); mouth?.(); } };
+}
+
+/** Swaps the thin smile line for an open smile with a row of top teeth, sized from the sculpted smile
+ * and wrapped onto the face so the corners follow the cheeks instead of floating off them. */
+function addOpenSmile(root: THREE.Object3D, line: THREE.Mesh, rootInverse: THREE.Matrix4) {
+  const bounds = new THREE.Box3().setFromObject(line).applyMatrix4(rootInverse);
+  const size = bounds.getSize(new THREE.Vector3());
+  const centreX = bounds.getCenter(new THREE.Vector3()).x;
+  line.visible = false;
+  const skin: THREE.Object3D[] = [];
+  root.traverse(node => {
+    if (node instanceof THREE.Mesh && (node.material as THREE.Material).name === 'Skin') skin.push(node);
+  });
+  const width = size.x * 1.33, height = size.y * 1.15, dip = height * .55, depth = height * 1.9, band = depth * .42;
+  const edge = width / 2 * .9, top = -band * .15;
+  // Each part is the band between two curves (corner to corner), as a fine grid so it can bend with the face.
+  const curve = (half: number, end: number, middle: number) => (t: number) =>
+    [half * (2 * t - 1), end * ((1 - t) ** 2 + t ** 2) + 2 * t * (1 - t) * middle] as const;
+  const ray = new THREE.Raycaster();
+  const origin = new THREE.Vector3(), back = new THREE.Vector3(0, 0, -1).transformDirection(root.matrixWorld);
+  const surfaceZ = (x: number, y: number) => {
+    ray.set(origin.set(x, y, bounds.max.z + 1).applyMatrix4(root.matrixWorld), back);
+    const hit = ray.intersectObjects(skin, false)[0];
+    return hit ? hit.point.applyMatrix4(rootInverse).z : bounds.max.z;
+  };
+  const baseY = bounds.max.y - height * .2;
+  const parts = [
+    { upper: curve(width / 2, 0, -dip * 2), lower: curve(width / 2, 0, -depth * 2), colour: '#5a1e24', roughness: .6, lift: .003, offset: -2 },
+    { upper: curve(edge, top, -dip * 2), lower: curve(edge, top, -dip * 2 - band * 1.4), colour: '#fbfaf6', roughness: .35, lift: .005, offset: -3 },
+  ].map(({ upper, lower, colour, roughness, lift, offset }) => {
+    const columns = 32, rows = 6, vertices: number[] = [], indices: number[] = [];
+    for (let c = 0; c <= columns; c += 1) {
+      const [ux, uy] = upper(c / columns), [lx, ly] = lower(c / columns);
+      for (let r = 0; r <= rows; r += 1) {
+        const x = centreX + ux + (lx - ux) * r / rows, y = baseY + uy + (ly - uy) * r / rows;
+        vertices.push(x, y, surfaceZ(x, y) + lift);
+        if (c < columns && r < rows) {
+          const i = c * (rows + 1) + r, next = i + rows + 1;
+          indices.push(i, i + 1, next, next, i + 1, next + 1);
+        }
+      }
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
+    geometry.computeVertexNormals();
+    return new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({
+      color: colour, roughness, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: offset,
+    }));
+  });
+  const mouth = new THREE.Group();
+  mouth.name = 'OpenSmile';
+  mouth.add(...parts);
+  root.add(mouth);
+  return () => parts.forEach(part => { part.geometry.dispose(); (part.material as THREE.Material).dispose(); });
 }
 
 /** The blush mesh rings each eye, sits on the cheeks and lines the ears. Eye rings take the skin colour,
