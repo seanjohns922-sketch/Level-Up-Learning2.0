@@ -1,11 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import NarratedLessonGuide from "@/components/lesson/NarratedLessonGuide";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RealmActiveLessonShell } from "@/components/lesson/RealmActiveLessonShell";
 import { RealmLessonHome, LessonConceptIntro } from "@/components/lesson/RealmLessonHome";
-import { Year2LessonEngine } from "@/components/lesson/Year2LessonEngine";
 import { generatePatternPeaksQuestion, isPatternPeaksQuestion } from "@/data/activities/patternPeaks/generator";
 import { getPatternPeaksLessonConceptIntro, type PatternPeaksYearLabel } from "@/data/programs/patternPeaks";
 import { buildRealmProgramHref } from "@/lib/realms/realm-journey";
@@ -15,6 +15,12 @@ import { useDemoPreviewMode } from "@/lib/demo-mode";
 import { getActiveStudentIdentity } from "@/lib/studentIdentity";
 import { restoreStudentStateFromServer, saveRealmLessonAttempt } from "@/lib/student-progress-sync";
 import type { LessonPerformanceSummary } from "@/components/lesson/Year2LessonEngine";
+
+// The intro and guide do not need the timed lesson engine.
+const Year2LessonEngine = dynamic(
+  () => import("@/components/lesson/Year2LessonEngine").then((module) => module.Year2LessonEngine),
+  { loading: () => <div role="status" className="grid min-h-40 place-items-center p-6">Preparing your lesson…</div> },
+);
 
 type Phase = "home" | "concept" | "active";
 

@@ -81,3 +81,29 @@ The private chunk inventory is
    legacy fallback, pagination and concurrent workloads; see
    `TEN_THOUSAND_CONCURRENT.md`. Its earlier SQL speedup remains a prototype,
    not a deployed capacity improvement.
+
+## Pattern Peaks lesson shell — 27 November 2026
+
+Pattern Peaks Levels 3–6 now defer `Year2LessonEngine` with the same module-level
+`next/dynamic` approach used by the shared lesson route. Home and concept phases
+remain unchanged. Starting the challenge displays the existing lesson-loading
+wording until the engine can mount; its timers cannot start before that mount.
+The generator, compatibility check, scoring, completion callbacks and shared
+engine implementation are unchanged. Level 8 Measurement is untouched.
+
+Production client-reference manifests show the shell's referenced JS shrinking
+from 3,674,174 to 1,117,418 bytes (69.6%). Including the deferred engine gives
+3,677,858 bytes, versus 3,674,174 previously: this moves work out of the initial
+shell rather than reducing total challenge code. These are uncompressed build
+metadata sizes, not full-page HTML inventories, HTTP transfers or measured load
+times. A cold-cache challenge start can require an extra network round trip.
+
+Reproduce with `node scripts/pattern-lesson-bundle.mjs` after a successful build.
+Before/after inventories: `pattern-lesson-loading-2026-11-27.json`.
+
+Validation: 23/23 critical checks, TypeScript, QA and targeted ESLint, and the
+complete production build passed. The new React DOM test exercises home → guide
+→ loading → engine, checks that the engine cannot mount while loading, and
+verifies generator, lesson and completion props. It uses a controlled dynamic
+loader, not a browser network simulation. Real-device latency, chunk-failure
+recovery, visual rendering and hosted capacity were not measured in this batch.

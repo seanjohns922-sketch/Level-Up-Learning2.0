@@ -299,6 +299,7 @@
     "qa:g6-reliability": "node scripts/g6-reliability-audit.mjs",
     "typecheck": "next typegen && tsc --noEmit",
     "qa:diagnostic-refresh": "node scripts/diagnostic-refresh-test.mjs",
+    "qa:pattern-lesson-loading": "node scripts/pattern-lesson-loading-test.mjs",
     "qa:teacher-live-drawer": "node scripts/teacher-live-drawer-test.mjs",
     "qa:teacher-live-tab": "node scripts/teacher-live-tab-test.mjs",
     "qa:teacher-student-render": "node scripts/teacher-student-render-test.mjs",
